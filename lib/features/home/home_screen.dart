@@ -111,7 +111,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         if (msg.event == const PhoenixChannelEvent.custom('new_message')) {
           final payload = msg.payload as Map<String, dynamic>?;
           if (payload != null) {
-            if (payload['encrypted'] == true) {
+            if (payload['encrypted'] == true || payload['encrypted'] == 'true') {
               kcpDecrypt(
                 channelId: channelId,
                 payload:    payload['content'] as String? ?? '',
@@ -165,7 +165,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       List<Map<String, dynamic>> msgs) async {
     final result = <Map<String, dynamic>>[];
     for (final m in msgs) {
-      if (m['encrypted'] == true) {
+      if (m['encrypted'] == true || m['encrypted'] == 'true') {
         try {
           final plain = await kcpDecrypt(
             channelId: m['channel_id'] as String? ?? '',
@@ -217,6 +217,102 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ));
     if (mounted) _returnToTextChannel();
+  }
+
+  Future<void> _showAddServerMenu() async {
+    final action = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(72, MediaQuery.of(context).size.height - 120,
+          72, 120),
+      color: KodaColors.card,
+      items: const [
+        PopupMenuItem(value: 'create', child: Text('Create Server')),
+        PopupMenuItem(value: 'join',   child: Text('Join Server')),
+        PopupMenuItem(value: 'redeem', child: Text('Redeem Code')),
+      ],
+    );
+    if (action == 'create') _showCreateServerDialog();
+    if (action == 'join')   _showJoinServerDialog();
+    if (action == 'redeem') _showRedeemCodeDialog();
+  }
+
+  Future<void> _showJoinServerDialog() async {
+    final ctrl = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Text('Join Server', style: TextStyle(color: KodaColors.text1)),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Text('Enter an invite code or URL:',
+              style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+          const SizedBox(height: 10),
+          KodaTextField(controller: ctrl, hintText: 'e.g. XK9MP2'),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () async {
+              final raw = ctrl.text.trim();
+              // Extract code from URL if pasted as full URL
+              final code = raw.contains('/invite/')
+                  ? raw.split('/invite/').last.trim()
+                  : raw.toUpperCase();
+              if (code.isEmpty) return;
+              Navigator.pop(context);
+              final result = await KodaApi.instance.redeemInvite(code);
+              if (!mounted) return;
+              if (result != null && result['ok'] == true) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Joined \!')));
+                _loadServers();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Invalid or expired invite code.')));
+              }
+            },
+            child: const Text('Join'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showRedeemCodeDialog() async {
+    final ctrl = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Text('Redeem Code', style: TextStyle(color: KodaColors.text1)),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Text('Enter your backer or reward code:',
+              style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+          const SizedBox(height: 10),
+          KodaTextField(controller: ctrl, hintText: 'Reward code'),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () async {
+              final code = ctrl.text.trim().toUpperCase();
+              if (code.isEmpty) return;
+              Navigator.pop(context);
+              final result = await KodaApi.instance.redeemBackerCode(code);
+              if (!mounted) return;
+              if (result != null && result['ok'] == true) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Code redeemed! Your rewards have been applied.')));
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Invalid, expired, or already redeemed code.')));
+              }
+            },
+            child: const Text('Redeem'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _showCreateServerDialog() async {
@@ -558,8 +654,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             IconButton(
               icon: const Icon(Icons.add, color: KodaColors.text2),
-              tooltip: 'Create Server',
-              onPressed: _showCreateServerDialog,
+              tooltip: 'Create or Join',
+              onPressed: () => _showAddServerMenu(),
             ),
             const SizedBox(height: 10),
           ]),
@@ -671,6 +767,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 }
+
 
 
 

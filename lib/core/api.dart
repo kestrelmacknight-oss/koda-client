@@ -272,6 +272,47 @@ class KodaApi {
     } catch (e) { _log('uploadFile', e); return null; }
   }
 
+  // ── Invites ───────────────────────────────────────────────────────────────
+
+  Future<Map<String, dynamic>?> createInvite(String serverId,
+      {int? maxUses, String? expiresAt}) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/invites', data: {
+        if (maxUses != null) 'max_uses': maxUses,
+        if (expiresAt != null) 'expires_at': expiresAt,
+      });
+      return res.data['invite'] as Map<String, dynamic>;
+    } catch (e) { _log('createInvite', e); return null; }
+  }
+
+  Future<List<Map<String, dynamic>>> listInvites(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/invites');
+      return List<Map<String, dynamic>>.from(res.data['invites'] ?? []);
+    } catch (e) { _log('listInvites', e); return []; }
+  }
+
+  Future<bool> deleteInvite(String serverId, String code) async {
+    try {
+      await _dio.delete('/servers/$serverId/invites/$code');
+      return true;
+    } catch (e) { _log('deleteInvite', e); return false; }
+  }
+
+  Future<Map<String, dynamic>?> redeemInvite(String code) async {
+    try {
+      final res = await _dio.post('/invites/$code/redeem');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('redeemInvite', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> redeemBackerCode(String code) async {
+    try {
+      final res = await _dio.post('/backer_codes/$code/redeem');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('redeemBackerCode', e); return null; }
+  }
+
   // ── Moderation ────────────────────────────────────────────────────────────
 
   Future<bool> deleteMessage(String channelId, String messageId,
@@ -482,12 +523,6 @@ class KodaApi {
     } catch (e) { _log('joinByInvite', e); return false; }
   }
 
-  Future<Map<String, dynamic>?> createInvite(String serverId) async {
-    try {
-      final res = await _dio.post('/servers/$serverId/invites');
-      return res.data['invite'] as Map<String, dynamic>;
-    } catch (_) { return null; }
-  }
 
   // ── Discovery ────────────────────────────────────────────────────────
 

@@ -54,7 +54,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _loadAll();
   }
 
@@ -387,6 +387,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             Tab(text: 'Channels'),
             Tab(text: 'Roles'),
             Tab(text: 'Members'),
+            Tab(text: 'Invites'),
           ],
         ),
       ),
@@ -394,7 +395,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
           : TabBarView(
               controller: _tabController,
-              children: [_buildChannelsTab(), _buildRolesTab(), _buildMembersTab()],
+              children: [_buildChannelsTab(), _buildRolesTab(), _buildMembersTab(), _buildInvitesTab()],
             ),
     );
   }
@@ -571,5 +572,93 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       }).toList(),
     );
   }
+Widget _buildInvitesTab() {
+    final server = ref.read(selectedServerProvider);
+    if (server == null) return const SizedBox();
+    final serverId = server['id'] as String;
+
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: KodaApi.instance.listInvites(serverId),
+      builder: (context, snapshot) {
+        final invites = snapshot.data ?? [];
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(backgroundColor: KodaColors.koda),
+                icon: const Icon(Icons.add_link, size: 16, color: Colors.white),
+                label: const Text('Create Invite', style: TextStyle(color: Colors.white)),
+                onPressed: () async {
+                  final invite = await KodaApi.instance.createInvite(serverId);
+                  if (invite != null && context.mounted) {
+                    setState(() {});
+                    final url = invite['url'] as String? ?? '';
+                    showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        backgroundColor: KodaColors.card,
+                        title: const Text('Invite Created',
+                            style: TextStyle(color: KodaColors.text1)),
+                        content: SelectableText(url,
+                            style: const TextStyle(color: KodaColors.koda)),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Done')),
+                        ],
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (invites.isEmpty)
+              const Center(child: Text('No active invites',
+                  style: TextStyle(color: KodaColors.text3)))
+            else
+              ...invites.map((inv) {
+                final uses    = inv['uses'] as int? ?? 0;
+                final maxUses = inv['max_uses'] as int?;
+                final usesStr = maxUses != null ? '$uses / $maxUses' : '$uses';
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: KodaColors.elevated,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: KodaColors.border),
+                  ),
+                  child: Row(children: [
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        SelectableText(
+                          inv['url'] as String? ?? '',
+                          style: const TextStyle(color: KodaColors.koda, fontSize: 13),
+                        ),
+                        Text('Uses: $usesStr',
+                          style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+                      ]),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, size: 16, color: KodaColors.accent),
+                      onPressed: () async {
+                        await KodaApi.instance.deleteInvite(
+                            serverId, inv['code'] as String);
+                        if (context.mounted) setState(() {});
+                      },
+                    ),
+                  ]),
+                );
+              }).toList(),
+          ],
+        );
+      },
+    );
+  }
 }
+
+
 
