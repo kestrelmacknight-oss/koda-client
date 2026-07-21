@@ -16,6 +16,7 @@ import '../../core/kcp_bridge.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 import '../gallery/gallery_screen.dart';
 import '../stage/stage_screen.dart';
+import '../admin/admin_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -657,6 +658,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               tooltip: 'Create or Join',
               onPressed: () => _showAddServerMenu(),
             ),
+            if (ref.watch(authProvider).user?.isAdmin == true)
+              IconButton(
+                icon: const Icon(Icons.admin_panel_settings_outlined,
+                    color: KodaColors.koda),
+                tooltip: 'Admin Panel',
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => AdminScreen())),
+              ),
             const SizedBox(height: 10),
           ]),
         ),
@@ -767,6 +776,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 }
+
 
 
 

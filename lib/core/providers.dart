@@ -72,11 +72,18 @@ class VoiceSettings {
   final bool echoCancellation;
   final bool autoGainControl;
   final bool vadEnabled;
-  final double vadThreshold; // 0.0 - 1.0
-  final String? pushToTalkKey; // null = push-to-talk off, mic always live
-  final String? audioInputId;  // null = system default
-  final String? audioOutputId; // null = system default
-  final String? videoInputId;  // null = system default
+  final double vadThreshold;
+  final String? pushToTalkKey;
+  final String? audioInputId;
+  final String? audioOutputId;
+  final String? videoInputId;
+
+  // VARM -- Virtual Avatar Reactive Model
+  // Two images that swap based on audio level (talking vs silent).
+  // Null = VARM disabled, use camera or nothing.
+  final String? varmSilentUrl;   // image shown when not speaking
+  final String? varmTalkingUrl;  // image shown when speaking
+  final double varmThreshold;    // 0.0-1.0, audio level to trigger talking image
 
   const VoiceSettings({
     this.noiseSuppression = true,
@@ -88,7 +95,12 @@ class VoiceSettings {
     this.audioInputId,
     this.audioOutputId,
     this.videoInputId,
+    this.varmSilentUrl,
+    this.varmTalkingUrl,
+    this.varmThreshold = 0.1,
   });
+
+  bool get varmEnabled => varmSilentUrl != null && varmTalkingUrl != null;
 
   factory VoiceSettings.fromJson(Map<String, dynamic> j) => VoiceSettings(
         noiseSuppression: j['noise_suppression'] as bool? ?? true,
@@ -100,6 +112,9 @@ class VoiceSettings {
         audioInputId:     j['audio_input_id'] as String?,
         audioOutputId:    j['audio_output_id'] as String?,
         videoInputId:     j['video_input_id'] as String?,
+        varmSilentUrl:    j['varm_silent_url'] as String?,
+        varmTalkingUrl:   j['varm_talking_url'] as String?,
+        varmThreshold:    (j['varm_threshold'] as num?)?.toDouble() ?? 0.1,
       );
 
   Map<String, dynamic> toJson() => {
@@ -112,6 +127,9 @@ class VoiceSettings {
         'audio_input_id':    audioInputId,
         'audio_output_id':   audioOutputId,
         'video_input_id':    videoInputId,
+        'varm_silent_url':   varmSilentUrl,
+        'varm_talking_url':  varmTalkingUrl,
+        'varm_threshold':    varmThreshold,
       };
 
   VoiceSettings copyWith({
@@ -125,6 +143,10 @@ class VoiceSettings {
     String? audioInputId,
     String? audioOutputId,
     String? videoInputId,
+    String? varmSilentUrl,
+    String? varmTalkingUrl,
+    double? varmThreshold,
+    bool clearVarm = false,
   }) => VoiceSettings(
         noiseSuppression: noiseSuppression ?? this.noiseSuppression,
         echoCancellation: echoCancellation ?? this.echoCancellation,
@@ -135,6 +157,9 @@ class VoiceSettings {
         audioInputId:  audioInputId ?? this.audioInputId,
         audioOutputId: audioOutputId ?? this.audioOutputId,
         videoInputId:  videoInputId ?? this.videoInputId,
+        varmSilentUrl:  clearVarm ? null : (varmSilentUrl ?? this.varmSilentUrl),
+        varmTalkingUrl: clearVarm ? null : (varmTalkingUrl ?? this.varmTalkingUrl),
+        varmThreshold:  varmThreshold ?? this.varmThreshold,
       );
 }
 

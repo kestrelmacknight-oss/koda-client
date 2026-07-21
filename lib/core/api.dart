@@ -507,20 +507,35 @@ class KodaApi {
     } catch (e) { _log('sendDmMessage', e); return null; }
   }
 
-  // ── Invites ──────────────────────────────────────────────────────────
+  // -- Admin -----------------------------------------------------------------
 
-  Future<Map<String, dynamic>?> resolveInvite(String code) async {
+  Future<List<Map<String, dynamic>>> listBackerCodes() async {
     try {
-      final res = await _dio.get('/invite/$code');
-      return res.data as Map<String, dynamic>;
-    } catch (_) { return {'valid': false}; }
+      final res = await _dio.get('/backer_codes');
+      return List<Map<String, dynamic>>.from(res.data['backer_codes'] ?? []);
+    } catch (e) { _log('listBackerCodes', e); return []; }
   }
 
-  Future<bool> joinByInvite(String code) async {
+  Future<Map<String, dynamic>?> createBackerCode({
+    String? code, Map<String, dynamic>? flags,
+    String? note, int? maxUses}) async {
     try {
-      await _dio.post('/invite/$code/join');
-      return true;
-    } catch (e) { _log('joinByInvite', e); return false; }
+      final res = await _dio.post('/backer_codes', data: {
+        if (code != null)    'code':     code,
+        if (flags != null)   'flags':    flags,
+        if (note != null)    'note':     note,
+        if (maxUses != null) 'max_uses': maxUses,
+      });
+      return res.data['backer_code'] as Map<String, dynamic>;
+    } catch (e) { _log('createBackerCode', e); return null; }
+  }
+
+  Future<List<Map<String, dynamic>>> searchUsers(String query) async {
+    try {
+      final res = await _dio.get('/admin/users/search',
+          queryParameters: {'q': query});
+      return List<Map<String, dynamic>>.from(res.data['users'] ?? []);
+    } catch (e) { _log('searchUsers', e); return []; }
   }
 
 
