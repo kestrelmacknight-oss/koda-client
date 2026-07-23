@@ -1,12 +1,4 @@
 // lib/features/voice/voice_screen.dart
-//
-// Real LiveKit voice connection for a voice channel. Connects using the
-// token/url returned by KodaApi.getVoiceToken, publishes the local
-// microphone, and shows connected participants with a speaking indicator.
-//
-// Also supports:
-//   - Webcam toggle (publishes local camera track)
-//   - VARM overlay (local-only reactive avatar when VARM is configured)
 
 import 'dart:async';
 import 'dart:convert';
@@ -43,8 +35,8 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
   bool _cameraOn   = false;
   bool _showVarm   = false;
   String? _error;
+  lk.LocalVideoTrack? _localVideoTrack;
 
-  // Polling timer for audio level updates (participant grid speaking indicator)
   Timer? _levelTimer;
 
   @override
@@ -74,7 +66,6 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
         })
         ..on<lk.ParticipantPermissionsUpdatedEvent>((_) {
           if (mounted) setState(() {});
-          if (mounted) setState(() {});
         })
         ..on<lk.LocalTrackPublishedEvent>((_) {
           if (mounted) setState(() {});
@@ -88,12 +79,10 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
 
       _room.addListener(_onRoomChange);
 
-      // Poll audio levels for speaking indicator
       _levelTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
         if (mounted) setState(() {});
       });
 
-      // Auto-enable VARM if configured
       final settings = ref.read(voiceSettingsProvider);
       if (settings.varmEnabled) {
         setState(() => _showVarm = true);
@@ -116,32 +105,39 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
   }
 
   Future<void> _toggleCamera() async {
-    final newOn = !_cameraOn;
-    await _room.localParticipant?.setCameraEnabled(newOn);
-    if (mounted) setState(() => _cameraOn = newOn);
-    if (newOn) {
-      await Future.delayed(const Duration(milliseconds: 500));
-      if (mounted) setState(() {});
+    if (_cameraOn) {
+      await _localVideoTrack?.stop();
+      await _room.localParticipant?.setCameraEnabled(false);
+      if (mounted) setState(() { _cameraOn = false; _localVideoTrack = null; });
+    } else {
+      try {
+        final track = await lk.LocalVideoTrack.createCameraTrack();
+        await track.start();
+        await _room.localParticipant?.publishVideoTrack(track);
+        if (mounted) {
+          setState(() { _cameraOn = true; _localVideoTrack = track; });
+          // Give the track time to start producing frames
+          await Future.delayed(const Duration(milliseconds: 300));
+          if (mounted) setState(() {});
+        }
+      } catch (e) {
+        debugPrint('[VoiceScreen] Camera error: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Camera error: $e')));
+        }
+      }
     }
   }
-
-
 
   Future<void> _leave() async {
     _leaving = true;
     _levelTimer?.cancel();
+    if (_localVideoTrack != null) {
+      await _localVideoTrack?.stop();
+    }
     try { await _room.disconnect(); } catch (_) {}
     if (mounted) Navigator.of(context).pop();
-  }
-
-  @override
-  void dispose() {
-    _levelTimer?.cancel();
-    _room.removeListener(_onRoomChange);
-    _listener.dispose();
-    try { _room.disconnect(); } catch (_) {}
-    _room.dispose();
-    super.dispose();
   }
 
   String _displayName(lk.Participant p) {
@@ -154,6 +150,28 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
       }
     } catch (_) {}
     return p.identity;
+  }
+
+  lk.VideoTrack? _getVideoTrack(lk.Participant p) {
+    // For local participant, use our stored reference
+    if (p == _room.localParticipant) return _localVideoTrack;
+    // For remote participants, find the camera track publication
+    final pubs = p.videoTrackPublications
+        .where((t) => !t.isScreenShare && t.track != null)
+        .toList();
+    if (pubs.isEmpty) return null;
+    return pubs.first.track as lk.VideoTrack?;
+  }
+
+  @override
+  void dispose() {
+    _levelTimer?.cancel();
+    _room.removeListener(_onRoomChange);
+    _listener.dispose();
+    _localVideoTrack?.stop();
+    try { _room.disconnect(); } catch (_) {}
+    _room.dispose();
+    super.dispose();
   }
 
   @override
@@ -188,61 +206,74 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                           ? const Center(child: Text('Connecting...',
                               style: TextStyle(color: KodaColors.text3)))
                           : GridView.builder(
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(16),
                               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                                maxCrossAxisExtent: 140,
-                                mainAxisSpacing: 16,
-                                crossAxisSpacing: 16,
+                                maxCrossAxisExtent: 160,
+                                mainAxisSpacing: 12,
+                                crossAxisSpacing: 12,
+                                childAspectRatio: 0.85,
                               ),
                               itemCount: participants.length,
                               itemBuilder: (_, i) {
                                 final p = participants[i];
                                 final speaking = speakingSids.contains(p.sid);
                                 final name = _displayName(p);
-                                final isLocal = p.identity ==
-                                    _room.localParticipant?.identity;
+                                final isLocal = p == _room.localParticipant;
+                                final videoTrack = _getVideoTrack(p);
 
-                                // Show camera video if published
-                                // Show camera video if published
-                                final videoTrack = (() {
-                                  if (p is lk.LocalParticipant) {
-                                    return p.videoTrackPublications
-                                        .where((t) => !t.isScreenShare && t.track != null)
-                                        .firstOrNull?.track as lk.VideoTrack?;
-                                  }
-                                  if (p is lk.RemoteParticipant) {
-                                    return p.videoTrackPublications
-                                        .where((t) => !t.isScreenShare && t.subscribed && t.track != null)
-                                        .firstOrNull?.track as lk.VideoTrack?;
-                                  }
-                                  return null;
-                                })();
-
-                                return Column(children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(3),
-                                    decoration: speaking ? BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(color: KodaColors.mint, width: 3))
-                                        : null,
-                                    child: videoTrack != null
-                                        ? SizedBox(width: 64, height: 64,
-                                            child: ClipOval(child: lk.VideoTrackRenderer(videoTrack)))
-                                        : Container(width: 64, height: 64,
-                                            color: _cameraOn && isLocal ? Colors.red.withOpacity(0.5) : null,
-                                            child: KodaAvatar(username: name, size: 64)),
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: KodaColors.card,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: speaking
+                                          ? KodaColors.mint
+                                          : KodaColors.border,
+                                      width: speaking ? 2 : 1,
+                                    ),
                                   ),
-                                  Text(
-                                    isLocal ? '$name (you)' : name,
-                                    style: const TextStyle(
-                                        color: KodaColors.text1, fontSize: 12),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ]);
+                                  child: Column(children: [
+                                    Expanded(
+                                      child: Stack(children: [
+                                        // Video or avatar
+                                        if (videoTrack != null)
+                                          ClipRRect(
+                                            borderRadius: const BorderRadius.vertical(
+                                                top: Radius.circular(9)),
+                                            child: ColoredBox(
+                                              color: Colors.black,
+                                              child: lk.VideoTrackRenderer(videoTrack),
+                                            ),
+                                          )
+                                        else
+                                          Center(child: KodaAvatar(
+                                              username: name, size: 48)),
+                                        // Camera indicator
+                                        if (isLocal && _cameraOn)
+                                          const Positioned(
+                                            bottom: 4, right: 4,
+                                            child: Icon(Icons.videocam,
+                                                color: Colors.green, size: 14),
+                                          ),
+                                      ]),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 6, vertical: 4),
+                                      child: Text(
+                                        isLocal ? '$name (you)' : name,
+                                        style: const TextStyle(
+                                            color: KodaColors.text1,
+                                            fontSize: 11),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ]),
+                                );
                               },
                             ),
 
-                      // VARM overlay -- local only, bottom-left corner
+                      // VARM overlay
                       if (_showVarm && settings.varmEnabled)
                         Positioned(
                           bottom: 12,
@@ -259,38 +290,38 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                   ),
 
                   // Controls
-                  Padding(
+                  Container(
                     padding: const EdgeInsets.all(20),
+                    decoration: const BoxDecoration(
+                        border: Border(top: BorderSide(color: KodaColors.border))),
                     child: Row(mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                       // Mute
                       IconButton(
                         iconSize: 28,
                         icon: Icon(_muted ? Icons.mic_off : Icons.mic,
-                            color: _muted
-                                ? KodaColors.accent
-                                : KodaColors.text1),
+                            color: _muted ? KodaColors.accent : KodaColors.text1),
                         onPressed: _toggleMute,
                         tooltip: _muted ? 'Unmute' : 'Mute',
                       ),
                       const SizedBox(width: 16),
 
-                      // Camera / VARM controls
+                      // VARM toggle (only if configured)
                       if (settings.varmEnabled) ...[
-                        Tooltip(
-                          message: _showVarm ? 'Hide VARM' : 'Show VARM',
-                          child: IconButton(
-                            iconSize: 28,
-                            icon: Icon(Icons.face_retouching_natural,
-                                color: _showVarm ? KodaColors.koda : KodaColors.text2),
-                            onPressed: () async {
-                              if (!_showVarm && _cameraOn) await _toggleCamera();
-                              setState(() => _showVarm = !_showVarm);
-                            },
-                          ),
+                        IconButton(
+                          iconSize: 28,
+                          icon: Icon(Icons.face_retouching_natural,
+                              color: _showVarm ? KodaColors.koda : KodaColors.text2),
+                          tooltip: _showVarm ? 'Hide VARM' : 'Show VARM',
+                          onPressed: () async {
+                            if (!_showVarm && _cameraOn) await _toggleCamera();
+                            setState(() => _showVarm = !_showVarm);
+                          },
                         ),
                         const SizedBox(width: 8),
                       ],
+
+                      // Camera
                       IconButton(
                         iconSize: 28,
                         icon: Icon(
@@ -298,17 +329,19 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                           color: _cameraOn ? KodaColors.mint : KodaColors.text2,
                         ),
                         onPressed: () async {
-                          if (!_cameraOn && _showVarm) setState(() => _showVarm = false);
+                          if (!_cameraOn && _showVarm) {
+                            setState(() => _showVarm = false);
+                          }
                           await _toggleCamera();
                         },
                         tooltip: _cameraOn ? 'Stop camera' : 'Start camera',
                       ),
+                      const SizedBox(width: 16),
 
                       // Leave
                       IconButton(
                         iconSize: 28,
-                        icon: const Icon(Icons.call_end,
-                            color: KodaColors.accent),
+                        icon: const Icon(Icons.call_end, color: KodaColors.accent),
                         onPressed: _leave,
                         tooltip: 'Leave Voice',
                       ),
@@ -318,8 +351,3 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
     );
   }
 }
-
-
-
-
-
