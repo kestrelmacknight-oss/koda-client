@@ -9,6 +9,7 @@ import '../../core/theme.dart';
 import '../../core/providers.dart';
 import '../../shared/widgets.dart';
 import 'varm_widget.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' show DesktopCapturerSource;
 
 class VoiceScreen extends ConsumerStatefulWidget {
   final String channelName;
@@ -36,6 +37,8 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
   bool _showVarm   = false;
   String? _error;
   lk.LocalVideoTrack? _localVideoTrack;
+  bool _screenShareOn = false;
+  lk.LocalVideoTrack? _screenShareTrack;
   Timer? _levelTimer;
 
   @override
@@ -127,10 +130,39 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
     }
   }
 
+  Future<void> _toggleScreenShare() async {
+    if (_screenShareOn) {
+      await _screenShareTrack?.stop();
+      if (mounted) setState(() { _screenShareOn = false; _screenShareTrack = null; });
+    } else {
+      try {
+        final source = await showDialog<DesktopCapturerSource>(
+          context: context,
+          builder: (_) => lk.ScreenSelectDialog(),
+        );
+        if (source == null) return;
+        final track = await lk.LocalVideoTrack.createScreenShareTrack(
+          lk.ScreenShareCaptureOptions(
+            sourceId: source.id,
+            maxFrameRate: 15.0,
+          ),
+        );
+        await _room.localParticipant?.publishVideoTrack(track);
+        if (mounted) setState(() { _screenShareOn = true; _screenShareTrack = track; });
+      } catch (e, stack) {
+        debugPrint('[VoiceScreen] Screen share error: ' + e.toString());
+        debugPrint(stack.toString());
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Screen share failed: ' + e.toString())));
+      }
+    }
+  }
+
   Future<void> _leave() async {
     _leaving = true;
     _levelTimer?.cancel();
     if (_localVideoTrack != null) await _localVideoTrack?.stop();
+    if (_screenShareTrack != null) await _screenShareTrack?.stop();
     try { await _room.disconnect(); } catch (_) {}
     if (mounted) Navigator.of(context).pop();
   }
@@ -205,24 +237,85 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                 crossAxisSpacing: 12,
                                 childAspectRatio: 0.85,
                               ),
-                              itemCount: participants.length,
+                              itemCount: participants.length + (_screenShareOn ? 1 : 0),
                               itemBuilder: (_, i) {
+                                // Last tile is the local screen share
+                                if (_screenShareOn && i == participants.length) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: KodaColors.card,
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(color: KodaColors.koda, width: 2),
+                                    ),
+                                    child: Column(children: [
+                                      Expanded(
+                                        child: ClipRRect(
+                                          borderRadius: const BorderRadius.vertical(top: Radius.circular(9)),
+                                          child: ColoredBox(
+                                            color: Colors.black,
+                                            child: lk.VideoTrackRenderer(_screenShareTrack!),
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                                        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                          const Icon(Icons.screen_share, color: KodaColors.koda, size: 12),
+                                          const SizedBox(width: 4),
+                                          Text('Your screen',
+                                              style: const TextStyle(color: KodaColors.text1, fontSize: 11)),
+                                        ]),
+                                      ),
+                                    ]),
+                                  );
+                                }
+                                // Normal participant tiles below
                                 final p = participants[i];
                                 final speaking = speakingSids.contains(p.sid);
                                 final name = _displayName(p);
                                 final isLocal = p == _room.localParticipant;
                                 final videoTrack = _getVideoTrack(p);
 
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    color: KodaColors.card,
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: speaking ? KodaColors.mint : KodaColors.border,
-                                      width: speaking ? 2 : 1,
+                                return GestureDetector(
+                                  onTap: () {
+                                    // Show expanded view on tap
+                                    showDialog(
+                                      context: context,
+                                      barrierColor: Colors.black87,
+                                      builder: (_) => GestureDetector(
+                                        onTap: () => Navigator.pop(context),
+                                        child: Scaffold(
+                                          backgroundColor: Colors.transparent,
+                                          body: Center(child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Expanded(child: Padding(
+                                                padding: const EdgeInsets.all(16),
+                                                child: ColoredBox(color: Colors.black,
+                                                 child: videoTrack != null 
+                                                  ? lk.VideoTrackRenderer(videoTrack!)
+                                                  : Center(child: KodaAvatar(username: name, size: 96))),
+                                              )),
+                                              Padding(padding: const EdgeInsets.all(12),
+                                                child: Text(name, style: const TextStyle(color: Colors.white, fontSize: 14))),
+                                              const Text('Tap to close', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                                              const SizedBox(height: 16),
+                                            ],
+                                          )),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: KodaColors.card,
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                        color: speaking ? KodaColors.mint : KodaColors.border,
+                                        width: speaking ? 2 : 1,
+                                      ),
                                     ),
-                                  ),
-                                  child: Column(children: [
+                                    child: Column(children: [
                                     Expanded(
                                       child: Stack(children: [
                                         if (videoTrack != null)
@@ -254,8 +347,10 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                  ]),
-                                );
+                                    ]),  // Column children
+                                  ),    // Container
+                                );      // GestureDetector
+
                               },
                             ),
 
@@ -317,6 +412,16 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                       ),
                       const SizedBox(width: 16),
 
+                      IconButton(
+                        iconSize: 28,
+                        icon: Icon(
+                          _screenShareOn ? Icons.stop_screen_share : Icons.screen_share,
+                          color: _screenShareOn ? KodaColors.accent : KodaColors.text2,
+                        ),
+                        onPressed: _toggleScreenShare,
+                        tooltip: _screenShareOn ? 'Stop sharing' : 'Share screen',
+                      ),
+                      const SizedBox(width: 16),
                       IconButton(
                         iconSize: 28,
                         icon: const Icon(Icons.call_end, color: KodaColors.accent),
