@@ -10,6 +10,8 @@ import '../../shared/widgets.dart';
 import '../settings/settings_screen.dart';
 import '../server/server_settings_screen.dart';
 import '../voice/voice_screen.dart';
+import '../voice/voice_bar.dart';
+import '../../core/voice_session.dart';
 import '../dm/dm_screen.dart';
 import '../../core/socket.dart';
 import '../../core/kcp_bridge.dart';
@@ -208,17 +210,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SnackBar(content: Text('Could not connect to voice.')));
       return;
     }
-    await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => VoiceScreen(
-            channelName: channel['name'] as String,
-            token: result['token'] as String,
-            url: result['url'] as String,
-          ),
-        ));
-    if (mounted) _returnToTextChannel();
+    final ok = await ref.read(voiceSessionProvider.notifier).join(
+      url:         result['url'] as String,
+      token:       result['token'] as String,
+      channelId:   channel['id'] as String,
+      channelName: channel['name'] as String,
+    );
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not connect to voice.')));
+    }
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   Future<void> _showAddServerMenu() async {
     final action = await showMenu<String>(
@@ -770,12 +790,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
           // Content area -- delegates to _buildContentArea which handles
           // gallery, text chat, and the "nothing selected" empty state.
-          Expanded(child: _buildContentArea(selectedChannel)),
+          Expanded(child: Column(children: [
+            Expanded(child: _buildContentArea(selectedChannel)),
+            const VoiceBar(),
+          ])),
         ],
       ]),
     );
   }
 }
+
 
 
 
