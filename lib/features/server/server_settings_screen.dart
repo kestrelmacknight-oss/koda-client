@@ -9,6 +9,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import '../../core/uploader.dart';
 import '../../shared/widgets.dart';
 
 class ServerSettingsScreen extends ConsumerStatefulWidget {
@@ -376,8 +379,29 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: Text('${server?['name'] ?? 'Server'} Settings',
-            style: const TextStyle(color: KodaColors.text1, fontSize: 16)),
+        title: Row(children: [
+          GestureDetector(
+            onTap: () => _uploadServerIcon(server),
+            child: Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(
+                color: KodaColors.elevated,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: KodaColors.border),
+              ),
+              child: server?['icon_url'] != null && (server!['icon_url'] as String).isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.network(server['icon_url'] as String,
+                          width: 36, height: 36, fit: BoxFit.cover))
+                  : const Icon(Icons.add_photo_alternate_outlined,
+                      color: KodaColors.text3, size: 18),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text('${server?['name'] ?? 'Server'} Settings',
+              style: const TextStyle(color: KodaColors.text1, fontSize: 16)),
+        ]),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: KodaColors.koda,
@@ -398,6 +422,37 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
               children: [_buildChannelsTab(), _buildRolesTab(), _buildMembersTab(), _buildInvitesTab()],
             ),
     );
+  }
+
+  Future<void> _uploadServerIcon(Map<String, dynamic>? server) async {
+    if (server == null) return;
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
+    );
+    if (result == null || result.files.single.path == null) return;
+    final path = result.files.single.path!;
+    final ext = path.split('.').last.toLowerCase();
+    final contentType = ext == 'png' ? 'image/png'
+        : ext == 'gif' ? 'image/gif'
+        : ext == 'webp' ? 'image/webp'
+        : 'image/jpeg';
+    try {
+      final uploaded = await KodaUploader.instance.upload(
+        file: File(path), uploadType: 'avatar', contentType: contentType);
+      await KodaApi.instance.updateServer(
+        server['id'] as String, {'icon_url': uploaded.cdnUrl});
+      // Refresh server list so the rail updates
+      if (mounted) {
+        ref.read(selectedServerProvider.notifier).state = {
+          ...server, 'icon_url': uploaded.cdnUrl};
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Server icon updated!')));
+      }
+    } on UploadException catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message)));
+    }
   }
 
   Widget _buildChannelsTab() {
@@ -659,6 +714,7 @@ Widget _buildInvitesTab() {
     );
   }
 }
+
 
 
 

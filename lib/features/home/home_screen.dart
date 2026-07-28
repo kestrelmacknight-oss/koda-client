@@ -659,14 +659,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     BorderRadius.circular(selected ? 14 : 24),
                               ),
                               alignment: Alignment.center,
-                              child: Text(
-                                (s['name'] as String).isNotEmpty
-                                    ? (s['name'] as String)[0].toUpperCase()
-                                    : '?',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700),
-                              ),
+                              child: s['icon_url'] != null && (s['icon_url'] as String).isNotEmpty
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(selected ? 14 : 24),
+                                      child: Image.network(
+                                        s['icon_url'] as String,
+                                        width: 48, height: 48, fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Text(
+                                          (s['name'] as String).isNotEmpty
+                                              ? (s['name'] as String)[0].toUpperCase() : '?',
+                                          style: const TextStyle(color: Colors.white,
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                      ),
+                                    )
+                                  : Text(
+                                    (s['name'] as String).isNotEmpty
+                                        ? (s['name'] as String)[0].toUpperCase()
+                                        : '?',
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700),
+                                  ),
                             ),
                           ),
                         );
@@ -721,7 +735,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       onPressed: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const ServerSettingsScreen())),
+                              builder: (_) => const ServerSettingsScreen())).then((_) {
+                              final server = ref.read(selectedServerProvider);
+                              if (server != null && mounted) _selectServer(server);
+                            }),
                     ),
                 ]),
               ),
