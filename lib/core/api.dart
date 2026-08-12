@@ -710,3 +710,4 @@ class KodaApi {
     if (kDebugMode) debugPrint('[KodaApi] $method failed: $e');
   }
 }
+
