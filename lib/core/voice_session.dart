@@ -97,7 +97,7 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
     } else {
       final settings = s.room.localParticipant;
       await s.room.localParticipant?.setCameraEnabled(true);
-      await Future.delayed(const Duration(milliseconds: 800));
+      await Future.delayed(const Duration(milliseconds: 2000));
       final pub = s.room.localParticipant?.videoTrackPublications
           .where((t) => !t.isScreenShare).firstOrNull;
       state = s.copyWith(
