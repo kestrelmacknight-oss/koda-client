@@ -709,7 +709,29 @@ class KodaApi {
   void _log(String method, Object e) {
     if (kDebugMode) debugPrint('[KodaApi] $method failed: $e');
   }
+  // -- Discord import ---------------------------------------------------------
+
+  Future<Map<String, dynamic>?> previewDiscordTemplate(String code) async {
+    try {
+      final res = await _dio.post('/import/discord/preview', data: {'code': code});
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('previewDiscordTemplate', e); return null; }
+  }
+
+  Future<bool> applyDiscordTemplate({
+    required String serverId,
+    required String code,
+    bool replace = false,
+  }) async {
+    try {
+      await _dio.post('/servers/$serverId/import/discord',
+          data: {'code': code, 'replace': replace});
+      return true;
+    } catch (e) { _log('applyDiscordTemplate', e); return false; }
+  }
+
 }
+
 
 
 
