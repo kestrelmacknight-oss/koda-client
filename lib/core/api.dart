@@ -272,6 +272,47 @@ class KodaApi {
     } catch (e) { _log('uploadFile', e); return null; }
   }
 
+  // ── Invites ───────────────────────────────────────────────────────────────
+
+  Future<Map<String, dynamic>?> createInvite(String serverId,
+      {int? maxUses, String? expiresAt}) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/invites', data: {
+        if (maxUses != null) 'max_uses': maxUses,
+        if (expiresAt != null) 'expires_at': expiresAt,
+      });
+      return res.data['invite'] as Map<String, dynamic>;
+    } catch (e) { _log('createInvite', e); return null; }
+  }
+
+  Future<List<Map<String, dynamic>>> listInvites(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/invites');
+      return List<Map<String, dynamic>>.from(res.data['invites'] ?? []);
+    } catch (e) { _log('listInvites', e); return []; }
+  }
+
+  Future<bool> deleteInvite(String serverId, String code) async {
+    try {
+      await _dio.delete('/servers/$serverId/invites/$code');
+      return true;
+    } catch (e) { _log('deleteInvite', e); return false; }
+  }
+
+  Future<Map<String, dynamic>?> redeemInvite(String code) async {
+    try {
+      final res = await _dio.post('/invites/$code/redeem');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('redeemInvite', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> redeemBackerCode(String code) async {
+    try {
+      final res = await _dio.post('/backer_codes/$code/redeem');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('redeemBackerCode', e); return null; }
+  }
+
   // ── Moderation ────────────────────────────────────────────────────────────
 
   Future<bool> deleteMessage(String channelId, String messageId,
@@ -466,28 +507,37 @@ class KodaApi {
     } catch (e) { _log('sendDmMessage', e); return null; }
   }
 
-  // ── Invites ──────────────────────────────────────────────────────────
+  // -- Admin -----------------------------------------------------------------
 
-  Future<Map<String, dynamic>?> resolveInvite(String code) async {
+  Future<List<Map<String, dynamic>>> listBackerCodes() async {
     try {
-      final res = await _dio.get('/invite/$code');
-      return res.data as Map<String, dynamic>;
-    } catch (_) { return {'valid': false}; }
+      final res = await _dio.get('/backer_codes');
+      return List<Map<String, dynamic>>.from(res.data['backer_codes'] ?? []);
+    } catch (e) { _log('listBackerCodes', e); return []; }
   }
 
-  Future<bool> joinByInvite(String code) async {
+  Future<Map<String, dynamic>?> createBackerCode({
+    String? code, Map<String, dynamic>? flags,
+    String? note, int? maxUses}) async {
     try {
-      await _dio.post('/invite/$code/join');
-      return true;
-    } catch (e) { _log('joinByInvite', e); return false; }
+      final res = await _dio.post('/backer_codes', data: {
+        if (code != null)    'code':     code,
+        if (flags != null)   'flags':    flags,
+        if (note != null)    'note':     note,
+        if (maxUses != null) 'max_uses': maxUses,
+      });
+      return res.data['backer_code'] as Map<String, dynamic>;
+    } catch (e) { _log('createBackerCode', e); return null; }
   }
 
-  Future<Map<String, dynamic>?> createInvite(String serverId) async {
+  Future<List<Map<String, dynamic>>> searchUsers(String query) async {
     try {
-      final res = await _dio.post('/servers/$serverId/invites');
-      return res.data['invite'] as Map<String, dynamic>;
-    } catch (_) { return null; }
+      final res = await _dio.get('/admin/users/search',
+          queryParameters: {'q': query});
+      return List<Map<String, dynamic>>.from(res.data['users'] ?? []);
+    } catch (e) { _log('searchUsers', e); return []; }
   }
+
 
   // ── Discovery ────────────────────────────────────────────────────────
 
@@ -660,3 +710,5 @@ class KodaApi {
     if (kDebugMode) debugPrint('[KodaApi] $method failed: $e');
   }
 }
+
+

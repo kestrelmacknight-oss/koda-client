@@ -5,12 +5,15 @@
 // key binding, and a link to the live device test screen. Persisted
 // via the user's settings blob (settings.voice).
 
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
+import '../../core/uploader.dart';
 import 'device_test_screen.dart';
 
 class VoiceVideoSettingsScreen extends ConsumerStatefulWidget {
@@ -193,7 +196,134 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                   'This takes priority over VOX while you\'re in a voice channel.',
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
                 ),
+                const SizedBox(height: 24),
+                _sectionLabel('VARM - Virtual Avatar Reactive Model'),
+                const Text(
+                  'Upload two images that swap when you speak. Visible only to you.',
+                  style: TextStyle(color: KodaColors.text3, fontSize: 11),
+                ),
+                const SizedBox(height: 12),
+                Row(children: [
+                  Expanded(child: _varmImageTile(
+                    label: 'Silent', url: settings.varmSilentUrl,
+                    onPick: () => _pickVarmImage('silent'),
+                    onClear: () => _save(settings.copyWith(varmSilentUrl: '')),
+                  )),
+                  const SizedBox(width: 12),
+                  Expanded(child: _varmImageTile(
+                    label: 'Talking', url: settings.varmTalkingUrl,
+                    onPick: () => _pickVarmImage('talking'),
+                    onClear: () => _save(settings.copyWith(varmTalkingUrl: '')),
+                  )),
+                ]),
+                if (settings.varmEnabled) ...[
+                  const SizedBox(height: 10),
+                  const Text('Speaking threshold',
+                      style: TextStyle(color: KodaColors.text2, fontSize: 12)),
+                  Slider(
+                    value: settings.varmThreshold,
+                    min: 0.01, max: 0.5,
+                    activeColor: KodaColors.koda,
+                    inactiveColor: KodaColors.border,
+                    onChanged: (v) => ref.read(voiceSettingsProvider.notifier)
+                        .update((s) => s.copyWith(varmThreshold: v)),
+                    onChangeEnd: (v) => _save(settings.copyWith(varmThreshold: v)),
+                  ),
+                  const Text('Lower = switches to talking image more easily.',
+                      style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+                  OutlinedButton.icon(
+                    onPressed: () => _save(settings.copyWith(clearVarm: true)),
+                    icon: const Icon(Icons.delete_outline, size: 14, color: KodaColors.accent),
+                    label: const Text('Remove VARM', style: TextStyle(color: KodaColors.accent)),
+                  ),
+                ],
               ],
+            ),
+    );
+  }
+
+  Future<void> _pickVarmImage(String slot) async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
+    );
+    if (result == null || result.files.single.path == null) return;
+    final path = result.files.single.path!;
+    final ext = path.split('.').last.toLowerCase();
+    final contentType = ext == 'png' ? 'image/png'
+        : ext == 'gif' ? 'image/gif'
+        : ext == 'webp' ? 'image/webp'
+        : 'image/jpeg';
+    try {
+      final uploaded = await KodaUploader.instance.upload(
+        file: File(path),
+        uploadType: 'avatar',
+        contentType: contentType,
+      );
+      final current = ref.read(voiceSettingsProvider);
+      final updated = slot == 'silent'
+          ? current.copyWith(varmSilentUrl: uploaded.cdnUrl)
+          : current.copyWith(varmTalkingUrl: uploaded.cdnUrl);
+      await _save(updated);
+    } on UploadException catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message)));
+    }
+  }
+
+  Widget _varmImageTile({
+    required String label,
+    required String? url,
+    required VoidCallback onPick,
+    required VoidCallback onClear,
+  }) {
+    return Container(
+      height: 120,
+      decoration: BoxDecoration(
+        color: KodaColors.card,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: KodaColors.border),
+      ),
+      child: url != null && url.isNotEmpty
+          ? Stack(children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(url,
+                    width: double.infinity, height: 120, fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const Center(
+                        child: Icon(Icons.broken_image_outlined, color: KodaColors.text3))),
+              ),
+              Positioned(top: 4, right: 4,
+                child: GestureDetector(
+                  onTap: onClear,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: KodaColors.accent.withOpacity(0.85),
+                      borderRadius: BorderRadius.circular(4)),
+                    child: const Icon(Icons.close, size: 12, color: Colors.white),
+                  ),
+                ),
+              ),
+              Positioned(bottom: 4, left: 0, right: 0,
+                child: Center(child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(color: Colors.black54,
+                      borderRadius: BorderRadius.circular(99)),
+                  child: Text(label,
+                      style: const TextStyle(color: Colors.white, fontSize: 10)),
+                )),
+              ),
+            ])
+          : InkWell(
+              onTap: onPick,
+              borderRadius: BorderRadius.circular(10),
+              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                const Icon(Icons.add_photo_alternate_outlined,
+                    color: KodaColors.text3, size: 28),
+                const SizedBox(height: 6),
+                Text(label, style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+              ]),
             ),
     );
   }

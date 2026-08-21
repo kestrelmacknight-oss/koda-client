@@ -9,6 +9,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import '../../core/uploader.dart';
 import '../../shared/widgets.dart';
 
 class ServerSettingsScreen extends ConsumerStatefulWidget {
@@ -54,7 +57,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _loadAll();
   }
 
@@ -376,8 +379,29 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: Text('${server?['name'] ?? 'Server'} Settings',
-            style: const TextStyle(color: KodaColors.text1, fontSize: 16)),
+        title: Row(children: [
+          GestureDetector(
+            onTap: () => _uploadServerIcon(server),
+            child: Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(
+                color: KodaColors.elevated,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: KodaColors.border),
+              ),
+              child: server?['icon_url'] != null && (server!['icon_url'] as String).isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.network(server['icon_url'] as String,
+                          width: 36, height: 36, fit: BoxFit.cover))
+                  : const Icon(Icons.add_photo_alternate_outlined,
+                      color: KodaColors.text3, size: 18),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text('${server?['name'] ?? 'Server'} Settings',
+              style: const TextStyle(color: KodaColors.text1, fontSize: 16)),
+        ]),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: KodaColors.koda,
@@ -387,6 +411,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             Tab(text: 'Channels'),
             Tab(text: 'Roles'),
             Tab(text: 'Members'),
+            Tab(text: 'Invites'),
           ],
         ),
       ),
@@ -394,9 +419,40 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
           : TabBarView(
               controller: _tabController,
-              children: [_buildChannelsTab(), _buildRolesTab(), _buildMembersTab()],
+              children: [_buildChannelsTab(), _buildRolesTab(), _buildMembersTab(), _buildInvitesTab()],
             ),
     );
+  }
+
+  Future<void> _uploadServerIcon(Map<String, dynamic>? server) async {
+    if (server == null) return;
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
+    );
+    if (result == null || result.files.single.path == null) return;
+    final path = result.files.single.path!;
+    final ext = path.split('.').last.toLowerCase();
+    final contentType = ext == 'png' ? 'image/png'
+        : ext == 'gif' ? 'image/gif'
+        : ext == 'webp' ? 'image/webp'
+        : 'image/jpeg';
+    try {
+      final uploaded = await KodaUploader.instance.upload(
+        file: File(path), uploadType: 'avatar', contentType: contentType);
+      await KodaApi.instance.updateServer(
+        server['id'] as String, {'icon_url': uploaded.cdnUrl});
+      // Refresh server list so the rail updates
+      if (mounted) {
+        ref.read(selectedServerProvider.notifier).state = {
+          ...server, 'icon_url': uploaded.cdnUrl};
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Server icon updated!')));
+      }
+    } on UploadException catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message)));
+    }
   }
 
   Widget _buildChannelsTab() {
@@ -571,5 +627,94 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       }).toList(),
     );
   }
+Widget _buildInvitesTab() {
+    final server = ref.read(selectedServerProvider);
+    if (server == null) return const SizedBox();
+    final serverId = server['id'] as String;
+
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: KodaApi.instance.listInvites(serverId),
+      builder: (context, snapshot) {
+        final invites = snapshot.data ?? [];
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(backgroundColor: KodaColors.koda),
+                icon: const Icon(Icons.add_link, size: 16, color: Colors.white),
+                label: const Text('Create Invite', style: TextStyle(color: Colors.white)),
+                onPressed: () async {
+                  final invite = await KodaApi.instance.createInvite(serverId);
+                  if (invite != null && context.mounted) {
+                    setState(() {});
+                    final url = invite['url'] as String? ?? '';
+                    showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        backgroundColor: KodaColors.card,
+                        title: const Text('Invite Created',
+                            style: TextStyle(color: KodaColors.text1)),
+                        content: SelectableText(url,
+                            style: const TextStyle(color: KodaColors.koda)),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Done')),
+                        ],
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (invites.isEmpty)
+              const Center(child: Text('No active invites',
+                  style: TextStyle(color: KodaColors.text3)))
+            else
+              ...invites.map((inv) {
+                final uses    = inv['uses'] as int? ?? 0;
+                final maxUses = inv['max_uses'] as int?;
+                final usesStr = maxUses != null ? '$uses / $maxUses' : '$uses';
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: KodaColors.elevated,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: KodaColors.border),
+                  ),
+                  child: Row(children: [
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        SelectableText(
+                          inv['url'] as String? ?? '',
+                          style: const TextStyle(color: KodaColors.koda, fontSize: 13),
+                        ),
+                        Text('Uses: $usesStr',
+                          style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+                      ]),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, size: 16, color: KodaColors.accent),
+                      onPressed: () async {
+                        await KodaApi.instance.deleteInvite(
+                            serverId, inv['code'] as String);
+                        if (context.mounted) setState(() {});
+                      },
+                    ),
+                  ]),
+                );
+              }).toList(),
+          ],
+        );
+      },
+    );
+  }
 }
+
+
+
 

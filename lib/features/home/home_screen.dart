@@ -10,12 +10,15 @@ import '../../shared/widgets.dart';
 import '../settings/settings_screen.dart';
 import '../server/server_settings_screen.dart';
 import '../voice/voice_screen.dart';
+import '../voice/voice_bar.dart';
+import '../../core/voice_session.dart';
 import '../dm/dm_screen.dart';
 import '../../core/socket.dart';
 import '../../core/kcp_bridge.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 import '../gallery/gallery_screen.dart';
 import '../stage/stage_screen.dart';
+import '../admin/admin_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -25,9 +28,11 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   List<Map<String, dynamic>> _servers = [];
   List<Map<String, dynamic>> _channels = [];
+  List<Map<String, dynamic>> _categories = [];
   List<Map<String, dynamic>> _messages = [];
-  bool _loadingServers = true;
+
   bool _showingDms = false;
+  bool _loadingServers = true;
   String? _activeChannelId;
   final _messageController = TextEditingController();
   final _scroll = ScrollController();
@@ -63,13 +68,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     setState(() => _showingDms = false);
     ref.read(selectedServerProvider.notifier).state = server;
     ref.read(selectedChannelProvider.notifier).state = null;
-    final channels = await KodaApi.instance.getChannels(server['id']);
+    final results = await Future.wait([
+      KodaApi.instance.getChannels(server['id']),
+      KodaApi.instance.getCategories(server['id']),
+    ]);
     if (!mounted) return;
-    setState(() => _channels = channels);
-    final firstText = channels.firstWhere(
+    setState(() {
+      _channels = results[0];
+      _categories = results[1];
+    });
+    final firstText = _channels.firstWhere(
         (c) => c['type'] == 'text', orElse: () => {});
     if (firstText.isNotEmpty) _selectChannel(firstText);
   }
+
+
 
   Future<void> _selectChannel(Map<String, dynamic> channel) async {
     final channelId = channel['id'] as String;
@@ -111,7 +124,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         if (msg.event == const PhoenixChannelEvent.custom('new_message')) {
           final payload = msg.payload as Map<String, dynamic>?;
           if (payload != null) {
-            if (payload['encrypted'] == true) {
+            if (payload['encrypted'] == true || payload['encrypted'] == 'true') {
               kcpDecrypt(
                 channelId: channelId,
                 payload:    payload['content'] as String? ?? '',
@@ -150,7 +163,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
     final msg = await KodaApi.instance.sendMessage(channel['id'], wireContent, encrypted: encrypted);
     if (msg != null && mounted) {
-      setState(() => _messages.add(msg));
+      if (msg['encrypted'] == true) {
+        final plain = await kcpDecrypt(
+          channelId: channel['id'] as String,
+          payload:   msg['content'] as String? ?? '',
+          ratchetKey: msg['ratchet_key'] as String? ?? '',
+          msgNumber: (msg['msg_number'] as num?)?.toInt() ?? 0,
+          prevChain: (msg['prev_chain'] as num?)?.toInt() ?? 0,
+          nonce:     msg['nonce'] as String? ?? '',
+        );
+        if (mounted) setState(() => _messages.add({...msg, 'content': plain}));
+      } else {
+        setState(() => _messages.add(msg));
+      }
       Future.delayed(const Duration(milliseconds: 50), () {
         if (_scroll.hasClients) {
           _scroll.animateTo(_scroll.position.maxScrollExtent,
@@ -165,7 +190,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       List<Map<String, dynamic>> msgs) async {
     final result = <Map<String, dynamic>>[];
     for (final m in msgs) {
-      if (m['encrypted'] == true) {
+      if (m['encrypted'] == true || m['encrypted'] == 'true') {
         try {
           final plain = await kcpDecrypt(
             channelId: m['channel_id'] as String? ?? '',
@@ -207,16 +232,188 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SnackBar(content: Text('Could not connect to voice.')));
       return;
     }
-    await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => VoiceScreen(
-            channelName: channel['name'] as String,
-            token: result['token'] as String,
-            url: result['url'] as String,
+    final ok = await ref.read(voiceSessionProvider.notifier).join(
+      url:         result['url'] as String,
+      token:       result['token'] as String,
+      channelId:   channel['id'] as String,
+      channelName: channel['name'] as String,
+    );
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not connect to voice.')));
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  Future<void> _showAddServerMenu() async {
+    final action = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(72, MediaQuery.of(context).size.height - 120,
+          72, 120),
+      color: KodaColors.card,
+      items: const [
+        PopupMenuItem(value: 'create', child: Text('Create Server')),
+        PopupMenuItem(value: 'join',   child: Text('Join Server')),
+        PopupMenuItem(value: 'redeem', child: Text('Redeem Code')),
+      ],
+    );
+    if (action == 'create') _showCreateServerDialog();
+    if (action == 'join')   _showJoinServerDialog();
+    if (action == 'redeem') _showRedeemCodeDialog();
+  }
+
+  Future<void> _showJoinServerDialog() async {
+    final ctrl = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Text('Join Server', style: TextStyle(color: KodaColors.text1)),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Text('Enter an invite code or URL:',
+              style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+          const SizedBox(height: 10),
+          KodaTextField(controller: ctrl, hintText: 'e.g. XK9MP2'),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () async {
+              final raw = ctrl.text.trim();
+              // Extract code from URL if pasted as full URL
+              final code = raw.contains('/invite/')
+                  ? raw.split('/invite/').last.trim()
+                  : raw.toUpperCase();
+              if (code.isEmpty) return;
+              Navigator.pop(context);
+              final result = await KodaApi.instance.redeemInvite(code);
+              if (!mounted) return;
+              if (result != null && result['ok'] == true) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Joined \!')));
+                _loadServers();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Invalid or expired invite code.')));
+              }
+            },
+            child: const Text('Join'),
           ),
-        ));
-    if (mounted) _returnToTextChannel();
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showRedeemCodeDialog() async {
+    final ctrl = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Text('Redeem Code', style: TextStyle(color: KodaColors.text1)),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Text('Enter your backer or reward code:',
+              style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+          const SizedBox(height: 10),
+          KodaTextField(controller: ctrl, hintText: 'Reward code'),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () async {
+              final code = ctrl.text.trim().toUpperCase();
+              if (code.isEmpty) return;
+              Navigator.pop(context);
+              final result = await KodaApi.instance.redeemBackerCode(code);
+              if (!mounted) return;
+              if (result != null && result['ok'] == true) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Code redeemed! Your rewards have been applied.')));
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Invalid, expired, or already redeemed code.')));
+              }
+            },
+            child: const Text('Redeem'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showServerContextMenu(
+      Map<String, dynamic> server, Offset position) async {
+    final user = ref.read(authProvider).user;
+    final isOwner = server['owner_id'] == user?.id || (user?.isAdmin ?? false);
+    final action = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+          position.dx, position.dy, position.dx, position.dy),
+      color: KodaColors.card,
+      items: [
+        const PopupMenuItem(value: 'select',
+            child: Text('Switch to Server')),
+        const PopupMenuItem(value: 'invite',
+            child: Text('Invite People')),
+        if (isOwner)
+          const PopupMenuItem(value: 'settings',
+              child: Text('Server Settings')),
+        const PopupMenuItem(value: 'leave',
+            child: Text('Leave Server',
+                style: TextStyle(color: KodaColors.accent))),
+      ],
+    );
+    if (!mounted) return;
+    switch (action) {
+      case 'select':
+        _selectServer(server);
+      case 'invite':
+        _selectServer(server);
+        // Open server settings to invites tab
+        await Navigator.push(context, MaterialPageRoute(
+            builder: (_) => const ServerSettingsScreen()));
+      case 'settings':
+        _selectServer(server);
+        await Navigator.push(context, MaterialPageRoute(
+            builder: (_) => const ServerSettingsScreen()));
+      case 'leave':
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (_) => AlertDialog(
+            backgroundColor: KodaColors.card,
+            content: Text('Leave ${server['name']}? You can rejoin with an invite.',
+                style: const TextStyle(color: KodaColors.text1)),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel')),
+              TextButton(onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Leave',
+                      style: TextStyle(color: KodaColors.accent))),
+            ],
+          ),
+        );
+        if (confirmed == true) {
+          await KodaApi.instance.leaveServer(server['id'] as String);
+          _loadServers();
+        }
+    }
   }
 
   Future<void> _showCreateServerDialog() async {
@@ -335,6 +532,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   // Returns the correct content widget for the currently selected channel.
   // Keeping this as a method rather than inline in build() avoids the
   // "if statement as positional argument" Dart restriction entirely.
+  Widget _buildChannelTile(Map<String, dynamic> c, Map<String, dynamic>? selectedChannel) {
+    final selected = selectedChannel?['id'] == c['id'];
+    final isVoice = c['type'] == 'voice';
+    final icon = switch (c['type'] as String? ?? 'text') {
+      'voice'   => Icons.volume_up,
+      'gallery' => Icons.image_outlined,
+      'stage'   => Icons.campaign_outlined,
+      _         => Icons.tag,
+    };
+    return GestureDetector(
+      onSecondaryTapUp: (d) => _showChannelContextMenu(c, d.globalPosition),
+      child: ListTile(
+        dense: true,
+        leading: Icon(icon, size: 16,
+            color: selected ? KodaColors.text1 : KodaColors.text3),
+        title: Text(c['name'] as String? ?? '',
+            style: TextStyle(fontSize: 13,
+                color: selected ? KodaColors.text1 : KodaColors.text3)),
+        selected: selected,
+        selectedTileColor: KodaColors.koda.withOpacity(0.1),
+        onTap: () => isVoice ? _joinVoice(c) : _selectChannel(c),
+      ),
+    );
+  }
+
   Widget _buildContentArea(Map<String, dynamic>? selectedChannel) {
     if (selectedChannel == null) {
       return const Center(
@@ -531,6 +753,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 6),
                           child: GestureDetector(
                             onTap: () => _selectServer(s),
+                            onSecondaryTapUp: (d) => _showServerContextMenu(s, d.globalPosition),
+
                             child: Container(
                               width: 48, height: 48,
                               margin: const EdgeInsets.symmetric(horizontal: 12),
@@ -542,14 +766,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     BorderRadius.circular(selected ? 14 : 24),
                               ),
                               alignment: Alignment.center,
-                              child: Text(
-                                (s['name'] as String).isNotEmpty
-                                    ? (s['name'] as String)[0].toUpperCase()
-                                    : '?',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700),
-                              ),
+                              child: s['icon_url'] != null && (s['icon_url'] as String).isNotEmpty
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(selected ? 14 : 24),
+                                      child: Image.network(
+                                        s['icon_url'] as String,
+                                        width: 48, height: 48, fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Text(
+                                          (s['name'] as String).isNotEmpty
+                                              ? (s['name'] as String)[0].toUpperCase() : '?',
+                                          style: const TextStyle(color: Colors.white,
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                      ),
+                                    )
+                                  : Text(
+                                    (s['name'] as String).isNotEmpty
+                                        ? (s['name'] as String)[0].toUpperCase()
+                                        : '?',
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700),
+                                  ),
                             ),
                           ),
                         );
@@ -558,9 +796,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             IconButton(
               icon: const Icon(Icons.add, color: KodaColors.text2),
-              tooltip: 'Create Server',
-              onPressed: _showCreateServerDialog,
+              tooltip: 'Create or Join',
+              onPressed: () => _showAddServerMenu(),
             ),
+            if (ref.watch(authProvider).user?.isAdmin == true)
+              IconButton(
+                icon: const Icon(Icons.admin_panel_settings_outlined,
+                    color: KodaColors.koda),
+                tooltip: 'Admin Panel',
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => AdminScreen())),
+              ),
             const SizedBox(height: 10),
           ]),
         ),
@@ -596,45 +842,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       onPressed: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const ServerSettingsScreen())),
+                              builder: (_) => const ServerSettingsScreen())).then((_) {
+                              final server = ref.read(selectedServerProvider);
+                              if (server != null && mounted) _selectServer(server);
+                            }),
                     ),
                 ]),
               ),
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  children: _channels.map((c) {
-                    final selected = selectedChannel?['id'] == c['id'];
-                    final isVoice = c['type'] == 'voice';
-                    final icon = switch (c['type'] as String? ?? 'text') {
-                      'voice'   => Icons.volume_up,
-                      'gallery' => Icons.image_outlined,
-                      'stage'   => Icons.campaign_outlined,
-                      _         => Icons.tag,
-                    };
-                    return GestureDetector(
-                      onSecondaryTapUp: (d) =>
-                          _showChannelContextMenu(c, d.globalPosition),
-                      child: ListTile(
-                        dense: true,
-                        leading: Icon(icon,
-                            size: 16,
-                            color: selected
-                                ? KodaColors.text1
-                                : KodaColors.text3),
-                        title: Text(c['name'] as String? ?? '',
-                            style: TextStyle(
-                                fontSize: 13,
-                                color: selected
-                                    ? KodaColors.text1
-                                    : KodaColors.text3)),
-                        selected: selected,
-                        selectedTileColor: KodaColors.koda.withOpacity(0.1),
-                        onTap: () =>
-                            isVoice ? _joinVoice(c) : _selectChannel(c),
-                      ),
-                    );
-                  }).toList(),
+                  children: [
+                    // Uncategorized channels first
+                    ..._channels.where((c) => c['category_id'] == null).map((c) => _buildChannelTile(c, selectedChannel)),
+                    // Then each category with its channels
+                    ..._categories.expand((cat) {
+                      final catChannels = _channels.where(
+                          (c) => c['category_id'] == cat['id']).toList();
+                      if (catChannels.isEmpty) return <Widget>[];
+                      return [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 12, 12, 2),
+                          child: Text(
+                            (cat['name'] as String? ?? '').toUpperCase(),
+                            style: const TextStyle(
+                                color: KodaColors.text3, fontSize: 10,
+                                fontWeight: FontWeight.w700, letterSpacing: 1),
+                          ),
+                        ),
+                        ...catChannels.map((c) => _buildChannelTile(c, selectedChannel)),
+                      ];
+                    }),
+                  ],
                 ),
               ),
               Container(
@@ -665,12 +904,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
           // Content area -- delegates to _buildContentArea which handles
           // gallery, text chat, and the "nothing selected" empty state.
-          Expanded(child: _buildContentArea(selectedChannel)),
+          Expanded(child: Column(children: [
+            Expanded(child: _buildContentArea(selectedChannel)),
+            const VoiceBar(),
+          ])),
         ],
       ]),
     );
   }
 }
+
+
+
+
 
 
 
