@@ -7,7 +7,7 @@ import Foundation
 
 import connectivity_plus
 import device_info_plus
-import file_picker
+import file_picker_darwin
 import flutter_webrtc
 import livekit_client
 import shared_preferences_foundation

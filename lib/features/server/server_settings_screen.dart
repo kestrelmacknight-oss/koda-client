@@ -13,6 +13,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import '../../core/uploader.dart';
 import '../../shared/widgets.dart';
+import 'discord_import_dialog.dart';
 
 class ServerSettingsScreen extends ConsumerStatefulWidget {
   const ServerSettingsScreen({super.key});
@@ -461,13 +462,35 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton.icon(
-            onPressed: () => _showCategoryDialog(),
-            icon: const Icon(Icons.add, size: 16, color: KodaColors.koda),
-            label: const Text('Add Category', style: TextStyle(color: KodaColors.koda)),
-          ),
+               Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton.icon(
+              onPressed: () {
+                final server = ref.read(selectedServerProvider);
+                if (server == null) return;
+                showDialog(
+                  context: context,
+                  builder: (_) => DiscordImportDialog(
+                    serverId: server['id'] as String,
+                    onImported: () {
+                      _loadAll();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Template imported!')));
+                    },
+                  ),
+                );
+              },
+              icon: const Icon(Icons.download_outlined, size: 16, color: KodaColors.text3),
+              label: const Text('Import from Discord',
+                  style: TextStyle(color: KodaColors.text3)),
+            ),
+            TextButton.icon(
+              onPressed: () => _showCategoryDialog(),
+              icon: const Icon(Icons.add, size: 16, color: KodaColors.koda),
+              label: const Text('Add Category', style: TextStyle(color: KodaColors.koda)),
+            ),
+          ],
         ),
         ..._categories.map((cat) {
           final channelsInCat = _channels.where((c) => c['category_id'] == cat['id']).toList();
