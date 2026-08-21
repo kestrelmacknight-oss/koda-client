@@ -41,15 +41,15 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       - name: Build Windows release
-        run: flutter build windows --release
+        run: flutter build windows
       - name: Install Inno Setup
         run: choco install innosetup -y
       - name: Create installer output dir
         run: New-Item -ItemType Directory -Path installer -Force
       - name: Build installer
+        shell: powershell
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" koda_installer.iss
-        shell: powershell
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
@@ -72,11 +72,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       - name: Build macOS release
-        run: flutter build macos --release
+        run: flutter build macos
       - name: Install create-dmg
         run: brew install create-dmg
       - name: Create DMG
         run: |
+          export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
           mkdir -p installer
           create-dmg \
             --volname "Koda" \
@@ -123,7 +124,7 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       - name: Build Linux release
-        run: flutter build linux --release
+        run: flutter build linux
       - name: Package as tar.gz
         run: |
           mkdir -p installer
