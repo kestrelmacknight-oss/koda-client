@@ -1,5 +1,6 @@
 // lib/features/server/discord_import_dialog.dart
 
+import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
 import '../../shared/widgets.dart';
