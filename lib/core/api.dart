@@ -77,6 +77,21 @@ class KodaApi {
     }
   }
 
+  Future<bool> verifyEmail(String code, String userId) async {
+    try {
+      await _dio.post('/auth/verify_email',
+          data: {'code': code, 'user_id': userId});
+      return true;
+    } catch (e) { _log('verifyEmail', e); return false; }
+  }
+
+  Future<bool> resendVerification() async {
+    try {
+      await _dio.post('/auth/verify_email/resend');
+      return true;
+    } catch (e) { _log('resendVerification', e); return false; }
+  }
+
   Future<Map<String, dynamic>?> register({
     required String email,
     required String username,
@@ -107,19 +122,6 @@ class KodaApi {
     } catch (_) { return null; }
   }
 
-  Future<bool> verifyEmail(String code) async {
-    try {
-      await _dio.post('/auth/verify_email', data: {'code': code});
-      return true;
-    } catch (_) { return false; }
-  }
-
-  Future<bool> resendVerification() async {
-    try {
-      await _dio.post('/auth/verify_email/resend');
-      return true;
-    } catch (_) { return false; }
-  }
 
   Future<bool> requestPasswordReset(String email) async {
     try {
@@ -702,6 +704,50 @@ class KodaApi {
       await _dio.delete('/members/$memberId/roles/$roleId');
       return true;
     } catch (e) { _log('unassignRole', e); return false; }
+  }
+
+  // -- Rules & self-assignable roles ------------------------------------------
+
+  Future<Map<String, dynamic>?> getServerRules(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/rules');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getServerRules', e); return null; }
+  }
+
+  Future<bool> acceptRules(String serverId) async {
+    try {
+      await _dio.post('/servers/$serverId/rules/accept');
+      return true;
+    } catch (e) { _log('acceptRules', e); return false; }
+  }
+
+  Future<bool> updateRules(String serverId, String content) async {
+    try {
+      await _dio.put('/servers/$serverId/rules', data: {'content': content});
+      return true;
+    } catch (e) { _log('updateRules', e); return false; }
+  }
+
+  Future<List<Map<String, dynamic>>> getAssignableRoles(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/roles/assignable');
+      return List<Map<String, dynamic>>.from(res.data['roles'] ?? []);
+    } catch (e) { _log('getAssignableRoles', e); return []; }
+  }
+
+  Future<bool> assignRoleToSelf(String serverId, String roleId) async {
+    try {
+      await _dio.post('/servers/$serverId/roles/$roleId/assign');
+      return true;
+    } catch (e) { _log('assignRoleToSelf', e); return false; }
+  }
+
+  Future<bool> unassignRoleFromSelf(String serverId, String roleId) async {
+    try {
+      await _dio.delete('/servers/$serverId/roles/$roleId/assign');
+      return true;
+    } catch (e) { _log('unassignRoleFromSelf', e); return false; }
   }
 
   // ── Errors ───────────────────────────────────────────────────────────

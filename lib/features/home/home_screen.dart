@@ -18,6 +18,8 @@ import '../../core/kcp_bridge.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 import '../gallery/gallery_screen.dart';
 import '../stage/stage_screen.dart';
+import '../server/rules_screen.dart';
+import '../server/role_select_screen.dart';
 import '../admin/admin_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -91,6 +93,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // Leave the previous channel's socket topic
     if (_activeChannelId != null && _activeChannelId != channelId) {
       KodaSocket.instance.leave('channel:$_activeChannelId');
+    }
+
+
+    // Rules channel -- show rules screen
+    if (channel['type'] == 'rules') {
+      final server = ref.read(selectedServerProvider);
+      if (server == null) return;
+      final rules = await KodaApi.instance.getServerRules(server['id'] as String);
+      if (!mounted) return;
+      if (rules != null && rules['accepted'] != true && rules['rules'] != null) {
+        await Navigator.push(context, MaterialPageRoute(
+          builder: (_) => RulesScreen(
+            serverId: server['id'] as String,
+            serverName: server['name'] as String? ?? '',
+            rulesContent: rules['rules'] as String,
+            onAccepted: () => Navigator.pop(context),
+          ),
+        ));
+      }
+      return;
+    }
+
+    // Role-select channel
+    if (channel['type'] == 'role-select') {
+      final server = ref.read(selectedServerProvider);
+      if (server == null) return;
+      await Navigator.push(context, MaterialPageRoute(
+        builder: (_) => RoleSelectScreen(
+          serverId: server['id'] as String,
+          channelName: channel['name'] as String? ?? 'Role Selection',
+        ),
+      ));
+      return;
     }
 
     // Stage channels push a route -- handled separately from text
@@ -536,11 +571,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final selected = selectedChannel?['id'] == c['id'];
     final isVoice = c['type'] == 'voice';
     final icon = switch (c['type'] as String? ?? 'text') {
-      'voice'   => Icons.volume_up,
-      'gallery' => Icons.image_outlined,
-      'stage'   => Icons.campaign_outlined,
-      _         => Icons.tag,
+      'voice'       => Icons.volume_up,
+      'gallery'     => Icons.image_outlined,
+      'stage'       => Icons.campaign_outlined,
+      'rules'       => Icons.gavel_outlined,
+      'role-select' => Icons.badge_outlined,
+      _             => Icons.tag,
     };
+
+
+
+
+
     return GestureDetector(
       onSecondaryTapUp: (d) => _showChannelContextMenu(c, d.globalPosition),
       child: ListTile(
@@ -913,6 +955,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 }
+
 
 
 

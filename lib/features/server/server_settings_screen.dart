@@ -97,11 +97,19 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
 
   Color _parseColor(dynamic hex) {
     try {
-      return Color(int.parse((hex as String).replaceFirst('#', '0xFF')));
+      if (hex is int) return Color(0xFF000000 | hex);
+      if (hex is String) return Color(int.parse(hex.replaceFirst('#', '0xFF')));
+      return KodaColors.koda;
     } catch (_) {
       return KodaColors.koda;
     }
   }
+
+
+
+
+
+
 
   Future<bool> _confirm(String message) async {
     final result = await showDialog<bool>(
@@ -182,6 +190,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                   DropdownMenuItem(value: 'voice', child: Text('Voice')),
                   DropdownMenuItem(value: 'gallery', child: Text('Gallery')),
                   DropdownMenuItem(value: 'stage', child: Text('Stage')),
+                  DropdownMenuItem(value: 'rules', child: Text('Rules')),
+                  DropdownMenuItem(value: 'role-select', child: Text('Role Selection')),
                 ],
                 onChanged: (v) => setDialogState(() => type = v ?? 'text'),
               ),
@@ -567,6 +577,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        Text('Roles: ${_roles.length}', style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
         Align(
           alignment: Alignment.centerRight,
           child: TextButton.icon(

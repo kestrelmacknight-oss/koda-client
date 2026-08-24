@@ -1,4 +1,4 @@
-// lib/features/auth/auth_screen.dart
+﻿// lib/features/auth/auth_screen.dart
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -132,8 +132,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       return;
     }
 
-    Navigator.push(context, MaterialPageRoute(
-        builder: (_) => VerifyEmailScreen(email: _regEmail.text.trim())));
+      final userId = result['user_id'] as String? ?? '';
+      Navigator.push(context, MaterialPageRoute(
+        builder: (_) => VerifyEmailScreen(email: _regEmail.text.trim(), userId: userId)));
   }
 
   @override
@@ -158,28 +159,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 400),
             child: Column(children: [
-              Container(
-                width: 56, height: 56,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                      colors: [KodaColors.koda, KodaColors.mint],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Center(
-                    child: Text('K',
-                        style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white))),
-              ),
-              const SizedBox(height: 14),
-              const Text(KodaConfig.appName,
-                  style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
-                      color: KodaColors.text1)),
+              Image.asset('assets/images/koda_logo.png', height: 80),
               Text('${KodaConfig.buildLabel} v${KodaConfig.appVersion}',
                   style: const TextStyle(fontSize: 12, color: KodaColors.gold)),
               const SizedBox(height: 28),
@@ -290,6 +270,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         ]),
       );
 }
+
 
 
 

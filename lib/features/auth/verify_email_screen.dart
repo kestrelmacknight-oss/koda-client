@@ -8,9 +8,8 @@ import 'auth_screen.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
   final String email;
-  const VerifyEmailScreen({super.key, required this.email});
-
-  @override
+  final String userId;
+  const VerifyEmailScreen({super.key, required this.email, required this.userId});
   State<VerifyEmailScreen> createState() => _VerifyEmailScreenState();
 }
 
@@ -27,7 +26,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     }
     setState(() { _busy = true; _error = null; });
 
-    final ok = await KodaApi.instance.verifyEmail(_code.text.trim());
+    final ok = await KodaApi.instance.verifyEmail(_code.text.trim(), widget.userId);
 
     if (!mounted) return;
     setState(() => _busy = false);
@@ -54,6 +53,15 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: KodaColors.text2),
+          onPressed: () => Navigator.pop(context),
+          tooltip: 'Back to sign in',
+        ),
+      ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 380),
@@ -97,3 +105,4 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     );
   }
 }
+
