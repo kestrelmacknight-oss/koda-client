@@ -752,50 +752,6 @@ class KodaApi {
 
   // ── Errors ───────────────────────────────────────────────────────────
 
-  // -- Rules -------------------------------------------------------------------
-
-  Future<Map<String, dynamic>?> getServerRules(String serverId) async {
-    try {
-      final res = await _dio.get('/servers/$serverId/rules');
-      return res.data as Map<String, dynamic>;
-    } catch (e) { _log('getServerRules', e); return null; }
-  }
-
-  Future<bool> acceptRules(String serverId) async {
-    try {
-      await _dio.post('/servers/$serverId/rules/accept');
-      return true;
-    } catch (e) { _log('acceptRules', e); return false; }
-  }
-
-  Future<bool> updateRules(String serverId, String content) async {
-    try {
-      await _dio.put('/servers/$serverId/rules', data: {'content': content});
-      return true;
-    } catch (e) { _log('updateRules', e); return false; }
-  }
-
-  Future<List<Map<String, dynamic>>> getAssignableRoles(String serverId) async {
-    try {
-      final res = await _dio.get('/servers/$serverId/roles/assignable');
-      return List<Map<String, dynamic>>.from(res.data['roles'] ?? []);
-    } catch (e) { _log('getAssignableRoles', e); return []; }
-  }
-
-  Future<bool> assignRoleToSelf(String serverId, String roleId) async {
-    try {
-      await _dio.post('/servers/$serverId/roles/$roleId/assign');
-      return true;
-    } catch (e) { _log('assignRoleToSelf', e); return false; }
-  }
-
-  Future<bool> unassignRoleFromSelf(String serverId, String roleId) async {
-    try {
-      await _dio.delete('/servers/$serverId/roles/$roleId/assign');
-      return true;
-    } catch (e) { _log('unassignRoleFromSelf', e); return false; }
-  }
-
   // -- Channel permissions ---------------------------------------------------
 
   Future<List<String>> getChannelAllowedRoles(String channelId) async {

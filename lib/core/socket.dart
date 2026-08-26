@@ -79,6 +79,13 @@ class KodaSocket {
     return ch;
   }
 
+  void push(String topic, String event, Map<String, dynamic> payload) {
+    final ch = _channels[topic];
+    if (ch != null) {
+      ch.push(event, payload);
+    }
+  }
+
   void leave(String topic) {
     final ch = _channels.remove(topic);
     if (ch != null) {

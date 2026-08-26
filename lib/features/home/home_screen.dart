@@ -1,5 +1,7 @@
 // lib/features/home/home_screen.dart
 
+import 'dart:async';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -38,6 +40,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String? _activeChannelId;
   final _messageController = TextEditingController();
   final _scroll = ScrollController();
+  final Map<String, DateTime> _typingUsers = {};
+  Timer? _typingCleanupTimer;
 
   @override
   void initState() {
@@ -751,6 +755,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           },
         ),
       ),
+      if (_typingUsers.isNotEmpty)
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 0, 14, 4),
+          child: Text(
+            _typingUsers.length == 1
+                ? '${_typingUsers.keys.first} is typing...'
+                : '${_typingUsers.keys.take(2).join(', ')} are typing...',
+            style: const TextStyle(color: KodaColors.text3, fontSize: 11,
+                fontStyle: FontStyle.italic),
+          ),
+        ),
       Padding(
         padding: const EdgeInsets.all(14),
         child: Row(children: [
@@ -758,7 +773,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: KodaTextField(
               controller: _messageController,
               hintText: 'Message #${selectedChannel['name']}',
-                          onSubmitted: (_) => _sendMessage(),
+              onChanged: (_) {
+                final channel = ref.read(selectedChannelProvider);
+                if (channel == null) return;
+                KodaSocket.instance.push(
+                  'channel:${channel['id']}',
+                  'typing',
+                  {'typing': true},
+                );
+              },
+              onSubmitted: (_) => _sendMessage(),
+
             ),
           ),
           const SizedBox(width: 10),
@@ -989,6 +1014,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 }
+
+
+
 
 
 
