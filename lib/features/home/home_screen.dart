@@ -18,6 +18,8 @@ import '../../core/kcp_bridge.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 import '../gallery/gallery_screen.dart';
 import '../stage/stage_screen.dart';
+import '../server/rules_screen.dart';
+import '../server/role_select_screen.dart';
 import '../admin/admin_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -94,6 +96,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     // Stage channels push a route -- handled separately from text
+    // Rules channel -- show rules content
+    if (channel['type'] == 'rules') {
+      final server = ref.read(selectedServerProvider);
+      if (server == null) return;
+      final rules = await KodaApi.instance.getServerRules(server['id'] as String);
+      if (!mounted) return;
+      if (rules != null && rules['rules'] != null) {
+        final accepted = rules['accepted'] == true;
+        await Navigator.push(context, MaterialPageRoute(
+          builder: (_) => RulesScreen(
+            serverId: server['id'] as String,
+            serverName: server['name'] as String? ?? '',
+            rulesContent: rules['rules'] as String,
+            onAccepted: () => Navigator.pop(context),
+            alreadyAccepted: accepted,
+          ),
+        ));
+      }
+      return;
+    }
+
+    // Role-select channel
+    if (channel['type'] == 'role-select') {
+      final server = ref.read(selectedServerProvider);
+      if (server == null) return;
+      await Navigator.push(context, MaterialPageRoute(
+        builder: (_) => RoleSelectScreen(
+          serverId: server['id'] as String,
+          channelName: channel['name'] as String? ?? 'Role Selection',
+        ),
+      ));
+      return;
+    }
+
     if (channel['type'] == 'stage') {
       ref.read(selectedChannelProvider.notifier).state = channel;
       await Navigator.push(context, MaterialPageRoute(
@@ -913,6 +949,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 }
+
 
 
 
