@@ -13,6 +13,7 @@ class RulesScreen extends StatefulWidget {
   final String serverName;
   final String rulesContent;
   final VoidCallback onAccepted;
+  final bool alreadyAccepted;
 
   const RulesScreen({
     super.key,
@@ -20,6 +21,7 @@ class RulesScreen extends StatefulWidget {
     required this.serverName,
     required this.rulesContent,
     required this.onAccepted,
+    this.alreadyAccepted = false,
   });
 
   @override
@@ -35,9 +37,7 @@ class _RulesScreenState extends State<RulesScreen> {
   void initState() {
     super.initState();
     _scroll.addListener(() {
-      if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 40) {
-        if (!_scrolledToBottom) setState(() => _scrolledToBottom = true);
-      }
+      // ... existing listener
     });
     // Auto-enable if rules are short
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -45,7 +45,13 @@ class _RulesScreenState extends State<RulesScreen> {
         setState(() => _scrolledToBottom = true);
       }
     });
-  }
+    // If already accepted, allow closing without scrolling  ← ADD HERE
+    if (widget.alreadyAccepted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() => _scrolledToBottom = true);
+      });
+    }
+  }  // ← closing brace of initState
 
   @override
   void dispose() {
@@ -63,8 +69,14 @@ class _RulesScreenState extends State<RulesScreen> {
       setState(() => _loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Could not accept rules. Try again.')));
+    if (widget.alreadyAccepted) {
+      Navigator.pop(context);
+      return;
+    }
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -147,8 +159,8 @@ class _RulesScreenState extends State<RulesScreen> {
                             strokeWidth: 2, color: Colors.white))
                     : Text(
                         _scrolledToBottom
-                            ? 'I Accept the Rules'
-                            : 'Read all rules to continue',
+                          ? (widget.alreadyAccepted ? 'Close' : 'I Accept the Rules')
+                          : 'Read all rules to continue',
                         style: TextStyle(
                             color: _scrolledToBottom
                                 ? Colors.black

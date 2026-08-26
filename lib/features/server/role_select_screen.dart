@@ -57,9 +57,18 @@ class _RoleSelectScreenState extends State<RoleSelectScreen> {
     }
   }
 
-  Color _roleColor(int colorInt) {
-    if (colorInt == 0) return KodaColors.text3;
-    return Color(0xFF000000 | colorInt);
+    Color _roleColor(dynamic colorVal) {
+    try {
+      if (colorVal is int) {
+        if (colorVal == 0) return KodaColors.text3;
+        return Color(0xFF000000 | colorVal);
+      }
+      if (colorVal is String) {
+        if (colorVal.isEmpty || colorVal == '#000000') return KodaColors.text3;
+        return Color(int.parse(colorVal.replaceFirst('#', '0xFF')));
+      }
+    } catch (_) {}
+    return KodaColors.text3;
   }
 
   @override
@@ -92,7 +101,7 @@ class _RoleSelectScreenState extends State<RoleSelectScreen> {
                     ..._roles.map((role) {
                       final id = role['id'] as String;
                       final name = role['name'] as String? ?? '';
-                      final color = _roleColor(role['color'] as int? ?? 0);
+                      final color = _roleColor(role['color']);
                       final isAssigned = _assigned.contains(id);
 
                       return Container(
