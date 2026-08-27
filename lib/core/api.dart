@@ -782,6 +782,79 @@ class KodaApi {
     } catch (e) { _log('setCategoryAllowedRoles', e); return false; }
   }
 
+  // -- Friends -----------------------------------------------------------------
+
+  Future<List<Map<String, dynamic>>> getFriends() async {
+    try {
+      final res = await _dio.get('/friends');
+      return List<Map<String, dynamic>>.from(res.data['friends'] ?? []);
+    } catch (e) { _log('getFriends', e); return []; }
+  }
+
+  Future<Map<String, dynamic>?> getFriendRequests() async {
+    try {
+      final res = await _dio.get('/friends/pending');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getFriendRequests', e); return null; }
+  }
+
+  Future<bool> sendFriendRequest(String userId, {String? message}) async {
+    try {
+      await _dio.post('/friends/$userId/request',
+          data: {'message': message});
+      return true;
+    } catch (e) { _log('sendFriendRequest', e); return false; }
+  }
+
+  Future<bool> acceptFriendRequest(String userId) async {
+    try {
+      await _dio.post('/friends/$userId/accept');
+      return true;
+    } catch (e) { _log('acceptFriendRequest', e); return false; }
+  }
+
+  Future<bool> declineFriendRequest(String userId) async {
+    try {
+      await _dio.delete('/friends/$userId/decline');
+      return true;
+    } catch (e) { _log('declineFriendRequest', e); return false; }
+  }
+
+  Future<bool> unfriend(String userId) async {
+    try {
+      await _dio.delete('/friends/$userId');
+      return true;
+    } catch (e) { _log('unfriend', e); return false; }
+  }
+
+  Future<Map<String, dynamic>?> getFriendStatus(String userId) async {
+    try {
+      final res = await _dio.get('/friends/status/$userId');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getFriendStatus', e); return null; }
+  }
+
+  Future<List<Map<String, dynamic>>> getConversations() async {
+    try {
+      final res = await _dio.get('/dms/conversations');
+      return List<Map<String, dynamic>>.from(res.data['conversations'] ?? []);
+    } catch (e) { _log('getConversations', e); return []; }
+  }
+
+  Future<Map<String, dynamic>?> getOrCreateConversation(String userId) async {
+    try {
+      final res = await _dio.post('/dms/conversations', data: {'user_id': userId});
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getOrCreateConversation', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> getUserByUsername(String username) async {
+    try {
+      final res = await _dio.get('/users/search', queryParameters: {'username': username});
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getUserByUsername', e); return null; }
+  }
+
   void _log(String method, Object e) {
     if (kDebugMode) debugPrint('[KodaApi] $method failed: $e');
   }
@@ -807,6 +880,8 @@ class KodaApi {
   }
 
 }
+
+
 
 
 
