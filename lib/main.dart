@@ -72,3 +72,4 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     return auth.user == null ? const AuthScreen() : const HomeScreen();
   }
 }
+
