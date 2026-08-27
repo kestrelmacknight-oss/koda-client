@@ -21,9 +21,15 @@ import 'package:phoenix_socket/phoenix_socket.dart';
 import '../gallery/gallery_screen.dart';
 import '../stage/stage_screen.dart';
 import '../server/rules_screen.dart';
+<<<<<<< HEAD
 import '../dm/dm_screen.dart';
+=======
+import '../../shared/notification_bell.dart';
+import '../../core/notifications_provider.dart';
+>>>>>>> dev
 import '../server/role_select_screen.dart';
 import '../admin/admin_screen.dart';
+import 'package:local_notifier/local_notifier.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -60,6 +66,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _scroll.dispose();
     super.dispose();
   }
+  Future<void> _subscribeToUserNotifications() async {
+    final user = ref.read(authProvider).user;
+    if (user == null) return;
+    final ch = await KodaSocket.instance.channelAsync('user:${user.id}');
+    ch?.messages.listen((msg) {
+      if (!mounted) return;
+      if (msg.event == const PhoenixChannelEvent.custom('notification')) {
+        final payload = msg.payload as Map<String, dynamic>?;
+        if (payload != null) {
+          ref.read(notificationsProvider.notifier).addNotification(payload);
+          // Show system tray notification (location only, no content)
+          _showTrayNotification(payload);
+        }
+      }
+    });
+  }
+
+  void _showTrayNotification(Map<String, dynamic> notif) {
+    final title = notif['title'] as String? ?? 'Koda';
+    final notification = LocalNotification(
+      title: 'Koda',
+      body: title,
+    );
+    notification.show();
+  }
+
+
+
+
+
+
+
+
+
   Future<void> _loadServers() async {
     setState(() => _loadingServers = true);
     final servers = await KodaApi.instance.getServers();
@@ -68,7 +108,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       _servers = servers;
       _loadingServers = false;
     });
+    // Load notifications and subscribe to real-time updates
+    ref.read(notificationsProvider.notifier).load();
+    _subscribeToUserNotifications();
     if (servers.isNotEmpty) _selectServer(servers.first);
+
   }
 
   Future<void> _selectServer(Map<String, dynamic> server) async {
@@ -317,24 +361,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SnackBar(content: Text('Could not connect to voice.')));
     }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   Future<void> _showAddServerMenu() async {
     final action = await showMenu<String>(
@@ -754,6 +780,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             message: 'End-to-end encrypted',
             child: Icon(Icons.lock_outline, size: 13, color: KodaColors.mint),
           ),
+          const Spacer(),
+          const NotificationBell(),
         ]),
       ),
       Expanded(
@@ -1098,6 +1126,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
 
 
+<<<<<<< HEAD
 
 
 
@@ -1117,3 +1146,5 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
 
 
+=======
+>>>>>>> dev

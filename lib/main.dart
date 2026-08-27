@@ -131,4 +131,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   }
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> dev

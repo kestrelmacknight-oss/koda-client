@@ -857,6 +857,7 @@ class KodaApi {
     } catch (e) { _log('getUserByUsername', e); return null; }
   }
 
+<<<<<<< HEAD
   // -- Version check ------------------------------------------------------------
 
   Future<Map<String, dynamic>?> checkVersion() async {
@@ -864,6 +865,30 @@ class KodaApi {
       final res = await _dio.get('/version');
       return res.data as Map<String, dynamic>;
     } catch (e) { _log('checkVersion', e); return null; }
+=======
+  // -- Notifications ------------------------------------------------------------
+
+  Future<Map<String, dynamic>?> getNotifications({bool unreadOnly = false}) async {
+    try {
+      final res = await _dio.get('/notifications',
+          queryParameters: unreadOnly ? {'unread_only': true} : {});
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getNotifications', e); return null; }
+  }
+
+  Future<bool> markNotificationRead(String id) async {
+    try {
+      await _dio.post('/notifications/$id/read');
+      return true;
+    } catch (e) { _log('markNotificationRead', e); return false; }
+  }
+
+  Future<bool> markAllNotificationsRead() async {
+    try {
+      await _dio.post('/notifications/read_all');
+      return true;
+    } catch (e) { _log('markAllNotificationsRead', e); return false; }
+>>>>>>> dev
   }
 
   void _log(String method, Object e) {
