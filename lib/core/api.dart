@@ -857,6 +857,15 @@ class KodaApi {
     } catch (e) { _log('getUserByUsername', e); return null; }
   }
 
+  // -- Version check ------------------------------------------------------------
+
+  Future<Map<String, dynamic>?> checkVersion() async {
+    try {
+      final res = await _dio.get('/version');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('checkVersion', e); return null; }
+  }
+
   void _log(String method, Object e) {
     if (kDebugMode) debugPrint('[KodaApi] $method failed: $e');
   }
