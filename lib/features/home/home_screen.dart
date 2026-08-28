@@ -1,7 +1,6 @@
 // lib/features/home/home_screen.dart
 
 import 'dart:async';
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -21,13 +20,9 @@ import 'package:phoenix_socket/phoenix_socket.dart';
 import '../gallery/gallery_screen.dart';
 import '../stage/stage_screen.dart';
 import '../server/rules_screen.dart';
-<<<<<<< HEAD
-import '../dm/dm_screen.dart';
-=======
+import '../server/role_select_screen.dart';
 import '../../shared/notification_bell.dart';
 import '../../core/notifications_provider.dart';
->>>>>>> dev
-import '../server/role_select_screen.dart';
 import '../admin/admin_screen.dart';
 import 'package:local_notifier/local_notifier.dart';
 
@@ -1123,28 +1118,3 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 }
-
-
-
-<<<<<<< HEAD
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-=======
->>>>>>> dev

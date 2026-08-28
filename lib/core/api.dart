@@ -203,11 +203,13 @@ class KodaApi {
     required String name,
     String type = 'text',
     String? categoryId,
+    bool isReadOnly = false,
   }) async {
     try {
       final res = await _dio.post('/servers/$serverId/channels', data: {
         'name': name,
         'type': type,
+        'is_read_only': isReadOnly,
         if (categoryId != null) 'category_id': categoryId,
       });
       return res.data['channel'] as Map<String, dynamic>;
@@ -857,15 +859,15 @@ class KodaApi {
     } catch (e) { _log('getUserByUsername', e); return null; }
   }
 
-<<<<<<< HEAD
   // -- Version check ------------------------------------------------------------
-
+  
   Future<Map<String, dynamic>?> checkVersion() async {
     try {
       final res = await _dio.get('/version');
       return res.data as Map<String, dynamic>;
     } catch (e) { _log('checkVersion', e); return null; }
-=======
+  }
+
   // -- Notifications ------------------------------------------------------------
 
   Future<Map<String, dynamic>?> getNotifications({bool unreadOnly = false}) async {
@@ -888,7 +890,6 @@ class KodaApi {
       await _dio.post('/notifications/read_all');
       return true;
     } catch (e) { _log('markAllNotificationsRead', e); return false; }
->>>>>>> dev
   }
 
   void _log(String method, Object e) {

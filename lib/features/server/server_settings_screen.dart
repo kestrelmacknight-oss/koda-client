@@ -163,8 +163,11 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                       value: isSelected,
                       activeColor: KodaColors.koda,
                       onChanged: (v) => setDialogState(() {
-                        if (v == true) selectedRoleIds.add(roleId);
-                        else selectedRoleIds.remove(roleId);
+                        if (v == true) {
+                          selectedRoleIds.add(roleId);
+                        } else {
+                          selectedRoleIds.remove(roleId);
+                        }
                       }),
                     );
                   }),
@@ -191,29 +194,6 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     _loadAll();
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   Future<void> _deleteCategory(Map<String, dynamic> category) async {
     final confirmed = await _confirm(
         'Delete "${category['name']}"? Channels inside will become uncategorized.');
@@ -234,6 +214,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       allowedRoleIds = List<String>.from(existing['allowed_role_ids'] ?? []);
     }
     List<String> selectedRoleIds = List<String>.from(allowedRoleIds);
+        bool isReadOnly = existing?['is_read_only'] == true;
     final saved = await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
@@ -300,6 +281,17 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                     }),
                   );
                 }),
+                const SizedBox(height: 12),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('View only',
+                      style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+                  subtitle: const Text('Only roles with send permission can post',
+                      style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+                  value: isReadOnly,
+                  activeColor: KodaColors.koda,
+                  onChanged: (v) => setDialogState(() => isReadOnly = v),
+                ),
               ],
               ]),
             ),
@@ -316,10 +308,11 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     final name = nameController.text.trim();
     if (existing == null) {
       await KodaApi.instance.createChannel(
-          serverId: _serverId, name: name, type: type, categoryId: selectedCategoryId);
-    } else {
-      await KodaApi.instance.updateChannel(existing['id'], {
-        'name': name, 'type': type, 'category_id': selectedCategoryId,
+          serverId: _serverId, name: name, type: type,
+          categoryId: selectedCategoryId, isReadOnly: isReadOnly);
+
+      await KodaApi.instance.updateChannel(existing!['id'], {
+        'name': name, 'type': type, 'category_id': selectedCategoryId, 'is_read_only': isReadOnly,
       });
     }
     // Save role permissions
