@@ -595,6 +595,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  Widget _buildReplyPreview(Map<String, dynamic> replyTo) {
+    final author = (replyTo['author'] as Map<String, dynamic>?)?['username'] as String? ?? 'Unknown';
+    final content = replyTo['content'] as String? ?? '';
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: KodaColors.elevated,
+        borderRadius: BorderRadius.circular(6),
+        border: const Border(left: BorderSide(color: KodaColors.koda, width: 2)),
+      ),
+      child: Text(
+        '$author: $content',
+        style: const TextStyle(
+            color: KodaColors.text3,
+            fontSize: 11,
+            fontStyle: FontStyle.italic),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
   // Returns the correct content widget for the currently selected channel.
   // Keeping this as a method rather than inline in build() avoids the
   // "if statement as positional argument" Dart restriction entirely.
@@ -704,12 +727,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         value: 'delete', child: Text('Delete Message')),
                   ],
                 );
-                if (action == 'reply') {
+                if (action == 'reply' && mounted) {
                   setState(() => _replyingTo = m);
+                }
                 if (action == 'thread' && mounted) {
                   _showCreateThreadDialog(m);
-                }  
-                } else if (action == 'delete' && mounted) {
+                }
+                if (action == 'delete' && mounted) {
                   final ok = await KodaApi.instance.deleteMessage(
                     m['channel_id'] as String? ?? selectedChannel!['id'] as String,
                     m['id'] as String? ?? '',
@@ -750,6 +774,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ],
                     ),
                     const SizedBox(height: 2),
+                    if (m['reply_to'] != null)
+                      _buildReplyPreview(m['reply_to'] as Map<String, dynamic>),
                     Text(m['content'] as String? ?? '',
                         style: const TextStyle(
                             color: KodaColors.text1, fontSize: 14)),
@@ -757,8 +783,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ]),
             ),
-            ); // end GestureDetector
-          },
+            );
+          }
         ),
       ),
       if (_replyingTo != null)
