@@ -1,5 +1,7 @@
 // lib/features/home/home_screen.dart
 
+import 'dart:async';
+import 'package:local_notifier/local_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -23,7 +25,6 @@ import '../../shared/notification_bell.dart';
 import '../../core/notifications_provider.dart';
 import '../server/role_select_screen.dart';
 import '../admin/admin_screen.dart';
-import 'package:local_notifier/local_notifier.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -41,6 +42,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String? _activeChannelId;
   final _messageController = TextEditingController();
   final _scroll = ScrollController();
+  final Map<String, DateTime> _typingUsers = {};
+  Timer? _typingCleanupTimer;
+  Map<String, dynamic>? _replyingTo;
 
   @override
   void initState() {
@@ -226,6 +230,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final channel = ref.read(selectedChannelProvider);
     final text = _messageController.text.trim();
     if (channel == null || text.isEmpty) return;
+    final replyToId = _replyingTo?['id'] as String?;
+    setState(() => _replyingTo = null);
     _messageController.clear();
 
     // Encrypt message content before sending
@@ -238,7 +244,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     } catch (_) {
       // Encryption failed -- send as plaintext (demo fallback)
     }
-    final msg = await KodaApi.instance.sendMessage(channel['id'], wireContent, encrypted: encrypted);
+        final msg = await KodaApi.instance.sendMessage(channel['id'], wireContent,
+        encrypted: encrypted, replyToId: replyToId);
     if (msg != null && mounted) {
       if (msg['encrypted'] == true) {
         final plain = await kcpDecrypt(
@@ -594,26 +601,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildChannelTile(Map<String, dynamic> c, Map<String, dynamic>? selectedChannel) {
     final selected = selectedChannel?['id'] == c['id'];
     final isVoice = c['type'] == 'voice';
+    final isThread = c['is_thread'] == true;
     final icon = switch (c['type'] as String? ?? 'text') {
-      'voice'   => Icons.volume_up,
-      'gallery' => Icons.image_outlined,
-      'stage'   => Icons.campaign_outlined,
-      _         => Icons.tag,
+      'voice'       => Icons.volume_up,
+      'gallery'     => Icons.image_outlined,
+      'stage'       => Icons.campaign_outlined,
+      'rules'       => Icons.gavel_outlined,
+      'role-select' => Icons.badge_outlined,
+      _             => isThread ? Icons.forum_outlined : Icons.tag,
     };
-    return GestureDetector(
+    final tile = GestureDetector(
       onSecondaryTapUp: (d) => _showChannelContextMenu(c, d.globalPosition),
       child: ListTile(
         dense: true,
         leading: Icon(icon, size: 16,
             color: selected ? KodaColors.text1 : KodaColors.text3),
         title: Text(c['name'] as String? ?? '',
-            style: TextStyle(fontSize: 13,
-                color: selected ? KodaColors.text1 : KodaColors.text3)),
+            style: TextStyle(fontSize: isThread ? 12 : 13,
+                color: selected ? KodaColors.text1 : KodaColors.text3,
+                fontStyle: isThread ? FontStyle.italic : FontStyle.normal)),
         selected: selected,
         selectedTileColor: KodaColors.koda.withOpacity(0.1),
         onTap: () => isVoice ? _joinVoice(c) : _selectChannel(c),
       ),
     );
+    if (isThread) {
+      return Padding(
+        padding: const EdgeInsets.only(left: 16),
+        child: tile,
+      );
+    }
+    return tile;
   }
 
   Widget _buildContentArea(Map<String, dynamic>? selectedChannel) {
@@ -680,11 +698,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       d.globalPosition.dy, d.globalPosition.dx, d.globalPosition.dy),
                   color: KodaColors.card,
                   items: [
+                    const PopupMenuItem(value: 'reply', child: Text('Reply')),
+                    const PopupMenuItem(value: 'thread', child: Text('Create Thread')),
                     if (canDelete) const PopupMenuItem(
                         value: 'delete', child: Text('Delete Message')),
                   ],
                 );
-                if (action == 'delete' && mounted) {
+                if (action == 'reply') {
+                  setState(() => _replyingTo = m);
+                if (action == 'thread' && mounted) {
+                  _showCreateThreadDialog(m);
+                }  
+                } else if (action == 'delete' && mounted) {
                   final ok = await KodaApi.instance.deleteMessage(
                     m['channel_id'] as String? ?? selectedChannel!['id'] as String,
                     m['id'] as String? ?? '',
@@ -736,6 +761,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           },
         ),
       ),
+      if (_replyingTo != null)
+        Container(
+          color: KodaColors.elevated,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Row(children: [
+            const Icon(Icons.reply, size: 14, color: KodaColors.koda),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                'Replying to ${(_replyingTo!['author'] as Map<String, dynamic>?)?['username'] ?? 'Unknown'}',
+                style: const TextStyle(color: KodaColors.text3, fontSize: 12),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close, size: 14, color: KodaColors.text3),
+              onPressed: () => setState(() => _replyingTo = null),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+          ]),
+        ),
       Padding(
         padding: const EdgeInsets.all(14),
         child: Row(children: [
@@ -754,6 +801,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ]),
       ),
     ]);
+  }
+
+  Future<void> _showCreateThreadDialog(Map<String, dynamic> message) async {
+    final channel = ref.read(selectedChannelProvider);
+    if (channel == null) return;
+    final ctrl = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Text('Create Thread',
+            style: TextStyle(color: KodaColors.text1)),
+        content: KodaTextField(controller: ctrl, hintText: 'Thread name'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()),
+              child: const Text('Create')),
+        ],
+      ),
+    );
+    if (name == null || name.isEmpty) return;
+    final thread = await KodaApi.instance.createThread(
+      channelId: channel['id'] as String,
+      messageId: message['id'] as String,
+      name: name,
+    );
+    if (thread != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Thread "$name" created!')));
+      final server = ref.read(selectedServerProvider);
+      if (server != null) _selectServer(server);
+    }
   }
 
   @override

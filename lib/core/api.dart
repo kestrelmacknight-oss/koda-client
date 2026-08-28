@@ -222,10 +222,14 @@ class KodaApi {
   }
 
   Future<Map<String, dynamic>?> sendMessage(
-      String channelId, String content, {bool encrypted = false}) async {
+      String channelId, String content, {bool encrypted = false, String? replyToId}) async {
     try {
       final res = await _dio.post('/channels/$channelId/messages',
-          data: {'content': content, 'encrypted': encrypted});
+          data: {
+            'content': content,
+            'encrypted': encrypted,
+            if (replyToId != null) 'reply_to_id': replyToId,
+          });
       return res.data['message'] as Map<String, dynamic>;
     } catch (e) { _log('sendMessage', e); return null; }
   }
@@ -877,6 +881,20 @@ class KodaApi {
       await _dio.post('/notifications/read_all');
       return true;
     } catch (e) { _log('markAllNotificationsRead', e); return false; }
+  }
+
+  // -- Threads ------------------------------------------------------------------
+
+  Future<Map<String, dynamic>?> createThread({
+    required String channelId,
+    required String messageId,
+    required String name,
+  }) async {
+    try {
+      final res = await _dio.post('/channels/$channelId/threads',
+          data: {'message_id': messageId, 'name': name});
+      return res.data['channel'] as Map<String, dynamic>;
+    } catch (e) { _log('createThread', e); return null; }
   }
 
   void _log(String method, Object e) {
