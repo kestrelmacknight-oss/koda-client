@@ -26,6 +26,7 @@ import '../../core/notifications_provider.dart';
 import '../server/role_select_screen.dart';
 import '../admin/admin_screen.dart';
 
+const _kQuickReactions = ['👍', '❤️', '😂', '😮', '😢', '😡'];
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
   @override
@@ -595,6 +596,88 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  Widget _buildReactions(Map<String, dynamic> m) {
+    final reactions = m['reactions'] as List? ?? [];
+    final me = ref.read(authProvider).user;
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Wrap(
+        spacing: 4,
+        runSpacing: 4,
+        children: [
+          ...reactions.map((r) {
+            final emoji = r['emoji'] as String;
+            final count = r['count'] as int;
+            final userIds = List<String>.from(r['user_ids'] ?? []);
+            final reacted = me != null && userIds.contains(me.id);
+            return GestureDetector(
+              onTap: () async {
+                final updated = reacted
+                    ? await KodaApi.instance.removeReaction(m['id'] as String, emoji)
+                    : await KodaApi.instance.addReaction(m['id'] as String, emoji);
+                if (updated != null && mounted) setState(() => m['reactions'] = updated);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: reacted ? KodaColors.koda.withValues(alpha: 0.15) : KodaColors.elevated,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: reacted ? KodaColors.koda.withValues(alpha: 0.5) : KodaColors.border),
+                ),
+                child: Text('$emoji $count', style: const TextStyle(fontSize: 12)),
+              ),
+            );
+          }),
+          GestureDetector(
+            onTap: () => _showReactionPicker(m),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: KodaColors.elevated,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: KodaColors.border),
+              ),
+              child: const Text('+ :)', style: TextStyle(fontSize: 12)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showReactionPicker(Map<String, dynamic> message) async {
+    final emoji = await showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Text('Add Reaction',
+            style: TextStyle(color: KodaColors.text1, fontSize: 14)),
+        content: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _kQuickReactions.map((e) => GestureDetector(
+            onTap: () => Navigator.pop(context, e),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: KodaColors.elevated,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(e, style: const TextStyle(fontSize: 24)),
+            ),
+          )).toList(),
+        ),
+      ),
+    );
+    if (emoji == null || !mounted) return;
+    final updated = await KodaApi.instance.addReaction(
+        message['id'] as String, emoji);
+    if (updated != null && mounted) {
+      setState(() => message['reactions'] = updated);
+    }
+  }
+
   Widget _buildReplyPreview(Map<String, dynamic> replyTo) {
     final author = (replyTo['author'] as Map<String, dynamic>?)?['username'] as String? ?? 'Unknown';
     final content = replyTo['content'] as String? ?? '';
@@ -773,12 +856,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ],
                       ],
                     ),
+                    
                     const SizedBox(height: 2),
                     if (m['reply_to'] != null)
                       _buildReplyPreview(m['reply_to'] as Map<String, dynamic>),
                     Text(m['content'] as String? ?? '',
                         style: const TextStyle(
                             color: KodaColors.text1, fontSize: 14)),
+                      _buildReactions(m),
                   ]),
                 ),
               ]),

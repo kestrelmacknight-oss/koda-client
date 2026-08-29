@@ -897,6 +897,23 @@ class KodaApi {
     } catch (e) { _log('createThread', e); return null; }
   }
 
+  // -- Reactions ----------------------------------------------------------------
+
+  Future<List<Map<String, dynamic>>?> addReaction(String messageId, String emoji) async {
+    try {
+      final res = await _dio.post('/messages/$messageId/reactions',
+          data: {'emoji': emoji});
+      return List<Map<String, dynamic>>.from(res.data['reactions'] ?? []);
+    } catch (e) { _log('addReaction', e); return null; }
+  }
+
+  Future<List<Map<String, dynamic>>?> removeReaction(String messageId, String emoji) async {
+    try {
+      final res = await _dio.delete('/messages/$messageId/reactions/$emoji');
+      return List<Map<String, dynamic>>.from(res.data['reactions'] ?? []);
+    } catch (e) { _log('removeReaction', e); return null; }
+  }
+
   void _log(String method, Object e) {
     if (kDebugMode) debugPrint('[KodaApi] $method failed: $e');
   }
