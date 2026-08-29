@@ -45,6 +45,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final Map<String, DateTime> _typingUsers = {};
   Timer? _typingCleanupTimer;
   Map<String, dynamic>? _replyingTo;
+  final Set<String> _expandedThreads = {};
 
   @override
   void initState() {
@@ -728,6 +729,56 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  List<Widget> _buildChannelList(Map<String, dynamic>? selectedChannel) {
+    final threads = _channels.where((c) => c['is_thread'] == true).toList();
+    final regular = _channels.where((c) => c['is_thread'] != true).toList();
+    final result = <Widget>[];
+
+    for (final c in regular.where((c) => c['category_id'] == null)) {
+      result.add(_buildChannelTile(c, selectedChannel));
+      final cThreads = threads.where((t) =>
+          (t['parent_message_id'] ?? '') != '').toList();
+      if (cThreads.isNotEmpty) {
+        result.add(ListTile(
+          dense: true,
+          contentPadding: const EdgeInsets.only(left: 16),
+          leading: Icon(
+            _expandedThreads.contains(c['id'])
+                ? Icons.expand_less : Icons.expand_more,
+            size: 14, color: KodaColors.text3),
+          title: Text('${cThreads.length} thread${cThreads.length == 1 ? '' : 's'}',
+              style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+          onTap: () => setState(() {
+            if (_expandedThreads.contains(c['id'])) {
+              _expandedThreads.remove(c['id']);
+            } else {
+              _expandedThreads.add(c['id']);
+            }
+          }),
+        ));
+        if (_expandedThreads.contains(c['id'])) {
+          result.addAll(cThreads.map((t) => _buildChannelTile(t, selectedChannel)));
+        }
+      }
+    }
+
+    for (final cat in _categories) {
+      final catChannels = regular.where((c) => c['category_id'] == cat['id']).toList();
+      if (catChannels.isEmpty) continue;
+      result.add(Padding(
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 2),
+        child: Text(
+          (cat['name'] as String? ?? '').toUpperCase(),
+          style: const TextStyle(color: KodaColors.text3, fontSize: 10,
+              fontWeight: FontWeight.w700, letterSpacing: 1),
+        ),
+      ));
+      result.addAll(catChannels.map((c) => _buildChannelTile(c, selectedChannel)));
+    }
+
+    return result;
+  }
+
   // Returns the correct content widget for the currently selected channel.
   // Keeping this as a method rather than inline in build() avoids the
   // "if statement as positional argument" Dart restriction entirely.
@@ -1142,28 +1193,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  children: [
-                    // Uncategorized channels first
-                    ..._channels.where((c) => c['category_id'] == null).map((c) => _buildChannelTile(c, selectedChannel)),
-                    // Then each category with its channels
-                    ..._categories.expand((cat) {
-                      final catChannels = _channels.where(
-                          (c) => c['category_id'] == cat['id']).toList();
-                      if (catChannels.isEmpty) return <Widget>[];
-                      return [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 12, 12, 2),
-                          child: Text(
-                            (cat['name'] as String? ?? '').toUpperCase(),
-                            style: const TextStyle(
-                                color: KodaColors.text3, fontSize: 10,
-                                fontWeight: FontWeight.w700, letterSpacing: 1),
-                          ),
-                        ),
-                        ...catChannels.map((c) => _buildChannelTile(c, selectedChannel)),
-                      ];
-                    }),
-                  ],
+                  children: _buildChannelList(selectedChannel),
                 ),
               ),
               Container(
@@ -1203,3 +1233,4 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 }
+
