@@ -21,9 +21,12 @@ import 'package:phoenix_socket/phoenix_socket.dart';
 import '../gallery/gallery_screen.dart';
 import '../stage/stage_screen.dart';
 import '../server/rules_screen.dart';
+import '../server/calendar_screen.dart';
+import '../marketplace/marketplace_screen.dart';
+import '../marketplace/tip_dialog.dart';
+import '../server/role_select_screen.dart';
 import '../../shared/notification_bell.dart';
 import '../../core/notifications_provider.dart';
-import '../server/role_select_screen.dart';
 import '../admin/admin_screen.dart';
 
 const _kQuickReactions = ['👍', '❤️', '😂', '😮', '😢', '😡'];
@@ -46,6 +49,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final Map<String, DateTime> _typingUsers = {};
   Timer? _typingCleanupTimer;
   Map<String, dynamic>? _replyingTo;
+  final Set<String> _expandedThreads = {};
 
   @override
   void initState() {
@@ -139,6 +143,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // Leave the previous channel's socket topic
     if (_activeChannelId != null && _activeChannelId != channelId) {
       KodaSocket.instance.leave('channel:$_activeChannelId');
+    }
+
+
+    // Rules channel -- show rules screen
+    if (channel['type'] == 'rules') {
+      final server = ref.read(selectedServerProvider);
+      if (server == null) return;
+      final rules = await KodaApi.instance.getServerRules(server['id'] as String);
+      if (!mounted) return;
+      if (rules != null && rules['accepted'] != true && rules['rules'] != null) {
+        await Navigator.push(context, MaterialPageRoute(
+          builder: (_) => RulesScreen(
+            serverId: server['id'] as String,
+            serverName: server['name'] as String? ?? '',
+            rulesContent: rules['rules'] as String,
+            onAccepted: () => Navigator.pop(context),
+          ),
+        ));
+      }
+      return;
+    }
+
+    // Role-select channel
+    if (channel['type'] == 'role-select') {
+      final server = ref.read(selectedServerProvider);
+      if (server == null) return;
+      await Navigator.push(context, MaterialPageRoute(
+        builder: (_) => RoleSelectScreen(
+          serverId: server['id'] as String,
+          channelName: channel['name'] as String? ?? 'Role Selection',
+        ),
+      ));
+      return;
     }
 
     // Stage channels push a route -- handled separately from text
@@ -425,6 +462,103 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Future<void> _showUserProfile(BuildContext context, Map<String, dynamic>? author) async {
+    if (author == null) return;
+    final me = ref.read(authProvider).user;
+    final userId = author['id'] as String? ?? '';
+    if (userId == me?.id) return; // don't show profile for self
+    final username = author['username'] as String? ?? 'Unknown';
+    final avatarUrl = author['avatar_url'] as String?;
+
+    // Check friendship status
+    final status = await KodaApi.instance.getFriendStatus(userId);
+    if (!mounted) return;
+    final isFriend = status?['friends'] == true;
+    final canDm = status?['can_dm'] == true;
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        content: SizedBox(
+          width: 280,
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            KodaAvatar(username: username, size: 64, avatarUrl: avatarUrl),
+            const SizedBox(height: 12),
+            Text(username, style: const TextStyle(color: KodaColors.text1,
+                fontSize: 18, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 16),
+            if (isFriend)
+              const Text('You are friends',
+                  style: TextStyle(color: KodaColors.koda, fontSize: 12)),
+            const SizedBox(height: 12),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              if (!isFriend)
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: KodaColors.koda,
+                    foregroundColor: Colors.black,
+                  ),
+                  icon: const Icon(Icons.person_add_outlined, size: 16),
+                  label: const Text('Add Friend'),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    final ok = await KodaApi.instance.sendFriendRequest(userId);
+                    if (ok && mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Friend request sent to $username!')));
+                    }
+                  },
+                ),
+              if (isFriend) ...[
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: KodaColors.elevated,
+                    foregroundColor: KodaColors.text1,
+                  ),
+                  icon: const Icon(Icons.message_outlined, size: 16),
+                  label: const Text('Message'),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    final convo = await KodaApi.instance.getOrCreateConversation(userId);
+                    if (convo != null && mounted) {
+                      Navigator.push(context, MaterialPageRoute(
+                          builder: (_) => const DmScreen()));
+                    }
+                  },
+                ),
+              ],
+            ]),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: KodaColors.koda,
+                side: const BorderSide(color: KodaColors.koda),
+              ),
+              icon: const Icon(Icons.volunteer_activism, size: 16),
+              label: const Text('Send Tip'),
+              onPressed: () {
+                Navigator.pop(context);
+                final server = ref.read(selectedServerProvider);
+                showDialog(
+                  context: context,
+                  builder: (_) => TipDialog(
+                    recipient: author,
+                    serverId: server?['id'] as String?,
+                  ),
+                );
+              },
+            ),
+          ]),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context),
+              child: const Text('Close')),
+        ],
+      ),
+    );
+  }
+
   Future<void> _showServerContextMenu(
       Map<String, dynamic> server, Offset position) async {
     final user = ref.read(authProvider).user;
@@ -701,6 +835,56 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  List<Widget> _buildChannelList(Map<String, dynamic>? selectedChannel) {
+    final threads = _channels.where((c) => c['is_thread'] == true).toList();
+    final regular = _channels.where((c) => c['is_thread'] != true).toList();
+    final result = <Widget>[];
+
+    for (final c in regular.where((c) => c['category_id'] == null)) {
+      result.add(_buildChannelTile(c, selectedChannel));
+      final cThreads = threads.where((t) =>
+          (t['parent_message_id'] ?? '') != '').toList();
+      if (cThreads.isNotEmpty) {
+        result.add(ListTile(
+          dense: true,
+          contentPadding: const EdgeInsets.only(left: 16),
+          leading: Icon(
+            _expandedThreads.contains(c['id'])
+                ? Icons.expand_less : Icons.expand_more,
+            size: 14, color: KodaColors.text3),
+          title: Text('${cThreads.length} thread${cThreads.length == 1 ? '' : 's'}',
+              style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+          onTap: () => setState(() {
+            if (_expandedThreads.contains(c['id'])) {
+              _expandedThreads.remove(c['id']);
+            } else {
+              _expandedThreads.add(c['id']);
+            }
+          }),
+        ));
+        if (_expandedThreads.contains(c['id'])) {
+          result.addAll(cThreads.map((t) => _buildChannelTile(t, selectedChannel)));
+        }
+      }
+    }
+
+    for (final cat in _categories) {
+      final catChannels = regular.where((c) => c['category_id'] == cat['id']).toList();
+      if (catChannels.isEmpty) continue;
+      result.add(Padding(
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 2),
+        child: Text(
+          (cat['name'] as String? ?? '').toUpperCase(),
+          style: const TextStyle(color: KodaColors.text3, fontSize: 10,
+              fontWeight: FontWeight.w700, letterSpacing: 1),
+        ),
+      ));
+      result.addAll(catChannels.map((c) => _buildChannelTile(c, selectedChannel)));
+    }
+
+    return result;
+  }
+
   // Returns the correct content widget for the currently selected channel.
   // Keeping this as a method rather than inline in build() avoids the
   // "if statement as positional argument" Dart restriction entirely.
@@ -714,6 +898,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       'stage'       => Icons.campaign_outlined,
       'rules'       => Icons.gavel_outlined,
       'role-select' => Icons.badge_outlined,
+      'calendar'    => Icons.calendar_month_outlined,
       _             => isThread ? Icons.forum_outlined : Icons.tag,
     };
     final tile = GestureDetector(
@@ -754,6 +939,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
     if (type == 'stage') {
       return StageScreen(channel: selectedChannel);
+    }
+
+    if (type == 'calendar') {
+      return CalendarScreen(channel: selectedChannel);
     }
 
     // Text channel (and anything else -- fallback to chat)
@@ -829,11 +1018,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                KodaAvatar(
+                GestureDetector(
+                  onTap: () => _showUserProfile(context, m['author'] as Map<String, dynamic>?),
+                  child: KodaAvatar(
                   username: author,
                   size: 34,
                   avatarUrl: (m['author'] as Map<String, dynamic>?)?['avatar_url'] as String?,
                   ),
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -901,7 +1093,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: KodaTextField(
               controller: _messageController,
               hintText: 'Message #${selectedChannel['name']}',
-                          onSubmitted: (_) => _sendMessage(),
+              onChanged: (_) {
+                final channel = ref.read(selectedChannelProvider);
+                if (channel == null) return;
+                KodaSocket.instance.push(
+                  'channel:${channel['id']}',
+                  'typing',
+                  {'typing': true},
+                );
+              },
+              onSubmitted: (_) => _sendMessage(),
+
             ),
           ),
           const SizedBox(width: 10),
@@ -1047,6 +1249,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
             ),
             IconButton(
+              icon: const Icon(Icons.storefront_outlined, color: KodaColors.text2),
+              tooltip: 'Marketplace',
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const MarketplaceScreen())),
+            ),
+            IconButton(
               icon: const Icon(Icons.add, color: KodaColors.text2),
               tooltip: 'Create or Join',
               onPressed: () => _showAddServerMenu(),
@@ -1104,28 +1312,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  children: [
-                    // Uncategorized channels first
-                    ..._channels.where((c) => c['category_id'] == null).map((c) => _buildChannelTile(c, selectedChannel)),
-                    // Then each category with its channels
-                    ..._categories.expand((cat) {
-                      final catChannels = _channels.where(
-                          (c) => c['category_id'] == cat['id']).toList();
-                      if (catChannels.isEmpty) return <Widget>[];
-                      return [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 12, 12, 2),
-                          child: Text(
-                            (cat['name'] as String? ?? '').toUpperCase(),
-                            style: const TextStyle(
-                                color: KodaColors.text3, fontSize: 10,
-                                fontWeight: FontWeight.w700, letterSpacing: 1),
-                          ),
-                        ),
-                        ...catChannels.map((c) => _buildChannelTile(c, selectedChannel)),
-                      ];
-                    }),
-                  ],
+                  children: _buildChannelList(selectedChannel),
                 ),
               ),
               Container(
@@ -1165,6 +1352,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 }
+
+
 
 
 
