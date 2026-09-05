@@ -21,6 +21,9 @@ import 'package:phoenix_socket/phoenix_socket.dart';
 import '../gallery/gallery_screen.dart';
 import '../stage/stage_screen.dart';
 import '../server/rules_screen.dart';
+import '../server/calendar_screen.dart';
+import '../marketplace/marketplace_screen.dart';
+import '../marketplace/tip_dialog.dart';
 import '../server/role_select_screen.dart';
 import '../../shared/notification_bell.dart';
 import '../../core/notifications_provider.dart';
@@ -526,6 +529,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ],
             ]),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: KodaColors.koda,
+                side: const BorderSide(color: KodaColors.koda),
+              ),
+              icon: const Icon(Icons.volunteer_activism, size: 16),
+              label: const Text('Send Tip'),
+              onPressed: () {
+                Navigator.pop(context);
+                final server = ref.read(selectedServerProvider);
+                showDialog(
+                  context: context,
+                  builder: (_) => TipDialog(
+                    recipient: author,
+                    serverId: server?['id'] as String?,
+                  ),
+                );
+              },
+            ),
           ]),
         ),
         actions: [
@@ -875,6 +898,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       'stage'       => Icons.campaign_outlined,
       'rules'       => Icons.gavel_outlined,
       'role-select' => Icons.badge_outlined,
+      'calendar'    => Icons.calendar_month_outlined,
       _             => isThread ? Icons.forum_outlined : Icons.tag,
     };
     final tile = GestureDetector(
@@ -915,6 +939,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
     if (type == 'stage') {
       return StageScreen(channel: selectedChannel);
+    }
+
+    if (type == 'calendar') {
+      return CalendarScreen(channel: selectedChannel);
     }
 
     // Text channel (and anything else -- fallback to chat)
@@ -1221,6 +1249,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
             ),
             IconButton(
+              icon: const Icon(Icons.storefront_outlined, color: KodaColors.text2),
+              tooltip: 'Marketplace',
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const MarketplaceScreen())),
+            ),
+            IconButton(
               icon: const Icon(Icons.add, color: KodaColors.text2),
               tooltip: 'Create or Join',
               onPressed: () => _showAddServerMenu(),
@@ -1318,4 +1352,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 }
+
+
+
+
 

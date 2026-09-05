@@ -204,12 +204,14 @@ class KodaApi {
     String type = 'text',
     String? categoryId,
     bool isReadOnly = false,
+    bool isSubscriberOnly = false,
   }) async {
     try {
       final res = await _dio.post('/servers/$serverId/channels', data: {
         'name': name,
         'type': type,
         'is_read_only': isReadOnly,
+        'is_subscriber_only': isSubscriberOnly,
         if (categoryId != null) 'category_id': categoryId,
       });
       return res.data['channel'] as Map<String, dynamic>;
@@ -927,6 +929,171 @@ class KodaApi {
     } catch (e) { _log('removeReaction', e); return null; }
   }
 
+  // -- Events / Calendar --------------------------------------------------------
+
+  Future<List<Map<String, dynamic>>> getEvents(String channelId) async {
+    try {
+      final res = await _dio.get('/channels/$channelId/events');
+      return List<Map<String, dynamic>>.from(res.data['events'] ?? []);
+    } catch (e) { _log('getEvents', e); return []; }
+  }
+
+  Future<Map<String, dynamic>?> createEvent(String channelId, Map<String, dynamic> data) async {
+    try {
+      final res = await _dio.post('/channels/$channelId/events', data: data);
+      return res.data['event'] as Map<String, dynamic>;
+    } catch (e) { _log('createEvent', e); return null; }
+  }
+
+  Future<bool> updateEvent(String eventId, Map<String, dynamic> data) async {
+    try {
+      await _dio.patch('/events/$eventId', data: data);
+      return true;
+    } catch (e) { _log('updateEvent', e); return false; }
+  }
+
+  Future<bool> deleteEvent(String eventId) async {
+    try {
+      await _dio.delete('/events/$eventId');
+      return true;
+    } catch (e) { _log('deleteEvent', e); return false; }
+  }
+
+  Future<bool> subscribeToEvent(String eventId) async {
+    try {
+      await _dio.post('/events/$eventId/subscribe');
+      return true;
+    } catch (e) { _log('subscribeToEvent', e); return false; }
+  }
+
+  Future<bool> unsubscribeFromEvent(String eventId) async {
+    try {
+      await _dio.delete('/events/$eventId/subscribe');
+      return true;
+    } catch (e) { _log('unsubscribeFromEvent', e); return false; }
+  }
+
+  // -- Marketplace --------------------------------------------------------------
+
+  Future<Map<String, dynamic>?> getConnectAccount() async {
+    try {
+      final res = await _dio.get('/marketplace/connect');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getConnectAccount', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> createConnectAccount() async {
+    try {
+      final res = await _dio.post('/marketplace/connect');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('createConnectAccount', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> getOnboardingUrl() async {
+    try {
+      final res = await _dio.post('/marketplace/connect/onboarding-url');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getOnboardingUrl', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> syncConnectAccount() async {
+    try {
+      final res = await _dio.post('/marketplace/connect/sync');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('syncConnectAccount', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> getTipPreview(String toUserId, int amountCents) async {
+    try {
+      final res = await _dio.get('/marketplace/tip/preview',
+          queryParameters: {'to_user_id': toUserId, 'amount_cents': amountCents});
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getTipPreview', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> createTip(String toUserId, int amountCents,
+      String serverId, {String? message}) async {
+    try {
+      final res = await _dio.post('/marketplace/tips', data: {
+        'to_user_id':   toUserId,
+        'amount_cents': amountCents,
+        'server_id':    serverId,
+        if (message != null) 'message': message,
+      });
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('createTip', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> getSubscriptionInfo() async {
+    try {
+      final res = await _dio.get('/marketplace/subscription');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getSubscriptionInfo', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> createSubscription(String tier,
+      {String? serverId, String? giftedToUserId}) async {
+    try {
+      final res = await _dio.post('/marketplace/subscription', data: {
+        'tier': tier,
+        if (serverId != null) 'server_id': serverId,
+        if (giftedToUserId != null) 'gifted_to_user_id': giftedToUserId,
+      });
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('createSubscription', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> getServerBank(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/bank');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getServerBank', e); return null; }
+  }
+
+  // -- Server subscriptions ----------------------------------------------------
+
+  Future<List<Map<String, dynamic>>> getServerSubscriptionTiers(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/subscription-tiers');
+      return List<Map<String, dynamic>>.from(res.data['tiers'] ?? []);
+    } catch (e) { _log('getServerSubscriptionTiers', e); return []; }
+  }
+
+  Future<Map<String, dynamic>?> createServerSubscriptionTier(String serverId, Map<String, dynamic> data) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/subscription-tiers', data: data);
+      return res.data['tier'] as Map<String, dynamic>;
+    } catch (e) { _log('createServerSubscriptionTier', e); return null; }
+  }
+
+  Future<bool> updateServerSubscriptionTier(String tierId, Map<String, dynamic> data) async {
+    try {
+      await _dio.patch('/subscription-tiers/$tierId', data: data);
+      return true;
+    } catch (e) { _log('updateServerSubscriptionTier', e); return false; }
+  }
+
+  Future<bool> deleteServerSubscriptionTier(String tierId) async {
+    try {
+      await _dio.delete('/subscription-tiers/$tierId');
+      return true;
+    } catch (e) { _log('deleteServerSubscriptionTier', e); return false; }
+  }
+
+  Future<Map<String, dynamic>?> getMyServerSubscription(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/my-subscription');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getMyServerSubscription', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> subscribeToServerTier(String tierId) async {
+    try {
+      final res = await _dio.post('/subscription-tiers/$tierId/subscribe');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('subscribeToServerTier', e); return null; }
+  }
+
   void _log(String method, Object e) {
     if (kDebugMode) debugPrint('[KodaApi] $method failed: $e');
   }
@@ -952,6 +1119,7 @@ class KodaApi {
   }
 
 }
+
 
 
 

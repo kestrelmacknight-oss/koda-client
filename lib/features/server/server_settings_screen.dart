@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import '../marketplace/server_subscription_screen.dart';
 import '../../core/providers.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
@@ -58,7 +59,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
     _loadAll();
   }
 
@@ -214,7 +215,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       allowedRoleIds = List<String>.from(existing['allowed_role_ids'] ?? []);
     }
     List<String> selectedRoleIds = List<String>.from(allowedRoleIds);
-        bool isReadOnly = existing?['is_read_only'] == true;
+    bool isReadOnly = existing?['is_read_only'] == true;
+    bool isSubscriberOnly = existing?['is_subscriber_only'] == true;
     final saved = await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
@@ -242,6 +244,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                   DropdownMenuItem(value: 'stage', child: Text('Stage')),
                   DropdownMenuItem(value: 'rules', child: Text('Rules')),
                   DropdownMenuItem(value: 'role-select', child: Text('Role Selection')),
+                  DropdownMenuItem(value: 'calendar', child: Text('Calendar')),
                 ],
                 onChanged: (v) => setDialogState(() => type = v ?? 'text'),
               ),
@@ -292,6 +295,18 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                   activeColor: KodaColors.koda,
                   onChanged: (v) => setDialogState(() => isReadOnly = v),
                 ),
+                const SizedBox(height: 4),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Subscriber only',
+                      style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+                  subtitle: const Text('Only server subscribers can view this channel',
+                      style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+                  value: isSubscriberOnly,
+                  activeColor: KodaColors.koda,
+                  onChanged: (v) => setDialogState(() => isSubscriberOnly = v),
+                ),
+
               ],
               ]),
             ),
@@ -309,10 +324,11 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     if (existing == null) {
       await KodaApi.instance.createChannel(
           serverId: _serverId, name: name, type: type,
-          categoryId: selectedCategoryId, isReadOnly: isReadOnly);
+          categoryId: selectedCategoryId, isReadOnly: isReadOnly, isSubscriberOnly: isSubscriberOnly);
     } else {
       await KodaApi.instance.updateChannel(existing!['id'], {
         'name': name, 'type': type, 'category_id': selectedCategoryId, 'is_read_only': isReadOnly,
+        'is_subscriber_only': isSubscriberOnly,
       });
     }
     // Save role permissions
@@ -539,7 +555,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
           : TabBarView(
               controller: _tabController,
-              children: [_buildChannelsTab(), _buildRolesTab(), _buildMembersTab(), _buildInvitesTab()],
+              children: [_buildChannelsTab(), _buildRolesTab(), _buildMembersTab(), _buildInvitesTab(), _buildSubscriptionsTab()],
             ),
     );
   }
@@ -919,7 +935,18 @@ Widget _buildInvitesTab() {
       },
     );
   }
+  Widget _buildSubscriptionsTab() {
+    final server = ref.watch(selectedServerProvider);
+    if (server == null) return const SizedBox.shrink();
+    return ServerSubscriptionScreen(
+      server: server,
+      isOwner: true,
+    );
+  }
+
 }
+
+
 
 
 
