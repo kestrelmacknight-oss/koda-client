@@ -10,6 +10,7 @@ import '../../core/api.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../shared/widgets.dart';
+import 'digital_goods_screen.dart';
 
 class MarketplaceScreen extends ConsumerStatefulWidget {
   const MarketplaceScreen({super.key});
@@ -28,7 +29,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 3, vsync: this);
+    _tabs = TabController(length: 4, vsync: this);
     _loadData();
   }
 
@@ -68,6 +69,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
             Tab(text: 'Subscriptions'),
             Tab(text: 'Creator'),
             Tab(text: 'Server Bank'),
+            const Tab(text: 'Digital Goods'),
           ],
         ),
       ),
@@ -77,6 +79,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
           _buildSubscriptionsTab(),
           _buildCreatorTab(),
           _buildServerBankTab(),
+          _buildDigitalGoodsTab(),
         ],
       ),
     );
@@ -549,6 +552,15 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
     return _ServerBankView(server: server);
   }
 
+  Widget _buildDigitalGoodsTab() {
+    final user = ref.watch(authProvider).user;
+    final server = ref.watch(selectedServerProvider);
+    return DigitalGoodsScreen(
+      server: server,
+      creatorMode: false,
+    );
+  }
+
   String _formatDate(dynamic raw) {
     if (raw == null) return '';
     try {
@@ -654,3 +666,6 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
     );
   }
 }
+
+
+

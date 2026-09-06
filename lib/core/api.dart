@@ -77,7 +77,7 @@ class KodaApi {
     }
   }
 
-  Future<bool> verifyEmail(String code, String userId) async {
+  Future<bool> verifyEmail(String code, [String userId = '']) async {
     try {
       await _dio.post('/auth/verify_email',
           data: {'code': code, 'user_id': userId});
@@ -1092,6 +1092,67 @@ class KodaApi {
       final res = await _dio.post('/subscription-tiers/$tierId/subscribe');
       return res.data as Map<String, dynamic>;
     } catch (e) { _log('subscribeToServerTier', e); return null; }
+  }
+
+  // -- Digital products ---------------------------------------------------------
+
+  Future<List<Map<String, dynamic>>> getProducts({String? serverId, String? creatorId}) async {
+    try {
+      final params = <String, dynamic>{};
+      if (serverId != null) params['server_id'] = serverId;
+      if (creatorId != null) params['creator_id'] = creatorId;
+      final res = await _dio.get('/products', queryParameters: params);
+      return List<Map<String, dynamic>>.from(res.data['products'] ?? []);
+    } catch (e) { _log('getProducts', e); return []; }
+  }
+
+  Future<Map<String, dynamic>?> getProduct(String id) async {
+    try {
+      final res = await _dio.get('/products/$id');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getProduct', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> createProduct(Map<String, dynamic> data) async {
+    try {
+      final res = await _dio.post('/products', data: data);
+      return res.data['product'] as Map<String, dynamic>;
+    } catch (e) { _log('createProduct', e); return null; }
+  }
+
+  Future<bool> updateProduct(String id, Map<String, dynamic> data) async {
+    try {
+      await _dio.patch('/products/$id', data: data);
+      return true;
+    } catch (e) { _log('updateProduct', e); return false; }
+  }
+
+  Future<bool> deleteProduct(String id) async {
+    try {
+      await _dio.delete('/products/$id');
+      return true;
+    } catch (e) { _log('deleteProduct', e); return false; }
+  }
+
+  Future<bool> addLicenseKeys(String productId, String keys) async {
+    try {
+      await _dio.post('/products/$productId/license-keys', data: {'keys': keys});
+      return true;
+    } catch (e) { _log('addLicenseKeys', e); return false; }
+  }
+
+  Future<Map<String, dynamic>?> purchaseProduct(String productId) async {
+    try {
+      final res = await _dio.post('/products/$productId/purchase');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('purchaseProduct', e); return null; }
+  }
+
+  Future<List<Map<String, dynamic>>> getMyPurchases() async {
+    try {
+      final res = await _dio.get('/products/purchases');
+      return List<Map<String, dynamic>>.from(res.data['purchases'] ?? []);
+    } catch (e) { _log('getMyPurchases', e); return []; }
   }
 
   void _log(String method, Object e) {
