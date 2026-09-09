@@ -665,6 +665,22 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
       ],
     );
   }
+
+  Widget _buildDigitalGoodsTab() {
+    final server = ref.watch(selectedServerProvider);
+    return DigitalGoodsScreen(
+      server: server,
+      creatorMode: false,
+    );
+  }
+
+  String _formatDate(dynamic raw) {
+    if (raw == null) return '';
+    try {
+      final dt = DateTime.parse(raw.toString()).toLocal();
+      return '${dt.month}/${dt.day}/${dt.year}';
+    } catch (_) { return ''; }
+  }
 }
 
 

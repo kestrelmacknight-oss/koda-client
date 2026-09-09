@@ -24,6 +24,7 @@ import '../server/rules_screen.dart';
 import '../server/calendar_screen.dart';
 import '../marketplace/marketplace_screen.dart';
 import '../marketplace/tip_dialog.dart';
+import '../marketplace/tip_dialog.dart';
 import '../server/role_select_screen.dart';
 import '../../shared/notification_bell.dart';
 import '../../core/notifications_provider.dart';
@@ -1352,6 +1353,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 }
+
 
 
 
