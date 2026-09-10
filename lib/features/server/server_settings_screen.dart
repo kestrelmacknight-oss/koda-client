@@ -450,32 +450,36 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
               style: const TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 320,
+            height: 400,
             child: _roles.isEmpty
                 ? const Text('No roles yet.', style: TextStyle(color: KodaColors.text3))
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: _roles.map((role) {
-                      final has = memberRoleIds.contains(role['id']);
-                      return CheckboxListTile(
-                        dense: true,
-                        title: Text(role['name'],
-                            style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
-                        value: has,
-                        activeColor: KodaColors.koda,
-                        onChanged: (v) async {
-                          if (v == true) {
-                            await KodaApi.instance.assignRole(member['member_id'], role['id']);
-                            memberRoleIds.add(role['id']);
-                          } else {
-                            await KodaApi.instance.unassignRole(member['member_id'], role['id']);
-                            memberRoleIds.remove(role['id']);
-                          }
-                          setDialogState(() {});
-                        },
-                      );
-                    }).toList(),
+                : SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: _roles.map((role) {
+                        final has = memberRoleIds.contains(role['id']);
+                        return CheckboxListTile(
+                          dense: true,
+                          title: Text(role['name'],
+                              style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+                          value: has,
+                          activeColor: KodaColors.koda,
+                          onChanged: (v) async {
+                            if (v == true) {
+                              await KodaApi.instance.assignRole(member['member_id'], role['id']);
+                              memberRoleIds.add(role['id']);
+                            } else {
+                              await KodaApi.instance.unassignRole(member['member_id'], role['id']);
+                              memberRoleIds.remove(role['id']);
+                            }
+                            setDialogState(() {});
+                          },
+                        );
+                      }).toList(),
+                    ),
                   ),
           ),
+
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Done')),
           ],

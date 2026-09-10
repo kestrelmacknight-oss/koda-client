@@ -1155,6 +1155,29 @@ class KodaApi {
     } catch (e) { _log('getMyPurchases', e); return []; }
   }
 
+  // -- Reordering --------------------------------------------------------------
+
+  Future<bool> reorderChannels(String serverId, List<Map<String, dynamic>> order) async {
+    try {
+      await _dio.post('/servers/$serverId/channels/reorder', data: {'order': order});
+      return true;
+    } catch (e) { _log('reorderChannels', e); return false; }
+  }
+
+  Future<bool> reorderCategories(String serverId, List<Map<String, dynamic>> order) async {
+    try {
+      await _dio.post('/servers/$serverId/categories/reorder', data: {'order': order});
+      return true;
+    } catch (e) { _log('reorderCategories', e); return false; }
+  }
+
+  Future<List<Map<String, dynamic>>> getServerPresence(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/presence');
+      return List<Map<String, dynamic>>.from(res.data['presence'] ?? []);
+    } catch (e) { _log('getServerPresence', e); return []; }
+  }
+
   void _log(String method, Object e) {
     if (kDebugMode) debugPrint('[KodaApi] $method failed: $e');
   }

@@ -197,6 +197,39 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
                 ),
                 const SizedBox(height: 24),
+                _sectionLabel('Audio Processing'),
+                _toggleTile(
+                  title: 'Loudness Normalization',
+                  subtitle: 'Normalize mic input to a consistent volume level',
+                  value: settings.loudnessNormalization,
+                  onChanged: (v) => _save(settings.copyWith(loudnessNormalization: v)),
+                ),
+                _toggleTile(
+                  title: 'Auto-Ducking',
+                  subtitle: 'Automatically lower your volume when others speak',
+                  value: settings.autoDucking,
+                  onChanged: (v) => _save(settings.copyWith(autoDucking: v)),
+                ),
+
+                const SizedBox(height: 24),
+                _sectionLabel('Equalizer'),
+                const Text('Adjust output audio tone',
+                    style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+                const SizedBox(height: 8),
+                _eqSlider('Bass', settings.eqBass, -10, 10,
+                  (v) => ref.read(voiceSettingsProvider.notifier).update((s) => s.copyWith(eqBass: v)),
+                  (v) => _save(settings.copyWith(eqBass: v)),
+                ),
+                _eqSlider('Mid', settings.eqMid, -10, 10,
+                  (v) => ref.read(voiceSettingsProvider.notifier).update((s) => s.copyWith(eqMid: v)),
+                  (v) => _save(settings.copyWith(eqMid: v)),
+                ),
+                _eqSlider('Treble', settings.eqTreble, -10, 10,
+                  (v) => ref.read(voiceSettingsProvider.notifier).update((s) => s.copyWith(eqTreble: v)),
+                  (v) => _save(settings.copyWith(eqTreble: v)),
+                ),
+
+                const SizedBox(height: 24),
                 _sectionLabel('VARM - Virtual Avatar Reactive Model'),
                 const Text(
                   'Upload two images that swap when you speak. Visible only to you.',
@@ -334,6 +367,40 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
             style: const TextStyle(
                 color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
       );
+
+  Widget _eqSlider(String label, double value, double min, double max,
+      ValueChanged<double> onChanged, ValueChanged<double> onChangeEnd) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(children: [
+        SizedBox(
+          width: 48,
+          child: Text(label,
+              style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+        ),
+        Expanded(
+          child: Slider(
+            value: value,
+            min: min,
+            max: max,
+            divisions: 20,
+            activeColor: KodaColors.koda,
+            inactiveColor: KodaColors.border,
+            onChanged: onChanged,
+            onChangeEnd: onChangeEnd,
+          ),
+        ),
+        SizedBox(
+          width: 36,
+          child: Text(
+            '${value.toStringAsFixed(0)}dB',
+            textAlign: TextAlign.right,
+            style: const TextStyle(color: KodaColors.text3, fontSize: 11),
+          ),
+        ),
+      ]),
+    );
+  }
 
   Widget _toggleTile({
     required String title,

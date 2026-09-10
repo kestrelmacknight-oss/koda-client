@@ -77,13 +77,14 @@ class VoiceSettings {
   final String? audioInputId;
   final String? audioOutputId;
   final String? videoInputId;
-
-  // VARM -- Virtual Avatar Reactive Model
-  // Two images that swap based on audio level (talking vs silent).
-  // Null = VARM disabled, use camera or nothing.
-  final String? varmSilentUrl;   // image shown when not speaking
-  final String? varmTalkingUrl;  // image shown when speaking
-  final double varmThreshold;    // 0.0-1.0, audio level to trigger talking image
+  final String? varmSilentUrl;
+  final String? varmTalkingUrl;
+  final double varmThreshold;
+  final bool loudnessNormalization;
+  final bool autoDucking;
+  final double eqBass;
+  final double eqMid;
+  final double eqTreble;
 
   const VoiceSettings({
     this.noiseSuppression = true,
@@ -98,38 +99,53 @@ class VoiceSettings {
     this.varmSilentUrl,
     this.varmTalkingUrl,
     this.varmThreshold = 0.1,
+    this.loudnessNormalization = false,
+    this.autoDucking = false,
+    this.eqBass = 0.0,
+    this.eqMid = 0.0,
+    this.eqTreble = 0.0,
   });
 
   bool get varmEnabled => varmSilentUrl != null && varmTalkingUrl != null;
 
   factory VoiceSettings.fromJson(Map<String, dynamic> j) => VoiceSettings(
-        noiseSuppression: j['noise_suppression'] as bool? ?? true,
-        echoCancellation: j['echo_cancellation'] as bool? ?? true,
-        autoGainControl:  j['auto_gain_control'] as bool? ?? true,
-        vadEnabled:       j['vad_enabled'] as bool? ?? false,
-        vadThreshold:     (j['vad_threshold'] as num?)?.toDouble() ?? 0.05,
-        pushToTalkKey:    j['push_to_talk_key'] as String?,
-        audioInputId:     j['audio_input_id'] as String?,
-        audioOutputId:    j['audio_output_id'] as String?,
-        videoInputId:     j['video_input_id'] as String?,
-        varmSilentUrl:    j['varm_silent_url'] as String?,
-        varmTalkingUrl:   j['varm_talking_url'] as String?,
-        varmThreshold:    (j['varm_threshold'] as num?)?.toDouble() ?? 0.1,
+        noiseSuppression:      j['noise_suppression'] as bool? ?? true,
+        echoCancellation:      j['echo_cancellation'] as bool? ?? true,
+        autoGainControl:       j['auto_gain_control'] as bool? ?? true,
+        vadEnabled:            j['vad_enabled'] as bool? ?? false,
+        vadThreshold:          (j['vad_threshold'] as num?)?.toDouble() ?? 0.05,
+        pushToTalkKey:         j['push_to_talk_key'] as String?,
+        audioInputId:          j['audio_input_id'] as String?,
+        audioOutputId:         j['audio_output_id'] as String?,
+        videoInputId:          j['video_input_id'] as String?,
+        varmSilentUrl:         j['varm_silent_url'] as String?,
+        varmTalkingUrl:        j['varm_talking_url'] as String?,
+        varmThreshold:         (j['varm_threshold'] as num?)?.toDouble() ?? 0.1,
+        loudnessNormalization: j['loudness_normalization'] as bool? ?? false,
+        autoDucking:           j['auto_ducking'] as bool? ?? false,
+        eqBass:                (j['eq_bass'] as num?)?.toDouble() ?? 0.0,
+        eqMid:                 (j['eq_mid'] as num?)?.toDouble() ?? 0.0,
+        eqTreble:              (j['eq_treble'] as num?)?.toDouble() ?? 0.0,
       );
 
   Map<String, dynamic> toJson() => {
-        'noise_suppression': noiseSuppression,
-        'echo_cancellation': echoCancellation,
-        'auto_gain_control': autoGainControl,
-        'vad_enabled':       vadEnabled,
-        'vad_threshold':     vadThreshold,
-        'push_to_talk_key':  pushToTalkKey,
-        'audio_input_id':    audioInputId,
-        'audio_output_id':   audioOutputId,
-        'video_input_id':    videoInputId,
-        'varm_silent_url':   varmSilentUrl,
-        'varm_talking_url':  varmTalkingUrl,
-        'varm_threshold':    varmThreshold,
+        'noise_suppression':    noiseSuppression,
+        'echo_cancellation':    echoCancellation,
+        'auto_gain_control':    autoGainControl,
+        'vad_enabled':          vadEnabled,
+        'vad_threshold':        vadThreshold,
+        'push_to_talk_key':     pushToTalkKey,
+        'audio_input_id':       audioInputId,
+        'audio_output_id':      audioOutputId,
+        'video_input_id':       videoInputId,
+        'varm_silent_url':      varmSilentUrl,
+        'varm_talking_url':     varmTalkingUrl,
+        'varm_threshold':       varmThreshold,
+        'loudness_normalization': loudnessNormalization,
+        'auto_ducking':         autoDucking,
+        'eq_bass':              eqBass,
+        'eq_mid':               eqMid,
+        'eq_treble':            eqTreble,
       };
 
   VoiceSettings copyWith({
@@ -147,22 +163,31 @@ class VoiceSettings {
     String? varmTalkingUrl,
     double? varmThreshold,
     bool clearVarm = false,
+    bool? loudnessNormalization,
+    bool? autoDucking,
+    double? eqBass,
+    double? eqMid,
+    double? eqTreble,
   }) => VoiceSettings(
-        noiseSuppression: noiseSuppression ?? this.noiseSuppression,
-        echoCancellation: echoCancellation ?? this.echoCancellation,
-        autoGainControl:  autoGainControl ?? this.autoGainControl,
-        vadEnabled:       vadEnabled ?? this.vadEnabled,
-        vadThreshold:     vadThreshold ?? this.vadThreshold,
-        pushToTalkKey: clearPushToTalkKey ? null : (pushToTalkKey ?? this.pushToTalkKey),
-        audioInputId:  audioInputId ?? this.audioInputId,
-        audioOutputId: audioOutputId ?? this.audioOutputId,
-        videoInputId:  videoInputId ?? this.videoInputId,
-        varmSilentUrl:  clearVarm ? null : (varmSilentUrl ?? this.varmSilentUrl),
-        varmTalkingUrl: clearVarm ? null : (varmTalkingUrl ?? this.varmTalkingUrl),
-        varmThreshold:  varmThreshold ?? this.varmThreshold,
+        noiseSuppression:      noiseSuppression ?? this.noiseSuppression,
+        echoCancellation:      echoCancellation ?? this.echoCancellation,
+        autoGainControl:       autoGainControl ?? this.autoGainControl,
+        vadEnabled:            vadEnabled ?? this.vadEnabled,
+        vadThreshold:          vadThreshold ?? this.vadThreshold,
+        pushToTalkKey:         clearPushToTalkKey ? null : (pushToTalkKey ?? this.pushToTalkKey),
+        audioInputId:          audioInputId ?? this.audioInputId,
+        audioOutputId:         audioOutputId ?? this.audioOutputId,
+        videoInputId:          videoInputId ?? this.videoInputId,
+        varmSilentUrl:         clearVarm ? null : (varmSilentUrl ?? this.varmSilentUrl),
+        varmTalkingUrl:        clearVarm ? null : (varmTalkingUrl ?? this.varmTalkingUrl),
+        varmThreshold:         varmThreshold ?? this.varmThreshold,
+        loudnessNormalization: loudnessNormalization ?? this.loudnessNormalization,
+        autoDucking:           autoDucking ?? this.autoDucking,
+        eqBass:                eqBass ?? this.eqBass,
+        eqMid:                 eqMid ?? this.eqMid,
+        eqTreble:              eqTreble ?? this.eqTreble,
       );
 }
-
 class VoiceSettingsNotifier extends StateNotifier<VoiceSettings> {
   VoiceSettingsNotifier() : super(const VoiceSettings());
 
@@ -176,3 +201,5 @@ class VoiceSettingsNotifier extends StateNotifier<VoiceSettings> {
 final voiceSettingsProvider =
     StateNotifierProvider<VoiceSettingsNotifier, VoiceSettings>(
         (ref) => VoiceSettingsNotifier());
+
+

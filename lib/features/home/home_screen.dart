@@ -24,9 +24,9 @@ import '../server/rules_screen.dart';
 import '../server/calendar_screen.dart';
 import '../marketplace/marketplace_screen.dart';
 import '../marketplace/tip_dialog.dart';
-import '../marketplace/tip_dialog.dart';
 import '../server/role_select_screen.dart';
 import '../../shared/notification_bell.dart';
+import '../../shared/member_panel.dart';
 import '../../core/notifications_provider.dart';
 import '../admin/admin_screen.dart';
 
@@ -50,6 +50,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final Map<String, DateTime> _typingUsers = {};
   Timer? _typingCleanupTimer;
   Map<String, dynamic>? _replyingTo;
+  bool _showMemberPanel = true;
   final Set<String> _expandedThreads = {};
 
   @override
@@ -836,6 +837,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+
+  Future<void> _onReorderChannels(int oldIndex, int newIndex) async {
+    if (newIndex > oldIndex) newIndex--;
+    final server = ref.read(selectedServerProvider);
+    if (server == null) return;
+    final threads = _channels.where((c) => c['is_thread'] == true).toList();
+    final regular = _channels.where((c) => c['is_thread'] != true).toList();
+    final ordered = <Map<String, dynamic>>[];
+    for (final c in regular.where((c) => c['category_id'] == null)) {
+      ordered.add(c);
+    }
+    for (final cat in _categories) {
+      ordered.addAll(regular.where((c) => c['category_id'] == cat['id']));
+    }
+    if (oldIndex >= ordered.length || newIndex >= ordered.length) return;
+    final item = ordered.removeAt(oldIndex);
+    ordered.insert(newIndex, item);
+    final order = ordered.asMap().entries
+        .map((e) => {'id': e.value['id'], 'position': e.key}).toList();
+    setState(() {
+      for (var i = 0; i < ordered.length; i++) {
+        ordered[i]['position'] = i;
+      }
+      _channels = [...ordered, ...threads];
+    });
+    await KodaApi.instance.reorderChannels(server['id'] as String, order);
+  }
   List<Widget> _buildChannelList(Map<String, dynamic>? selectedChannel) {
     final threads = _channels.where((c) => c['is_thread'] == true).toList();
     final regular = _channels.where((c) => c['is_thread'] != true).toList();
@@ -971,6 +999,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           const Spacer(),
           const NotificationBell(),
+          IconButton(
+            icon: Icon(
+              _showMemberPanel
+                  ? Icons.people
+                  : Icons.people_outline,
+              color: _showMemberPanel
+                  ? KodaColors.koda
+                  : KodaColors.text3,
+              size: 18,
+            ),
+            tooltip: _showMemberPanel ? 'Hide Members' : 'Show Members',
+            onPressed: () => setState(() => _showMemberPanel = !_showMemberPanel),
+          ),
         ]),
       ),
       Expanded(
@@ -1311,13 +1352,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ]),
               ),
               Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  children: _buildChannelList(selectedChannel),
+                child: ReorderableListView(
+                  onReorder: _onReorderChannels,
+                  children: _buildChannelList(selectedChannel)
+                      .asMap()
+                      .entries
+                      .map((e) => KeyedSubtree(
+                            key: ValueKey('ch_${e.key}'),
+                            child: e.value,
+                          ))
+                      .toList(),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.all(10),
+
+
                 decoration: const BoxDecoration(
                     border: Border(top: BorderSide(color: KodaColors.border))),
                 child: Row(children: [
@@ -1344,18 +1394,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
           // Content area -- delegates to _buildContentArea which handles
           // gallery, text chat, and the "nothing selected" empty state.
-          Expanded(child: Column(children: [
-            Expanded(child: _buildContentArea(selectedChannel)),
-            const VoiceBar(),
-          ])),
-        ],
+          // Content area + optional member panel
+          Expanded(child: Row(children: [
+            Expanded(child: Column(children: [
+              Expanded(child: _buildContentArea(selectedChannel)),
+              const VoiceBar(),
+            ])),
+            if (_showMemberPanel && selectedServer != null)
+              MemberPanel(
+                server: selectedServer,
+                onMemberTap: (member) => _showUserProfile(context, {
+                  'id': member['user_id'],
+                  'username': member['username'],
+                  'avatar_url': member['avatar_url'],
+                }),
+              ),
+          ])),  // closes content Row
+        ],      // closes outer Row children
       ]),
     );
   }
 }
-
-
-
-
-
-

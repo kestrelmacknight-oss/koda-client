@@ -5,14 +5,33 @@
 // and route to either the main app or the sign-in screen.
 
 import 'package:flutter/material.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/api.dart';
 import 'core/providers.dart';
 import 'core/theme.dart';
 import 'features/auth/auth_screen.dart';
 import 'features/home/home_screen.dart';
+import 'package:audio_session/audio_session.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Prevent Windows from ducking other app audio when Koda voice is active.
+  // Using media usage instead of communications category.
+  try {
+    final session = await AudioSession.instance;
+    await session.configure(const AudioSessionConfiguration(
+      androidAudioAttributes: AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.music,
+        flags: AndroidAudioFlags.none,
+        usage: AndroidAudioUsage.media,
+      ),
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+      androidWillPauseWhenDucked: false,
+    ));
+  } catch (_) {}
+
   runApp(const ProviderScope(child: KodaApp()));
 }
 
@@ -30,7 +49,6 @@ class KodaApp extends StatelessWidget {
   }
 }
 
-/// Checks for a stored session on launch and routes accordingly.
 class AuthGate extends ConsumerStatefulWidget {
   const AuthGate({super.key});
   @override
@@ -72,4 +90,5 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     return auth.user == null ? const AuthScreen() : const HomeScreen();
   }
 }
+
 
