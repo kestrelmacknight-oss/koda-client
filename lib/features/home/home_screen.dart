@@ -22,6 +22,7 @@ import '../../core/voice_session.dart';
 import '../dm/dm_screen.dart';
 import '../../core/socket.dart';
 import '../../core/kcp_bridge.dart';
+import '../../core/message_utils.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 import '../gallery/gallery_screen.dart';
 import '../stage/stage_screen.dart';
@@ -34,6 +35,7 @@ import '../../shared/notification_bell.dart';
 import '../../shared/member_panel.dart';
 import '../../core/notifications_provider.dart';
 import '../admin/admin_screen.dart';
+import 'message_search_dialog.dart';
 
 const _kQuickReactions = ['👍', '❤️', '😂', '😮', '😢', '😡'];
 class HomeScreen extends ConsumerStatefulWidget {
@@ -417,29 +419,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<List<Map<String, dynamic>>> _decryptMessages(
-      List<Map<String, dynamic>> msgs) async {
-    final result = <Map<String, dynamic>>[];
-    for (final m in msgs) {
-      if (m['encrypted'] == true || m['encrypted'] == 'true') {
-        try {
-          final plain = await kcpDecrypt(
-            channelId: m['channel_id'] as String? ?? '',
-            payload:   m['content']   as String? ?? '',
-            ratchetKey: m['ratchet_key'] as String? ?? '',
-            msgNumber:  (m['msg_number'] as num?)?.toInt() ?? 0,
-            prevChain:  (m['prev_chain'] as num?)?.toInt() ?? 0,
-            nonce:      m['nonce'] as String? ?? '',
-          );
-          result.add({...m, 'content': plain});
-        } catch (_) {
-          result.add(m); // fallback: show raw
-        }
-      } else {
-        result.add(m);
-      }
-    }
-    return result;
-  }
+      List<Map<String, dynamic>> msgs) => decryptMessages(msgs);
 
   void _returnToTextChannel() {
     // Clear selected channel immediately so content area shows empty
@@ -1159,6 +1139,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           const Spacer(),
           IconButton(
+            icon: const Icon(Icons.search, color: KodaColors.text3, size: 18),
+            tooltip: 'Search',
+            onPressed: () => _searchChannel(selectedChannel['id'] as String),
+          ),
+          IconButton(
             icon: const Icon(Icons.push_pin_outlined, color: KodaColors.text3, size: 18),
             tooltip: 'Pinned Messages',
             onPressed: () => _showPinnedMessages(selectedChannel['id'] as String),
@@ -1408,6 +1393,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         message['edited_at'] = updated['edited_at'];
       });
     }
+  }
+
+  Future<void> _searchChannel(String channelId) async {
+    final result = await showDialog<MessageSearchResult>(
+      context: context,
+      builder: (_) => MessageSearchDialog(channelId: channelId),
+    );
+    if (result == null || !mounted) return;
+
+    setState(() {
+      _messages = result.context;
+      _activeChannelId = channelId;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scroll.hasClients) return;
+      final index = _messages.indexWhere((m) => m['id'] == result.message['id']);
+      if (index == -1) return;
+      // Rough position estimate -- there's no fixed item extent to compute
+      // this exactly, but it's enough to land the target message on screen.
+      final fraction = index / _messages.length;
+      _scroll.jumpTo(fraction * _scroll.position.maxScrollExtent);
+    });
   }
 
   Future<void> _showPinnedMessages(String channelId) async {

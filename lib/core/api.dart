@@ -220,9 +220,10 @@ class KodaApi {
 
   // ── Messages ─────────────────────────────────────────────────────────
 
-  Future<List<Map<String, dynamic>>> getMessages(String channelId) async {
+  Future<List<Map<String, dynamic>>> getMessages(String channelId, {String? beforeId}) async {
     try {
-      final res = await _dio.get('/channels/$channelId/messages');
+      final res = await _dio.get('/channels/$channelId/messages',
+          queryParameters: beforeId != null ? {'before': beforeId} : null);
       return List<Map<String, dynamic>>.from(res.data['messages'] ?? []);
     } catch (e) { _log('getMessages', e); return []; }
   }
