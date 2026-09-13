@@ -64,6 +64,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _showMemberPanel = true;
   final Set<String> _expandedThreads = {};
   Map<String, int> _channelUnread = {};
+  final Map<String, List<Map<String, dynamic>>> _voiceOccupants = {};
+  final Set<String> _voiceTopics = {};
 
   @override
   void initState() {
@@ -83,6 +85,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void dispose() {
     if (_activeChannelId != null) {
       KodaSocket.instance.leave('channel:$_activeChannelId');
+    }
+    for (final topic in _voiceTopics) {
+      KodaSocket.instance.leave(topic);
     }
     _messageController.dispose();
     _scroll.dispose();
@@ -156,6 +161,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final firstText = _channels.firstWhere(
         (c) => c['type'] == 'text', orElse: () => {});
     if (firstText.isNotEmpty) _selectChannel(firstText);
+    _subscribeVoicePresence();
+  }
+
+  // "Who's in this voice channel" for every voice channel in the current
+  // server -- separate from actually joining one via LiveKit.
+  Future<void> _subscribeVoicePresence() async {
+    for (final topic in _voiceTopics) {
+      KodaSocket.instance.leave(topic);
+    }
+    _voiceTopics.clear();
+    if (mounted) setState(() => _voiceOccupants.clear());
+
+    for (final c in _channels.where((c) => c['type'] == 'voice')) {
+      final channelId = c['id'] as String;
+      final topic = 'voice:$channelId';
+      _voiceTopics.add(topic);
+      final ch = await KodaSocket.instance.channelAsync(topic);
+      ch?.messages.listen((msg) {
+        if (!mounted) return;
+        if (msg.event == const PhoenixChannelEvent.custom('voice_state')) {
+          final payload = msg.payload as Map<String, dynamic>?;
+          final participants = List<Map<String, dynamic>>.from(payload?['participants'] ?? []);
+          setState(() => _voiceOccupants[channelId] = participants);
+        } else if (msg.event == const PhoenixChannelEvent.custom('voice_participant_joined')) {
+          final payload = msg.payload as Map<String, dynamic>?;
+          if (payload == null) return;
+          setState(() {
+            final existing = _voiceOccupants[channelId] ?? [];
+            if (!existing.any((p) => p['user_id'] == payload['user_id'])) {
+              _voiceOccupants[channelId] = [...existing, payload];
+            }
+          });
+        } else if (msg.event == const PhoenixChannelEvent.custom('voice_participant_left')) {
+          final payload = msg.payload as Map<String, dynamic>?;
+          final userId = payload?['user_id'];
+          if (userId == null) return;
+          setState(() {
+            _voiceOccupants[channelId] =
+                (_voiceOccupants[channelId] ?? []).where((p) => p['user_id'] != userId).toList();
+          });
+        }
+      });
+    }
   }
 
 
@@ -1149,6 +1197,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ? Icons.campaign_outlined
           : (isThread ? Icons.forum_outlined : Icons.tag),
     };
+    final occupants = isVoice ? (_voiceOccupants[c['id']] ?? const []) : const [];
     final tile = GestureDetector(
       onSecondaryTapUp: (d) => _showChannelContextMenu(c, d.globalPosition),
       child: ListTile(
@@ -1160,6 +1209,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 color: unread > 0 && !selected ? KodaColors.text1 : (selected ? KodaColors.text1 : KodaColors.text3),
                 fontWeight: unread > 0 ? FontWeight.w700 : FontWeight.w400,
                 fontStyle: isThread ? FontStyle.italic : FontStyle.normal)),
+        subtitle: occupants.isEmpty ? null : Text(
+            occupants.map((p) => p['username'] as String? ?? '?').join(', '),
+            style: const TextStyle(color: KodaColors.text3, fontSize: 11),
+            maxLines: 1, overflow: TextOverflow.ellipsis),
         trailing: unread > 0
             ? Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
