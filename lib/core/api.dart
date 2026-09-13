@@ -417,6 +417,13 @@ class KodaApi {
     } catch (e) { _log('unbanMember', e); return false; }
   }
 
+  Future<List<Map<String, dynamic>>> listBans(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/bans');
+      return List<Map<String, dynamic>>.from(res.data['bans'] ?? []);
+    } catch (e) { _log('listBans', e); return []; }
+  }
+
   Future<List<Map<String, dynamic>>> getBans(String serverId) async {
     try {
       final res = await _dio.get('/servers/$serverId/bans');

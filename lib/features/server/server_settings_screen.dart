@@ -13,6 +13,8 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import '../../core/uploader.dart';
 import '../../shared/widgets.dart';
+import '../../shared/channel_edit_dialog.dart';
+import '../../shared/category_edit_dialog.dart';
 import 'discord_import_dialog.dart';
 
 class ServerSettingsScreen extends ConsumerStatefulWidget {
@@ -28,7 +30,9 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   List<Map<String, dynamic>> _channels = [];
   List<Map<String, dynamic>> _roles = [];
   List<Map<String, dynamic>> _members = [];
+  List<Map<String, dynamic>> _bans = [];
   bool _loading = true;
+  bool _showBans = false;
 
   // Matches the flat permission map used server-side on Koda.Servers.Role.
   static const List<String> _permissionKeys = [
@@ -82,6 +86,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       KodaApi.instance.getChannels(serverId),
       KodaApi.instance.getRoles(serverId),
       KodaApi.instance.getMembers(serverId),
+      KodaApi.instance.listBans(serverId),
     ]);
     if (!mounted) return;
     final roles = results[2]
@@ -91,6 +96,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       _channels   = results[1];
       _roles      = roles;
       _members    = results[3];
+      _bans       = results[4];
       _loading    = false;
     });
   }
@@ -121,71 +127,14 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
 
   // -- Category dialogs -----------------------------------------------------
 
-  Future<void> _showCategoryDialog({Map<String, dynamic>? existing}) async {
-    final controller = TextEditingController(text: existing?['name'] ?? '');
-    List<String> selectedRoleIds = List<String>.from(
-        existing?['allowed_role_ids'] ?? []);
-
-    final saved = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          backgroundColor: KodaColors.card,
-          title: Text(existing == null ? 'New Category' : 'Edit Category',
-              style: const TextStyle(color: KodaColors.text1)),
-          content: SizedBox(
-            width: 340,
-            height: 360,
-            child: SingleChildScrollView(
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                KodaTextField(controller: controller, hintText: 'Category name'),
-                if (_roles.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  const Text('Role Access (leave empty for all)',
-                      style: TextStyle(color: KodaColors.text3, fontSize: 12)),
-                  const SizedBox(height: 6),
-                  ..._roles.where((r) => r['is_default'] != true).map((role) {
-                    final roleId = role['id'] as String;
-                    final isSelected = selectedRoleIds.contains(roleId);
-                    return CheckboxListTile(
-                      dense: true,
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(role['name'] as String? ?? '',
-                          style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
-                      value: isSelected,
-                      activeColor: KodaColors.koda,
-                      onChanged: (v) => setDialogState(() {
-                        if (v == true) selectedRoleIds.add(roleId);
-                        else selectedRoleIds.remove(roleId);
-                      }),
-                    );
-                  }),
-                ],
-              ]),
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-            TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
-          ],
-        ),
-      ),
-    );
-    if (saved != true || controller.text.trim().isEmpty) return;
-    final name = controller.text.trim();
-    if (existing == null) {
-      final created = await KodaApi.instance.createCategory(_serverId, name);
-      if (created != null && selectedRoleIds.isNotEmpty) {
-        await KodaApi.instance.setCategoryAllowedRoles(
-            created['id'] as String, selectedRoleIds);
-      }
-    } else {
-      await KodaApi.instance.updateCategory(existing['id'], name);
-      await KodaApi.instance.setCategoryAllowedRoles(
-          existing['id'] as String, selectedRoleIds);
-    }
-    _loadAll();
-  }
+  Future<void> _showCategoryDialog({Map<String, dynamic>? existing}) =>
+      showCategoryEditDialog(
+        context,
+        serverId: _serverId,
+        roles: _roles,
+        existing: existing,
+        onSaved: _loadAll,
+      );
 
 
 
@@ -220,130 +169,16 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
 
   // -- Channel dialogs -------------------------------------------------------
 
-  Future<void> _showChannelDialog({Map<String, dynamic>? existing, String? categoryId}) async {
-    final nameController = TextEditingController(text: existing?['name'] ?? '');
-    String type = existing?['type'] ?? 'text';
-    String? selectedCategoryId = existing?['category_id'] ?? categoryId;
-    bool isReadOnly = existing?['is_read_only'] == true;
-    // Load allowed roles for existing channel
-    List<String> allowedRoleIds = [];
-    if (existing != null) {
-      allowedRoleIds = List<String>.from(existing['allowed_role_ids'] ?? []);
-    }
-    List<String> selectedRoleIds = List<String>.from(allowedRoleIds);
-    final saved = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          backgroundColor: KodaColors.card,
-          title: Text(existing == null ? 'New Channel' : 'Edit Channel',
-              style: const TextStyle(color: KodaColors.text1)),
-          content: SizedBox(
-            width: 340,
-            height: 400,
-            child: SingleChildScrollView(
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-
-
-              KodaTextField(controller: nameController, hintText: 'Channel name'),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                value: type,
-                dropdownColor: KodaColors.card,
-                decoration: const InputDecoration(labelText: 'Type'),
-                items: const [
-                  DropdownMenuItem(value: 'text', child: Text('Text')),
-                  DropdownMenuItem(value: 'voice', child: Text('Voice')),
-                  DropdownMenuItem(value: 'gallery', child: Text('Gallery')),
-                  DropdownMenuItem(value: 'stage', child: Text('Stage')),
-                  DropdownMenuItem(value: 'rules', child: Text('Rules')),
-                  DropdownMenuItem(value: 'role-select', child: Text('Role Selection')),
-                  DropdownMenuItem(value: 'calendar', child: Text('Calendar')),
-                ],
-                onChanged: (v) => setDialogState(() => type = v ?? 'text'),
-              ),
-              if (type == 'text') ...[
-                CheckboxListTile(
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: const Text('Announcement channel',
-                      style: TextStyle(color: KodaColors.text1, fontSize: 13)),
-                  subtitle: const Text('Only members who can manage messages may post',
-                      style: TextStyle(color: KodaColors.text3, fontSize: 11)),
-                  value: isReadOnly,
-                  activeColor: KodaColors.koda,
-                  onChanged: (v) => setDialogState(() => isReadOnly = v ?? false),
-                ),
-              ],
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String?>(
-                value: selectedCategoryId,
-                dropdownColor: KodaColors.card,
-                decoration: const InputDecoration(labelText: 'Category'),
-                items: [
-                  const DropdownMenuItem(value: null, child: Text('No category')),
-                  ..._categories.map((c) => DropdownMenuItem(
-                      value: c['id'] as String, child: Text(c['name']))),
-                ],
-                onChanged: (v) => setDialogState(() => selectedCategoryId = v),
-              ),
-              if (_roles.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                const Text('Role Access (leave empty for all)',
-                    style: TextStyle(color: KodaColors.text3, fontSize: 12)),
-                const SizedBox(height: 6),
-                ..._roles.where((r) => r['is_default'] != true).map((role) {
-                  final roleId = role['id'] as String;
-                  final isSelected = selectedRoleIds.contains(roleId);
-                  return CheckboxListTile(
-                    dense: true,
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(role['name'] as String? ?? '',
-                        style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
-                    value: isSelected,
-                    activeColor: KodaColors.koda,
-                    onChanged: (v) => setDialogState(() {
-                      if (v == true) {
-                        selectedRoleIds.add(roleId);
-                      } else {
-                        selectedRoleIds.remove(roleId);
-                      }
-                    }),
-                  );
-                }),
-              ],
-              ]),
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-            TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
-          ],
-        ),
-      ),
-    );
-
-    if (saved != true || nameController.text.trim().isEmpty) return;
-    final name = nameController.text.trim();
-    if (existing == null) {
-      final created = await KodaApi.instance.createChannel(
-          serverId: _serverId, name: name, type: type, categoryId: selectedCategoryId,
-          isReadOnly: isReadOnly);
-      if (created != null && selectedRoleIds.isNotEmpty) {
-        await KodaApi.instance.setChannelAllowedRoles(
-            created['id'] as String, selectedRoleIds);
-      }
-    } else {
-      await KodaApi.instance.updateChannel(existing['id'], {
-        'name': name, 'type': type, 'category_id': selectedCategoryId,
-        'is_read_only': isReadOnly,
-      });
-      await KodaApi.instance.setChannelAllowedRoles(
-          existing['id'] as String, selectedRoleIds);
-    }
-    _loadAll();
-  }
+  Future<void> _showChannelDialog({Map<String, dynamic>? existing, String? categoryId}) =>
+      showChannelEditDialog(
+        context,
+        serverId: _serverId,
+        categories: _categories,
+        roles: _roles,
+        existing: existing,
+        categoryId: categoryId,
+        onSaved: _loadAll,
+      );
 
   Future<void> _deleteChannel(Map<String, dynamic> channel) async {
     final confirmed = await _confirm('Delete #${channel['name']}? This cannot be undone.');
@@ -816,44 +651,142 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   }
 
   Widget _buildMembersTab() {
+    final me = ref.read(authProvider).user;
     return ListView(
       padding: const EdgeInsets.all(16),
-      children: _members.map((m) {
-        final roles = (m['roles'] as List? ?? []);
-        return Container(
-          margin: const EdgeInsets.only(bottom: 6),
-          decoration: BoxDecoration(
-            color: KodaColors.card,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: KodaColors.border),
-          ),
-          child: ListTile(
-            leading: KodaAvatar(username: m['username'] ?? '?', size: 32),
-            title: Text(m['username'] ?? '', style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
-            subtitle: roles.isEmpty
-                ? null
-                : Wrap(
-                    spacing: 4,
-                    children: roles.map<Widget>((r) {
-                      final c = _parseColor(r['color']);
-                      return Container(
-                        margin: const EdgeInsets.only(top: 4),
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: c.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(99),
-                          border: Border.all(color: c.withOpacity(0.4)),
-                        ),
-                        child: Text(r['name'], style: TextStyle(color: c, fontSize: 10)),
-                      );
-                    }).toList(),
+      children: [
+        ..._members.map((m) {
+          final roles = (m['roles'] as List? ?? []);
+          final isSelf = m['user_id'] == me?.id;
+          return Container(
+            margin: const EdgeInsets.only(bottom: 6),
+            decoration: BoxDecoration(
+              color: KodaColors.card,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: KodaColors.border),
+            ),
+            child: ListTile(
+              leading: KodaAvatar(username: m['username'] ?? '?', size: 32),
+              title: Text(m['username'] ?? '', style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+              subtitle: roles.isEmpty
+                  ? null
+                  : Wrap(
+                      spacing: 4,
+                      children: roles.map<Widget>((r) {
+                        final c = _parseColor(r['color']);
+                        return Container(
+                          margin: const EdgeInsets.only(top: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: c.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(99),
+                            border: Border.all(color: c.withOpacity(0.4)),
+                          ),
+                          child: Text(r['name'], style: TextStyle(color: c, fontSize: 10)),
+                        );
+                      }).toList(),
+                    ),
+              trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                IconButton(
+                  icon: const Icon(Icons.edit, size: 16, color: KodaColors.text3),
+                  tooltip: 'Manage Roles',
+                  onPressed: () => _showMemberRolesDialog(m),
+                ),
+                if (!isSelf)
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, size: 16, color: KodaColors.text3),
+                    color: KodaColors.card,
+                    itemBuilder: (_) => const [
+                      PopupMenuItem(value: 'kick', child: Text('Kick')),
+                      PopupMenuItem(value: 'ban',
+                          child: Text('Ban', style: TextStyle(color: KodaColors.accent))),
+                    ],
+                    onSelected: (action) => _kickOrBanMember(m, action),
                   ),
-            trailing: const Icon(Icons.edit, size: 16, color: KodaColors.text3),
-            onTap: () => _showMemberRolesDialog(m),
+              ]),
+              onTap: () => _showMemberRolesDialog(m),
+            ),
+          );
+        }),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () => setState(() => _showBans = !_showBans),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(children: [
+              Icon(_showBans ? Icons.expand_more : Icons.chevron_right,
+                  size: 16, color: KodaColors.text3),
+              const SizedBox(width: 4),
+              Text('BANNED USERS — ${_bans.length}',
+                  style: const TextStyle(color: KodaColors.text3, fontSize: 11,
+                      fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+            ]),
           ),
-        );
-      }).toList(),
+        ),
+        if (_showBans)
+          if (_bans.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Text('No banned users.', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+            )
+          else
+            ..._bans.map((b) => Container(
+                  margin: const EdgeInsets.only(bottom: 6),
+                  decoration: BoxDecoration(
+                    color: KodaColors.card,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: KodaColors.border),
+                  ),
+                  child: ListTile(
+                    leading: KodaAvatar(username: b['username'] ?? '?', size: 28),
+                    title: Text(b['username'] ?? '',
+                        style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+                    trailing: TextButton(
+                      onPressed: () async {
+                        final ok = await KodaApi.instance
+                            .unbanMember(_serverId, b['user_id'] as String);
+                        if (ok) _loadAll();
+                      },
+                      child: const Text('Unban'),
+                    ),
+                  ),
+                )),
+      ],
     );
+  }
+
+  Future<void> _kickOrBanMember(Map<String, dynamic> member, String action) async {
+    final server = ref.read(selectedServerProvider);
+    final username = member['username'] as String? ?? 'this member';
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        content: Text(
+            action == 'ban'
+                ? 'Ban $username from ${server?['name']}? They will not be able to rejoin without being unbanned.'
+                : 'Kick $username from ${server?['name']}? They can rejoin with an invite.',
+            style: const TextStyle(color: KodaColors.text1)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(action == 'ban' ? 'Ban' : 'Kick',
+                  style: const TextStyle(color: KodaColors.accent))),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final userId = member['user_id'] as String;
+    final ok = action == 'ban'
+        ? await KodaApi.instance.banMember(_serverId, userId)
+        : await KodaApi.instance.kickMember(_serverId, userId);
+    if (ok) {
+      _loadAll();
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not ${action == 'ban' ? 'ban' : 'kick'} $username.')));
+    }
   }
 Widget _buildInvitesTab() {
     final server = ref.read(selectedServerProvider);

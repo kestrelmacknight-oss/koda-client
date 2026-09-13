@@ -13,10 +13,14 @@ import '../core/providers.dart';
 class MemberPanel extends ConsumerStatefulWidget {
   final Map<String, dynamic> server;
   final Function(Map<String, dynamic>) onMemberTap;
+  final bool canKick;
+  final bool canBan;
   const MemberPanel({
     super.key,
     required this.server,
     required this.onMemberTap,
+    this.canKick = false,
+    this.canBan = false,
   });
   @override
   ConsumerState<MemberPanel> createState() => _MemberPanelState();
@@ -206,7 +210,9 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
         ? _parseColor(topRole['color'] as String? ?? '#e2e4f0')
         : KodaColors.text2;
 
-    return InkWell(
+    return GestureDetector(
+      onSecondaryTapUp: (d) => _showModerationMenu(member, d.globalPosition),
+      child: InkWell(
       onTap: () => widget.onMemberTap(member),
       borderRadius: BorderRadius.circular(6),
       child: Padding(
@@ -262,7 +268,63 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
           ),
         ]),
       ),
+      ),
     );
+  }
+
+  Future<void> _showModerationMenu(Map<String, dynamic> member, Offset position) async {
+    final me = ref.read(authProvider).user;
+    if (member['user_id'] == me?.id) return; // can't moderate yourself
+    if (!widget.canKick && !widget.canBan) return;
+
+    final action = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(position.dx, position.dy, position.dx, position.dy),
+      color: KodaColors.card,
+      items: [
+        if (widget.canKick)
+          const PopupMenuItem(value: 'kick', child: Text('Kick')),
+        if (widget.canBan)
+          const PopupMenuItem(value: 'ban',
+              child: Text('Ban', style: TextStyle(color: KodaColors.accent))),
+      ],
+    );
+    if (!mounted || action == null) return;
+    final serverId = widget.server['id'] as String;
+    final userId = member['user_id'] as String;
+    final username = member['username'] as String? ?? 'this member';
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        content: Text(
+            action == 'ban'
+                ? 'Ban $username from ${widget.server['name']}? They will not be able to rejoin without being unbanned.'
+                : 'Kick $username from ${widget.server['name']}? They can rejoin with an invite.',
+            style: const TextStyle(color: KodaColors.text1)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(action == 'ban' ? 'Ban' : 'Kick',
+                  style: const TextStyle(color: KodaColors.accent))),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    final ok = action == 'ban'
+        ? await KodaApi.instance.banMember(serverId, userId)
+        : await KodaApi.instance.kickMember(serverId, userId);
+    if (mounted) {
+      if (ok) {
+        _load();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not ${action == 'ban' ? 'ban' : 'kick'} $username.')));
+      }
+    }
   }
 
   Color _parseColor(String hex) {

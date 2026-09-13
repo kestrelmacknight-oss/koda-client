@@ -14,6 +14,8 @@ import '../../core/theme.dart';
 import '../../core/providers.dart';
 import '../../core/uploader.dart';
 import '../../shared/widgets.dart';
+import '../../shared/channel_edit_dialog.dart';
+import '../../shared/category_edit_dialog.dart';
 import '../settings/settings_screen.dart';
 import '../server/server_settings_screen.dart';
 import '../voice/voice_screen.dart';
@@ -48,6 +50,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   List<Map<String, dynamic>> _servers = [];
   List<Map<String, dynamic>> _channels = [];
   List<Map<String, dynamic>> _categories = [];
+  List<Map<String, dynamic>> _roles = [];
+  Map<String, bool> _myPermissions = {};
+  bool _isServerOwnerOrAdmin = false;
   List<Map<String, dynamic>> _messages = [];
 
   bool _showingDms = false;
@@ -161,7 +166,50 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         (c) => c['type'] == 'text', orElse: () => {});
     if (firstText.isNotEmpty) _selectChannel(firstText);
     _subscribeVoicePresence();
+    _loadMyPermissions(server);
   }
+
+  /// What the current user can do in [server] -- computed client-side
+  /// from their roles' permissions (or owner/admin bypass), purely to
+  /// decide what moderation UI to show. The server re-checks everything
+  /// independently; this is about not showing a Kick/Ban/Edit Channel
+  /// button to someone who'd just get a 403, not a security boundary.
+  Future<void> _loadMyPermissions(Map<String, dynamic> server) async {
+    final serverId = server['id'] as String;
+    final me = ref.read(authProvider).user;
+    final isOwner = server['owner_id'] == me?.id || (me?.isAdmin ?? false);
+
+    final results = await Future.wait([
+      KodaApi.instance.getMembers(serverId),
+      KodaApi.instance.getRoles(serverId),
+    ]);
+    if (!mounted || ref.read(selectedServerProvider)?['id'] != serverId) return;
+    final members = results[0];
+    final roles = results[1];
+
+    final myMember = members
+        .where((m) => m['user_id'] == me?.id)
+        .cast<Map<String, dynamic>?>()
+        .firstOrNull;
+    final myRoleIds = <String>{
+      for (final r in (myMember?['roles'] as List? ?? [])) r['id'] as String,
+    };
+    final permissions = <String, bool>{};
+    for (final role in roles) {
+      if (!myRoleIds.contains(role['id'])) continue;
+      final perms = role['permissions'] as Map<String, dynamic>? ?? {};
+      perms.forEach((k, v) { if (v == true) permissions[k] = true; });
+    }
+
+    setState(() {
+      _roles = roles;
+      _myPermissions = permissions;
+      _isServerOwnerOrAdmin = isOwner;
+    });
+  }
+
+  bool _can(String permission) =>
+      _isServerOwnerOrAdmin || (_myPermissions[permission] ?? false);
 
   // "Who's in this voice channel" for every voice channel in the current
   // server -- separate from actually joining one via LiveKit.
@@ -715,6 +763,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       Map<String, dynamic> server, Offset position) async {
     final user = ref.read(authProvider).user;
     final isOwner = server['owner_id'] == user?.id || (user?.isAdmin ?? false);
+    // Permissions are only known for the currently-selected server (see
+    // _loadMyPermissions) -- for any other server in the list this falls
+    // back to owner-only, which is conservative rather than wrong.
+    final isActiveServer = ref.read(selectedServerProvider)?['id'] == server['id'];
+    final canModerate = isOwner || (isActiveServer && (
+        _can('manage_server') || _can('manage_channels') || _can('manage_roles') ||
+        _can('kick_members') || _can('ban_members')));
     final action = await showMenu<String>(
       context: context,
       position: RelativeRect.fromLTRB(
@@ -725,7 +780,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Text('Switch to Server')),
         const PopupMenuItem(value: 'invite',
             child: Text('Invite People')),
-        if (isOwner)
+        if (canModerate)
           const PopupMenuItem(value: 'settings',
               child: Text('Server Settings')),
         const PopupMenuItem(value: 'leave',
@@ -820,65 +875,136 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _showChannelContextMenu(
       Map<String, dynamic> channel, Offset position) async {
+    final canManage = _can('manage_channels');
+    final hasUnread = (_channelUnread[channel['id']] ?? 0) > 0;
+    final action = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+          position.dx, position.dy, position.dx, position.dy),
+      color: KodaColors.card,
+      items: [
+        if (hasUnread)
+          const PopupMenuItem(value: 'mark_read', child: Text('Mark as Read')),
+        if (canManage) ...[
+          const PopupMenuItem(value: 'edit', child: Text('Edit Channel')),
+          const PopupMenuItem(value: 'delete',
+              child: Text('Delete Channel', style: TextStyle(color: KodaColors.accent))),
+        ],
+      ],
+    );
+    if (!mounted || action == null) return;
+    final channelId = channel['id'] as String;
+
+    switch (action) {
+      case 'mark_read':
+        await KodaApi.instance.markChannelRead(channelId);
+        if (mounted) setState(() => _channelUnread = {..._channelUnread, channelId: 0});
+
+      case 'edit':
+        await showChannelEditDialog(
+          context,
+          serverId: (ref.read(selectedServerProvider)?['id']) as String,
+          categories: _categories,
+          roles: _roles,
+          existing: channel,
+          onSaved: () {
+            final server = ref.read(selectedServerProvider);
+            if (server != null) _selectServer(server);
+          },
+        );
+
+      case 'delete':
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            backgroundColor: KodaColors.card,
+            content: Text('Delete #${channel['name']}? This cannot be undone.',
+                style: const TextStyle(color: KodaColors.text1)),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Cancel')),
+              TextButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: const Text('Delete',
+                      style: TextStyle(color: KodaColors.accent))),
+            ],
+          ),
+        );
+        if (confirmed == true) {
+          await KodaApi.instance.deleteChannel(channelId);
+          final server = ref.read(selectedServerProvider);
+          if (server != null) _selectServer(server);
+        }
+    }
+  }
+
+  Future<void> _showCategoryContextMenu(
+      Map<String, dynamic> category, Offset position) async {
+    if (!_can('manage_channels')) return;
     final action = await showMenu<String>(
       context: context,
       position: RelativeRect.fromLTRB(
           position.dx, position.dy, position.dx, position.dy),
       color: KodaColors.card,
       items: const [
-        PopupMenuItem(value: 'edit', child: Text('Edit Channel')),
-        PopupMenuItem(value: 'delete', child: Text('Delete Channel')),
+        PopupMenuItem(value: 'create_channel', child: Text('Create Channel Here')),
+        PopupMenuItem(value: 'edit', child: Text('Edit Category')),
+        PopupMenuItem(value: 'delete',
+            child: Text('Delete Category', style: TextStyle(color: KodaColors.accent))),
       ],
     );
-    if (action == 'delete') {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: KodaColors.card,
-          content: Text('Delete #${channel['name']}? This cannot be undone.',
-              style: const TextStyle(color: KodaColors.text1)),
-          actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Cancel')),
-            TextButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('Delete',
-                    style: TextStyle(color: KodaColors.accent))),
-          ],
-        ),
-      );
-      if (confirmed == true) {
-        await KodaApi.instance.deleteChannel(channel['id']);
-        final server = ref.read(selectedServerProvider);
-        if (server != null) _selectServer(server);
-      }
-    } else if (action == 'edit') {
-      final nameController = TextEditingController(text: channel['name']);
-      final newName = await showDialog<String>(
-        context: context,
-        builder: (_) => AlertDialog(
-          backgroundColor: KodaColors.card,
-          title: const Text('Rename Channel',
-              style: TextStyle(color: KodaColors.text1)),
-          content: KodaTextField(
-              controller: nameController, hintText: 'Channel name'),
-          actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel')),
-            TextButton(
-                onPressed: () =>
-                    Navigator.pop(context, nameController.text.trim()),
-                child: const Text('Save')),
-          ],
-        ),
-      );
-      if (newName != null && newName.isNotEmpty) {
-        await KodaApi.instance.updateChannel(channel['id'], {'name': newName});
-        final server = ref.read(selectedServerProvider);
-        if (server != null) _selectServer(server);
-      }
+    if (!mounted || action == null) return;
+    final serverId = ref.read(selectedServerProvider)?['id'] as String?;
+    if (serverId == null) return;
+
+    switch (action) {
+      case 'create_channel':
+        await showChannelEditDialog(
+          context,
+          serverId: serverId,
+          categories: _categories,
+          roles: _roles,
+          categoryId: category['id'] as String,
+          onSaved: () {
+            final server = ref.read(selectedServerProvider);
+            if (server != null) _selectServer(server);
+          },
+        );
+
+      case 'edit':
+        await showCategoryEditDialog(
+          context,
+          serverId: serverId,
+          roles: _roles,
+          existing: category,
+          onSaved: () {
+            final server = ref.read(selectedServerProvider);
+            if (server != null) _selectServer(server);
+          },
+        );
+
+      case 'delete':
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            backgroundColor: KodaColors.card,
+            content: Text(
+                'Delete "${category['name']}"? Channels inside will become uncategorized.',
+                style: const TextStyle(color: KodaColors.text1)),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Cancel')),
+              TextButton(onPressed: () => Navigator.pop(ctx, true),
+                  child: const Text('Delete', style: TextStyle(color: KodaColors.accent))),
+            ],
+          ),
+        );
+        if (confirmed == true) {
+          await KodaApi.instance.deleteCategory(category['id']);
+          final server = ref.read(selectedServerProvider);
+          if (server != null) _selectServer(server);
+        }
     }
   }
 
@@ -1135,12 +1261,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     for (final cat in _categories) {
       final catChannels = regular.where((c) => c['category_id'] == cat['id']).toList();
       if (catChannels.isEmpty) continue;
-      result.add(Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 2),
-        child: Text(
-          (cat['name'] as String? ?? '').toUpperCase(),
-          style: const TextStyle(color: KodaColors.text3, fontSize: 10,
-              fontWeight: FontWeight.w700, letterSpacing: 1),
+      result.add(GestureDetector(
+        onSecondaryTapUp: (d) => _showCategoryContextMenu(cat, d.globalPosition),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 2),
+          child: Text(
+            (cat['name'] as String? ?? '').toUpperCase(),
+            style: const TextStyle(color: KodaColors.text3, fontSize: 10,
+                fontWeight: FontWeight.w700, letterSpacing: 1),
+          ),
         ),
       ));
       result.addAll(catChannels.map((c) => _buildChannelTile(c, selectedChannel)));
@@ -1842,6 +1971,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (_showMemberPanel && selectedServer != null)
               MemberPanel(
                 server: selectedServer,
+                canKick: _can('kick_members'),
+                canBan: _can('ban_members'),
                 onMemberTap: (member) => _showUserProfile(context, {
                   'id': member['user_id'],
                   'username': member['username'],
