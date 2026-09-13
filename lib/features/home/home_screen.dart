@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/api.dart';
+import '../../core/platform.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
 import '../../shared/widgets.dart';
@@ -87,6 +88,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showTrayNotification(Map<String, dynamic> notif) {
+    // local_notifier only ships Windows/macOS/Linux implementations --
+    // mobile push is a separate roadmap item (APNs/FCM), not this.
+    if (!isDesktop) return;
     final title = notif['title'] as String? ?? 'Koda';
     final notification = LocalNotification(
       title: 'Koda',

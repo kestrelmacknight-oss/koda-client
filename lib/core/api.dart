@@ -875,6 +875,20 @@ class KodaApi {
     } catch (e) { _log('getFriendStatus', e); return null; }
   }
 
+  Future<String?> getThroneWebhookUrl() async {
+    try {
+      final res = await _dio.get('/throne/webhook_url');
+      return res.data['webhook_url'] as String?;
+    } catch (e) { _log('getThroneWebhookUrl', e); return null; }
+  }
+
+  Future<String?> regenerateThroneWebhookUrl() async {
+    try {
+      final res = await _dio.post('/throne/webhook_url/regenerate');
+      return res.data['webhook_url'] as String?;
+    } catch (e) { _log('regenerateThroneWebhookUrl', e); return null; }
+  }
+
   Future<bool> updateDmPrivacy(bool friendsOnly) async {
     try {
       await _dio.patch('/friends/privacy',

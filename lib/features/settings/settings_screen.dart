@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/config.dart';
@@ -34,6 +35,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   late TextEditingController _avatarUrlCtrl;
   late TextEditingController _bioCtrl;
   String _status = 'online';
+  String? _throneWebhookUrl;
+  bool _loadingThroneUrl = false;
 
   static const _sections = [
     ('My Account', Icons.person_outline),
@@ -379,7 +382,92 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ]),
       ),
+      const SizedBox(height: 16),
+      _buildThroneCard(),
     ]);
+  }
+
+  Widget _buildThroneCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+          color: KodaColors.card, borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: KodaColors.border)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Row(children: [
+          Icon(Icons.card_giftcard_outlined, size: 16, color: KodaColors.gold),
+          SizedBox(width: 8),
+          Text('Throne Webhook',
+              style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w600)),
+        ]),
+        const SizedBox(height: 6),
+        const Text(
+            'Paste this URL into your Throne.com webhook settings to get notified '
+            'in Koda whenever someone sends you a gift.',
+            style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+        const SizedBox(height: 12),
+        if (_loadingThroneUrl)
+          const Center(child: SizedBox(width: 18, height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda)))
+        else if (_throneWebhookUrl == null)
+          TextButton(onPressed: _loadThroneWebhookUrl, child: const Text('Get my webhook URL'))
+        else
+          Row(children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                    color: KodaColors.elevated, borderRadius: BorderRadius.circular(8)),
+                child: Text(_throneWebhookUrl!,
+                    style: const TextStyle(color: KodaColors.text2, fontSize: 11),
+                    overflow: TextOverflow.ellipsis),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.copy, size: 16, color: KodaColors.text3),
+              tooltip: 'Copy',
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: _throneWebhookUrl!));
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Copied to clipboard')));
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.refresh, size: 16, color: KodaColors.text3),
+              tooltip: 'Regenerate (invalidates the old URL)',
+              onPressed: _regenerateThroneWebhookUrl,
+            ),
+          ]),
+      ]),
+    );
+  }
+
+  Future<void> _loadThroneWebhookUrl() async {
+    setState(() => _loadingThroneUrl = true);
+    final url = await KodaApi.instance.getThroneWebhookUrl();
+    if (mounted) setState(() { _throneWebhookUrl = url; _loadingThroneUrl = false; });
+  }
+
+  Future<void> _regenerateThroneWebhookUrl() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Text('Regenerate webhook URL?',
+            style: TextStyle(color: KodaColors.text1)),
+        content: const Text(
+            'Your old URL will stop working, so update it in Throne.com afterward.',
+            style: TextStyle(color: KodaColors.text3)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Regenerate')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    setState(() => _loadingThroneUrl = true);
+    final url = await KodaApi.instance.regenerateThroneWebhookUrl();
+    if (mounted) setState(() { _throneWebhookUrl = url; _loadingThroneUrl = false; });
   }
 
   // -- Profile editor ---------------------------------------------------------

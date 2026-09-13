@@ -7,6 +7,7 @@ import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/api.dart';
+import 'core/platform.dart';
 import 'core/providers.dart';
 import 'core/theme.dart';
 import 'features/auth/auth_screen.dart';
@@ -15,35 +16,36 @@ import 'features/voice/pop_out_video_window.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Check if this is a pop-out window BEFORE initializing window_manager
-  // window_manager only works in the main Flutter engine
-  final windowController = await WindowController.fromCurrentEngine();
-  final rawArgs = windowController.arguments;
-  final arguments = rawArgs.isNotEmpty
-      ? Map<String, dynamic>.from(jsonDecode(rawArgs))
-      : <String, dynamic>{};
 
-  if (arguments['type'] == 'voice_popout') {
-    // Pop-out window — don't initialize window_manager
-    runApp(ProviderScope(child: PopOutVideoWindow(
-      windowId: windowController.windowId,
-      arguments: rawArgs,
-    )));
-    return;
+  if (isDesktop) {
+    // Check if this is a pop-out window BEFORE initializing window_manager
+    // window_manager only works in the main Flutter engine
+    final windowController = await WindowController.fromCurrentEngine();
+    final rawArgs = windowController.arguments;
+    final arguments = rawArgs.isNotEmpty
+        ? Map<String, dynamic>.from(jsonDecode(rawArgs))
+        : <String, dynamic>{};
+
+    if (arguments['type'] == 'voice_popout') {
+      // Pop-out window -- don't initialize window_manager
+      runApp(ProviderScope(child: PopOutVideoWindow(
+        windowId: windowController.windowId,
+        arguments: rawArgs,
+      )));
+      return;
+    }
+
+    // Main window only
+    await windowManager.ensureInitialized();
+    const windowOptions = WindowOptions(
+      center: true,
+      title: 'Koda',
+    );
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
   }
-
-  // Main window only
-  // Main window only
-  await windowManager.ensureInitialized();
-  const windowOptions = WindowOptions(
-
-    center: true,
-    title: 'Koda',
-  );
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-  });
 
   try {
     final session = await AudioSession.instance;

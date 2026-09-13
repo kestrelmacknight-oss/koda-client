@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' show DesktopCapturerSource;
 import 'package:livekit_client/livekit_client.dart' as lk;
 import '../../core/api.dart';
+import '../../core/platform.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
 import '../../core/voice_session.dart';
@@ -437,50 +438,52 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                       ),
                       const SizedBox(width: 8),
 
-                      IconButton(
-                        iconSize: 28,
-                        icon: Icon(
-                          _screenShareOn ? Icons.stop_screen_share : Icons.screen_share,
-                          color: _screenShareOn ? KodaColors.accent : KodaColors.text2,
+                      if (isDesktop) ...[
+                        IconButton(
+                          iconSize: 28,
+                          icon: Icon(
+                            _screenShareOn ? Icons.stop_screen_share : Icons.screen_share,
+                            color: _screenShareOn ? KodaColors.accent : KodaColors.text2,
+                          ),
+                          onPressed: _toggleScreenShare,
+                          tooltip: _screenShareOn ? 'Stop sharing' : 'Share screen',
                         ),
-                        onPressed: _toggleScreenShare,
-                        tooltip: _screenShareOn ? 'Stop sharing' : 'Share screen',
-                      ),
-                      IconButton(
-                        iconSize: 24,
-                        icon: const Icon(Icons.open_in_new, color: KodaColors.text2),
-                        tooltip: 'Pop out voice to separate window',
-                        onPressed: () async {
-                          final channelId = widget.existingSession?.channelId;
-                          if (channelId == null) return;
-                          // The pop-out runs in its own isolate/engine, so it
-                          // needs its own LiveKit connection -- request a
-                          // subscribe-only "viewer" token (distinct identity)
-                          // rather than reusing this window's, which would
-                          // make the server boot the main call as a duplicate
-                          // connection under the same identity.
-                          final result = await KodaApi.instance
-                              .getVoiceToken(channelId, viewer: true);
-                          if (!context.mounted) return;
-                          if (result == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Could not pop out voice.')),
-                            );
-                            return;
-                          }
-                          final args = jsonEncode({
-                            'type': 'voice_popout',
-                            'token': result['token'],
-                            'url': result['url'],
-                            'channel_name': widget.channelName,
-                          });
-                          final ctrl = await WindowController.create(WindowConfiguration(
-                            arguments: args,
-                          ));
-                          await ctrl.show();
-                        },
-                      ),
-                      const SizedBox(width: 8),
+                        IconButton(
+                          iconSize: 24,
+                          icon: const Icon(Icons.open_in_new, color: KodaColors.text2),
+                          tooltip: 'Pop out voice to separate window',
+                          onPressed: () async {
+                            final channelId = widget.existingSession?.channelId;
+                            if (channelId == null) return;
+                            // The pop-out runs in its own isolate/engine, so it
+                            // needs its own LiveKit connection -- request a
+                            // subscribe-only "viewer" token (distinct identity)
+                            // rather than reusing this window's, which would
+                            // make the server boot the main call as a duplicate
+                            // connection under the same identity.
+                            final result = await KodaApi.instance
+                                .getVoiceToken(channelId, viewer: true);
+                            if (!context.mounted) return;
+                            if (result == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Could not pop out voice.')),
+                              );
+                              return;
+                            }
+                            final args = jsonEncode({
+                              'type': 'voice_popout',
+                              'token': result['token'],
+                              'url': result['url'],
+                              'channel_name': widget.channelName,
+                            });
+                            final ctrl = await WindowController.create(WindowConfiguration(
+                              arguments: args,
+                            ));
+                            await ctrl.show();
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                      ],
 
 
 
