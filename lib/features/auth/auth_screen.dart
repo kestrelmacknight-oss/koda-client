@@ -7,7 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/config.dart';
 import '../../core/api.dart';
 import '../../core/socket.dart';
-import '../../core/kcp_bridge.dart';
+import '../../core/crypto/dm_session_manager.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../shared/widgets.dart';
@@ -46,13 +46,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   Future<void> _initKeyBundle() async {
     try {
-      final has = await KodaApi.instance.hasKeyBundle();
-      if (!has) {
-        final bundle = await kcpGenerateBundle();
-        await KodaApi.instance.uploadKeyBundle(bundle.toJson());
-      }
+      // Gated on local private-key presence (inside ensureMyKeysExist),
+      // not on whatever the server reports -- see its doc comment.
+      await DmSessionManager.instance.ensureMyKeysExist();
     } catch (e) {
-      // Non-fatal -- E2EE setup failed, app still works
+      // Non-fatal -- E2EE setup failed, app still works, DMs just won't
+      // encrypt until this succeeds on a later launch.
       debugPrint('[KCP] Key bundle init failed: $e');
     }
   }

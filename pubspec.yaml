@@ -22,6 +22,8 @@ dependencies:
   audio_session: ^0.1.21
   desktop_multi_window: ^0.3.1
   window_manager: ^0.4.3
+  cryptography: ^2.9.0
+  flutter_secure_storage: ^9.2.2
 
 dev_dependencies:
   flutter_test:

@@ -21,7 +21,6 @@ import '../voice/voice_bar.dart';
 import '../../core/voice_session.dart';
 import '../dm/dm_screen.dart';
 import '../../core/socket.dart';
-import '../../core/kcp_bridge.dart';
 import '../../core/link_preview.dart';
 import '../../core/message_utils.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
@@ -317,21 +316,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         if (msg.event == const PhoenixChannelEvent.custom('new_message')) {
           final payload = msg.payload as Map<String, dynamic>?;
           if (payload != null) {
-            if (payload['encrypted'] == true || payload['encrypted'] == 'true') {
-              kcpDecrypt(
-                channelId: channelId,
-                payload:    payload['content'] as String? ?? '',
-                ratchetKey: payload['ratchet_key'] as String? ?? '',
-                msgNumber:  (payload['msg_number'] as num?)?.toInt() ?? 0,
-                prevChain:  (payload['prev_chain'] as num?)?.toInt() ?? 0,
-                nonce:      payload['nonce'] as String? ?? '',
-              ).then((plain) {
-                if (mounted) setState(() =>
-                    _messages.add({...payload, 'content': plain}));
-              });
-            } else {
-              setState(() => _messages.add(payload));
-            }
+            // New channel messages always arrive with encrypted: false --
+            // channel/group E2EE is a separate, not-yet-built protocol
+            // (see the "real E2EE" DM work). decryptMessages only exists
+            // to unwrap legacy pre-existing rows, not to do anything real.
+            decryptMessages([payload]).then((decoded) {
+              if (mounted) setState(() => _messages.add(decoded.first));
+            });
             // This channel is open and visible -- the message is immediately read.
             KodaApi.instance.markChannelRead(channelId);
           }
@@ -388,38 +379,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     setState(() { _replyingTo = null; _pendingAttachment = null; });
     _messageController.clear();
 
-    // Encrypt message content before sending (an attachment-only message
-    // has no text to encrypt -- the attachment itself is never encrypted,
-    // it's a plain CDN link).
-    String wireContent = text;
-    bool encrypted = false;
-    if (text.isNotEmpty) {
-      try {
-        final enc = await kcpEncrypt(channelId: channel['id'] as String, plaintext: text);
-        wireContent = enc.payload;
-        encrypted = true;
-      } catch (_) {
-        // Encryption failed -- send as plaintext (demo fallback)
-      }
-    }
-        final msg = await KodaApi.instance.sendMessage(channel['id'], wireContent,
-        encrypted: encrypted, replyToId: replyToId,
+    // Channel/group messages are not end-to-end encrypted -- Double
+    // Ratchet is pairwise by construction (see lib/core/crypto), and
+    // group encryption needs a different protocol (Sender Keys) that
+    // hasn't been built yet. Better to be explicit about that than to
+    // run a per-channel AES layer with no real group key-agreement
+    // behind it, which would look secure without providing any coherent
+    // security property. DMs (dm_screen.dart) are real E2EE.
+    final msg = await KodaApi.instance.sendMessage(channel['id'], text,
+        encrypted: false, replyToId: replyToId,
         attachmentUrl: attachment?['url'],
         attachmentContentType: attachment?['contentType']);
     if (msg != null && mounted) {
-      if (msg['encrypted'] == true) {
-        final plain = await kcpDecrypt(
-          channelId: channel['id'] as String,
-          payload:   msg['content'] as String? ?? '',
-          ratchetKey: msg['ratchet_key'] as String? ?? '',
-          msgNumber: (msg['msg_number'] as num?)?.toInt() ?? 0,
-          prevChain: (msg['prev_chain'] as num?)?.toInt() ?? 0,
-          nonce:     msg['nonce'] as String? ?? '',
-        );
-        if (mounted) setState(() => _messages.add({...msg, 'content': plain}));
-      } else {
-        setState(() => _messages.add(msg));
-      }
+      setState(() => _messages.add(msg));
       Future.delayed(const Duration(milliseconds: 50), () {
         if (_scroll.hasClients) {
           _scroll.animateTo(_scroll.position.maxScrollExtent,
@@ -1276,10 +1248,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   color: KodaColors.text1, fontWeight: FontWeight.w600)),
           const SizedBox(width: 8),
 
-          const Tooltip(
-            message: 'End-to-end encrypted',
-            child: Icon(Icons.lock_outline, size: 13, color: KodaColors.mint),
-          ),
           if (selectedChannel['is_read_only'] == true) ...[
             const SizedBox(width: 8),
             const Tooltip(

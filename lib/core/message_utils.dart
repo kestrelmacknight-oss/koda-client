@@ -1,31 +1,30 @@
 // lib/core/message_utils.dart
 //
-// Shared helpers for working with message maps as they come back from
-// the API (decrypting the ones marked encrypted: true).
+// Shared helpers for working with channel message maps as they come
+// back from the API.
+//
+// Channel messages are no longer sent through any encryption pretense
+// (see home_screen.dart / the "real E2EE" work this pairs with) --
+// group encryption needs a materially different protocol (Sender Keys)
+// than the pairwise Double Ratchet DMs use, and hasn't been built yet.
+// New channel messages always send encrypted: false. This function only
+// exists to keep pre-existing rows in the database (from when the demo
+// bridge base64-"encrypted" everything) readable rather than showing
+// raw base64 -- it was never real cryptography, so there's nothing
+// real to undo here, just a legacy encoding to strip.
 
-import 'kcp_bridge.dart';
+import 'dart:convert';
 
 Future<List<Map<String, dynamic>>> decryptMessages(
     List<Map<String, dynamic>> msgs) async {
-  final result = <Map<String, dynamic>>[];
-  for (final m in msgs) {
-    if (m['encrypted'] == true || m['encrypted'] == 'true') {
-      try {
-        final plain = await kcpDecrypt(
-          channelId: m['channel_id'] as String? ?? '',
-          payload:   m['content']   as String? ?? '',
-          ratchetKey: m['ratchet_key'] as String? ?? '',
-          msgNumber:  (m['msg_number'] as num?)?.toInt() ?? 0,
-          prevChain:  (m['prev_chain'] as num?)?.toInt() ?? 0,
-          nonce:      m['nonce'] as String? ?? '',
-        );
-        result.add({...m, 'content': plain});
-      } catch (_) {
-        result.add(m); // fallback: show raw
-      }
-    } else {
-      result.add(m);
+  return msgs.map((m) {
+    if (m['encrypted'] != true && m['encrypted'] != 'true') return m;
+    final raw = m['content'] as String? ?? '';
+    try {
+      final padded = raw.padRight((raw.length + 3) ~/ 4 * 4, '=');
+      return {...m, 'content': utf8.decode(base64Decode(padded))};
+    } catch (_) {
+      return m; // not legacy-decodable -- show as-is rather than crash
     }
-  }
-  return result;
+  }).toList();
 }

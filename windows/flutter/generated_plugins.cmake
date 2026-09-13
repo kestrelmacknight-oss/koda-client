@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
   desktop_multi_window
+  flutter_secure_storage_windows
   flutter_webrtc
   livekit_client
   local_notifier

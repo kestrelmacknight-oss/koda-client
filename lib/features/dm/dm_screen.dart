@@ -11,7 +11,11 @@ import '../../core/api.dart';
 import '../../core/socket.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
+import '../../core/secure_storage.dart';
+import '../../core/crypto/dm_session_manager.dart';
+import '../../core/crypto/double_ratchet.dart' show DoubleRatchetDecryptFailure;
 import '../../shared/widgets.dart';
+import 'safety_number_screen.dart';
 
 class DmScreen extends ConsumerStatefulWidget {
   const DmScreen({super.key});
@@ -32,6 +36,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
   bool _loadingMessages = false;
   String? _peerLastReadAt;
   Map<String, int> _unreadCounts = {};
+  bool _safetyNumberChanged = false;
   final _msgCtrl = TextEditingController();
   final _scroll = ScrollController();
 
@@ -102,8 +107,44 @@ class _DmScreenState extends ConsumerState<DmScreen>
     });
   }
 
+  String? _peerUserId(Map<String, dynamic> convo) =>
+      (convo['user'] as Map<String, dynamic>?)?['id'] as String?;
+
+  /// Real end-to-end decryption (X3DH + Double Ratchet, see
+  /// lib/core/crypto) for DMs -- unlike channel messages, which aren't
+  /// encrypted yet (group E2EE is a separate, harder protocol). Each
+  /// message key is used once and then gone by design, so plaintext is
+  /// cached locally the moment it's known (send or decrypt) -- that
+  /// cache, not the ratchet, is what lets history redisplay later.
+  Future<Map<String, dynamic>> _decryptForDisplay(
+      Map<String, dynamic> message, String conversationId, String peerUserId) async {
+    if (message['encrypted'] != true) return message;
+    final id = message['id'] as String;
+
+    final cached = await SecureStorage.getCachedDecryptedContent(id);
+    if (cached != null) return {...message, 'content': cached};
+
+    try {
+      final plain = await DmSessionManager.instance.decryptReceived(
+        conversationId: conversationId,
+        senderUserId: peerUserId,
+        message: message,
+      );
+      await SecureStorage.cacheDecryptedContent(id, plain);
+      return {...message, 'content': plain};
+    } on SafetyNumberChanged {
+      if (mounted) setState(() => _safetyNumberChanged = true);
+      return {...message, 'content': '', '_undecryptable': 'safety_number_changed'};
+    } on DoubleRatchetDecryptFailure {
+      return {...message, 'content': '', '_undecryptable': 'failed'};
+    } catch (_) {
+      return {...message, 'content': '', '_undecryptable': 'failed'};
+    }
+  }
+
   Future<void> _openConversation(Map<String, dynamic> convo) async {
     final conversationId = convo['id'] as String;
+    final peerUserId = _peerUserId(convo);
 
     if (_activeConversationId != null && _activeConversationId != conversationId) {
       KodaSocket.instance.leave('dm:$_activeConversationId');
@@ -114,11 +155,17 @@ class _DmScreenState extends ConsumerState<DmScreen>
       _activeConversationId = conversationId;
       _loadingMessages = true;
       _peerLastReadAt = null;
+      _safetyNumberChanged = false;
     });
 
     final msgs = await KodaApi.instance.getDmMessages(conversationId);
     if (!mounted) return;
-    setState(() { _messages = msgs.reversed.toList(); _loadingMessages = false; });
+    final decrypted = peerUserId == null
+        ? msgs
+        : await Future.wait(
+            msgs.map((m) => _decryptForDisplay(m, conversationId, peerUserId)));
+    if (!mounted) return;
+    setState(() { _messages = decrypted.reversed.toList(); _loadingMessages = false; });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scroll.hasClients) {
         _scroll.jumpTo(_scroll.position.maxScrollExtent);
@@ -139,15 +186,21 @@ class _DmScreenState extends ConsumerState<DmScreen>
       if (msg.event == const PhoenixChannelEvent.custom('new_message')) {
         final payload = msg.payload as Map<String, dynamic>?;
         if (payload == null) return;
-        setState(() => _messages.add(payload));
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (_scroll.hasClients) {
-            _scroll.animateTo(_scroll.position.maxScrollExtent,
-                duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
-          }
-        });
-        // Conversation is open -- the incoming message is immediately seen.
-        KodaApi.instance.markDmRead(conversationId);
+        () async {
+          final display = peerUserId == null
+              ? payload
+              : await _decryptForDisplay(payload, conversationId, peerUserId);
+          if (!mounted || _activeConversationId != conversationId) return;
+          setState(() => _messages.add(display));
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_scroll.hasClients) {
+              _scroll.animateTo(_scroll.position.maxScrollExtent,
+                  duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+            }
+          });
+          // Conversation is open -- the incoming message is immediately seen.
+          KodaApi.instance.markDmRead(conversationId);
+        }();
       } else if (msg.event == const PhoenixChannelEvent.custom('conversation_read')) {
         final payload = msg.payload as Map<String, dynamic>?;
         final me = ref.read(authProvider).user;
@@ -161,18 +214,55 @@ class _DmScreenState extends ConsumerState<DmScreen>
   Future<void> _sendMessage() async {
     final convo = _activeConversation;
     final text = _msgCtrl.text.trim();
-    if (convo == null || text.isEmpty) return;
+    final peerUserId = convo != null ? _peerUserId(convo) : null;
+    if (convo == null || text.isEmpty || peerUserId == null) return;
+    if (_safetyNumberChanged) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
+          "This conversation's safety number changed -- verify it before sending.")));
+      return;
+    }
     _msgCtrl.clear();
-    final msg = await KodaApi.instance.sendDmMessage(convo['id'], text);
-    if (msg != null && mounted) {
-      setState(() => _messages.add(msg));
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scroll.hasClients) {
-          _scroll.animateTo(_scroll.position.maxScrollExtent,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOut);
-        }
-      });
+
+    try {
+      final envelope = await DmSessionManager.instance.encryptForSend(
+        conversationId: convo['id'] as String,
+        peerUserId: peerUserId,
+        plaintext: text,
+      );
+      final msg = await KodaApi.instance.sendDmMessage(convo['id'] as String, envelope.content,
+          encrypted: true,
+          ratchetKey: envelope.ratchetKey,
+          msgNumber: envelope.msgNumber,
+          prevChain: envelope.prevChain,
+          nonce: envelope.nonce,
+          x3dhHeader: envelope.x3dhHeader);
+      if (msg != null && mounted) {
+        await SecureStorage.cacheDecryptedContent(msg['id'] as String, text);
+        setState(() => _messages.add({...msg, 'content': text}));
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (_scroll.hasClients) {
+            _scroll.animateTo(_scroll.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut);
+          }
+        });
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Message not sent.')));
+      }
+    } on SafetyNumberChanged {
+      if (mounted) {
+        setState(() => _safetyNumberChanged = true);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
+            "This conversation's safety number changed -- verify it before sending.")));
+      }
+    } catch (e) {
+      // Fail closed: never send plaintext when encryption couldn't
+      // complete. Surface the failure instead.
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not encrypt message: $e')));
+      }
     }
   }
 
@@ -326,7 +416,49 @@ class _DmScreenState extends ConsumerState<DmScreen>
   }
 
   Widget _buildChatArea() {
+    final peer = _activeConversation?['user'] as Map<String, dynamic>?;
+    final peerName = peer?['username'] as String? ?? 'Unknown';
+    final peerId = peer?['id'] as String?;
+
     return Column(children: [
+      Container(
+        height: 48,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: const BoxDecoration(
+            border: Border(bottom: BorderSide(color: KodaColors.border))),
+        child: Row(children: [
+          Text(peerName, style: const TextStyle(
+              color: KodaColors.text1, fontWeight: FontWeight.w600, fontSize: 13)),
+          const SizedBox(width: 8),
+          const Tooltip(
+            message: 'End-to-end encrypted',
+            child: Icon(Icons.lock_outline, size: 13, color: KodaColors.mint),
+          ),
+          const Spacer(),
+          if (peerId != null)
+            IconButton(
+              icon: const Icon(Icons.verified_user_outlined, size: 18, color: KodaColors.text3),
+              tooltip: 'Verify Safety Number',
+              onPressed: () async {
+                final confirmed = await Navigator.push<bool>(context, MaterialPageRoute(
+                  builder: (_) => SafetyNumberScreen(peerUserId: peerId, peerName: peerName),
+                ));
+                if (confirmed == true && mounted) setState(() => _safetyNumberChanged = false);
+              },
+            ),
+        ]),
+      ),
+      if (_safetyNumberChanged)
+        Container(
+          width: double.infinity,
+          color: KodaColors.accent.withOpacity(0.15),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Text(
+            "${peerName}'s safety number changed -- verify it before sending. "
+            "This can mean they reinstalled the app, or (rarely) something is wrong.",
+            style: const TextStyle(color: KodaColors.accent, fontSize: 11),
+          ),
+        ),
       // Messages
       Expanded(
         child: _loadingMessages
@@ -372,12 +504,27 @@ class _DmScreenState extends ConsumerState<DmScreen>
                                       : KodaColors.card,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: Text(
-                                  m['content'] as String? ?? '',
-                                  style: const TextStyle(
-                                      color: KodaColors.text1,
-                                      fontSize: 13),
-                                ),
+                                child: m['_undecryptable'] != null
+                                    ? Row(mainAxisSize: MainAxisSize.min, children: [
+                                        const Icon(Icons.lock_outline,
+                                            size: 13, color: KodaColors.accent),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          m['_undecryptable'] == 'safety_number_changed'
+                                              ? 'Unable to decrypt -- safety number changed'
+                                              : 'Unable to decrypt this message',
+                                          style: const TextStyle(
+                                              color: KodaColors.accent,
+                                              fontSize: 12,
+                                              fontStyle: FontStyle.italic),
+                                        ),
+                                      ])
+                                    : Text(
+                                        m['content'] as String? ?? '',
+                                        style: const TextStyle(
+                                            color: KodaColors.text1,
+                                            fontSize: 13),
+                                      ),
                               ),
                               if (isMe && i == _messages.length - 1 && _seenByPeer(m))
                                 const Padding(

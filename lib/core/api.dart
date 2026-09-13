@@ -571,10 +571,24 @@ class KodaApi {
   }
 
   Future<Map<String, dynamic>?> sendDmMessage(
-      String conversationId, String content) async {
+      String conversationId, String content, {
+        bool encrypted = false,
+        String? ratchetKey,
+        int? msgNumber,
+        int? prevChain,
+        String? nonce,
+        Map<String, dynamic>? x3dhHeader,
+      }) async {
     try {
-      final res = await _dio.post('/dms/$conversationId/messages',
-          data: {'content': content});
+      final res = await _dio.post('/dms/$conversationId/messages', data: {
+        'content': content,
+        'encrypted': encrypted,
+        if (ratchetKey != null) 'ratchet_key': ratchetKey,
+        if (msgNumber != null) 'msg_number': msgNumber,
+        if (prevChain != null) 'prev_chain': prevChain,
+        if (nonce != null) 'nonce': nonce,
+        if (x3dhHeader != null) 'x3dh_header': x3dhHeader,
+      });
       return res.data['message'] as Map<String, dynamic>;
     } catch (e) { _log('sendDmMessage', e); return null; }
   }
