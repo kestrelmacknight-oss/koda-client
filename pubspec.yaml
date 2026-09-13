@@ -19,6 +19,8 @@ dependencies:
   phoenix_socket: ^0.8.0
   local_notifier: ^0.1.6
   audio_session: ^0.1.21
+  desktop_multi_window: ^0.3.1
+  window_manager: ^0.4.3
 
 dev_dependencies:
   flutter_test:
@@ -27,3 +29,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+
+
+

@@ -2,10 +2,12 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' show DesktopCapturerSource;
 import 'package:livekit_client/livekit_client.dart' as lk;
+import '../../core/api.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
 import '../../core/voice_session.dart';
@@ -184,6 +186,14 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
     if (mounted) Navigator.of(context).pop();
   }
 
+  void _popOutParticipant(BuildContext context, String name, lk.VideoTrack? videoTrack) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black54,
+      builder: (_) => _PopOutWindow(name: name, videoTrack: videoTrack),
+    );
+  }
+
   String _displayName(lk.Participant p) {
     try {
       final meta = p.metadata;
@@ -226,7 +236,9 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
     final settings = ref.watch(voiceSettingsProvider);
     final participants = <lk.Participant>[
       if (_room.localParticipant != null) _room.localParticipant!,
-      ..._room.remoteParticipants.values,
+      // "-view" identities are subscribe-only pop-out windows, not real
+      // participants -- never show them as a tile.
+      ..._room.remoteParticipants.values.where((p) => !p.identity.endsWith('-view')),
     ];
     final speakingSids = _room.activeSpeakers.map((p) => p.sid).toSet();
 
@@ -255,10 +267,10 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                           : GridView.builder(
                               padding: const EdgeInsets.all(16),
                               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                                maxCrossAxisExtent: 160,
+                                maxCrossAxisExtent: 320,
                                 mainAxisSpacing: 12,
                                 crossAxisSpacing: 12,
-                                childAspectRatio: 0.85,
+                                childAspectRatio: 16 / 9,
                               ),
                               itemCount: participants.length + (_screenShareOn ? 1 : 0),
                               itemBuilder: (_, i) {
@@ -326,33 +338,8 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                 final videoTrack = _getVideoTrack(p);
 
                                 return GestureDetector(
-                                  onTap: () => showDialog(
-                                    context: context,
-                                    barrierColor: Colors.black87,
-                                    builder: (_) => GestureDetector(
-                                      onTap: () => Navigator.pop(context),
-                                      child: Scaffold(
-                                        backgroundColor: Colors.transparent,
-                                        body: Center(child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Expanded(child: Padding(
-                                              padding: const EdgeInsets.all(16),
-                                              child: ColoredBox(color: Colors.black,
-                                                child: videoTrack != null
-                                                    ? lk.VideoTrackRenderer(videoTrack)
-                                                    : Center(child: KodaAvatar(username: name, size: 96))),
-                                            )),
-                                            Padding(padding: const EdgeInsets.all(12),
-                                              child: Text(name, style: const TextStyle(color: Colors.white, fontSize: 14))),
-                                            const Text('Tap to close',
-                                                style: TextStyle(color: Colors.white54, fontSize: 11)),
-                                            const SizedBox(height: 16),
-                                          ],
-                                        )),
-                                      ),
-                                    ),
-                                  ),
+                                  onDoubleTap: () => _popOutParticipant(context, name, videoTrack),
+                                  onTap: () => _popOutParticipant(context, name, videoTrack),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       color: KodaColors.card,
@@ -459,7 +446,46 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                         onPressed: _toggleScreenShare,
                         tooltip: _screenShareOn ? 'Stop sharing' : 'Share screen',
                       ),
-                      const SizedBox(width: 16),
+                      IconButton(
+                        iconSize: 24,
+                        icon: const Icon(Icons.open_in_new, color: KodaColors.text2),
+                        tooltip: 'Pop out voice to separate window',
+                        onPressed: () async {
+                          final channelId = widget.existingSession?.channelId;
+                          if (channelId == null) return;
+                          // The pop-out runs in its own isolate/engine, so it
+                          // needs its own LiveKit connection -- request a
+                          // subscribe-only "viewer" token (distinct identity)
+                          // rather than reusing this window's, which would
+                          // make the server boot the main call as a duplicate
+                          // connection under the same identity.
+                          final result = await KodaApi.instance
+                              .getVoiceToken(channelId, viewer: true);
+                          if (!context.mounted) return;
+                          if (result == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Could not pop out voice.')),
+                            );
+                            return;
+                          }
+                          final args = jsonEncode({
+                            'type': 'voice_popout',
+                            'token': result['token'],
+                            'url': result['url'],
+                            'channel_name': widget.channelName,
+                          });
+                          final ctrl = await WindowController.create(WindowConfiguration(
+                            arguments: args,
+                          ));
+                          await ctrl.show();
+                        },
+                      ),
+                      const SizedBox(width: 8),
+
+
+
+
+
 
                       IconButton(
                         iconSize: 28,
@@ -467,9 +493,138 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                         onPressed: _leave,
                         tooltip: 'Leave Voice',
                       ),
+
                     ]),
                   ),
                 ]),
     );
   }
 }
+
+class _PopOutWindow extends StatefulWidget {
+  final String name;
+  final lk.VideoTrack? videoTrack;
+  const _PopOutWindow({required this.name, this.videoTrack});
+  @override
+  State<_PopOutWindow> createState() => _PopOutWindowState();
+}
+
+class _PopOutWindowState extends State<_PopOutWindow> {
+  Offset _position = const Offset(100, 100);
+  Size _size = const Size(480, 270); // 16:9
+  bool _pinned = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      // Dismiss backdrop
+      if (!_pinned)
+        GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Container(color: Colors.transparent),
+        ),
+      Positioned(
+        left: _position.dx,
+        top: _position.dy,
+        child: GestureDetector(
+          onPanUpdate: (d) => setState(() =>
+              _position = _position + d.delta),
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: _size.width,
+              height: _size.height + 36,
+              decoration: BoxDecoration(
+                color: KodaColors.card,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: KodaColors.border),
+                boxShadow: const [BoxShadow(
+                  color: Colors.black54, blurRadius: 24, offset: Offset(0, 8))],
+              ),
+              child: Column(children: [
+                // Title bar
+                Container(
+                  height: 36,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: const BoxDecoration(
+                    color: KodaColors.elevated,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
+                  ),
+                  child: Row(children: [
+                    const Icon(Icons.drag_indicator,
+                        size: 14, color: KodaColors.text3),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(widget.name,
+                          style: const TextStyle(color: KodaColors.text1,
+                              fontSize: 12, fontWeight: FontWeight.w600),
+                          overflow: TextOverflow.ellipsis),
+                    ),
+                    // Pin toggle
+                    IconButton(
+                      icon: Icon(
+                        _pinned ? Icons.push_pin : Icons.push_pin_outlined,
+                        size: 14,
+                        color: _pinned ? KodaColors.koda : KodaColors.text3,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      tooltip: _pinned ? 'Unpin' : 'Pin (keep open)',
+                      onPressed: () => setState(() => _pinned = !_pinned),
+                    ),
+                    const SizedBox(width: 8),
+                    // Resize
+                    PopupMenuButton<Size>(
+                      icon: const Icon(Icons.open_in_full,
+                          size: 14, color: KodaColors.text3),
+                      itemBuilder: (_) => [
+                        const PopupMenuItem(value: Size(320, 180), child: Text('Small (320x180)')),
+                        const PopupMenuItem(value: Size(480, 270), child: Text('Medium (480x270)')),
+                        const PopupMenuItem(value: Size(640, 360), child: Text('Large (640x360)')),
+                        const PopupMenuItem(value: Size(960, 540), child: Text('XL (960x540)')),
+                      ],
+                      onSelected: (s) => setState(() => _size = s),
+                    ),
+                    const SizedBox(width: 4),
+                    // Close
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(Icons.close,
+                          size: 16, color: KodaColors.text3),
+                    ),
+                  ]),
+                ),
+                // Video content � 16:9
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                        bottom: Radius.circular(11)),
+                    child: ColoredBox(
+                      color: Colors.black,
+                      child: widget.videoTrack != null
+                          ? lk.VideoTrackRenderer(widget.videoTrack!)
+                          : Center(
+                              child: Column(mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                const Icon(Icons.videocam_off,
+                                    color: KodaColors.text3, size: 32),
+                                const SizedBox(height: 8),
+                                Text(widget.name,
+                                    style: const TextStyle(
+                                        color: KodaColors.text3, fontSize: 13)),
+                              ])),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    ]);
+  }
+}
+
+
+
+

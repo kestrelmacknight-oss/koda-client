@@ -1,24 +1,50 @@
 // lib/main.dart
-//
-// Koda Alpha v0.34 -- entry point.
-// On launch: load any stored token, verify it against api.koda.fyi,
-// and route to either the main app or the sign-in screen.
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:desktop_multi_window/desktop_multi_window.dart';
+import 'package:window_manager/window_manager.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/api.dart';
 import 'core/providers.dart';
 import 'core/theme.dart';
 import 'features/auth/auth_screen.dart';
 import 'features/home/home_screen.dart';
-import 'package:audio_session/audio_session.dart';
+import 'features/voice/pop_out_video_window.dart';
 
-void main() async {
+void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Check if this is a pop-out window BEFORE initializing window_manager
+  // window_manager only works in the main Flutter engine
+  final windowController = await WindowController.fromCurrentEngine();
+  final rawArgs = windowController.arguments;
+  final arguments = rawArgs.isNotEmpty
+      ? Map<String, dynamic>.from(jsonDecode(rawArgs))
+      : <String, dynamic>{};
 
-  // Prevent Windows from ducking other app audio when Koda voice is active.
-  // Using media usage instead of communications category.
+  if (arguments['type'] == 'voice_popout') {
+    // Pop-out window — don't initialize window_manager
+    runApp(ProviderScope(child: PopOutVideoWindow(
+      windowId: windowController.windowId,
+      arguments: rawArgs,
+    )));
+    return;
+  }
+
+  // Main window only
+  // Main window only
+  await windowManager.ensureInitialized();
+  const windowOptions = WindowOptions(
+
+    center: true,
+    title: 'Koda',
+  );
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
+
   try {
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration(
@@ -37,7 +63,6 @@ void main() async {
 
 class KodaApp extends StatelessWidget {
   const KodaApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -64,7 +89,6 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
   Future<void> _checkSession() async {
     await KodaApi.instance.loadStoredToken();
-
     if (KodaApi.instance.hasToken) {
       final me = await KodaApi.instance.me();
       if (me != null && mounted) {
@@ -72,23 +96,19 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         return;
       }
     }
-
     if (mounted) ref.read(authProvider.notifier).doneLoading();
   }
 
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
-
     if (auth.loading) {
       return const Scaffold(
-        backgroundColor: KodaColors.voidBg,
-        body: Center(child: CircularProgressIndicator(color: KodaColors.koda)),
+        backgroundColor: Color(0xFF0d0e1a),
+        body: Center(child: CircularProgressIndicator(color: Color(0xFF2DD4A0))),
       );
     }
-
-    return auth.user == null ? const AuthScreen() : const HomeScreen();
+    return auth.user != null ? const HomeScreen() : const AuthScreen();
   }
 }
-
 

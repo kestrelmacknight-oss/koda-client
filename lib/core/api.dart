@@ -242,9 +242,10 @@ class KodaApi {
 
   // ── Voice ────────────────────────────────────────────────────────────
 
-  Future<Map<String, dynamic>?> getVoiceToken(String channelId) async {
+  Future<Map<String, dynamic>?> getVoiceToken(String channelId, {bool viewer = false}) async {
     try {
-      final res = await _dio.get('/channels/$channelId/voice/token');
+      final res = await _dio.get('/channels/$channelId/voice/token',
+          queryParameters: viewer ? {'viewer': 'true'} : null);
       return res.data as Map<String, dynamic>;
     } catch (e) { _log('getVoiceToken', e); return null; }
   }

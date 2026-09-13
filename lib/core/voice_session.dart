@@ -13,6 +13,8 @@ class VoiceSession {
   final lk.Room room;
   final String channelId;
   final String channelName;
+  final String token;
+  final String url;
   final bool muted;
   final bool cameraOn;
   final lk.LocalVideoTrack? localVideoTrack;
@@ -21,6 +23,8 @@ class VoiceSession {
     required this.room,
     required this.channelId,
     required this.channelName,
+    required this.token,
+    required this.url,
     this.muted = false,
     this.cameraOn = false,
     this.localVideoTrack,
@@ -35,10 +39,23 @@ class VoiceSession {
     room:             room,
     channelId:        channelId,
     channelName:      channelName,
+    token:            token,
+    url:              url,
     muted:            muted ?? this.muted,
     cameraOn:         cameraOn ?? this.cameraOn,
     localVideoTrack:  clearVideo ? null : (localVideoTrack ?? this.localVideoTrack),
   );
+
+
+
+
+
+
+
+
+
+
+
 }
 
 class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
@@ -61,7 +78,13 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
         room:        room,
         channelId:   channelId,
         channelName: channelName,
+        token:       token,
+        url:         url,
       );
+
+
+
+
       return true;
     } catch (e) {
       debugPrint('[VoiceSession] Failed to join: $e');
