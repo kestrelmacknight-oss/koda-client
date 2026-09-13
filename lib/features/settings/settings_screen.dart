@@ -236,11 +236,38 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ? _buildProfileEditor(user)
             : _buildProfileView(user));
       case 1:
+        final friendsOnlyDms = ref.watch(authProvider).user?.friendsOnlyDms ?? false;
         return _shell('Security', Column(children: [
           _tile(Icons.phone_android_outlined, 'Two-Factor Authentication',
               'Add an authenticator app for extra security',
               () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const TotpSetupScreen()))),
+          Container(
+            margin: const EdgeInsets.only(bottom: 6),
+            decoration: BoxDecoration(
+                color: KodaColors.card, borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: KodaColors.border)),
+            child: SwitchListTile(
+              secondary: const Icon(Icons.mail_lock_outlined, color: KodaColors.text3, size: 18),
+              title: const Text('Only allow DMs from friends',
+                  style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+              subtitle: const Text('Non-friends cannot start a new conversation with you',
+                  style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+              activeColor: KodaColors.koda,
+              value: friendsOnlyDms,
+              onChanged: (v) async {
+                ref.read(authProvider.notifier).setFriendsOnlyDms(v);
+                final ok = await KodaApi.instance.updateDmPrivacy(v);
+                if (!ok) {
+                  ref.read(authProvider.notifier).setFriendsOnlyDms(!v);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Could not update DM privacy.')));
+                  }
+                }
+              },
+            ),
+          ),
         ]));
       case 2:
         return const VoiceVideoSettingsScreen();

@@ -845,6 +845,14 @@ class KodaApi {
     } catch (e) { _log('getFriendStatus', e); return null; }
   }
 
+  Future<bool> updateDmPrivacy(bool friendsOnly) async {
+    try {
+      await _dio.patch('/friends/privacy',
+          data: {'friends_only_dms': friendsOnly});
+      return true;
+    } catch (e) { _log('updateDmPrivacy', e); return false; }
+  }
+
   Future<List<Map<String, dynamic>>> getConversations() async {
     try {
       final res = await _dio.get('/dms/conversations');

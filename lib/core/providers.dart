@@ -7,6 +7,7 @@ class KodaUser {
   final String? avatarUrl;
   final bool isAdmin;
   final bool emailVerified;
+  final bool friendsOnlyDms;
   KodaUser({
     required this.id,
     required this.username,
@@ -14,14 +15,21 @@ class KodaUser {
     this.avatarUrl,
     this.isAdmin = false,
     this.emailVerified = false,
+    this.friendsOnlyDms = false,
   });
   factory KodaUser.fromJson(Map<String, dynamic> j) => KodaUser(
-        id:            j['id'] as String,
-        username:      j['username'] as String,
-        email:         j['email'] as String,
-        avatarUrl:     j['avatar_url'] as String?,
-        isAdmin:       j['is_admin'] as bool? ?? false,
-        emailVerified: j['email_verified'] as bool? ?? false,
+        id:             j['id'] as String,
+        username:       j['username'] as String,
+        email:          j['email'] as String,
+        avatarUrl:      j['avatar_url'] as String?,
+        isAdmin:        j['is_admin'] as bool? ?? false,
+        emailVerified:  j['email_verified'] as bool? ?? false,
+        friendsOnlyDms: j['friends_only_dms'] as bool? ?? false,
+      );
+  KodaUser copyWith({bool? friendsOnlyDms}) => KodaUser(
+        id: id, username: username, email: email, avatarUrl: avatarUrl,
+        isAdmin: isAdmin, emailVerified: emailVerified,
+        friendsOnlyDms: friendsOnlyDms ?? this.friendsOnlyDms,
       );
 }
 class AuthState {
@@ -47,6 +55,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
   void setMustChangePassword(bool value) {
     state = state.copyWith(mustChangePassword: value);
+  }
+  void setFriendsOnlyDms(bool value) {
+    final user = state.user;
+    if (user == null) return;
+    state = state.copyWith(user: user.copyWith(friendsOnlyDms: value));
   }
   void doneLoading() {
     state = state.copyWith(loading: false);
