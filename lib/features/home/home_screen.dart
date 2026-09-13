@@ -22,6 +22,7 @@ import '../../core/voice_session.dart';
 import '../dm/dm_screen.dart';
 import '../../core/socket.dart';
 import '../../core/kcp_bridge.dart';
+import '../../core/link_preview.dart';
 import '../../core/message_utils.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 import '../gallery/gallery_screen.dart';
@@ -315,6 +316,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               }
             });
           }
+        } else if (msg.event == const PhoenixChannelEvent.custom('link_preview_updated')) {
+          final payload = msg.payload as Map<String, dynamic>?;
+          final id = payload?['id'];
+          if (id != null) {
+            setState(() {
+              final i = _messages.indexWhere((m) => m['id'] == id);
+              if (i != -1) _messages[i] = {..._messages[i], 'link_preview': payload!['link_preview']};
+            });
+          }
         }
       });
     }
@@ -368,9 +378,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               curve: Curves.easeOut);
         }
       });
+      final url = firstUrl(text);
+      if (url != null) _attachLinkPreview(channel['id'] as String, msg['id'] as String, url);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Message not sent -- you may not have permission to post here.")));
+    }
+  }
+
+  // Fetches the OG preview for a just-sent message's URL on this (the
+  // sender's) device and attaches it once ready -- fire-and-forget, a
+  // failed or slow preview must never block the message that already sent.
+  Future<void> _attachLinkPreview(String channelId, String messageId, String url) async {
+    final preview = await fetchLinkPreview(url);
+    if (preview == null || !mounted) return;
+    final ok = await KodaApi.instance.setLinkPreview(channelId, messageId, preview);
+    if (ok && mounted) {
+      setState(() {
+        final i = _messages.indexWhere((m) => m['id'] == messageId);
+        if (i != -1) _messages[i] = {..._messages[i], 'link_preview': preview};
+      });
     }
   }
 
@@ -969,6 +996,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Widget _buildLinkPreview(Map<String, dynamic> preview) {
+    final url = preview['url'] as String? ?? '';
+    final title = preview['title'] as String?;
+    final description = preview['description'] as String?;
+    final imageUrl = preview['image_url'] as String?;
+    if (title == null) return const SizedBox.shrink();
+
+    return InkWell(
+      onTap: () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 320),
+        decoration: BoxDecoration(
+          color: KodaColors.elevated,
+          borderRadius: BorderRadius.circular(8),
+          border: const Border(left: BorderSide(color: KodaColors.koda, width: 3)),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          if (imageUrl != null)
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+              child: Image.network(imageUrl, fit: BoxFit.cover, height: 140, width: double.infinity,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+            ),
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title,
+                  style: const TextStyle(color: KodaColors.koda, fontSize: 13, fontWeight: FontWeight.w600),
+                  maxLines: 2, overflow: TextOverflow.ellipsis),
+              if (description != null) ...[
+                const SizedBox(height: 2),
+                Text(description,
+                    style: const TextStyle(color: KodaColors.text3, fontSize: 11),
+                    maxLines: 2, overflow: TextOverflow.ellipsis),
+              ],
+            ]),
+          ),
+        ]),
+      ),
+    );
+  }
+
   Future<void> _onReorderChannels(int oldIndex, int newIndex) async {
     if (newIndex > oldIndex) newIndex--;
     final server = ref.read(selectedServerProvider);
@@ -1291,6 +1361,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     if (m['attachment_url'] != null) ...[
                       const SizedBox(height: 4),
                       _buildAttachment(m),
+                    ],
+                    if (m['link_preview'] != null) ...[
+                      const SizedBox(height: 4),
+                      _buildLinkPreview(m['link_preview'] as Map<String, dynamic>),
                     ],
                       _buildReactions(m),
                   ]),

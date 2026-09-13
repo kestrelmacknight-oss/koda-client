@@ -257,6 +257,15 @@ class KodaApi {
     } catch (e) { _log('editMessage', e); return null; }
   }
 
+  Future<bool> setLinkPreview(String channelId, String messageId,
+      Map<String, String> preview) async {
+    try {
+      await _dio.patch('/channels/$channelId/messages/$messageId/link_preview',
+          data: {'link_preview': preview});
+      return true;
+    } catch (e) { _log('setLinkPreview', e); return false; }
+  }
+
   Future<bool> pinMessage(String channelId, String messageId) async {
     try {
       await _dio.post('/channels/$channelId/messages/$messageId/pin');
