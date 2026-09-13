@@ -174,7 +174,11 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     if (saved != true || controller.text.trim().isEmpty) return;
     final name = controller.text.trim();
     if (existing == null) {
-      await KodaApi.instance.createCategory(_serverId, name);
+      final created = await KodaApi.instance.createCategory(_serverId, name);
+      if (created != null && selectedRoleIds.isNotEmpty) {
+        await KodaApi.instance.setCategoryAllowedRoles(
+            created['id'] as String, selectedRoleIds);
+      }
     } else {
       await KodaApi.instance.updateCategory(existing['id'], name);
       await KodaApi.instance.setCategoryAllowedRoles(
@@ -323,17 +327,18 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     if (saved != true || nameController.text.trim().isEmpty) return;
     final name = nameController.text.trim();
     if (existing == null) {
-      await KodaApi.instance.createChannel(
+      final created = await KodaApi.instance.createChannel(
           serverId: _serverId, name: name, type: type, categoryId: selectedCategoryId,
           isReadOnly: isReadOnly);
+      if (created != null && selectedRoleIds.isNotEmpty) {
+        await KodaApi.instance.setChannelAllowedRoles(
+            created['id'] as String, selectedRoleIds);
+      }
     } else {
       await KodaApi.instance.updateChannel(existing['id'], {
         'name': name, 'type': type, 'category_id': selectedCategoryId,
         'is_read_only': isReadOnly,
       });
-    }
-    // Save role permissions
-    if (existing != null) {
       await KodaApi.instance.setChannelAllowedRoles(
           existing['id'] as String, selectedRoleIds);
     }
