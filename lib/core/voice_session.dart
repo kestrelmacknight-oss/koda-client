@@ -8,6 +8,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:livekit_client/livekit_client.dart' as lk;
+import 'providers.dart';
 
 class VoiceSession {
   final lk.Room room;
@@ -58,8 +59,17 @@ class VoiceSession {
 
 }
 
+lk.AudioCaptureOptions audioCaptureOptionsFor(VoiceSettings settings) =>
+    lk.AudioCaptureOptions(
+      deviceId:         settings.audioInputId,
+      noiseSuppression: settings.noiseSuppression,
+      echoCancellation: settings.echoCancellation,
+      autoGainControl:  settings.autoGainControl,
+    );
+
 class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
-  VoiceSessionNotifier() : super(null);
+  VoiceSessionNotifier(this._ref) : super(null);
+  final Ref _ref;
 
   Future<bool> join({
     required String url,
@@ -73,7 +83,8 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
     final room = lk.Room();
     try {
       await room.connect(url, token);
-      await room.localParticipant?.setMicrophoneEnabled(true);
+      await room.localParticipant?.setMicrophoneEnabled(true,
+          audioCaptureOptions: audioCaptureOptionsFor(_ref.read(voiceSettingsProvider)));
       state = VoiceSession(
         room:        room,
         channelId:   channelId,
@@ -107,7 +118,8 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
     final s = state;
     if (s == null) return;
     final newMuted = !s.muted;
-    await s.room.localParticipant?.setMicrophoneEnabled(!newMuted);
+    await s.room.localParticipant?.setMicrophoneEnabled(!newMuted,
+        audioCaptureOptions: audioCaptureOptionsFor(_ref.read(voiceSettingsProvider)));
     state = s.copyWith(muted: newMuted);
   }
 
@@ -133,5 +145,5 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
 
 final voiceSessionProvider =
     StateNotifierProvider<VoiceSessionNotifier, VoiceSession?>(
-  (ref) => VoiceSessionNotifier(),
+  (ref) => VoiceSessionNotifier(ref),
 );

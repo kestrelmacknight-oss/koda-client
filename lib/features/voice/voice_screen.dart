@@ -74,7 +74,8 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
     _listener = _room.createListener();
     try {
       await _room.connect(widget.url, widget.token);
-      await _room.localParticipant?.setMicrophoneEnabled(true);
+      await _room.localParticipant?.setMicrophoneEnabled(true,
+          audioCaptureOptions: audioCaptureOptionsFor(ref.read(voiceSettingsProvider)));
 
       _listener
         ..on<lk.RoomDisconnectedEvent>((_) {
@@ -123,7 +124,8 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
 
   Future<void> _toggleMute() async {
     final newMuted = !_muted;
-    await _room.localParticipant?.setMicrophoneEnabled(!newMuted);
+    await _room.localParticipant?.setMicrophoneEnabled(!newMuted,
+        audioCaptureOptions: audioCaptureOptionsFor(ref.read(voiceSettingsProvider)));
     if (mounted) setState(() => _muted = newMuted);
   }
 
