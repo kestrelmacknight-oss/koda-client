@@ -240,6 +240,36 @@ class KodaApi {
     } catch (e) { _log('sendMessage', e); return null; }
   }
 
+  Future<Map<String, dynamic>?> editMessage(
+      String channelId, String messageId, String content) async {
+    try {
+      final res = await _dio.patch('/channels/$channelId/messages/$messageId',
+          data: {'content': content});
+      return res.data['message'] as Map<String, dynamic>;
+    } catch (e) { _log('editMessage', e); return null; }
+  }
+
+  Future<bool> pinMessage(String channelId, String messageId) async {
+    try {
+      await _dio.post('/channels/$channelId/messages/$messageId/pin');
+      return true;
+    } catch (e) { _log('pinMessage', e); return false; }
+  }
+
+  Future<bool> unpinMessage(String channelId, String messageId) async {
+    try {
+      await _dio.delete('/channels/$channelId/messages/$messageId/pin');
+      return true;
+    } catch (e) { _log('unpinMessage', e); return false; }
+  }
+
+  Future<List<Map<String, dynamic>>> getPinnedMessages(String channelId) async {
+    try {
+      final res = await _dio.get('/channels/$channelId/pins');
+      return List<Map<String, dynamic>>.from(res.data['messages'] ?? []);
+    } catch (e) { _log('getPinnedMessages', e); return []; }
+  }
+
   // ── Voice ────────────────────────────────────────────────────────────
 
   Future<Map<String, dynamic>?> getVoiceToken(String channelId, {bool viewer = false}) async {

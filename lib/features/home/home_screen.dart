@@ -261,6 +261,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               setState(() => _messages.add(payload));
             }
           }
+        } else if (msg.event == const PhoenixChannelEvent.custom('message_deleted')) {
+          final payload = msg.payload as Map<String, dynamic>?;
+          final id = payload?['id'];
+          if (id != null) setState(() => _messages.removeWhere((m) => m['id'] == id));
+        } else if (msg.event == const PhoenixChannelEvent.custom('message_edited')) {
+          final payload = msg.payload as Map<String, dynamic>?;
+          final id = payload?['id'];
+          if (id != null) {
+            setState(() {
+              final i = _messages.indexWhere((m) => m['id'] == id);
+              if (i != -1) {
+                _messages[i] = {..._messages[i],
+                  'content': payload!['content'], 'edited_at': payload['edited_at']};
+              }
+            });
+          }
+        } else if (msg.event == const PhoenixChannelEvent.custom('message_pinned') ||
+                   msg.event == const PhoenixChannelEvent.custom('message_unpinned')) {
+          final payload = msg.payload as Map<String, dynamic>?;
+          final id = payload?['id'];
+          final pinned = msg.event == const PhoenixChannelEvent.custom('message_pinned');
+          if (id != null) {
+            setState(() {
+              final i = _messages.indexWhere((m) => m['id'] == id);
+              if (i != -1) {
+                _messages[i] = {..._messages[i],
+                  'pinned_at': pinned ? DateTime.now().toIso8601String() : null};
+              }
+            });
+          }
         }
       });
     }
@@ -998,6 +1028,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Icon(Icons.lock_outline, size: 13, color: KodaColors.mint),
           ),
           const Spacer(),
+          IconButton(
+            icon: const Icon(Icons.push_pin_outlined, color: KodaColors.text3, size: 18),
+            tooltip: 'Pinned Messages',
+            onPressed: () => _showPinnedMessages(selectedChannel['id'] as String),
+          ),
           const NotificationBell(),
           IconButton(
             icon: Icon(
@@ -1027,8 +1062,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 'Unknown';
             final time = _formatTime(m['inserted_at']);
             final canDelete = true; // server enforces permission
+            final isMine = m['sender_id'] == ref.read(authProvider).user?.id;
+            final isPinned = m['pinned_at'] != null;
+            final isEdited = m['edited_at'] != null;
             return GestureDetector(
               onSecondaryTapUp: (d) async {
+                final channelId = m['channel_id'] as String? ?? selectedChannel!['id'] as String;
                 final action = await showMenu<String>(
                   context: context,
                   position: RelativeRect.fromLTRB(d.globalPosition.dx,
@@ -1037,6 +1076,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   items: [
                     const PopupMenuItem(value: 'reply', child: Text('Reply')),
                     const PopupMenuItem(value: 'thread', child: Text('Create Thread')),
+                    if (isMine && m['encrypted'] != true)
+                      const PopupMenuItem(value: 'edit', child: Text('Edit Message')),
+                    PopupMenuItem(value: isPinned ? 'unpin' : 'pin',
+                        child: Text(isPinned ? 'Unpin Message' : 'Pin Message')),
                     if (canDelete) const PopupMenuItem(
                         value: 'delete', child: Text('Delete Message')),
                   ],
@@ -1047,9 +1090,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 if (action == 'thread' && mounted) {
                   _showCreateThreadDialog(m);
                 }
+                if (action == 'edit' && mounted) {
+                  _editMessage(channelId, m);
+                }
+                if (action == 'pin' && mounted) {
+                  final ok = await KodaApi.instance.pinMessage(channelId, m['id'] as String? ?? '');
+                  if (ok) setState(() => m['pinned_at'] = DateTime.now().toIso8601String());
+                }
+                if (action == 'unpin' && mounted) {
+                  final ok = await KodaApi.instance.unpinMessage(channelId, m['id'] as String? ?? '');
+                  if (ok) setState(() => m['pinned_at'] = null);
+                }
                 if (action == 'delete' && mounted) {
-                  final ok = await KodaApi.instance.deleteMessage(
-                    m['channel_id'] as String? ?? selectedChannel!['id'] as String,
+                  final ok = await KodaApi.instance.deleteMessage(channelId,
                     m['id'] as String? ?? '',
                   );
                   if (ok) setState(() => _messages.remove(m));
@@ -1088,9 +1141,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               style: const TextStyle(
                                   color: KodaColors.text3, fontSize: 11)),
                         ],
+                        if (isEdited) ...[
+                          const SizedBox(width: 4),
+                          const Text('(edited)',
+                              style: TextStyle(color: KodaColors.text3, fontSize: 10)),
+                        ],
+                        if (isPinned) ...[
+                          const SizedBox(width: 6),
+                          const Icon(Icons.push_pin, size: 11, color: KodaColors.gold),
+                        ],
                       ],
                     ),
-                    
+
                     const SizedBox(height: 2),
                     if (m['reply_to'] != null)
                       _buildReplyPreview(m['reply_to'] as Map<String, dynamic>),
@@ -1156,6 +1218,86 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ]),
       ),
     ]);
+  }
+
+  Future<void> _editMessage(String channelId, Map<String, dynamic> message) async {
+    final ctrl = TextEditingController(text: message['content'] as String? ?? '');
+    final content = await showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Text('Edit Message', style: TextStyle(color: KodaColors.text1)),
+        content: KodaTextField(controller: ctrl, hintText: 'Message'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()),
+              child: const Text('Save')),
+        ],
+      ),
+    );
+    if (content == null || content.isEmpty || content == message['content']) return;
+    final updated = await KodaApi.instance.editMessage(
+        channelId, message['id'] as String? ?? '', content);
+    if (updated != null && mounted) {
+      setState(() {
+        message['content'] = updated['content'];
+        message['edited_at'] = updated['edited_at'];
+      });
+    }
+  }
+
+  Future<void> _showPinnedMessages(String channelId) async {
+    final pins = await KodaApi.instance.getPinnedMessages(channelId);
+    if (!mounted) return;
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Text('Pinned Messages', style: TextStyle(color: KodaColors.text1)),
+        content: SizedBox(
+          width: 360,
+          height: 400,
+          child: pins.isEmpty
+              ? const Center(child: Text('No pinned messages',
+                  style: TextStyle(color: KodaColors.text3)))
+              : ListView.separated(
+                  itemCount: pins.length,
+                  separatorBuilder: (_, __) => const Divider(color: KodaColors.border),
+                  itemBuilder: (_, i) {
+                    final p = pins[i];
+                    final author = (p['author'] as Map<String, dynamic>?)?['username']
+                        as String? ?? 'Unknown';
+                    return ListTile(
+                      dense: true,
+                      title: Text(author, style: const TextStyle(
+                          color: KodaColors.koda, fontSize: 12, fontWeight: FontWeight.w600)),
+                      subtitle: Text(p['content'] as String? ?? '',
+                          style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.push_pin, size: 16, color: KodaColors.gold),
+                        tooltip: 'Unpin',
+                        onPressed: () async {
+                          final ok = await KodaApi.instance.unpinMessage(
+                              channelId, p['id'] as String? ?? '');
+                          if (ok) {
+                            setState(() {
+                              final idx = _messages.indexWhere((m) => m['id'] == p['id']);
+                              if (idx != -1) _messages[idx]['pinned_at'] = null;
+                            });
+                            if (mounted) Navigator.pop(context);
+                          }
+                        },
+                      ),
+                    );
+                  },
+                ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+        ],
+      ),
+    );
   }
 
   Future<void> _showCreateThreadDialog(Map<String, dynamic> message) async {
