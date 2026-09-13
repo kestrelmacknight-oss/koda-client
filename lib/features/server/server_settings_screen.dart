@@ -220,6 +220,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     final nameController = TextEditingController(text: existing?['name'] ?? '');
     String type = existing?['type'] ?? 'text';
     String? selectedCategoryId = existing?['category_id'] ?? categoryId;
+    bool isReadOnly = existing?['is_read_only'] == true;
     // Load allowed roles for existing channel
     List<String> allowedRoleIds = [];
     if (existing != null) {
@@ -253,9 +254,24 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                   DropdownMenuItem(value: 'stage', child: Text('Stage')),
                   DropdownMenuItem(value: 'rules', child: Text('Rules')),
                   DropdownMenuItem(value: 'role-select', child: Text('Role Selection')),
+                  DropdownMenuItem(value: 'calendar', child: Text('Calendar')),
                 ],
                 onChanged: (v) => setDialogState(() => type = v ?? 'text'),
               ),
+              if (type == 'text') ...[
+                CheckboxListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: const Text('Announcement channel',
+                      style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+                  subtitle: const Text('Only members who can manage messages may post',
+                      style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+                  value: isReadOnly,
+                  activeColor: KodaColors.koda,
+                  onChanged: (v) => setDialogState(() => isReadOnly = v ?? false),
+                ),
+              ],
               const SizedBox(height: 12),
               DropdownButtonFormField<String?>(
                 value: selectedCategoryId,
@@ -308,10 +324,12 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     final name = nameController.text.trim();
     if (existing == null) {
       await KodaApi.instance.createChannel(
-          serverId: _serverId, name: name, type: type, categoryId: selectedCategoryId);
+          serverId: _serverId, name: name, type: type, categoryId: selectedCategoryId,
+          isReadOnly: isReadOnly);
     } else {
       await KodaApi.instance.updateChannel(existing['id'], {
         'name': name, 'type': type, 'category_id': selectedCategoryId,
+        'is_read_only': isReadOnly,
       });
     }
     // Save role permissions

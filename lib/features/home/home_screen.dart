@@ -368,6 +368,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               curve: Curves.easeOut);
         }
       });
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Message not sent -- you may not have permission to post here.")));
     }
   }
 
@@ -1050,6 +1053,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final isVoice = c['type'] == 'voice';
     final isThread = c['is_thread'] == true;
     final unread = _channelUnread[c['id']] ?? 0;
+    final isAnnouncement = c['is_read_only'] == true && c['type'] == 'text';
     final icon = switch (c['type'] as String? ?? 'text') {
       'voice'       => Icons.volume_up,
       'gallery'     => Icons.image_outlined,
@@ -1057,7 +1061,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       'rules'       => Icons.gavel_outlined,
       'role-select' => Icons.badge_outlined,
       'calendar'    => Icons.calendar_month_outlined,
-      _             => isThread ? Icons.forum_outlined : Icons.tag,
+      _             => isAnnouncement
+          ? Icons.campaign_outlined
+          : (isThread ? Icons.forum_outlined : Icons.tag),
     };
     final tile = GestureDetector(
       onSecondaryTapUp: (d) => _showChannelContextMenu(c, d.globalPosition),
@@ -1137,6 +1143,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             message: 'End-to-end encrypted',
             child: Icon(Icons.lock_outline, size: 13, color: KodaColors.mint),
           ),
+          if (selectedChannel['is_read_only'] == true) ...[
+            const SizedBox(width: 8),
+            const Tooltip(
+              message: 'Announcement channel -- only staff may post',
+              child: Icon(Icons.campaign_outlined, size: 14, color: KodaColors.gold),
+            ),
+          ],
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.search, color: KodaColors.text3, size: 18),
