@@ -6,7 +6,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:phoenix_socket/phoenix_socket.dart';
 import '../../core/api.dart';
+import '../../core/socket.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
 import '../../shared/widgets.dart';
@@ -24,9 +26,12 @@ class _DmScreenState extends ConsumerState<DmScreen>
   // All tab
   List<Map<String, dynamic>> _conversations = [];
   Map<String, dynamic>? _activeConversation;
+  String? _activeConversationId;
   List<Map<String, dynamic>> _messages = [];
   bool _loadingConvos = true;
   bool _loadingMessages = false;
+  String? _peerLastReadAt;
+  Map<String, int> _unreadCounts = {};
   final _msgCtrl = TextEditingController();
   final _scroll = ScrollController();
 
@@ -50,10 +55,14 @@ class _DmScreenState extends ConsumerState<DmScreen>
       }
     });
     _loadConversations();
+    _loadUnreadCounts();
   }
 
   @override
   void dispose() {
+    if (_activeConversationId != null) {
+      KodaSocket.instance.leave('dm:$_activeConversationId');
+    }
     _tabs.dispose();
     _msgCtrl.dispose();
     _scroll.dispose();
@@ -65,6 +74,12 @@ class _DmScreenState extends ConsumerState<DmScreen>
     final convos = await KodaApi.instance.getConversations();
     if (!mounted) return;
     setState(() { _conversations = convos; _loadingConvos = false; });
+  }
+
+  Future<void> _loadUnreadCounts() async {
+    final counts = await KodaApi.instance.getUnreadCounts();
+    if (!mounted) return;
+    setState(() => _unreadCounts = Map<String, int>.from(counts['dms'] ?? {}));
   }
 
   Future<void> _loadFriends() async {
@@ -88,13 +103,57 @@ class _DmScreenState extends ConsumerState<DmScreen>
   }
 
   Future<void> _openConversation(Map<String, dynamic> convo) async {
-    setState(() { _activeConversation = convo; _loadingMessages = true; });
-    final msgs = await KodaApi.instance.getDmMessages(convo['id']);
+    final conversationId = convo['id'] as String;
+
+    if (_activeConversationId != null && _activeConversationId != conversationId) {
+      KodaSocket.instance.leave('dm:$_activeConversationId');
+    }
+
+    setState(() {
+      _activeConversation = convo;
+      _activeConversationId = conversationId;
+      _loadingMessages = true;
+      _peerLastReadAt = null;
+    });
+
+    final msgs = await KodaApi.instance.getDmMessages(conversationId);
     if (!mounted) return;
     setState(() { _messages = msgs.reversed.toList(); _loadingMessages = false; });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scroll.hasClients) {
         _scroll.jumpTo(_scroll.position.maxScrollExtent);
+      }
+    });
+
+    KodaApi.instance.markDmRead(conversationId);
+    setState(() => _unreadCounts = {..._unreadCounts, conversationId: 0});
+    KodaApi.instance.getDmPeerLastReadAt(conversationId).then((readAt) {
+      if (mounted && _activeConversationId == conversationId) {
+        setState(() => _peerLastReadAt = readAt);
+      }
+    });
+
+    final ch = await KodaSocket.instance.channelAsync('dm:$conversationId');
+    ch?.messages.listen((msg) {
+      if (!mounted || _activeConversationId != conversationId) return;
+      if (msg.event == const PhoenixChannelEvent.custom('new_message')) {
+        final payload = msg.payload as Map<String, dynamic>?;
+        if (payload == null) return;
+        setState(() => _messages.add(payload));
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (_scroll.hasClients) {
+            _scroll.animateTo(_scroll.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+          }
+        });
+        // Conversation is open -- the incoming message is immediately seen.
+        KodaApi.instance.markDmRead(conversationId);
+      } else if (msg.event == const PhoenixChannelEvent.custom('conversation_read')) {
+        final payload = msg.payload as Map<String, dynamic>?;
+        final me = ref.read(authProvider).user;
+        if (payload != null && payload['user_id'] != me?.id) {
+          setState(() => _peerLastReadAt = payload['read_at'] as String?);
+        }
       }
     });
   }
@@ -114,6 +173,17 @@ class _DmScreenState extends ConsumerState<DmScreen>
               curve: Curves.easeOut);
         }
       });
+    }
+  }
+
+  bool _seenByPeer(Map<String, dynamic> message) {
+    final readAt = _peerLastReadAt;
+    final sentAt = message['inserted_at'] as String?;
+    if (readAt == null || sentAt == null) return false;
+    try {
+      return !DateTime.parse(readAt).isBefore(DateTime.parse(sentAt));
+    } catch (_) {
+      return false;
     }
   }
 
@@ -213,17 +283,30 @@ class _DmScreenState extends ConsumerState<DmScreen>
                         itemCount: _conversations.length,
                         itemBuilder: (_, i) {
                           final c = _conversations[i];
-                          final other = c['other_user'] as Map<String, dynamic>?;
+                          final other = c['user'] as Map<String, dynamic>?;
                           final name = other?['username'] as String? ?? 'Unknown';
                           final active = _activeConversation?['id'] == c['id'];
+                          final unread = _unreadCounts[c['id']] ?? 0;
                           return ListTile(
                             selected: active,
                             selectedTileColor: KodaColors.koda.withOpacity(0.1),
                             leading: KodaAvatar(username: name, size: 32,
                                 avatarUrl: other?['avatar_url'] as String?),
                             title: Text(name,
-                                style: const TextStyle(
-                                    color: KodaColors.text1, fontSize: 13)),
+                                style: TextStyle(
+                                    color: KodaColors.text1, fontSize: 13,
+                                    fontWeight: unread > 0 ? FontWeight.w700 : FontWeight.w400)),
+                            trailing: unread > 0
+                                ? Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                    decoration: BoxDecoration(
+                                        color: KodaColors.koda,
+                                        borderRadius: BorderRadius.circular(99)),
+                                    child: Text('$unread',
+                                        style: const TextStyle(color: Colors.white,
+                                            fontSize: 11, fontWeight: FontWeight.w700)),
+                                  )
+                                : null,
                             onTap: () => _openConversation(c),
                           );
                         },
@@ -296,6 +379,12 @@ class _DmScreenState extends ConsumerState<DmScreen>
                                       fontSize: 13),
                                 ),
                               ),
+                              if (isMe && i == _messages.length - 1 && _seenByPeer(m))
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 2, right: 2),
+                                  child: Text('Seen',
+                                      style: TextStyle(color: KodaColors.text3, fontSize: 10)),
+                                ),
                             ],
                           ),
                         ),

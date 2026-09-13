@@ -555,6 +555,35 @@ class KodaApi {
     } catch (e) { _log('sendDmMessage', e); return null; }
   }
 
+  Future<bool> markDmRead(String conversationId) async {
+    try {
+      await _dio.post('/dms/$conversationId/read');
+      return true;
+    } catch (e) { _log('markDmRead', e); return false; }
+  }
+
+  Future<String?> getDmPeerLastReadAt(String conversationId) async {
+    try {
+      final res = await _dio.get('/dms/$conversationId/read_state');
+      return res.data['peer_last_read_at'] as String?;
+    } catch (e) { _log('getDmPeerLastReadAt', e); return null; }
+  }
+
+  Future<bool> markChannelRead(String channelId) async {
+    try {
+      await _dio.post('/channels/$channelId/read');
+      return true;
+    } catch (e) { _log('markChannelRead', e); return false; }
+  }
+
+  /// {channels: {channel_id: count}, dms: {conversation_id: count}}
+  Future<Map<String, dynamic>> getUnreadCounts() async {
+    try {
+      final res = await _dio.get('/unread_counts');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getUnreadCounts', e); return {'channels': {}, 'dms': {}}; }
+  }
+
   // -- Admin -----------------------------------------------------------------
 
   Future<List<Map<String, dynamic>>> listBackerCodes() async {

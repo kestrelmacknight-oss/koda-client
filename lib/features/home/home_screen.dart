@@ -59,11 +59,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _uploadingAttachment = false;
   bool _showMemberPanel = true;
   final Set<String> _expandedThreads = {};
+  Map<String, int> _channelUnread = {};
 
   @override
   void initState() {
     super.initState();
     _loadServers();
+    _loadUnreadCounts();
+  }
+
+  Future<void> _loadUnreadCounts() async {
+    final counts = await KodaApi.instance.getUnreadCounts();
+    if (!mounted) return;
+    setState(() => _channelUnread = Map<String, int>.from(counts['channels'] ?? {}));
   }
 
 
@@ -246,7 +254,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       setState(() {
         _messages = decrypted;
         _activeChannelId = channelId;
+        _channelUnread = {..._channelUnread, channelId: 0};
       });
+      KodaApi.instance.markChannelRead(channelId);
 
       // Subscribe to real-time messages for this channel
       final ch = await KodaSocket.instance.channelAsync('channel:$channelId');
@@ -270,6 +280,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             } else {
               setState(() => _messages.add(payload));
             }
+            // This channel is open and visible -- the message is immediately read.
+            KodaApi.instance.markChannelRead(channelId);
           }
         } else if (msg.event == const PhoenixChannelEvent.custom('message_deleted')) {
           final payload = msg.payload as Map<String, dynamic>?;
@@ -1057,6 +1069,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final selected = selectedChannel?['id'] == c['id'];
     final isVoice = c['type'] == 'voice';
     final isThread = c['is_thread'] == true;
+    final unread = _channelUnread[c['id']] ?? 0;
     final icon = switch (c['type'] as String? ?? 'text') {
       'voice'       => Icons.volume_up,
       'gallery'     => Icons.image_outlined,
@@ -1074,8 +1087,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             color: selected ? KodaColors.text1 : KodaColors.text3),
         title: Text(c['name'] as String? ?? '',
             style: TextStyle(fontSize: isThread ? 12 : 13,
-                color: selected ? KodaColors.text1 : KodaColors.text3,
+                color: unread > 0 && !selected ? KodaColors.text1 : (selected ? KodaColors.text1 : KodaColors.text3),
+                fontWeight: unread > 0 ? FontWeight.w700 : FontWeight.w400,
                 fontStyle: isThread ? FontStyle.italic : FontStyle.normal)),
+        trailing: unread > 0
+            ? Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(
+                    color: KodaColors.koda, borderRadius: BorderRadius.circular(99)),
+                child: Text(unread > 99 ? '99+' : '$unread',
+                    style: const TextStyle(color: Colors.white,
+                        fontSize: 10, fontWeight: FontWeight.w700)),
+              )
+            : null,
         selected: selected,
         selectedTileColor: KodaColors.koda.withOpacity(0.1),
         onTap: () => isVoice ? _joinVoice(c) : _selectChannel(c),
