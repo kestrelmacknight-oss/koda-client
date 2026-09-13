@@ -287,6 +287,20 @@ class KodaApi {
     } catch (e) { _log('getPinnedMessages', e); return []; }
   }
 
+  Future<List<Map<String, dynamic>>> searchGifs(String query) async {
+    try {
+      final res = await _dio.get('/gifs/search', queryParameters: {'q': query});
+      return List<Map<String, dynamic>>.from(res.data['gifs'] ?? []);
+    } catch (e) { _log('searchGifs', e); return []; }
+  }
+
+  Future<List<Map<String, dynamic>>> getTrendingGifs() async {
+    try {
+      final res = await _dio.get('/gifs/trending');
+      return List<Map<String, dynamic>>.from(res.data['gifs'] ?? []);
+    } catch (e) { _log('getTrendingGifs', e); return []; }
+  }
+
   // ── Voice ────────────────────────────────────────────────────────────
 
   Future<Map<String, dynamic>?> getVoiceToken(String channelId, {bool viewer = false}) async {

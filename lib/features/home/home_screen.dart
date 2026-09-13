@@ -37,6 +37,7 @@ import '../../shared/member_panel.dart';
 import '../../core/notifications_provider.dart';
 import '../admin/admin_screen.dart';
 import 'message_search_dialog.dart';
+import 'gif_picker_dialog.dart';
 
 const _kQuickReactions = ['👍', '❤️', '😂', '😮', '😢', '😡'];
 class HomeScreen extends ConsumerStatefulWidget {
@@ -446,6 +447,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
       }
     }
+  }
+
+  Future<void> _pickGif() async {
+    final gif = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (_) => const GifPickerDialog(),
+    );
+    final url = gif?['url'] as String?;
+    if (url == null || !mounted) return;
+    setState(() => _pendingAttachment = {
+      'url': url, 'contentType': 'image/gif', 'fileName': gif?['title'] as String? ?? 'GIF',
+    });
+    await _sendMessage();
   }
 
   Future<List<Map<String, dynamic>>> _decryptMessages(
@@ -1427,6 +1441,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 : const Icon(Icons.attach_file, color: KodaColors.text2),
             tooltip: 'Attach file',
             onPressed: _uploadingAttachment ? null : _pickAttachment,
+          ),
+          IconButton(
+            icon: const Icon(Icons.gif_box_outlined, color: KodaColors.text2),
+            tooltip: 'GIF',
+            onPressed: _pickGif,
           ),
           Expanded(
             child: KodaTextField(
