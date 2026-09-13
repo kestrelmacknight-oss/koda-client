@@ -1,14 +1,18 @@
 // lib/features/home/home_screen.dart
 
 import 'dart:async';
+import 'dart:io' show File;
+import 'package:file_picker/file_picker.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/api.dart';
 import '../../core/platform.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
+import '../../core/uploader.dart';
 import '../../shared/widgets.dart';
 import '../settings/settings_screen.dart';
 import '../server/server_settings_screen.dart';
@@ -51,6 +55,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final Map<String, DateTime> _typingUsers = {};
   Timer? _typingCleanupTimer;
   Map<String, dynamic>? _replyingTo;
+  Map<String, String>? _pendingAttachment; // {url, contentType, fileName}
+  bool _uploadingAttachment = false;
   bool _showMemberPanel = true;
   final Set<String> _expandedThreads = {};
 
@@ -303,23 +309,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> _sendMessage() async {
     final channel = ref.read(selectedChannelProvider);
     final text = _messageController.text.trim();
-    if (channel == null || text.isEmpty) return;
+    final attachment = _pendingAttachment;
+    if (channel == null || (text.isEmpty && attachment == null)) return;
     final replyToId = _replyingTo?['id'] as String?;
-    setState(() => _replyingTo = null);
+    setState(() { _replyingTo = null; _pendingAttachment = null; });
     _messageController.clear();
 
-    // Encrypt message content before sending
+    // Encrypt message content before sending (an attachment-only message
+    // has no text to encrypt -- the attachment itself is never encrypted,
+    // it's a plain CDN link).
     String wireContent = text;
     bool encrypted = false;
-    try {
-      final enc = await kcpEncrypt(channelId: channel['id'] as String, plaintext: text);
-      wireContent = enc.payload;
-      encrypted = true;
-    } catch (_) {
-      // Encryption failed -- send as plaintext (demo fallback)
+    if (text.isNotEmpty) {
+      try {
+        final enc = await kcpEncrypt(channelId: channel['id'] as String, plaintext: text);
+        wireContent = enc.payload;
+        encrypted = true;
+      } catch (_) {
+        // Encryption failed -- send as plaintext (demo fallback)
+      }
     }
         final msg = await KodaApi.instance.sendMessage(channel['id'], wireContent,
-        encrypted: encrypted, replyToId: replyToId);
+        encrypted: encrypted, replyToId: replyToId,
+        attachmentUrl: attachment?['url'],
+        attachmentContentType: attachment?['contentType']);
     if (msg != null && mounted) {
       if (msg['encrypted'] == true) {
         final plain = await kcpDecrypt(
@@ -341,6 +354,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               curve: Curves.easeOut);
         }
       });
+    }
+  }
+
+  // Matches Koda.Upload's allowed_content_types server-side -- anything
+  // else would upload fine here and then 422 on send.
+  static const _attachmentExtensions = [
+    'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'avif',
+    'mp4', 'webm', 'mov',
+    'mp3', 'ogg', 'wav',
+    'pdf',
+  ];
+  static const _extensionContentTypes = {
+    'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'png': 'image/png',
+    'gif': 'image/gif', 'webp': 'image/webp', 'svg': 'image/svg+xml',
+    'avif': 'image/avif', 'mp4': 'video/mp4', 'webm': 'video/webm',
+    'mov': 'video/quicktime', 'mp3': 'audio/mpeg', 'ogg': 'audio/ogg',
+    'wav': 'audio/wav', 'pdf': 'application/pdf',
+  };
+
+  Future<void> _pickAttachment() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: _attachmentExtensions,
+    );
+    final path = result?.files.single.path;
+    if (path == null || !mounted) return;
+    final ext = result!.files.single.extension?.toLowerCase() ?? '';
+    final contentType = _extensionContentTypes[ext] ?? 'application/octet-stream';
+    final fileName = result.files.single.name;
+
+    setState(() => _uploadingAttachment = true);
+    try {
+      final uploaded = await KodaUploader.instance.upload(
+        file: File(path), uploadType: 'attachment', contentType: contentType);
+      if (mounted) {
+        setState(() {
+          _pendingAttachment = {
+            'url': uploaded.cdnUrl, 'contentType': contentType, 'fileName': fileName,
+          };
+          _uploadingAttachment = false;
+        });
+      }
+    } on UploadException catch (e) {
+      if (mounted) {
+        setState(() => _uploadingAttachment = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+      }
     }
   }
 
@@ -871,6 +931,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Widget _buildAttachment(Map<String, dynamic> m) {
+    final url = m['attachment_url'] as String? ?? '';
+    final contentType = m['attachment_content_type'] as String? ?? '';
+    final fileName = url.split('/').last;
+
+    if (contentType.startsWith('image/')) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 320, maxHeight: 240),
+          child: Image.network(url, fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => _attachmentChip(url, fileName)),
+        ),
+      );
+    }
+    return _attachmentChip(url, fileName);
+  }
+
+  Widget _attachmentChip(String url, String fileName) {
+    return InkWell(
+      onTap: () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        constraints: const BoxConstraints(maxWidth: 280),
+        decoration: BoxDecoration(
+          color: KodaColors.elevated,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: KodaColors.border),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.insert_drive_file_outlined, size: 16, color: KodaColors.text3),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(fileName,
+                style: const TextStyle(color: KodaColors.koda, fontSize: 12),
+                overflow: TextOverflow.ellipsis),
+          ),
+        ]),
+      ),
+    );
+  }
 
   Future<void> _onReorderChannels(int oldIndex, int newIndex) async {
     if (newIndex > oldIndex) newIndex--;
@@ -1160,9 +1262,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const SizedBox(height: 2),
                     if (m['reply_to'] != null)
                       _buildReplyPreview(m['reply_to'] as Map<String, dynamic>),
-                    Text(m['content'] as String? ?? '',
-                        style: const TextStyle(
-                            color: KodaColors.text1, fontSize: 14)),
+                    if ((m['content'] as String? ?? '').isNotEmpty)
+                      Text(m['content'] as String,
+                          style: const TextStyle(
+                              color: KodaColors.text1, fontSize: 14)),
+                    if (m['attachment_url'] != null) ...[
+                      const SizedBox(height: 4),
+                      _buildAttachment(m),
+                    ],
                       _buildReactions(m),
                   ]),
                 ),
@@ -1194,9 +1301,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ]),
         ),
+      if (_pendingAttachment != null)
+        Container(
+          color: KodaColors.elevated,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Row(children: [
+            const Icon(Icons.attach_file, size: 14, color: KodaColors.koda),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(_pendingAttachment!['fileName'] ?? 'Attachment',
+                  style: const TextStyle(color: KodaColors.text3, fontSize: 12),
+                  overflow: TextOverflow.ellipsis),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close, size: 14, color: KodaColors.text3),
+              onPressed: () => setState(() => _pendingAttachment = null),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+          ]),
+        ),
       Padding(
         padding: const EdgeInsets.all(14),
         child: Row(children: [
+          IconButton(
+            icon: _uploadingAttachment
+                ? const SizedBox(width: 18, height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
+                : const Icon(Icons.attach_file, color: KodaColors.text2),
+            tooltip: 'Attach file',
+            onPressed: _uploadingAttachment ? null : _pickAttachment,
+          ),
           Expanded(
             child: KodaTextField(
               controller: _messageController,

@@ -228,13 +228,20 @@ class KodaApi {
   }
 
   Future<Map<String, dynamic>?> sendMessage(
-      String channelId, String content, {bool encrypted = false, String? replyToId}) async {
+      String channelId, String content, {
+        bool encrypted = false,
+        String? replyToId,
+        String? attachmentUrl,
+        String? attachmentContentType,
+      }) async {
     try {
       final res = await _dio.post('/channels/$channelId/messages',
           data: {
             'content': content,
             'encrypted': encrypted,
             if (replyToId != null) 'reply_to_id': replyToId,
+            if (attachmentUrl != null) 'attachment_url': attachmentUrl,
+            if (attachmentContentType != null) 'attachment_content_type': attachmentContentType,
           });
       return res.data['message'] as Map<String, dynamic>;
     } catch (e) { _log('sendMessage', e); return null; }
