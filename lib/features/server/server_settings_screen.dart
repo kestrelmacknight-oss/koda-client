@@ -42,7 +42,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   static const List<String> _permissionKeys = [
     'view_channels', 'send_messages', 'connect_voice', 'manage_server',
     'manage_channels', 'manage_roles', 'manage_messages',
-    'kick_members', 'ban_members', 'mention_everyone',
+    'kick_members', 'ban_members', 'mention_everyone', 'manage_marketplace',
   ];
 
   static const Map<String, String> _permissionLabels = {
@@ -56,6 +56,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     'kick_members':     'Kick Members',
     'ban_members':      'Ban Members',
     'mention_everyone': 'Mention @everyone',
+    'manage_marketplace': 'Manage Marketplace',
   };
 
   static const List<String> _colorSwatches = [

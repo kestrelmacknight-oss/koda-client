@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/api.dart';
+import '../../core/permissions.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../core/uploader.dart';
@@ -35,12 +36,29 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
   List<Map<String, dynamic>> _products = [];
   List<Map<String, dynamic>> _myPurchases = [];
   bool _loading = true;
+  // Was previously only ever the constructor's fixed initial value --
+  // both call sites (marketplace_screen.dart) hardcoded creatorMode:
+  // false, which meant there was no reachable path to this screen's
+  // create/upload flow at all, ever, for anyone. Now a real toggle (see
+  // the AppBar action below), gated to whoever can manage this server's
+  // marketplace (owner, or a role with the manage_marketplace
+  // permission -- see server_settings_screen.dart's Roles tab).
+  late bool _creatorMode = widget.creatorMode;
+  bool _canManageMarketplace = false;
 
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: widget.creatorMode ? 2 : 2, vsync: this);
+    _tabs = TabController(length: 2, vsync: this);
     _load();
+    _loadPermission();
+  }
+
+  Future<void> _loadPermission() async {
+    final user = ref.read(authProvider).user;
+    final canManage = await hasServerPermission(widget.server, 'manage_marketplace',
+        currentUserId: user?.id, isKodaAdmin: user?.isAdmin ?? false);
+    if (mounted) setState(() => _canManageMarketplace = canManage);
   }
 
   @override
@@ -54,7 +72,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
     final user = ref.read(authProvider).user;
     final products = await KodaApi.instance.getProducts(
       serverId: widget.server?['id'] as String?,
-      creatorId: widget.creatorMode ? user?.id : null,
+      creatorId: _creatorMode ? user?.id : null,
     );
     final purchases = await KodaApi.instance.getMyPurchases();
     if (!mounted) return;
@@ -65,6 +83,11 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
     });
   }
 
+  void _toggleCreatorMode() {
+    setState(() => _creatorMode = !_creatorMode);
+    _load();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,14 +95,22 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
         title: Text(
-          widget.creatorMode ? 'My Products' : 'Digital Goods',
+          _creatorMode ? 'My Products' : 'Digital Goods',
           style: const TextStyle(color: KodaColors.text1,
               fontSize: 16, fontWeight: FontWeight.w700),
         ),
         actions: [
-          if (widget.creatorMode)
+          if (_canManageMarketplace)
+            IconButton(
+              icon: Icon(_creatorMode ? Icons.storefront_outlined : Icons.inventory_2_outlined,
+                  color: KodaColors.text2),
+              tooltip: _creatorMode ? 'Switch to Browse' : 'Manage this server\'s products',
+              onPressed: _toggleCreatorMode,
+            ),
+          if (_creatorMode)
             IconButton(
               icon: const Icon(Icons.add, color: KodaColors.koda),
+              tooltip: 'Create product',
               onPressed: _showCreateProductDialog,
             ),
         ],
@@ -89,7 +120,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
           labelColor: KodaColors.text1,
           unselectedLabelColor: KodaColors.text3,
           tabs: [
-            Tab(text: widget.creatorMode ? 'My Listings' : 'Browse'),
+            Tab(text: _creatorMode ? 'My Listings' : 'Browse'),
             const Tab(text: 'My Purchases'),
           ],
         ),
@@ -114,18 +145,18 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
         const Icon(Icons.storefront_outlined, color: KodaColors.text3, size: 48),
         const SizedBox(height: 12),
         Text(
-          widget.creatorMode ? 'No products yet' : 'No products available',
+          _creatorMode ? 'No products yet' : 'No products available',
           style: const TextStyle(color: KodaColors.text1, fontSize: 16,
               fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         Text(
-          widget.creatorMode
+          _creatorMode
               ? 'Create your first product to start selling'
               : 'Check back later for digital goods',
           style: const TextStyle(color: KodaColors.text3, fontSize: 13),
         ),
-        if (widget.creatorMode) ...[
+        if (_creatorMode) ...[
           const SizedBox(height: 20),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
@@ -244,7 +275,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
           const SizedBox(height: 12),
 
           Row(children: [
-            if (widget.creatorMode) ...[
+            if (_creatorMode) ...[
               Expanded(
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
