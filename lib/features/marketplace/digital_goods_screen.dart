@@ -3,6 +3,8 @@
 // Digital products listing — browse, purchase, download.
 // Creator view: create/manage products, upload license keys.
 
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +12,14 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/api.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
+import '../../core/uploader.dart';
 import '../../shared/widgets.dart';
+
+// Matches Koda.Upload's @digital_max_bytes server-side -- larger than
+// every other upload type in this app (avatars/attachments cap at 8MB),
+// since a digital product might be a real piece of software or a large
+// asset pack, not just an image.
+const _kDigitalProductMaxBytes = 100 * 1024 * 1024;
 
 class DigitalGoodsScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic>? server;
@@ -477,6 +486,10 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
             : '');
     String type = existing?['product_type'] ?? 'file';
     String scope = existing?['scope'] ?? 'server';
+    String? fileUrl = existing?['file_url'] as String?;
+    String? fileName = existing?['file_name'] as String?;
+    int? fileSizeBytes = existing?['file_size_bytes'] as int?;
+    bool uploadingFile = false;
 
     final saved = await showDialog<bool>(
       context: context,
@@ -540,9 +553,80 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                 ],
                 if (type == 'file') ...[
                   const SizedBox(height: 8),
-                  const Text(
-                    'File upload coming soon — enter a direct file URL for now.',
-                    style: TextStyle(color: KodaColors.text3, fontSize: 11),
+                  const Text('Product file',
+                      style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                  const SizedBox(height: 4),
+                  if (fileName != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: KodaColors.elevated,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(children: [
+                        const Icon(Icons.insert_drive_file_outlined,
+                            size: 16, color: KodaColors.text3),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            fileSizeBytes != null
+                                ? '$fileName (${(fileSizeBytes! / (1024 * 1024)).toStringAsFixed(1)}MB)'
+                                : fileName!,
+                            style: const TextStyle(color: KodaColors.text1, fontSize: 12),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, size: 14, color: KodaColors.text3),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () => setDialogState(() {
+                            fileUrl = null; fileName = null; fileSizeBytes = null;
+                          }),
+                        ),
+                      ]),
+                    ),
+                  const SizedBox(height: 6),
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: KodaColors.koda,
+                      side: const BorderSide(color: KodaColors.koda),
+                      minimumSize: const Size(double.infinity, 36),
+                    ),
+                    icon: uploadingFile
+                        ? const SizedBox(width: 14, height: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
+                        : const Icon(Icons.upload_file_outlined, size: 16),
+                    label: Text(uploadingFile
+                        ? 'Uploading...'
+                        : (fileName == null ? 'Choose File' : 'Replace File')),
+                    onPressed: uploadingFile ? null : () async {
+                      final result = await FilePicker.platform.pickFiles(withData: false);
+                      final path = result?.files.single.path;
+                      if (path == null) return;
+                      setDialogState(() => uploadingFile = true);
+                      try {
+                        final uploaded = await KodaUploader.instance.upload(
+                          file: File(path),
+                          uploadType: 'digital_product',
+                          contentType: 'application/octet-stream',
+                          maxBytes: _kDigitalProductMaxBytes,
+                          sendTimeout: const Duration(minutes: 5),
+                        );
+                        setDialogState(() {
+                          fileUrl = uploaded.cdnUrl;
+                          fileName = result!.files.single.name;
+                          fileSizeBytes = result.files.single.size;
+                          uploadingFile = false;
+                        });
+                      } on UploadException catch (e) {
+                        setDialogState(() => uploadingFile = false);
+                        if (ctx.mounted) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                              SnackBar(content: Text(e.message)));
+                        }
+                      }
+                    },
                   ),
                 ],
               ]),
@@ -564,6 +648,13 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
     );
 
     if (saved != true || titleCtrl.text.trim().isEmpty) return;
+    if (type == 'file' && fileUrl == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Choose a file for this product before saving.')));
+      }
+      return;
+    }
     final price = double.tryParse(priceCtrl.text.trim());
     final priceCents = price != null ? (price * 100).round() : 0;
     final user = ref.read(authProvider).user;
@@ -577,6 +668,9 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
         'scope':        scope,
         'server_id':    widget.server?['id'],
         'creator_id':   user?.id,
+        if (type == 'file') 'file_url': fileUrl,
+        if (type == 'file') 'file_name': fileName,
+        if (type == 'file') 'file_size_bytes': fileSizeBytes,
       });
       if (product != null && mounted) _load();
     } else {
@@ -587,6 +681,9 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
           'description': descCtrl.text.trim(),
           'price_cents': priceCents,
           'scope':       scope,
+          if (type == 'file') 'file_url': fileUrl,
+          if (type == 'file') 'file_name': fileName,
+          if (type == 'file') 'file_size_bytes': fileSizeBytes,
         },
       );
       if (ok && mounted) _load();

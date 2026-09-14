@@ -71,6 +71,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _showMemberPanel = true;
   final Set<String> _expandedThreads = {};
   Map<String, int> _channelUnread = {};
+  // Channels with an unread @mention or @role pending -- rendered as a
+  // distinct (red, not violet) badge from plain unread, per
+  // notifications carrying type "mention"/"role_mention" (see
+  // _subscribeToUserNotifications and Koda.Chat.push_notification
+  // server-side). Cleared the same place _channelUnread is zeroed.
+  final Set<String> _channelsWithMentions = {};
   final Map<String, List<Map<String, dynamic>>> _voiceOccupants = {};
   final Set<String> _voiceTopics = {};
 
@@ -128,6 +134,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ref.read(notificationsProvider.notifier).addNotification(payload);
           // Show system tray notification (location only, no content)
           _showTrayNotification(payload);
+
+          // A mention/role-mention (as opposed to plain channel activity)
+          // gets its own distinct badge in the sidebar -- see
+          // _channelsWithMentions' doc comment.
+          final type = payload['type'] as String?;
+          final data = payload['data'] as Map<String, dynamic>?;
+          final channelId = data?['channel_id'] as String?;
+          if (channelId != null && (type == 'mention' || type == 'role_mention')) {
+            setState(() => _channelsWithMentions.add(channelId));
+          }
+        }
+      } else if (msg.event == const PhoenixChannelEvent.custom('unread_bump')) {
+        // A channel this user can see got a new message while they
+        // weren't viewing it -- bump its sidebar badge live instead of
+        // only ever refreshing once at startup (see
+        // Koda.Chat.broadcast_unread_bump/2 server-side).
+        final payload = msg.payload as Map<String, dynamic>?;
+        final channelId = payload?['channel_id'] as String?;
+        if (channelId != null && channelId != _activeChannelId) {
+          setState(() => _channelUnread = {
+                ..._channelUnread,
+                channelId: (_channelUnread[channelId] ?? 0) + 1,
+              });
         }
       }
     });
@@ -417,6 +446,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         _messages = decrypted;
         _activeChannelId = channelId;
         _channelUnread = {..._channelUnread, channelId: 0};
+        _channelsWithMentions.remove(channelId);
       });
       KodaApi.instance.markChannelRead(channelId);
 
@@ -961,7 +991,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     switch (action) {
       case 'mark_read':
         await KodaApi.instance.markChannelRead(channelId);
-        if (mounted) setState(() => _channelUnread = {..._channelUnread, channelId: 0});
+        if (mounted) {
+          setState(() {
+            _channelUnread = {..._channelUnread, channelId: 0};
+            _channelsWithMentions.remove(channelId);
+          });
+        }
 
       case 'edit':
         await showChannelEditDialog(
@@ -1367,6 +1402,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     };
     final occupants = isVoice ? (_voiceOccupants[c['id']] ?? const []) : const [];
     final labelSetting = _labelSettingFor(c);
+    final hasMention = _channelsWithMentions.contains(c['id']);
     final tile = GestureDetector(
       onSecondaryTapUp: (d) => _showChannelContextMenu(c, d.globalPosition),
       child: ListTile(
@@ -1395,13 +1431,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             style: const TextStyle(color: KodaColors.text3, fontSize: 11),
             maxLines: 1, overflow: TextOverflow.ellipsis),
         trailing: unread > 0
-            ? Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                    color: KodaColors.koda, borderRadius: BorderRadius.circular(99)),
-                child: Text(unread > 99 ? '99+' : '$unread',
-                    style: const TextStyle(color: Colors.white,
-                        fontSize: 10, fontWeight: FontWeight.w700)),
+            ? Tooltip(
+                message: hasMention ? 'Unread mention' : 'Unread messages',
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                  decoration: BoxDecoration(
+                      // Mentions get the same red used for kick/ban/danger
+                      // actions elsewhere -- deliberately distinct from
+                      // plain unread's violet, matching Discord's
+                      // red-for-mention convention.
+                      color: hasMention ? KodaColors.accent : KodaColors.koda,
+                      borderRadius: BorderRadius.circular(99)),
+                  child: Text(unread > 99 ? '99+' : '$unread',
+                      style: const TextStyle(color: Colors.white,
+                          fontSize: 10, fontWeight: FontWeight.w700)),
+                ),
               )
             : null,
         selected: selected,

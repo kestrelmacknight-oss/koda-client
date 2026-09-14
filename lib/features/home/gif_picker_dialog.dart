@@ -40,14 +40,19 @@ class _GifPickerDialogState extends State<GifPickerDialog> {
   Future<void> _load({bool trending = false}) async {
     setState(() { _loading = true; _error = null; });
     final query = _queryCtrl.text.trim();
-    final gifs = trending || query.isEmpty
+    final result = trending || query.isEmpty
         ? await KodaApi.instance.getTrendingGifs()
         : await KodaApi.instance.searchGifs(query);
     if (!mounted) return;
     setState(() {
-      _gifs = gifs;
+      _gifs = result.data ?? [];
       _loading = false;
-      _error = gifs.isEmpty ? 'No GIFs found (or GIF search isn\'t configured yet)' : null;
+      // Surface the server's actual reason (e.g. "GIF search is not
+      // configured" if GIPHY_API_KEY is missing/wrong) rather than a
+      // generic "no results" message that looks identical to a real
+      // empty search -- that ambiguity was the whole reason this was
+      // hard to diagnose before.
+      _error = _gifs.isEmpty ? (result.errorCode ?? 'No GIFs found') : null;
     });
   }
 

@@ -25,16 +25,23 @@ class KodaUploader {
   /// Uploads [file] through the Koda server to R2.
   /// Returns the permanent CDN URL on success.
   /// Throws [UploadException] with a user-readable message on failure.
+  ///
+  /// [maxBytes] and [sendTimeout] default to values tuned for small
+  /// avatar/attachment uploads -- pass larger ones for upload types with
+  /// a bigger server-side limit (e.g. 'digital_product', 100MB, see
+  /// Koda.Upload server-side), or the default 8MB/15s will incorrectly
+  /// reject or time out an otherwise-valid large file.
   Future<UploadResult> upload({
     required File file,
     required String uploadType,
     required String contentType,
+    int maxBytes = 8 * 1024 * 1024,
+    Duration? sendTimeout,
   }) async {
-    const maxBytes = 8 * 1024 * 1024;
-
     final fileSize = await file.length();
     if (fileSize > maxBytes) {
-      throw UploadException('File is too large. Maximum size is 8MB.');
+      final maxMb = (maxBytes / (1024 * 1024)).round();
+      throw UploadException('File is too large. Maximum size is ${maxMb}MB.');
     }
 
     try {
@@ -42,6 +49,7 @@ class KodaUploader {
         file: file,
         uploadType: uploadType,
         contentType: contentType,
+        sendTimeout: sendTimeout,
       );
 
       if (cdnUrl == null) {

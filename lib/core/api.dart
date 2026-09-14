@@ -326,18 +326,38 @@ class KodaApi {
     } catch (e) { _log('getPinnedMessages', e); return []; }
   }
 
-  Future<List<Map<String, dynamic>>> searchGifs(String query) async {
+  // Both return a typed result (rather than the usual empty-list-on-error
+  // convention) because an empty list here is genuinely ambiguous -- it
+  // could mean "no GIFs matched" or "GIPHY_API_KEY isn't configured/the
+  // upstream call failed," and those need visibly different UI (see
+  // gif_picker_dialog.dart). The server already distinguishes these
+  // (GiphyController: 503 "not configured" vs 502 "failed") -- this was
+  // previously being silently discarded by a bare catch-all here.
+  Future<KodaApiResult<List<Map<String, dynamic>>>> searchGifs(String query) async {
     try {
       final res = await _dio.get('/gifs/search', queryParameters: {'q': query});
-      return List<Map<String, dynamic>>.from(res.data['gifs'] ?? []);
-    } catch (e) { _log('searchGifs', e); return []; }
+      final gifs = List<Map<String, dynamic>>.from(res.data['gifs'] ?? []);
+      return KodaApiResult(data: gifs, statusCode: res.statusCode);
+    } on DioException catch (e) {
+      _log('searchGifs', e);
+      return KodaApiResult(statusCode: e.response?.statusCode, errorCode: _giphyErrorOf(e));
+    }
   }
 
-  Future<List<Map<String, dynamic>>> getTrendingGifs() async {
+  Future<KodaApiResult<List<Map<String, dynamic>>>> getTrendingGifs() async {
     try {
       final res = await _dio.get('/gifs/trending');
-      return List<Map<String, dynamic>>.from(res.data['gifs'] ?? []);
-    } catch (e) { _log('getTrendingGifs', e); return []; }
+      final gifs = List<Map<String, dynamic>>.from(res.data['gifs'] ?? []);
+      return KodaApiResult(data: gifs, statusCode: res.statusCode);
+    } on DioException catch (e) {
+      _log('getTrendingGifs', e);
+      return KodaApiResult(statusCode: e.response?.statusCode, errorCode: _giphyErrorOf(e));
+    }
+  }
+
+  String? _giphyErrorOf(DioException e) {
+    final data = e.response?.data;
+    return data is Map ? data['error'] as String? : null;
   }
 
   // ── Voice ────────────────────────────────────────────────────────────
@@ -365,6 +385,11 @@ class KodaApi {
     required File file,
     required String uploadType,
     required String contentType,
+    // Digital product files can be up to 100MB (see Koda.Upload's
+    // per-type size limits server-side) -- the default 15s send timeout
+    // is tuned for small avatar/attachment uploads and isn't enough for
+    // that, so callers of large uploads need to pass a longer one.
+    Duration? sendTimeout,
   }) async {
     try {
       final bytes = await file.readAsBytes();
@@ -373,6 +398,8 @@ class KodaApi {
         data: bytes,
         options: Options(
           contentType: contentType,
+          sendTimeout: sendTimeout,
+          receiveTimeout: sendTimeout,
           headers: {
             'X-Upload-Type': uploadType,
             'Content-Length': bytes.length,
@@ -1261,6 +1288,32 @@ class KodaApi {
       final res = await _dio.get('/servers/$serverId/bank');
       return res.data as Map<String, dynamic>;
     } catch (e) { _log('getServerBank', e); return null; }
+  }
+
+  // -- Printful (per-server merch fulfillment) ---------------------------------
+
+  /// Returns the URL to open in a browser to start connecting this
+  /// server's Printful store -- the OAuth handshake itself happens
+  /// server-side (see koda-server's PrintfulController.callback/2).
+  Future<String?> connectPrintful(String serverId) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/printful/connect');
+      return res.data['authorize_url'] as String?;
+    } catch (e) { _log('connectPrintful', e); return null; }
+  }
+
+  Future<bool> getPrintfulStatus(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/printful/status');
+      return res.data['connected'] as bool? ?? false;
+    } catch (e) { _log('getPrintfulStatus', e); return false; }
+  }
+
+  Future<bool> disconnectPrintful(String serverId) async {
+    try {
+      await _dio.delete('/servers/$serverId/printful');
+      return true;
+    } catch (e) { _log('disconnectPrintful', e); return false; }
   }
 
   // -- Server boosting (Pulse subscriber perk) ---------------------------------

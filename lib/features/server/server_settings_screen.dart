@@ -11,6 +11,7 @@ import '../../core/theme.dart';
 import '../../core/providers.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/uploader.dart';
 import '../../shared/widgets.dart';
 import '../../shared/channel_edit_dialog.dart';
@@ -33,6 +34,9 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   List<Map<String, dynamic>> _bans = [];
   bool _loading = true;
   bool _showBans = false;
+  bool _printfulConnected = false;
+  bool _loadingPrintful = true;
+  bool _connectingPrintful = false;
 
   // Matches the flat permission map used server-side on Koda.Servers.Role.
   static const List<String> _permissionKeys = [
@@ -62,8 +66,61 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
     _loadAll();
+    _loadPrintfulStatus();
+  }
+
+  Future<void> _loadPrintfulStatus() async {
+    final serverId = _serverId;
+    if (serverId.isEmpty) {
+      if (mounted) setState(() => _loadingPrintful = false);
+      return;
+    }
+    final connected = await KodaApi.instance.getPrintfulStatus(serverId);
+    if (!mounted) return;
+    setState(() { _printfulConnected = connected; _loadingPrintful = false; });
+  }
+
+  Future<void> _connectPrintful() async {
+    setState(() => _connectingPrintful = true);
+    final url = await KodaApi.instance.connectPrintful(_serverId);
+    if (!mounted) return;
+    setState(() => _connectingPrintful = false);
+    if (url == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not start Printful connection.')));
+      return;
+    }
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
+          'Finish connecting in your browser, then come back and refresh.')));
+    }
+  }
+
+  Future<void> _disconnectPrintful() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Text('Disconnect Printful?', style: TextStyle(color: KodaColors.text1)),
+        content: const Text(
+            'This server will no longer be able to fulfill merch orders until reconnected.',
+            style: TextStyle(color: KodaColors.text2)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Disconnect', style: TextStyle(color: KodaColors.accent)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final ok = await KodaApi.instance.disconnectPrintful(_serverId);
+    if (ok && mounted) setState(() => _printfulConnected = false);
   }
 
   @override
@@ -390,6 +447,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             Tab(text: 'Roles'),
             Tab(text: 'Members'),
             Tab(text: 'Invites'),
+            Tab(text: 'Merch'),
           ],
         ),
       ),
@@ -397,8 +455,77 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
           : TabBarView(
               controller: _tabController,
-              children: [_buildChannelsTab(), _buildRolesTab(), _buildMembersTab(), _buildInvitesTab()],
+              children: [_buildChannelsTab(), _buildRolesTab(), _buildMembersTab(),
+                  _buildInvitesTab(), _buildMerchTab()],
             ),
+    );
+  }
+
+  Widget _buildMerchTab() {
+    if (_loadingPrintful) {
+      return const Center(child: CircularProgressIndicator(color: KodaColors.koda));
+    }
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: KodaColors.card,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: KodaColors.border),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Icon(_printfulConnected ? Icons.check_circle : Icons.storefront_outlined,
+                  color: _printfulConnected ? KodaColors.mint : KodaColors.text3, size: 22),
+              const SizedBox(width: 10),
+              Text(_printfulConnected ? 'Printful Connected' : 'Printful Not Connected',
+                  style: const TextStyle(color: KodaColors.text1,
+                      fontSize: 15, fontWeight: FontWeight.w600)),
+            ]),
+            const SizedBox(height: 8),
+            const Text(
+              'Connect this server\'s Printful account to fulfill merch orders '
+              'placed through Koda. Each server connects its own store.',
+              style: TextStyle(color: KodaColors.text3, fontSize: 12, height: 1.5),
+            ),
+            const SizedBox(height: 14),
+            if (_printfulConnected)
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: KodaColors.accent,
+                  side: const BorderSide(color: KodaColors.accent),
+                  minimumSize: const Size(double.infinity, 40),
+                ),
+                onPressed: _disconnectPrintful,
+                child: const Text('Disconnect'),
+              )
+            else
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: KodaColors.koda,
+                  foregroundColor: Colors.black,
+                  minimumSize: const Size(double.infinity, 40),
+                ),
+                icon: _connectingPrintful
+                    ? const SizedBox(width: 14, height: 14,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                    : const Icon(Icons.link, size: 16),
+                label: Text(_connectingPrintful ? 'Connecting...' : 'Connect Printful'),
+                onPressed: _connectingPrintful ? null : _connectPrintful,
+              ),
+            if (!_printfulConnected) ...[
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: _loadPrintfulStatus,
+                child: const Text('Already connected in your browser? Refresh status',
+                    style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+              ),
+            ],
+          ]),
+        ),
+      ],
     );
   }
 
