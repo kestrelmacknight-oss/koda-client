@@ -8,6 +8,7 @@ class KodaUser {
   final bool isAdmin;
   final bool emailVerified;
   final bool friendsOnlyDms;
+  final String kodaTier; // 'free' | 'spark' | 'pulse' -- see lib/shared/tier_badge.dart
   KodaUser({
     required this.id,
     required this.username,
@@ -16,6 +17,7 @@ class KodaUser {
     this.isAdmin = false,
     this.emailVerified = false,
     this.friendsOnlyDms = false,
+    this.kodaTier = 'free',
   });
   factory KodaUser.fromJson(Map<String, dynamic> j) => KodaUser(
         id:             j['id'] as String,
@@ -25,11 +27,13 @@ class KodaUser {
         isAdmin:        j['is_admin'] as bool? ?? false,
         emailVerified:  j['email_verified'] as bool? ?? false,
         friendsOnlyDms: j['friends_only_dms'] as bool? ?? false,
+        kodaTier:       j['koda_tier'] as String? ?? 'free',
       );
-  KodaUser copyWith({bool? friendsOnlyDms}) => KodaUser(
+  KodaUser copyWith({bool? friendsOnlyDms, String? kodaTier}) => KodaUser(
         id: id, username: username, email: email, avatarUrl: avatarUrl,
         isAdmin: isAdmin, emailVerified: emailVerified,
         friendsOnlyDms: friendsOnlyDms ?? this.friendsOnlyDms,
+        kodaTier: kodaTier ?? this.kodaTier,
       );
 }
 class AuthState {

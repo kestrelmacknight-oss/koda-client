@@ -9,11 +9,20 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/api.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
+import '../../shared/tier_badge.dart';
 import '../../shared/widgets.dart';
 import 'digital_goods_screen.dart';
 
 class MarketplaceScreen extends ConsumerStatefulWidget {
-  const MarketplaceScreen({super.key});
+  /// When true, renders just the tab bar + tab content (no Scaffold/AppBar
+  /// of its own) so it can sit inline inside another screen's layout --
+  /// see home_screen.dart, where this is shown in the main content area
+  /// as a server-scoped pseudo-channel rather than a pushed full-screen
+  /// route. Pushed full-screen (the default), it's reached from Settings
+  /// for account-level billing (Subscriptions/Creator), which isn't tied
+  /// to any one server.
+  final bool embedded;
+  const MarketplaceScreen({super.key, this.embedded = false});
   @override
   ConsumerState<MarketplaceScreen> createState() => _MarketplaceScreenState();
 }
@@ -23,6 +32,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   late final TabController _tabs;
   Map<String, dynamic>? _connectAccount;
   Map<String, dynamic>? _subscriptionInfo;
+  List<Map<String, dynamic>> _boostTokens = [];
   bool _loadingConnect = true;
   bool _loadingSub = true;
 
@@ -42,10 +52,12 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   Future<void> _loadData() async {
     final connect = await KodaApi.instance.getConnectAccount();
     final sub = await KodaApi.instance.getSubscriptionInfo();
+    final tokens = await KodaApi.instance.getMyBoostTokens();
     if (!mounted) return;
     setState(() {
       _connectAccount = connect;
       _subscriptionInfo = sub;
+      _boostTokens = tokens;
       _loadingConnect = false;
       _loadingSub = false;
     });
@@ -53,6 +65,40 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
 
   @override
   Widget build(BuildContext context) {
+    final tabBar = TabBar(
+      controller: _tabs,
+      indicatorColor: KodaColors.koda,
+      labelColor: KodaColors.text1,
+      unselectedLabelColor: KodaColors.text3,
+      tabs: const [
+        Tab(text: 'Subscriptions'),
+        Tab(text: 'Creator'),
+        Tab(text: 'Server Bank'),
+        Tab(text: 'Digital Goods'),
+      ],
+    );
+    final tabViews = TabBarView(
+      controller: _tabs,
+      children: [
+        _buildSubscriptionsTab(),
+        _buildCreatorTab(),
+        _buildServerBankTab(),
+        _buildDigitalGoodsTab(),
+      ],
+    );
+
+    if (widget.embedded) {
+      // No Scaffold/AppBar of its own -- the host screen (home_screen.dart)
+      // already supplies the surrounding chrome and a channel-style header.
+      return Column(children: [
+        Container(
+          color: KodaColors.bg2,
+          child: tabBar,
+        ),
+        Expanded(child: tabViews),
+      ]);
+    }
+
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
@@ -60,28 +106,9 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
         title: const Text('Marketplace',
             style: TextStyle(color: KodaColors.text1,
                 fontSize: 16, fontWeight: FontWeight.w700)),
-        bottom: TabBar(
-          controller: _tabs,
-          indicatorColor: KodaColors.koda,
-          labelColor: KodaColors.text1,
-          unselectedLabelColor: KodaColors.text3,
-          tabs: const [
-            Tab(text: 'Subscriptions'),
-            Tab(text: 'Creator'),
-            Tab(text: 'Server Bank'),
-            const Tab(text: 'Digital Goods'),
-          ],
-        ),
+        bottom: tabBar,
       ),
-      body: TabBarView(
-        controller: _tabs,
-        children: [
-          _buildSubscriptionsTab(),
-          _buildCreatorTab(),
-          _buildServerBankTab(),
-          _buildDigitalGoodsTab(),
-        ],
-      ),
+      body: tabViews,
     );
   }
 
@@ -108,13 +135,9 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
             border: Border.all(color: KodaColors.border),
           ),
           child: Row(children: [
-            Icon(
-              tier == 'pulse' ? Icons.bolt :
-              tier == 'spark' ? Icons.local_fire_department :
-              Icons.person_outline,
-              color: tier == 'free' ? KodaColors.text3 : KodaColors.koda,
-              size: 28,
-            ),
+            tier == 'free'
+                ? const Icon(Icons.person_outline, color: KodaColors.text3, size: 28)
+                : TierBadge(tier: tier, size: 32),
             const SizedBox(width: 12),
             Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -133,6 +156,30 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
             ])),
           ]),
         ),
+
+        if (tier == 'pulse' || _boostTokens.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: KodaColors.card,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: KodaColors.border),
+            ),
+            child: Row(children: [
+              const Icon(Icons.rocket_launch_outlined, color: KodaColors.koda, size: 24),
+              const SizedBox(width: 12),
+              Expanded(child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('${_boostTokens.length} boost token${_boostTokens.length == 1 ? '' : 's'} available',
+                    style: const TextStyle(color: KodaColors.text1,
+                        fontSize: 14, fontWeight: FontWeight.w600)),
+                const Text('Gift a token to any server you\'re in from its Server Bank tab',
+                    style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+              ])),
+            ]),
+          ),
+        ],
         const SizedBox(height: 20),
 
         // Spark tier
@@ -140,7 +187,6 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
           tier: 'spark',
           name: 'Spark',
           price: sparkPrice,
-          icon: Icons.local_fire_department,
           color: const Color(0xFFFF6B35),
           current: tier == 'spark',
           perks: [
@@ -157,7 +203,6 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
           tier: 'pulse',
           name: 'Pulse',
           price: pulsePrice,
-          icon: Icons.bolt,
           color: KodaColors.koda,
           current: tier == 'pulse',
           perks: [
@@ -176,7 +221,6 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
     required String tier,
     required String name,
     required int price,
-    required IconData icon,
     required Color color,
     required bool current,
     required List<String> perks,
@@ -198,7 +242,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
             borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
           ),
           child: Row(children: [
-            Icon(icon, color: color, size: 24),
+            TierBadge(tier: tier, size: 24),
             const SizedBox(width: 10),
             Text(name, style: TextStyle(color: color,
                 fontSize: 18, fontWeight: FontWeight.w700)),
@@ -581,7 +625,10 @@ class _ServerBankView extends ConsumerStatefulWidget {
 
 class _ServerBankViewState extends ConsumerState<_ServerBankView> {
   Map<String, dynamic>? _bank;
+  Map<String, dynamic>? _boostStatus;
+  int _myTokenCount = 0;
   bool _loading = true;
+  bool _boosting = false;
 
   @override
   void initState() {
@@ -590,10 +637,33 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
   }
 
   Future<void> _load() async {
-    final bank = await KodaApi.instance.getServerBank(
-        widget.server['id'] as String);
+    final serverId = widget.server['id'] as String;
+    final results = await Future.wait([
+      KodaApi.instance.getServerBank(serverId),
+      KodaApi.instance.getServerBoostStatus(serverId),
+      KodaApi.instance.getMyBoostTokens(),
+    ]);
     if (!mounted) return;
-    setState(() { _bank = bank; _loading = false; });
+    setState(() {
+      _bank = results[0] as Map<String, dynamic>?;
+      _boostStatus = results[1] as Map<String, dynamic>?;
+      _myTokenCount = (results[2] as List).length;
+      _loading = false;
+    });
+  }
+
+  Future<void> _boost() async {
+    setState(() => _boosting = true);
+    final error = await KodaApi.instance.boostServer(widget.server['id'] as String);
+    if (!mounted) return;
+    setState(() => _boosting = false);
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${widget.server['name']} boosted!')));
+    _load();
   }
 
   @override
@@ -639,6 +709,55 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
             const Text(
               'Points are earned from the 5% processing fee on tips and subscriptions in this server. Use points to unlock server upgrades.',
               style: TextStyle(color: KodaColors.text3, fontSize: 11),
+            ),
+          ]),
+        ),
+
+        const SizedBox(height: 16),
+
+        // Server boosts
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: KodaColors.card,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: KodaColors.border),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              const Icon(Icons.rocket_launch_outlined, color: KodaColors.koda, size: 20),
+              const SizedBox(width: 8),
+              const Text('Server Boosts',
+                  style: TextStyle(color: KodaColors.text1,
+                      fontWeight: FontWeight.w600, fontSize: 14)),
+              const Spacer(),
+              Text('Level ${_boostStatus?['level'] ?? 0}',
+                  style: const TextStyle(color: KodaColors.koda,
+                      fontWeight: FontWeight.w700, fontSize: 13)),
+            ]),
+            const SizedBox(height: 4),
+            Text('${_boostStatus?['count'] ?? 0} active boost${(_boostStatus?['count'] ?? 0) == 1 ? '' : 's'}',
+                style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+            const SizedBox(height: 12),
+            Text(
+              _myTokenCount > 0
+                  ? 'You have $_myTokenCount boost token${_myTokenCount == 1 ? '' : 's'} available.'
+                  : 'Boost tokens come from a Pulse subscription (1/month). Subscribe on the Subscriptions tab to earn one.',
+              style: const TextStyle(color: KodaColors.text3, fontSize: 11),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: KodaColors.koda,
+                foregroundColor: Colors.black,
+                minimumSize: const Size(double.infinity, 40),
+              ),
+              icon: _boosting
+                  ? const SizedBox(width: 14, height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                  : const Icon(Icons.rocket_launch_outlined, size: 16),
+              label: Text(_boosting ? 'Boosting...' : 'Boost This Server'),
+              onPressed: (_myTokenCount == 0 || _boosting) ? null : _boost,
             ),
           ]),
         ),

@@ -3,6 +3,9 @@
 // Direct messages with three tabs: All (conversations), Friends, Requests.
 
 import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -12,8 +15,10 @@ import '../../core/socket.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
 import '../../core/secure_storage.dart';
+import '../../core/crypto/dm_attachments.dart';
 import '../../core/crypto/dm_session_manager.dart';
 import '../../core/crypto/double_ratchet.dart' show DoubleRatchetDecryptFailure;
+import '../../shared/tier_badge.dart';
 import '../../shared/widgets.dart';
 import 'safety_number_screen.dart';
 
@@ -39,6 +44,8 @@ class _DmScreenState extends ConsumerState<DmScreen>
   bool _safetyNumberChanged = false;
   final _msgCtrl = TextEditingController();
   final _scroll = ScrollController();
+  DmAttachmentMeta? _pendingAttachment;
+  bool _uploadingAttachment = false;
 
   // Friends tab
   List<Map<String, dynamic>> _friends = [];
@@ -122,7 +129,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
     final id = message['id'] as String;
 
     final cached = await SecureStorage.getCachedDecryptedContent(id);
-    if (cached != null) return {...message, 'content': cached};
+    if (cached != null) return _applyPayload(message, cached);
 
     try {
       final plain = await DmSessionManager.instance.decryptReceived(
@@ -131,7 +138,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
         message: message,
       );
       await SecureStorage.cacheDecryptedContent(id, plain);
-      return {...message, 'content': plain};
+      return _applyPayload(message, plain);
     } on SafetyNumberChanged {
       if (mounted) setState(() => _safetyNumberChanged = true);
       return {...message, 'content': '', '_undecryptable': 'safety_number_changed'};
@@ -140,6 +147,20 @@ class _DmScreenState extends ConsumerState<DmScreen>
     } catch (_) {
       return {...message, 'content': '', '_undecryptable': 'failed'};
     }
+  }
+
+  /// Decrypted DM content is a [DmPayload] envelope, not a bare string --
+  /// this splits it back into the text (for the bubble) and the optional
+  /// attachment metadata (for [_buildAttachment]). Legacy messages sent
+  /// before attachments existed decode as plain text with no attachment,
+  /// so old history keeps rendering correctly.
+  Map<String, dynamic> _applyPayload(Map<String, dynamic> message, String raw) {
+    final payload = decodeDmPayload(raw);
+    return {
+      ...message,
+      'content': payload.text,
+      if (payload.attachment != null) '_attachment': payload.attachment,
+    };
   }
 
   Future<void> _openConversation(Map<String, dynamic> convo) async {
@@ -215,19 +236,27 @@ class _DmScreenState extends ConsumerState<DmScreen>
     final convo = _activeConversation;
     final text = _msgCtrl.text.trim();
     final peerUserId = convo != null ? _peerUserId(convo) : null;
-    if (convo == null || text.isEmpty || peerUserId == null) return;
+    final attachment = _pendingAttachment;
+    if (convo == null || peerUserId == null) return;
+    if (text.isEmpty && attachment == null) return;
     if (_safetyNumberChanged) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
           "This conversation's safety number changed -- verify it before sending.")));
       return;
     }
     _msgCtrl.clear();
+    setState(() => _pendingAttachment = null);
 
     try {
+      // The attachment's decryption key/nonce never leave this envelope --
+      // it gets Double Ratchet-encrypted below exactly like ordinary text,
+      // so the server only ever sees ciphertext for both the message and
+      // (separately) the file itself.
+      final payload = encodeDmPayload(text, attachment: attachment);
       final envelope = await DmSessionManager.instance.encryptForSend(
         conversationId: convo['id'] as String,
         peerUserId: peerUserId,
-        plaintext: text,
+        plaintext: payload,
       );
       final msg = await KodaApi.instance.sendDmMessage(convo['id'] as String, envelope.content,
           encrypted: true,
@@ -237,8 +266,12 @@ class _DmScreenState extends ConsumerState<DmScreen>
           nonce: envelope.nonce,
           x3dhHeader: envelope.x3dhHeader);
       if (msg != null && mounted) {
-        await SecureStorage.cacheDecryptedContent(msg['id'] as String, text);
-        setState(() => _messages.add({...msg, 'content': text}));
+        await SecureStorage.cacheDecryptedContent(msg['id'] as String, payload);
+        setState(() => _messages.add({
+              ...msg,
+              'content': text,
+              if (attachment != null) '_attachment': attachment,
+            }));
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_scroll.hasClients) {
             _scroll.animateTo(_scroll.position.maxScrollExtent,
@@ -262,6 +295,60 @@ class _DmScreenState extends ConsumerState<DmScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Could not encrypt message: $e')));
+      }
+    }
+  }
+
+  // Matches Koda.Upload's allowed_content_types server-side (minus
+  // application/pdf's dedicated mime lookup -- ciphertext always uploads
+  // as application/octet-stream regardless of the real file type, see
+  // lib/core/crypto/dm_attachments.dart).
+  static const _attachmentExtensions = [
+    'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'avif',
+    'mp4', 'webm', 'mov',
+    'mp3', 'ogg', 'wav',
+    'pdf',
+  ];
+  static const _extensionContentTypes = {
+    'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'png': 'image/png',
+    'gif': 'image/gif', 'webp': 'image/webp', 'svg': 'image/svg+xml',
+    'avif': 'image/avif', 'mp4': 'video/mp4', 'webm': 'video/webm',
+    'mov': 'video/quicktime', 'mp3': 'audio/mpeg', 'ogg': 'audio/ogg',
+    'wav': 'audio/wav', 'pdf': 'application/pdf',
+  };
+
+  Future<void> _pickAndEncryptAttachment() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: _attachmentExtensions,
+    );
+    final path = result?.files.single.path;
+    if (path == null || !mounted) return;
+    final ext = result!.files.single.extension?.toLowerCase() ?? '';
+    final contentType = _extensionContentTypes[ext] ?? 'application/octet-stream';
+    final fileName = result.files.single.name;
+
+    setState(() => _uploadingAttachment = true);
+    try {
+      final bytes = await File(path).readAsBytes();
+      final meta = await encryptAndUploadDmAttachment(
+          bytes: bytes, contentType: contentType, fileName: fileName);
+      if (!mounted) return;
+      if (meta == null) {
+        setState(() => _uploadingAttachment = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Attachment upload failed.')));
+        return;
+      }
+      setState(() {
+        _pendingAttachment = meta;
+        _uploadingAttachment = false;
+      });
+    } catch (e) {
+      if (mounted) {
+        setState(() => _uploadingAttachment = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not encrypt attachment: $e')));
       }
     }
   }
@@ -381,11 +468,17 @@ class _DmScreenState extends ConsumerState<DmScreen>
                             selected: active,
                             selectedTileColor: KodaColors.koda.withOpacity(0.1),
                             leading: KodaAvatar(username: name, size: 32,
-                                avatarUrl: other?['avatar_url'] as String?),
-                            title: Text(name,
-                                style: TextStyle(
-                                    color: KodaColors.text1, fontSize: 13,
-                                    fontWeight: unread > 0 ? FontWeight.w700 : FontWeight.w400)),
+                                avatarUrl: other?['avatar_url'] as String?,
+                                tier: other?['koda_tier'] as String?),
+                            title: Row(mainAxisSize: MainAxisSize.min, children: [
+                              Flexible(child: Text(name,
+                                  style: TextStyle(
+                                      color: KodaColors.text1, fontSize: 13,
+                                      fontWeight: unread > 0 ? FontWeight.w700 : FontWeight.w400),
+                                  overflow: TextOverflow.ellipsis)),
+                              const SizedBox(width: 4),
+                              TierBadge(tier: other?['koda_tier'] as String?, size: 12),
+                            ]),
                             trailing: unread > 0
                                 ? Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
@@ -419,6 +512,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
     final peer = _activeConversation?['user'] as Map<String, dynamic>?;
     final peerName = peer?['username'] as String? ?? 'Unknown';
     final peerId = peer?['id'] as String?;
+    final peerTier = peer?['koda_tier'] as String?;
 
     return Column(children: [
       Container(
@@ -429,6 +523,8 @@ class _DmScreenState extends ConsumerState<DmScreen>
         child: Row(children: [
           Text(peerName, style: const TextStyle(
               color: KodaColors.text1, fontWeight: FontWeight.w600, fontSize: 13)),
+          const SizedBox(width: 6),
+          TierBadge(tier: peerTier, size: 13),
           const SizedBox(width: 8),
           const Tooltip(
             message: 'End-to-end encrypted',
@@ -480,7 +576,9 @@ class _DmScreenState extends ConsumerState<DmScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (!isMe) ...[
-                          KodaAvatar(username: author, size: 32),
+                          KodaAvatar(username: author, size: 32,
+                              avatarUrl: peer?['avatar_url'] as String?,
+                              tier: peerTier),
                           const SizedBox(width: 8),
                         ],
                         Expanded(
@@ -519,11 +617,24 @@ class _DmScreenState extends ConsumerState<DmScreen>
                                               fontStyle: FontStyle.italic),
                                         ),
                                       ])
-                                    : Text(
-                                        m['content'] as String? ?? '',
-                                        style: const TextStyle(
-                                            color: KodaColors.text1,
-                                            fontSize: 13),
+                                    : Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          if (m['_attachment'] is DmAttachmentMeta) ...[
+                                            _EncryptedAttachment(
+                                                meta: m['_attachment'] as DmAttachmentMeta),
+                                            if ((m['content'] as String? ?? '').isNotEmpty)
+                                              const SizedBox(height: 6),
+                                          ],
+                                          if ((m['content'] as String? ?? '').isNotEmpty)
+                                            Text(
+                                              m['content'] as String,
+                                              style: const TextStyle(
+                                                  color: KodaColors.text1,
+                                                  fontSize: 13),
+                                            ),
+                                        ],
                                       ),
                               ),
                               if (isMe && i == _messages.length - 1 && _seenByPeer(m))
@@ -546,19 +657,49 @@ class _DmScreenState extends ConsumerState<DmScreen>
       // Input
       Padding(
         padding: const EdgeInsets.all(14),
-        child: Row(children: [
-          Expanded(
-            child: KodaTextField(
-              controller: _msgCtrl,
-              hintText: 'Message...',
-              onSubmitted: (_) => _sendMessage(),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          if (_pendingAttachment != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.lock_outline, size: 12, color: KodaColors.mint),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(_pendingAttachment!.fileName,
+                      style: const TextStyle(color: KodaColors.text2, fontSize: 12),
+                      overflow: TextOverflow.ellipsis),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, size: 14, color: KodaColors.text3),
+                  onPressed: () => setState(() => _pendingAttachment = null),
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.only(left: 6),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ]),
             ),
-          ),
-          const SizedBox(width: 10),
-          IconButton(
-            icon: const Icon(Icons.send, color: KodaColors.koda),
-            onPressed: _sendMessage,
-          ),
+          Row(children: [
+            IconButton(
+              icon: _uploadingAttachment
+                  ? const SizedBox(
+                      width: 16, height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
+                  : const Icon(Icons.attach_file, color: KodaColors.text3),
+              onPressed: _uploadingAttachment ? null : _pickAndEncryptAttachment,
+            ),
+            Expanded(
+              child: KodaTextField(
+                controller: _msgCtrl,
+                hintText: 'Message...',
+                onSubmitted: (_) => _sendMessage(),
+              ),
+            ),
+            const SizedBox(width: 10),
+            IconButton(
+              icon: const Icon(Icons.send, color: KodaColors.koda),
+              onPressed: _sendMessage,
+            ),
+          ]),
         ]),
       ),
     ]);
@@ -591,10 +732,16 @@ class _DmScreenState extends ConsumerState<DmScreen>
           ),
           child: ListTile(
             leading: KodaAvatar(username: name, size: 36,
-                avatarUrl: f['avatar_url'] as String?),
-            title: Text(name,
-                style: const TextStyle(color: KodaColors.text1,
-                    fontWeight: FontWeight.w500)),
+                avatarUrl: f['avatar_url'] as String?,
+                tier: f['koda_tier'] as String?),
+            title: Row(mainAxisSize: MainAxisSize.min, children: [
+              Flexible(child: Text(name,
+                  style: const TextStyle(color: KodaColors.text1,
+                      fontWeight: FontWeight.w500),
+                  overflow: TextOverflow.ellipsis)),
+              const SizedBox(width: 4),
+              TierBadge(tier: f['koda_tier'] as String?, size: 12),
+            ]),
             trailing: Row(mainAxisSize: MainAxisSize.min, children: [
               IconButton(
                 icon: const Icon(Icons.message_outlined,
@@ -742,5 +889,96 @@ class _DmScreenState extends ConsumerState<DmScreen>
       await _loadConversations();
       await _openConversation(convo);
     }
+  }
+}
+
+/// Renders one decrypted DM attachment. Deliberately not `Image.network`
+/// (or any direct CDN fetch by URL) -- the bytes at that URL are AES-256-GCM
+/// ciphertext, so they have to be fetched and decrypted first (see
+/// lib/core/crypto/dm_attachments.dart) before there's anything displayable.
+/// Decrypted once per widget lifetime and cached in memory; nothing
+/// plaintext is written to disk unless the user explicitly saves the file.
+class _EncryptedAttachment extends StatefulWidget {
+  final DmAttachmentMeta meta;
+  const _EncryptedAttachment({required this.meta});
+
+  @override
+  State<_EncryptedAttachment> createState() => _EncryptedAttachmentState();
+}
+
+class _EncryptedAttachmentState extends State<_EncryptedAttachment> {
+  late final Future<Uint8List> _bytes = downloadAndDecryptDmAttachment(widget.meta);
+
+  Future<void> _saveToDisk(Uint8List bytes) async {
+    final path = await FilePicker.platform.saveFile(fileName: widget.meta.fileName);
+    if (path == null) return;
+    await File(path).writeAsBytes(bytes);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Saved ${widget.meta.fileName}')));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isImage = widget.meta.contentType.startsWith('image/');
+    return FutureBuilder<Uint8List>(
+      future: _bytes,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const SizedBox(
+              width: 32, height: 32,
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)));
+        }
+        if (snapshot.hasError || snapshot.data == null) {
+          return _attachmentChip(Icons.error_outline, widget.meta.fileName,
+              color: KodaColors.accent, onTap: null);
+        }
+        final bytes = snapshot.data!;
+        if (isImage) {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 320, maxHeight: 240),
+              child: GestureDetector(
+                onTap: () => _saveToDisk(bytes),
+                child: Image.memory(bytes, fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => _attachmentChip(
+                        Icons.insert_drive_file_outlined, widget.meta.fileName,
+                        onTap: () => _saveToDisk(bytes))),
+              ),
+            ),
+          );
+        }
+        return _attachmentChip(Icons.insert_drive_file_outlined, widget.meta.fileName,
+            onTap: () => _saveToDisk(bytes));
+      },
+    );
+  }
+
+  Widget _attachmentChip(IconData icon, String fileName,
+      {Color color = KodaColors.text3, VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        constraints: const BoxConstraints(maxWidth: 280),
+        decoration: BoxDecoration(
+          color: KodaColors.elevated,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: KodaColors.border),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(fileName,
+                style: const TextStyle(color: KodaColors.koda, fontSize: 12),
+                overflow: TextOverflow.ellipsis),
+          ),
+        ]),
+      ),
+    );
   }
 }

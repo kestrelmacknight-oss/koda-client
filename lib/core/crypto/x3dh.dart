@@ -18,11 +18,31 @@ class IdentityKeyPair {
 /// Everything generated at account setup / SPK rotation time. Private
 /// halves never leave the device; only the `*Pub`/`spkSig` fields (plus
 /// the OPKs' public halves) are uploaded to the server.
+///
+/// [previousSignedPrekey] exists to bridge SPK rotation: a peer may have
+/// fetched our bundle (and started an X3DH handshake against the SPK that
+/// was current then) just before we rotated. Without keeping that old
+/// private key around for a grace window, their first message would be
+/// silently undecryptable -- not an attack, just an ordinary race, but
+/// one that would look identical to one at the UI layer. It's discarded
+/// once [previousSignedPrekeyExpiresAt] passes (see
+/// dm_session_manager.dart's rotation logic), same grace-period tradeoff
+/// Signal's own clients make.
 class LocalKeyMaterial {
   final IdentityKeyPair identity;
   final X25519KeyPair signedPrekey;
+  final DateTime signedPrekeyCreatedAt;
+  final X25519KeyPair? previousSignedPrekey;
+  final DateTime? previousSignedPrekeyExpiresAt;
   final List<X25519KeyPair> oneTimePrekeys;
-  const LocalKeyMaterial(this.identity, this.signedPrekey, this.oneTimePrekeys);
+  const LocalKeyMaterial(
+    this.identity,
+    this.signedPrekey,
+    this.oneTimePrekeys, {
+    required this.signedPrekeyCreatedAt,
+    this.previousSignedPrekey,
+    this.previousSignedPrekeyExpiresAt,
+  });
 }
 
 const _oneTimePrekeyCount = 20;
@@ -32,7 +52,8 @@ Future<LocalKeyMaterial> generateKeyMaterial() async {
   final dh = await generateX25519KeyPair();
   final spk = await generateX25519KeyPair();
   final opks = await Future.wait(List.generate(_oneTimePrekeyCount, (_) => generateX25519KeyPair()));
-  return LocalKeyMaterial(IdentityKeyPair(signing, dh), spk, opks);
+  return LocalKeyMaterial(IdentityKeyPair(signing, dh), spk, opks,
+      signedPrekeyCreatedAt: DateTime.now().toUtc());
 }
 
 Future<Uint8List> signPrekey(IdentityKeyPair identity, X25519KeyPair prekey) =>

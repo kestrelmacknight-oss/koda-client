@@ -60,7 +60,14 @@ class SecureStorage {
         .where((k) => bytesToB64(k.publicKeyBytes) != bytesToB64(publicKeyBytes))
         .toList();
     if (remaining.length == material.oneTimePrekeys.length) return;
-    await saveKeyMaterial(LocalKeyMaterial(material.identity, material.signedPrekey, remaining));
+    await saveKeyMaterial(LocalKeyMaterial(
+      material.identity,
+      material.signedPrekey,
+      remaining,
+      signedPrekeyCreatedAt: material.signedPrekeyCreatedAt,
+      previousSignedPrekey: material.previousSignedPrekey,
+      previousSignedPrekeyExpiresAt: material.previousSignedPrekeyExpiresAt,
+    ));
   }
 
   // ── Per-conversation Double Ratchet state ───────────────────────────────
@@ -127,6 +134,15 @@ class SecureStorage {
           'priv': bytesToB64(m.signedPrekey.privateKeyBytes),
           'pub':  bytesToB64(m.signedPrekey.publicKeyBytes),
         },
+        'signed_prekey_created_at': m.signedPrekeyCreatedAt.toIso8601String(),
+        if (m.previousSignedPrekey != null)
+          'previous_signed_prekey': {
+            'priv': bytesToB64(m.previousSignedPrekey!.privateKeyBytes),
+            'pub':  bytesToB64(m.previousSignedPrekey!.publicKeyBytes),
+          },
+        if (m.previousSignedPrekeyExpiresAt != null)
+          'previous_signed_prekey_expires_at':
+              m.previousSignedPrekeyExpiresAt!.toIso8601String(),
         'one_time_prekeys': m.oneTimePrekeys
             .map((k) => {'priv': bytesToB64(k.privateKeyBytes), 'pub': bytesToB64(k.publicKeyBytes)})
             .toList(),
@@ -139,6 +155,9 @@ class SecureStorage {
         Ed25519KeyPair(b64ToBytes(k['priv'] as String), b64ToBytes(k['pub'] as String));
 
     final identityJson = j['identity'] as Map<String, dynamic>;
+    final createdAtRaw = j['signed_prekey_created_at'] as String?;
+    final previousJson = j['previous_signed_prekey'] as Map<String, dynamic>?;
+    final previousExpiresRaw = j['previous_signed_prekey_expires_at'] as String?;
     return LocalKeyMaterial(
       IdentityKeyPair(
         ed25519From(identityJson['signing'] as Map<String, dynamic>),
@@ -148,6 +167,15 @@ class SecureStorage {
       (j['one_time_prekeys'] as List)
           .map((k) => x25519From(k as Map<String, dynamic>))
           .toList(),
+      // Older locally-stored bundles predate SPK rotation and have no
+      // timestamp -- treat as "just created" so rotation waits a full
+      // interval from first launch after the update, rather than
+      // rotating immediately for every existing install.
+      signedPrekeyCreatedAt:
+          createdAtRaw != null ? DateTime.parse(createdAtRaw) : DateTime.now().toUtc(),
+      previousSignedPrekey: previousJson != null ? x25519From(previousJson) : null,
+      previousSignedPrekeyExpiresAt:
+          previousExpiresRaw != null ? DateTime.parse(previousExpiresRaw) : null,
     );
   }
 }

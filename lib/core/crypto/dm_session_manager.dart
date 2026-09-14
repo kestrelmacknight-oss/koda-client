@@ -42,6 +42,21 @@ class EncryptedEnvelope {
 }
 
 class DmSessionManager {
+  /// How long a signed prekey stays current before rotateSignedPrekeyIfDue
+  /// replaces it. Signal-class clients rotate on a similar weekly cadence
+  /// -- frequent enough to bound how long a single leaked SPK private key
+  /// stays useful to an attacker, infrequent enough that it's not a
+  /// meaningful battery/bandwidth cost.
+  static const spkRotationInterval = Duration(days: 7);
+
+  /// How long a just-retired SPK's private key is kept around after
+  /// rotation purely to decrypt X3DH handshakes that were already in
+  /// flight against it (a peer who fetched our bundle moments before we
+  /// rotated). Generous on purpose -- OPK-less handshake messages queued
+  /// server-side for an offline peer could realistically be older than a
+  /// day by the time they're delivered.
+  static const spkGraceRetention = Duration(days: 14);
+
   DmSessionManager._();
   static final DmSessionManager instance = DmSessionManager._();
 
@@ -62,6 +77,52 @@ class DmSessionManager {
     final spkSig = await signPrekey(material.identity, material.signedPrekey);
     await SecureStorage.saveKeyMaterial(material);
     await KodaApi.instance.uploadKeyBundle(bundleToUploadJson(material, spkSig));
+  }
+
+  /// Rotates the signed prekey if it's older than [spkRotationInterval].
+  /// Safe to call on every app start / periodically while the app is
+  /// open -- a no-op most of the time. Only the SPK rotates here (not the
+  /// identity key, which must stay stable for TOFU pinning to mean
+  /// anything, and not one-time prekeys, which are single-use and
+  /// replenished separately).
+  ///
+  /// The upload is a *partial* PUT -- just spk_pub/spk_sig -- which the
+  /// server's put_key_bundle/2 merges via Ecto's cast/3 rather than
+  /// replacing the row, so it can't clobber ik_*_pub or opks. The server
+  /// also stamps spk_rotated_at itself on every such call, so there's
+  /// nothing to send for that field (see koda-server's lib/koda/crypto.ex).
+  ///
+  /// Already-established Double Ratchet sessions are unaffected: once
+  /// initAsResponder/initAsInitiator captures a signed-prekey keypair
+  /// into a conversation's persisted ratchet state, that state never
+  /// consults SecureStorage.loadKeyMaterial().signedPrekey again -- only
+  /// *new* incoming sessions look at the current SPK, which is exactly
+  /// what the previousSignedPrekey grace window in decryptReceived exists
+  /// to bridge.
+  Future<void> rotateSignedPrekeyIfDue() async {
+    final material = await SecureStorage.loadKeyMaterial();
+    if (material == null) return; // ensureMyKeysExist() hasn't run yet
+
+    final age = DateTime.now().toUtc().difference(material.signedPrekeyCreatedAt);
+    if (age < spkRotationInterval) return;
+
+    final newSpk = await generateX25519KeyPair();
+    final spkSig = await signPrekey(material.identity, newSpk);
+    final now = DateTime.now().toUtc();
+
+    final rotated = LocalKeyMaterial(
+      material.identity,
+      newSpk,
+      material.oneTimePrekeys,
+      signedPrekeyCreatedAt: now,
+      previousSignedPrekey: material.signedPrekey,
+      previousSignedPrekeyExpiresAt: now.add(spkGraceRetention),
+    );
+    await SecureStorage.saveKeyMaterial(rotated);
+    await KodaApi.instance.uploadKeyBundle({
+      'spk_pub': bytesToB64(newSpk.publicKeyBytes),
+      'spk_sig': bytesToB64(spkSig),
+    });
   }
 
   /// Encrypts [plaintext] for [peerUserId] in [conversationId], creating
@@ -152,20 +213,56 @@ class DmSessionManager {
             .firstOrNull;
       }
 
-      final x3dh = await respondToSession(
-        myIdentity: myMaterial.identity,
-        mySignedPrekey: myMaterial.signedPrekey,
-        myOneTimePrekey: myOpk,
-        theirIdentityDhPub: theirIdentityDhPub,
-        theirEphemeralPub: theirEphemeralPub,
+      final header = RatchetHeader(
+        b64ToBytes(message['ratchet_key'] as String),
+        message['msg_number'] as int,
+        message['prev_chain'] as int,
       );
-      state = RatchetState.initAsResponder(
-        rootKey: x3dh.sharedSecret,
-        myInitialRatchetKeyPair: myMaterial.signedPrekey,
-        associatedData: x3dh.associatedData,
-      );
-      if (myOpk != null) {
-        await SecureStorage.removeOneTimePrekey(myOpk.publicKeyBytes);
+      final nonce = b64ToBytes(message['nonce'] as String);
+      final payload = b64ToBytes(message['content'] as String);
+
+      // Try the current SPK first. If it fails and we still hold a
+      // just-retired one within its grace window, this message may be an
+      // X3DH handshake the sender started against our *previous* bundle
+      // just before we rotated -- retry against that one before giving up.
+      // See LocalKeyMaterial's previousSignedPrekey doc for why this is a
+      // routine race rather than something to fail closed on immediately.
+      Future<RatchetState> buildResponderState(X25519KeyPair spk) async {
+        final x3dh = await respondToSession(
+          myIdentity: myMaterial.identity,
+          mySignedPrekey: spk,
+          myOneTimePrekey: myOpk,
+          theirIdentityDhPub: theirIdentityDhPub,
+          theirEphemeralPub: theirEphemeralPub,
+        );
+        return RatchetState.initAsResponder(
+          rootKey: x3dh.sharedSecret,
+          myInitialRatchetKeyPair: spk,
+          associatedData: x3dh.associatedData,
+        );
+      }
+
+      final candidate = await buildResponderState(myMaterial.signedPrekey);
+      try {
+        final plaintext = await candidate.decrypt(header: header, nonce: nonce, payload: payload);
+        state = candidate;
+        await SecureStorage.saveRatchetState(conversationId, state);
+        if (myOpk != null) await SecureStorage.removeOneTimePrekey(myOpk.publicKeyBytes);
+        return utf8.decode(plaintext);
+      } on DoubleRatchetDecryptFailure {
+        final previous = myMaterial.previousSignedPrekey;
+        final previousExpiresAt = myMaterial.previousSignedPrekeyExpiresAt;
+        if (previous == null ||
+            previousExpiresAt == null ||
+            DateTime.now().toUtc().isAfter(previousExpiresAt)) {
+          rethrow;
+        }
+        final fallback = await buildResponderState(previous);
+        final plaintext = await fallback.decrypt(header: header, nonce: nonce, payload: payload);
+        state = fallback;
+        await SecureStorage.saveRatchetState(conversationId, state);
+        if (myOpk != null) await SecureStorage.removeOneTimePrekey(myOpk.publicKeyBytes);
+        return utf8.decode(plaintext);
       }
     }
 

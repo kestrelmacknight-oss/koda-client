@@ -344,6 +344,46 @@ class KodaApi {
     } catch (e) { _log('uploadFile', e); return null; }
   }
 
+  /// Same endpoint as [uploadFile], for callers that already have bytes
+  /// in memory (e.g. encrypted attachment ciphertext) rather than a File
+  /// on disk.
+  Future<String?> uploadBytes({
+    required List<int> bytes,
+    required String uploadType,
+    required String contentType,
+  }) async {
+    try {
+      final res = await _dio.post(
+        '/uploads',
+        data: bytes,
+        options: Options(
+          contentType: contentType,
+          headers: {
+            'X-Upload-Type': uploadType,
+            'Content-Length': bytes.length,
+          },
+        ),
+      );
+      return res.data['cdn_url'] as String?;
+    } catch (e) { _log('uploadBytes', e); return null; }
+  }
+
+  /// Fetches raw bytes from an absolute URL (e.g. a CDN attachment URL),
+  /// for callers that will decrypt the response themselves. Uses a bare
+  /// Dio instance rather than [_dio]: the CDN lives on a different host
+  /// than the API, and [_dio]'s interceptor attaches the session's
+  /// bearer token to every request -- that must never be sent cross-origin
+  /// to a plain object-storage host that doesn't need it.
+  Future<List<int>?> downloadRawBytes(String url) async {
+    try {
+      final res = await Dio().get<List<int>>(
+        url,
+        options: Options(responseType: ResponseType.bytes),
+      );
+      return res.data;
+    } catch (e) { _log('downloadRawBytes', e); return null; }
+  }
+
   // ── Invites ───────────────────────────────────────────────────────────────
 
   Future<Map<String, dynamic>?> createInvite(String serverId,
@@ -1182,6 +1222,35 @@ class KodaApi {
       final res = await _dio.get('/servers/$serverId/bank');
       return res.data as Map<String, dynamic>;
     } catch (e) { _log('getServerBank', e); return null; }
+  }
+
+  // -- Server boosting (Pulse subscriber perk) ---------------------------------
+
+  Future<List<Map<String, dynamic>>> getMyBoostTokens() async {
+    try {
+      final res = await _dio.get('/boost_tokens');
+      return List<Map<String, dynamic>>.from(res.data['tokens'] ?? []);
+    } catch (e) { _log('getMyBoostTokens', e); return []; }
+  }
+
+  Future<Map<String, dynamic>?> getServerBoostStatus(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/boost_status');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getServerBoostStatus', e); return null; }
+  }
+
+  /// Redeems one of the caller's available boost tokens on [serverId].
+  /// Returns the error code ("no_tokens_available", etc.) on failure so
+  /// the UI can show a specific message, or null on success.
+  Future<String?> boostServer(String serverId) async {
+    try {
+      await _dio.post('/servers/$serverId/boost');
+      return null;
+    } on DioException catch (e) {
+      final err = e.response?.data is Map ? e.response?.data['error'] as String? : null;
+      return err ?? 'Could not boost this server.';
+    } catch (e) { _log('boostServer', e); return 'Could not boost this server.'; }
   }
 
   // -- Server subscriptions ----------------------------------------------------

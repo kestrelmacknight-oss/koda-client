@@ -24,6 +24,7 @@ dependencies:
   window_manager: ^0.4.3
   cryptography: ^2.9.0
   flutter_secure_storage: ^9.2.2
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:
@@ -32,6 +33,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/badges/
+    - assets/frames/
 
 
 

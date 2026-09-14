@@ -1,5 +1,6 @@
 // lib/main.dart
 
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:audio_session/audio_session.dart';
@@ -7,6 +8,7 @@ import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/api.dart';
+import 'core/crypto/dm_session_manager.dart';
 import 'core/platform.dart';
 import 'core/providers.dart';
 import 'core/theme.dart';
@@ -95,6 +97,19 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       final me = await KodaApi.instance.me();
       if (me != null && mounted) {
         ref.read(authProvider.notifier).setUser(me['user']);
+        // Returning to an already-logged-in session (app relaunch with a
+        // stored token, no auth_screen involved) -- this is the one
+        // choke point that covers that path, so it's also where SPK
+        // rotation gets checked on every launch. Both are cheap no-ops
+        // when there's nothing to do, and non-fatal: DMs just keep using
+        // whatever keys are already on record until a later launch
+        // succeeds.
+        unawaited(() async {
+          try {
+            await DmSessionManager.instance.ensureMyKeysExist();
+            await DmSessionManager.instance.rotateSignedPrekeyIfDue();
+          } catch (_) {}
+        }());
         return;
       }
     }

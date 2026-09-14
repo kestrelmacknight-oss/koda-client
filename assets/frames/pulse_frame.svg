@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- Pulse avatar frame (placeholder art). Same ring construction as
+       spark_frame.svg but in Koda's brand gradient with diamond
+       "sparkle" accents instead of dots -- a static stand-in for what
+       should eventually be a subtly animated frame (Pulse's real perk
+       is "Animated avatar frame"; swap this for a Lottie/Rive asset
+       when one exists rather than trying to fake motion in a static SVG). -->
+  <defs>
+    <linearGradient id="pulseFrameGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7B68EE"/>
+      <stop offset="100%" stop-color="#5BEAD4"/>
+    </linearGradient>
+  </defs>
+  <circle cx="24" cy="24" r="22.5" fill="none" stroke="url(#pulseFrameGrad)" stroke-width="3.2"/>
+  <rect x="21.5" y="0.5" width="5" height="5" rx="1" fill="#5BEAD4" transform="rotate(45 24 3)"/>
+  <rect x="40" y="21.5" width="4" height="4" rx="1" fill="#7B68EE" transform="rotate(45 42 23.5)"/>
+  <rect x="4" y="24" width="4" height="4" rx="1" fill="#7B68EE" transform="rotate(45 6 26)"/>
+</svg>

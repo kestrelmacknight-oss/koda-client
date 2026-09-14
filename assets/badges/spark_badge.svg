@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- Spark tier badge (placeholder art -- swap freely, referenced only by
+       asset path from lib/shared/tier_badge.dart). Flame glyph on a warm
+       gradient disc, matching the existing Spark tier color used in
+       lib/features/marketplace/marketplace_screen.dart. -->
+  <defs>
+    <linearGradient id="sparkBadgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFA13D"/>
+      <stop offset="100%" stop-color="#FF6B35"/>
+    </linearGradient>
+  </defs>
+  <circle cx="12" cy="12" r="11" fill="url(#sparkBadgeGrad)" stroke="#7A2E0A" stroke-width="0.75"/>
+  <path d="M12 4 C8.2 8 6.8 10.6 6.8 13.2 C6.8 16.8 9.1 19.2 12 19.2 C14.9 19.2 17.2 16.8 17.2 13.2 C17.2 10.6 15.8 8 12 4 Z" fill="#FFFFFF"/>
+  <circle cx="12" cy="14.6" r="1.9" fill="#FFD9B0"/>
+</svg>

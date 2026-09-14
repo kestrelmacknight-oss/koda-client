@@ -56,6 +56,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   List<Map<String, dynamic>> _messages = [];
 
   bool _showingDms = false;
+  bool _showingMarketplace = false;
   bool _loadingServers = true;
   String? _activeChannelId;
   final _messageController = TextEditingController();
@@ -150,7 +151,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _selectServer(Map<String, dynamic> server) async {
-    setState(() => _showingDms = false);
+    setState(() { _showingDms = false; _showingMarketplace = false; });
     ref.read(selectedServerProvider.notifier).state = server;
     ref.read(selectedChannelProvider.notifier).state = null;
     final results = await Future.wait([
@@ -257,6 +258,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _selectChannel(Map<String, dynamic> channel) async {
     final channelId = channel['id'] as String;
+    if (_showingMarketplace) setState(() => _showingMarketplace = false);
     ref.read(selectedChannelProvider.notifier).state = channel;
 
     // Leave the previous channel's socket topic
@@ -1339,6 +1341,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildContentArea(Map<String, dynamic>? selectedChannel) {
+    if (_showingMarketplace) {
+      return Column(children: [
+        Container(
+          height: 52,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(color: KodaColors.border))),
+          child: Row(children: [
+            const Icon(Icons.storefront_outlined, size: 16, color: KodaColors.text3),
+            const SizedBox(width: 6),
+            const Text('Marketplace',
+                style: TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w600)),
+          ]),
+        ),
+        const Expanded(child: MarketplaceScreen(embedded: true)),
+      ]);
+    }
+
     if (selectedChannel == null) {
       return const Center(
           child: Text('Select a channel',
@@ -1783,6 +1803,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: GestureDetector(
                   onTap: () => setState(() {
                     _showingDms = true;
+                    _showingMarketplace = false;
                     ref.read(selectedServerProvider.notifier).state = null;
                     ref.read(selectedChannelProvider.notifier).state = null;
                   }),
@@ -1859,12 +1880,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
             ),
             IconButton(
-              icon: const Icon(Icons.storefront_outlined, color: KodaColors.text2),
-              tooltip: 'Marketplace',
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const MarketplaceScreen())),
-            ),
-            IconButton(
               icon: const Icon(Icons.add, color: KodaColors.text2),
               tooltip: 'Create or Join',
               onPressed: () => _showAddServerMenu(),
@@ -1919,6 +1934,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                 ]),
               ),
+              if (selectedServer != null)
+                ListTile(
+                  dense: true,
+                  leading: Icon(Icons.storefront_outlined, size: 16,
+                      color: _showingMarketplace ? KodaColors.text1 : KodaColors.text3),
+                  title: Text('Marketplace',
+                      style: TextStyle(fontSize: 13,
+                          color: _showingMarketplace ? KodaColors.text1 : KodaColors.text3,
+                          fontWeight: _showingMarketplace ? FontWeight.w600 : FontWeight.w400)),
+                  selected: _showingMarketplace,
+                  selectedTileColor: KodaColors.koda.withOpacity(0.1),
+                  onTap: () => setState(() {
+                    _showingMarketplace = true;
+                    ref.read(selectedChannelProvider.notifier).state = null;
+                  }),
+                ),
+              if (selectedServer != null)
+                Container(height: 1, color: KodaColors.border,
+                    margin: const EdgeInsets.symmetric(vertical: 4)),
               Expanded(
                 child: ReorderableListView(
                   onReorder: _onReorderChannels,

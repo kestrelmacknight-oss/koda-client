@@ -49,6 +49,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       // Gated on local private-key presence (inside ensureMyKeysExist),
       // not on whatever the server reports -- see its doc comment.
       await DmSessionManager.instance.ensureMyKeysExist();
+      await DmSessionManager.instance.rotateSignedPrekeyIfDue();
     } catch (e) {
       // Non-fatal -- E2EE setup failed, app still works, DMs just won't
       // encrypt until this succeeds on a later launch.

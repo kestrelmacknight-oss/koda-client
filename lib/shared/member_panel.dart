@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
 import '../core/providers.dart';
+import 'tier_badge.dart';
 
 class MemberPanel extends ConsumerStatefulWidget {
   final Map<String, dynamic> server;
@@ -202,6 +203,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
   Widget _buildMemberTile(Map<String, dynamic> member, bool isOffline) {
     final username = member['username'] as String? ?? 'Unknown';
     final avatarUrl = member['avatar_url'] as String?;
+    final tier = member['koda_tier'] as String?;
     final roles = member['roles'] as List? ?? [];
     final topRole = roles.isNotEmpty
         ? roles.first as Map<String, dynamic>
@@ -218,40 +220,44 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
         child: Row(children: [
-          Stack(clipBehavior: Clip.none, children: [
-            // Avatar
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: KodaColors.elevated,
-              backgroundImage: avatarUrl != null
-                  ? NetworkImage(avatarUrl)
-                  : null,
-              child: avatarUrl == null
-                  ? Text(username[0].toUpperCase(),
-                      style: const TextStyle(
-                          color: KodaColors.text1,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700))
-                  : null,
-            ),
-            // Status dot
-            Positioned(
-              bottom: -1,
-              right: -1,
-              child: Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: isOffline
-                      ? const Color(0xFF6b7280)
-                      : KodaColors.koda,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                      color: KodaColors.bg2, width: 1.5),
+          TierFramedAvatar(
+            tier: tier,
+            avatarSize: 32,
+            child: Stack(clipBehavior: Clip.none, children: [
+              // Avatar
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: KodaColors.elevated,
+                backgroundImage: avatarUrl != null
+                    ? NetworkImage(avatarUrl)
+                    : null,
+                child: avatarUrl == null
+                    ? Text(username[0].toUpperCase(),
+                        style: const TextStyle(
+                            color: KodaColors.text1,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700))
+                    : null,
+              ),
+              // Status dot
+              Positioned(
+                bottom: -1,
+                right: -1,
+                child: Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: isOffline
+                        ? const Color(0xFF6b7280)
+                        : KodaColors.koda,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                        color: KodaColors.bg2, width: 1.5),
+                  ),
                 ),
               ),
-            ),
-          ]),
+            ]),
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -266,6 +272,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
+          TierBadge(tier: tier, size: 13),
         ]),
       ),
       ),

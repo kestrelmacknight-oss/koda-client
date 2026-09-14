@@ -16,6 +16,8 @@ import '../../shared/widgets.dart';
 import 'totp_setup_screen.dart';
 import 'voice_video_settings_screen.dart';
 import '../auth/auth_screen.dart';
+import '../marketplace/marketplace_screen.dart';
+import '../../shared/tier_badge.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -41,6 +43,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   static const _sections = [
     ('My Account', Icons.person_outline),
     ('Security',   Icons.security_outlined),
+    ('Billing',    Icons.payments_outlined),
     ('Voice & Video', Icons.mic_outlined),
     ('About',      Icons.info_outlined),
   ];
@@ -273,8 +276,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ]));
       case 2:
-        return const VoiceVideoSettingsScreen();
+        return const MarketplaceScreen(embedded: true);
       case 3:
+        return const VoiceVideoSettingsScreen();
+      case 4:
         return _shell('About Koda', Column(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
           Container(
@@ -330,7 +335,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             border: Border.all(color: KodaColors.border)),
         child: Row(children: [
           Stack(children: [
-            KodaAvatar(username: user?.username ?? '?', size: 64, avatarUrl: user?.avatarUrl),
+            KodaAvatar(username: user?.username ?? '?', size: 64, avatarUrl: user?.avatarUrl,
+                tier: user?.kodaTier),
             Positioned(
               bottom: 0, right: 0,
               child: Container(
@@ -345,9 +351,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(width: 16),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(user?.username ?? '',
-                  style: const TextStyle(color: KodaColors.text1,
-                      fontSize: 17, fontWeight: FontWeight.w700)),
+              Row(children: [
+                Text(user?.username ?? '',
+                    style: const TextStyle(color: KodaColors.text1,
+                        fontSize: 17, fontWeight: FontWeight.w700)),
+                if (user != null && user.kodaTier != 'free') ...[
+                  const SizedBox(width: 6),
+                  TierBadge(tier: user.kodaTier, size: 15),
+                ],
+              ]),
               Text(user?.email ?? '',
                   style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
               const SizedBox(height: 6),

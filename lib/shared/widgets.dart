@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../core/theme.dart';
+import 'tier_badge.dart';
 
 class KodaTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -44,28 +45,32 @@ class KodaAvatar extends StatelessWidget {
   final String username;
   final double size;
   final String? avatarUrl;
+  /// 'spark' | 'pulse' | 'free' | null -- see lib/shared/tier_badge.dart.
+  /// Purely decorative; omit where the caller doesn't have tier info handy.
+  final String? tier;
 
   const KodaAvatar({
     super.key,
     required this.username,
     this.size = 40,
     this.avatarUrl,
+    this.tier,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (avatarUrl != null && avatarUrl!.isNotEmpty) {
-      return ClipOval(
-        child: Image.network(
-          avatarUrl!,
-          width: size,
-          height: size,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _initialCircle(),
-        ),
-      );
-    }
-    return _initialCircle();
+    final avatar = (avatarUrl != null && avatarUrl!.isNotEmpty)
+        ? ClipOval(
+            child: Image.network(
+              avatarUrl!,
+              width: size,
+              height: size,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => _initialCircle(),
+            ),
+          )
+        : _initialCircle();
+    return TierFramedAvatar(tier: tier, avatarSize: size, child: avatar);
   }
 
   Widget _initialCircle() {
