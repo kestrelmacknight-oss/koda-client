@@ -10,6 +10,7 @@
 import 'package:flutter/material.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
+import '../features/settings/content_filters_screen.dart' show kContentLabels, kContentLabelNames;
 import 'widgets.dart';
 
 Future<void> showChannelEditDialog(
@@ -27,6 +28,7 @@ Future<void> showChannelEditDialog(
   bool isReadOnly = existing?['is_read_only'] == true;
   final allowedRoleIds = List<String>.from(existing?['allowed_role_ids'] ?? []);
   final selectedRoleIds = List<String>.from(allowedRoleIds);
+  final selectedLabels = List<String>.from(existing?['content_labels'] ?? []);
 
   final saved = await showDialog<bool>(
     context: context,
@@ -108,6 +110,38 @@ Future<void> showChannelEditDialog(
                   );
                 }),
               ],
+              if (existing != null) ...[
+                const SizedBox(height: 12),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Content Labels',
+                      style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                ),
+                const Text(
+                  'Flags this channel for members\' content filters; hard-blocked for supervised accounts',
+                  style: TextStyle(color: KodaColors.text3, fontSize: 10),
+                ),
+                const SizedBox(height: 4),
+                ...kContentLabels.map((label) {
+                  final isSelected = selectedLabels.contains(label);
+                  return CheckboxListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(kContentLabelNames[label] ?? label,
+                        style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+                    value: isSelected,
+                    activeColor: KodaColors.koda,
+                    onChanged: (v) => setDialogState(() {
+                      if (v == true) {
+                        selectedLabels.add(label);
+                      } else {
+                        selectedLabels.remove(label);
+                      }
+                    }),
+                  );
+                }),
+              ],
             ]),
           ),
         ),
@@ -131,7 +165,7 @@ Future<void> showChannelEditDialog(
   } else {
     await KodaApi.instance.updateChannel(existing['id'], {
       'name': name, 'type': type, 'category_id': selectedCategoryId,
-      'is_read_only': isReadOnly,
+      'is_read_only': isReadOnly, 'content_labels': selectedLabels,
     });
     await KodaApi.instance.setChannelAllowedRoles(existing['id'] as String, selectedRoleIds);
   }

@@ -11,8 +11,10 @@ import 'core/api.dart';
 import 'core/crypto/dm_session_manager.dart';
 import 'core/platform.dart';
 import 'core/providers.dart';
+import 'core/socket.dart';
 import 'core/theme.dart';
 import 'features/auth/auth_screen.dart';
+import 'features/auth/child_lockout_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/voice/pop_out_video_window.dart';
 
@@ -85,18 +87,51 @@ class AuthGate extends ConsumerStatefulWidget {
 }
 
 class _AuthGateState extends ConsumerState<AuthGate> {
+  bool _lockedOut = false;
+  StreamSubscription<void>? _lockoutSub;
+  StreamSubscription<void>? _socketCloseSub;
+
   @override
   void initState() {
     super.initState();
     _checkSession();
+
+    // Fires when any request comes back 403 outside_allowed_hours --
+    // covers the case where a child's account gets locked out mid-use
+    // (schedule window closes) while some screen other than login is on
+    // top. See KodaApi.lockoutStream's doc comment.
+    _lockoutSub = KodaApi.instance.lockoutStream.listen((_) {
+      if (mounted) setState(() => _lockedOut = true);
+      ref.read(authProvider.notifier).doneLoading();
+    });
+
+    // A live child session can be force-disconnected the instant their
+    // window closes (koda-server's Koda.Parental.ScheduleSweeper), but
+    // the socket close event itself carries no reason. Ask /auth/me --
+    // it's gated by the same schedule check, so if that's what happened
+    // it'll push onto lockoutStream above. Harmless no-op for every
+    // ordinary disconnect (network blip, backgrounding, logout, etc.),
+    // and only bothered for child sessions in the first place.
+    _socketCloseSub = KodaSocket.instance.closeEvents.listen((_) {
+      if (KodaApi.instance.hasToken && ref.read(authProvider).user?.isChild == true) {
+        KodaApi.instance.me();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _lockoutSub?.cancel();
+    _socketCloseSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _checkSession() async {
     await KodaApi.instance.loadStoredToken();
     if (KodaApi.instance.hasToken) {
-      final me = await KodaApi.instance.me();
-      if (me != null && mounted) {
-        ref.read(authProvider.notifier).setUser(me['user']);
+      final result = await KodaApi.instance.me();
+      if (result.ok && mounted) {
+        ref.read(authProvider.notifier).setUser(result.data!['user']);
         // Returning to an already-logged-in session (app relaunch with a
         // stored token, no auth_screen involved) -- this is the one
         // choke point that covers that path, so it's also where SPK
@@ -112,12 +147,26 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         }());
         return;
       }
+      if (result.isOutsideAllowedHours && mounted) {
+        setState(() => _lockedOut = true);
+        ref.read(authProvider.notifier).doneLoading();
+        return;
+      }
     }
     if (mounted) ref.read(authProvider.notifier).doneLoading();
   }
 
+  void _handleLockoutLogout() {
+    KodaApi.instance.logout();
+    ref.read(authProvider.notifier).clear();
+    setState(() => _lockedOut = false);
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_lockedOut) {
+      return ChildLockoutScreen(onLogout: _handleLockoutLogout);
+    }
     final auth = ref.watch(authProvider);
     if (auth.loading) {
       return const Scaffold(

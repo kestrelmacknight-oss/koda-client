@@ -11,6 +11,7 @@ import '../../core/crypto/dm_session_manager.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../shared/widgets.dart';
+import 'child_lockout_screen.dart';
 import 'verify_email_screen.dart';
 import 'forgot_password_screen.dart';
 import '../home/home_screen.dart';
@@ -64,12 +65,21 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     }
     setState(() { _busy = true; _error = null; });
 
-    final result = await KodaApi.instance
+    final apiResult = await KodaApi.instance
         .login(_loginEmail.text.trim(), _loginPassword.text);
 
     if (!mounted) return;
     setState(() => _busy = false);
 
+    if (apiResult.isOutsideAllowedHours) {
+      Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (_) => ChildLockoutScreen(onLogout: () =>
+              Navigator.pushReplacement(context, MaterialPageRoute(
+                  builder: (_) => const AuthScreen())))));
+      return;
+    }
+
+    final result = apiResult.data;
     if (result == null) {
       setState(() => _error = 'Incorrect email or password.');
       return;

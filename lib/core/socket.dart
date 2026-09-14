@@ -4,6 +4,7 @@
 // One persistent connection per session, established after login.
 // Auto-reconnects if the socket drops while the app is running.
 
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 import 'config.dart';
@@ -15,6 +16,13 @@ class KodaSocket {
   PhoenixSocket? _socket;
   String? _token;
   final Map<String, PhoenixChannel> _channels = {};
+
+  final _closeController = StreamController<void>.broadcast();
+  /// Fires on every socket close, including a server-forced disconnect
+  /// (see koda-server's Koda.Parental.ScheduleSweeper) -- this stream
+  /// carries no reason, so a listener that cares why has to ask (see
+  /// main.dart's AuthGate, which follows this up with one me() call).
+  Stream<void> get closeEvents => _closeController.stream;
 
   bool get isConnected => _socket?.isConnected == true;
 
@@ -40,6 +48,7 @@ class KodaSocket {
     _socket!.closeStream.listen((_) {
       debugPrint('[KodaSocket] Disconnected');
       _channels.clear();
+      _closeController.add(null);
     });
 
     _socket!.errorStream.listen((e) {

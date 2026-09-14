@@ -17,6 +17,7 @@ import '../../shared/widgets.dart';
 import '../../shared/channel_edit_dialog.dart';
 import '../../shared/category_edit_dialog.dart';
 import '../settings/settings_screen.dart';
+import '../settings/content_filters_screen.dart';
 import '../server/server_settings_screen.dart';
 import '../voice/voice_screen.dart';
 import '../voice/voice_bar.dart';
@@ -58,6 +59,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _showingDms = false;
   bool _showingMarketplace = false;
   bool _loadingServers = true;
+  Map<String, dynamic> _contentFilters = {};
   String? _activeChannelId;
   final _messageController = TextEditingController();
   final _scroll = ScrollController();
@@ -77,7 +79,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     _loadServers();
     _loadUnreadCounts();
+    _loadContentFilters();
   }
+
+  // A standard account's personal hide/warn/show preferences (see
+  // content_filters_screen.dart) -- irrelevant for a child session,
+  // whose labeled channels are already hard-blocked server-side and
+  // simply never appear in _channels to begin with.
+  Future<void> _loadContentFilters() async {
+    final settings = await KodaApi.instance.getSettings();
+    if (!mounted) return;
+    setState(() {
+      _contentFilters = Map<String, dynamic>.from(settings['content_filters'] as Map? ?? {});
+    });
+  }
+
+  String _labelSettingFor(Map<String, dynamic> channel) => effectiveFilterSetting(
+      List<String>.from(channel['content_labels'] as List? ?? []), _contentFilters);
 
   Future<void> _loadUnreadCounts() async {
     final counts = await KodaApi.instance.getUnreadCounts();
@@ -255,6 +273,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
 
+
+  /// Entry point for tapping a channel in the sidebar -- interposes the
+  /// content-warning interstitial (every visit, for v1 -- see
+  /// content_filters_screen.dart) ahead of the normal open flow when the
+  /// viewer's own preference for this channel's labels is "warn".
+  Future<void> _openChannel(Map<String, dynamic> channel) async {
+    if (_labelSettingFor(channel) == 'warn') {
+      final proceed = await _showContentWarningDialog(channel);
+      if (proceed != true) return;
+    }
+    if (channel['type'] == 'voice') {
+      _joinVoice(channel);
+    } else {
+      _selectChannel(channel);
+    }
+  }
+
+  Future<bool?> _showContentWarningDialog(Map<String, dynamic> channel) {
+    final labels = List<String>.from(channel['content_labels'] as List? ?? []);
+    final names = labels.map((l) => kContentLabelNames[l] ?? l).join(', ');
+    return showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Row(children: [
+          Icon(Icons.warning_amber_rounded, color: KodaColors.gold, size: 20),
+          SizedBox(width: 8),
+          Text('Content Warning', style: TextStyle(color: KodaColors.text1)),
+        ]),
+        content: Text(
+          'This channel is flagged for: $names.\n\nChange this in Settings > Security > Content Filters.',
+          style: const TextStyle(color: KodaColors.text2, fontSize: 13),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('View Anyway', style: TextStyle(color: KodaColors.koda)),
+          ),
+        ],
+      ),
+    );
+  }
 
   Future<void> _selectChannel(Map<String, dynamic> channel) async {
     final channelId = channel['id'] as String;
@@ -1228,8 +1289,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     await KodaApi.instance.reorderChannels(server['id'] as String, order);
   }
   List<Widget> _buildChannelList(Map<String, dynamic>? selectedChannel) {
-    final threads = _channels.where((c) => c['is_thread'] == true).toList();
-    final regular = _channels.where((c) => c['is_thread'] != true).toList();
+    // "Hide" is a personal preference applied purely client-side here --
+    // a child account never sees a labeled channel in _channels to begin
+    // with, since the server already omits those for them.
+    final visible = _channels.where((c) => _labelSettingFor(c) != 'hide').toList();
+    final threads = visible.where((c) => c['is_thread'] == true).toList();
+    final regular = visible.where((c) => c['is_thread'] != true).toList();
     final result = <Widget>[];
 
     for (final c in regular.where((c) => c['category_id'] == null)) {
@@ -1301,17 +1366,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           : (isThread ? Icons.forum_outlined : Icons.tag),
     };
     final occupants = isVoice ? (_voiceOccupants[c['id']] ?? const []) : const [];
+    final labelSetting = _labelSettingFor(c);
     final tile = GestureDetector(
       onSecondaryTapUp: (d) => _showChannelContextMenu(c, d.globalPosition),
       child: ListTile(
         dense: true,
         leading: Icon(icon, size: 16,
             color: selected ? KodaColors.text1 : KodaColors.text3),
-        title: Text(c['name'] as String? ?? '',
-            style: TextStyle(fontSize: isThread ? 12 : 13,
-                color: unread > 0 && !selected ? KodaColors.text1 : (selected ? KodaColors.text1 : KodaColors.text3),
-                fontWeight: unread > 0 ? FontWeight.w700 : FontWeight.w400,
-                fontStyle: isThread ? FontStyle.italic : FontStyle.normal)),
+        title: Row(mainAxisSize: MainAxisSize.min, children: [
+          Flexible(
+            child: Text(c['name'] as String? ?? '',
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: isThread ? 12 : 13,
+                    color: unread > 0 && !selected ? KodaColors.text1 : (selected ? KodaColors.text1 : KodaColors.text3),
+                    fontWeight: unread > 0 ? FontWeight.w700 : FontWeight.w400,
+                    fontStyle: isThread ? FontStyle.italic : FontStyle.normal)),
+          ),
+          if (labelSetting == 'warn') ...[
+            const SizedBox(width: 4),
+            const Tooltip(
+              message: 'Content warning',
+              child: Icon(Icons.warning_amber_rounded, size: 12, color: KodaColors.gold),
+            ),
+          ],
+        ]),
         subtitle: occupants.isEmpty ? null : Text(
             occupants.map((p) => p['username'] as String? ?? '?').join(', '),
             style: const TextStyle(color: KodaColors.text3, fontSize: 11),
@@ -1328,7 +1406,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             : null,
         selected: selected,
         selectedTileColor: KodaColors.koda.withOpacity(0.1),
-        onTap: () => isVoice ? _joinVoice(c) : _selectChannel(c),
+        onTap: () => _openChannel(c),
       ),
     );
     if (isThread) {

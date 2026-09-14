@@ -5,11 +5,28 @@
 // empty results or null so the UI can show a real connection error
 // rather than fabricated content.
 
+import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'config.dart';
 import 'storage.dart';
+
+/// Typed outcome for the handful of calls where "null on any failure"
+/// (this file's normal convention) isn't enough -- specifically login()
+/// and me(), which need to tell "wrong password" apart from "valid
+/// session, but a child account outside its allowed hours" (see
+/// lib/features/auth/child_lockout_screen.dart). Every other method
+/// keeps the plain null-on-error convention; this is deliberately not a
+/// blanket replacement.
+class KodaApiResult<T> {
+  final T? data;
+  final int? statusCode;
+  final String? errorCode; // e.g. "outside_allowed_hours", "invalid_credentials"
+  const KodaApiResult({this.data, this.statusCode, this.errorCode});
+  bool get ok => data != null;
+  bool get isOutsideAllowedHours => errorCode == 'outside_allowed_hours';
+}
 
 class KodaApi {
   KodaApi._() {
@@ -36,6 +53,13 @@ class KodaApi {
         if (error.response?.statusCode == 401) {
           _token = null;
           KodaStorage.clearToken();
+        } else if (error.response?.statusCode == 403 &&
+            _errorCodeOf(error) == 'outside_allowed_hours') {
+          // The token itself is still valid -- this is a child account
+          // outside its allowed hours, not an auth failure, so the
+          // session is left intact. Broadcast so the app can route to
+          // the lockout screen regardless of which call tripped this.
+          _lockoutController.add(null);
         }
         handler.next(error);
       },
@@ -53,6 +77,17 @@ class KodaApi {
   late final Dio _dio;
   String? _token;
 
+  final _lockoutController = StreamController<void>.broadcast();
+  /// Fires whenever any request comes back 403 "outside_allowed_hours" --
+  /// listened to at the app root (see main.dart's AuthGate) to route to
+  /// the child lockout screen regardless of which call noticed it.
+  Stream<void> get lockoutStream => _lockoutController.stream;
+
+  String? _errorCodeOf(DioException error) {
+    final data = error.response?.data;
+    return data is Map ? data['error'] as String? : null;
+  }
+
   void setToken(String token) {
     _token = token;
     KodaStorage.saveToken(token);
@@ -66,14 +101,14 @@ class KodaApi {
 
   // ── Auth ─────────────────────────────────────────────────────────────
 
-  Future<Map<String, dynamic>?> login(String email, String password) async {
+  Future<KodaApiResult<Map<String, dynamic>>> login(String email, String password) async {
     try {
       final res = await _dio.post('/auth/login',
           data: {'email': email, 'password': password});
-      return res.data as Map<String, dynamic>;
+      return KodaApiResult(data: res.data as Map<String, dynamic>, statusCode: res.statusCode);
     } on DioException catch (e) {
       _log('login', e);
-      return null;
+      return KodaApiResult(statusCode: e.response?.statusCode, errorCode: _errorCodeOf(e));
     }
   }
 
@@ -115,11 +150,15 @@ class KodaApi {
     await KodaStorage.clearToken();
   }
 
-  Future<Map<String, dynamic>?> me() async {
+  Future<KodaApiResult<Map<String, dynamic>>> me() async {
     try {
       final res = await _dio.get('/auth/me');
-      return res.data as Map<String, dynamic>;
-    } catch (_) { return null; }
+      return KodaApiResult(data: res.data as Map<String, dynamic>, statusCode: res.statusCode);
+    } on DioException catch (e) {
+      return KodaApiResult(statusCode: e.response?.statusCode, errorCode: _errorCodeOf(e));
+    } catch (_) {
+      return const KodaApiResult();
+    }
   }
 
 
@@ -1379,6 +1418,115 @@ class KodaApi {
       final res = await _dio.get('/servers/$serverId/presence');
       return List<Map<String, dynamic>>.from(res.data['presence'] ?? []);
     } catch (e) { _log('getServerPresence', e); return []; }
+  }
+
+  // -- Parental controls --------------------------------------------------------
+  // Structural visibility (friends/servers) + schedule management for a
+  // parent's linked child account -- never message content. See
+  // koda-server's Koda.Parental / ParentalController.
+
+  Future<Map<String, dynamic>?> createChildAccount({
+    required String username,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final res = await _dio.post('/parental/children', data: {
+        'username': username, 'email': email, 'password': password,
+        'password_confirmation': password,
+      });
+      return res.data['child'] as Map<String, dynamic>?;
+    } catch (e) { _log('createChildAccount', e); return null; }
+  }
+
+  Future<List<Map<String, dynamic>>> listChildren() async {
+    try {
+      final res = await _dio.get('/parental/children');
+      return List<Map<String, dynamic>>.from(res.data['children'] ?? []);
+    } catch (e) { _log('listChildren', e); return []; }
+  }
+
+  Future<List<Map<String, dynamic>>> childFriends(String childId) async {
+    try {
+      final res = await _dio.get('/parental/children/$childId/friends');
+      return List<Map<String, dynamic>>.from(res.data['friends'] ?? []);
+    } catch (e) { _log('childFriends', e); return []; }
+  }
+
+  Future<bool> removeChildFriend(String childId, String friendId) async {
+    try {
+      await _dio.delete('/parental/children/$childId/friends/$friendId');
+      return true;
+    } catch (e) { _log('removeChildFriend', e); return false; }
+  }
+
+  Future<List<Map<String, dynamic>>> childServers(String childId) async {
+    try {
+      final res = await _dio.get('/parental/children/$childId/servers');
+      return List<Map<String, dynamic>>.from(res.data['servers'] ?? []);
+    } catch (e) { _log('childServers', e); return []; }
+  }
+
+  Future<bool> removeChildFromServer(String childId, String serverId) async {
+    try {
+      await _dio.delete('/parental/children/$childId/servers/$serverId');
+      return true;
+    } catch (e) { _log('removeChildFromServer', e); return false; }
+  }
+
+  Future<Map<String, dynamic>?> getChildSchedule(String childId) async {
+    try {
+      final res = await _dio.get('/parental/children/$childId/schedule');
+      return res.data['schedule'] as Map<String, dynamic>?;
+    } catch (e) { _log('getChildSchedule', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> putChildSchedule(
+    String childId, {
+    required String timezone,
+    required Map<String, dynamic> windows,
+  }) async {
+    try {
+      final res = await _dio.put('/parental/children/$childId/schedule',
+          data: {'timezone': timezone, 'windows': windows});
+      return res.data['schedule'] as Map<String, dynamic>?;
+    } catch (e) { _log('putChildSchedule', e); return null; }
+  }
+
+  /// Removes the schedule restriction entirely -- distinct from saving
+  /// empty windows, which the server treats as "always blocked" since
+  /// the row would still exist. This is how a parent goes back to
+  /// unrestricted access.
+  Future<bool> deleteChildSchedule(String childId) async {
+    try {
+      await _dio.delete('/parental/children/$childId/schedule');
+      return true;
+    } catch (e) { _log('deleteChildSchedule', e); return false; }
+  }
+
+  /// Grants a temporary override. Pass exactly one of [durationMinutes]
+  /// or [expiresAt].
+  Future<Map<String, dynamic>?> createOverride(
+    String childId, {
+    int? durationMinutes,
+    DateTime? expiresAt,
+    String? reason,
+  }) async {
+    try {
+      final res = await _dio.post('/parental/children/$childId/override', data: {
+        if (durationMinutes != null) 'duration_minutes': durationMinutes,
+        if (expiresAt != null) 'expires_at': expiresAt.toUtc().toIso8601String(),
+        if (reason != null) 'reason': reason,
+      });
+      return res.data['override'] as Map<String, dynamic>?;
+    } catch (e) { _log('createOverride', e); return null; }
+  }
+
+  Future<bool> deleteOverride(String childId) async {
+    try {
+      await _dio.delete('/parental/children/$childId/override');
+      return true;
+    } catch (e) { _log('deleteOverride', e); return false; }
   }
 
   void _log(String method, Object e) {

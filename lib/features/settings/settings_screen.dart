@@ -13,10 +13,12 @@ import '../../core/theme.dart';
 import '../../core/providers.dart';
 import '../../core/uploader.dart';
 import '../../shared/widgets.dart';
+import 'content_filters_screen.dart';
 import 'totp_setup_screen.dart';
 import 'voice_video_settings_screen.dart';
 import '../auth/auth_screen.dart';
 import '../marketplace/marketplace_screen.dart';
+import '../parental/parental_dashboard_screen.dart';
 import '../../shared/tier_badge.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -44,6 +46,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     ('My Account', Icons.person_outline),
     ('Security',   Icons.security_outlined),
     ('Billing',    Icons.payments_outlined),
+    ('Family',     Icons.family_restroom_outlined),
     ('Voice & Video', Icons.mic_outlined),
     ('About',      Icons.info_outlined),
   ];
@@ -242,12 +245,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ? _buildProfileEditor(user)
             : _buildProfileView(user));
       case 1:
-        final friendsOnlyDms = ref.watch(authProvider).user?.friendsOnlyDms ?? false;
+        final currentUser = ref.watch(authProvider).user;
+        final friendsOnlyDms = currentUser?.friendsOnlyDms ?? false;
         return _shell('Security', Column(children: [
           _tile(Icons.phone_android_outlined, 'Two-Factor Authentication',
               'Add an authenticator app for extra security',
               () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const TotpSetupScreen()))),
+          // Child accounts have labeled channels hard-blocked server-side
+          // and don't get a personal filter preference to configure --
+          // see content_filters_screen.dart's doc comment.
+          if (currentUser != null && !currentUser.isChild)
+            _tile(Icons.visibility_off_outlined, 'Content Filters',
+                'Choose how you want labeled content to appear',
+                () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const ContentFiltersScreen()))),
           Container(
             margin: const EdgeInsets.only(bottom: 6),
             decoration: BoxDecoration(
@@ -278,8 +290,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       case 2:
         return const MarketplaceScreen(embedded: true);
       case 3:
-        return const VoiceVideoSettingsScreen();
+        if (user?.isChild == true) {
+          return _shell('Family', const Text(
+              'Parental controls aren\'t available on a supervised account.',
+              style: TextStyle(color: KodaColors.text3, fontSize: 13)));
+        }
+        return const ParentalDashboardScreen(embedded: true);
       case 4:
+        return const VoiceVideoSettingsScreen();
+      case 5:
         return _shell('About Koda', Column(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
           Container(
