@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/api.dart';
+import '../../core/permissions.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../shared/tier_badge.dart';
@@ -39,7 +40,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 4, vsync: this);
+    _tabs = TabController(length: 5, vsync: this);
     _loadData();
   }
 
@@ -75,6 +76,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
         Tab(text: 'Creator'),
         Tab(text: 'Server Bank'),
         Tab(text: 'Digital Goods'),
+        Tab(text: 'Revenue'),
       ],
     );
     final tabViews = TabBarView(
@@ -84,6 +86,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
         _buildCreatorTab(),
         _buildServerBankTab(),
         _buildDigitalGoodsTab(),
+        _buildRevenueTab(),
       ],
     );
 
@@ -612,6 +615,17 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
       return '${dt.month}/${dt.day}/${dt.year}';
     } catch (_) { return ''; }
   }
+
+  // ── Revenue tab ──────────────────────────────────────────────────────────
+
+  Widget _buildRevenueTab() {
+    final server = ref.watch(selectedServerProvider);
+    if (server == null) {
+      return const Center(child: Text('Select a server to view its revenue',
+          style: TextStyle(color: KodaColors.text3)));
+    }
+    return _RevenueDashboardView(server: server);
+  }
 }
 
 // ── Server bank view ──────────────────────────────────────────────────────
@@ -784,23 +798,312 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
       ],
     );
   }
+}
 
-  Widget _buildDigitalGoodsTab() {
-    final server = ref.watch(selectedServerProvider);
-    return DigitalGoodsScreen(
-      server: server,
-      creatorMode: false,
-    );
+// ── Revenue dashboard ────────────────────────────────────────────────────
+//
+// Detail beyond the plain balance every member sees on the Server Bank
+// tab -- gated server-side to manage_marketplace, same authority as
+// pricing tickets/products or connecting Printful.
+
+class _RevenueDashboardView extends ConsumerStatefulWidget {
+  final Map<String, dynamic> server;
+  const _RevenueDashboardView({required this.server});
+  @override
+  ConsumerState<_RevenueDashboardView> createState() => _RevenueDashboardViewState();
+}
+
+class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
+  bool _loading = true;
+  bool _authorized = false;
+  Map<String, dynamic>? _summary;
+  List<Map<String, dynamic>> _points = [];
+  List<Map<String, dynamic>> _transactions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
   }
 
-  String _formatDate(dynamic raw) {
-    if (raw == null) return '';
+  @override
+  void didUpdateWidget(covariant _RevenueDashboardView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.server['id'] != widget.server['id']) _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    final serverId = widget.server['id'] as String;
+    final user = ref.read(authProvider).user;
+    final authorized = await hasServerPermission(widget.server, 'manage_marketplace',
+        currentUserId: user?.id, isKodaAdmin: user?.isAdmin ?? false);
+    if (!authorized) {
+      if (!mounted) return;
+      setState(() { _authorized = false; _loading = false; });
+      return;
+    }
+    final results = await Future.wait([
+      KodaApi.instance.getRevenueSummary(serverId),
+      KodaApi.instance.getRevenueTimeseries(serverId),
+      KodaApi.instance.getRevenueTransactions(serverId),
+    ]);
+    if (!mounted) return;
+    setState(() {
+      _authorized = true;
+      _summary = results[0];
+      _points = List<Map<String, dynamic>>.from(
+          (results[1]?['points'] as List?) ?? []);
+      _transactions = List<Map<String, dynamic>>.from(
+          (results[2]?['transactions'] as List?) ?? []);
+      _loading = false;
+    });
+  }
+
+  String _sourceLabel(String type) {
+    switch (type) {
+      case 'tip': return 'Tips';
+      case 'subscription': return 'Koda Subscriptions';
+      case 'server_subscription': return 'Server Subscriptions';
+      case 'digital_product': return 'Digital Goods';
+      case 'stage_ticket': return 'Stage Tickets';
+      default: return type;
+    }
+  }
+
+  IconData _sourceIcon(String type) {
+    switch (type) {
+      case 'tip': return Icons.volunteer_activism_outlined;
+      case 'subscription': return Icons.workspace_premium_outlined;
+      case 'server_subscription': return Icons.card_membership_outlined;
+      case 'digital_product': return Icons.inventory_2_outlined;
+      case 'stage_ticket': return Icons.confirmation_num_outlined;
+      default: return Icons.circle_outlined;
+    }
+  }
+
+  String _relativeDate(String iso) {
     try {
-      final dt = DateTime.parse(raw.toString()).toLocal();
+      final dt = DateTime.parse(iso).toLocal();
+      final diff = DateTime.now().difference(dt);
+      if (diff.inMinutes < 1) return 'just now';
+      if (diff.inHours < 1) return '${diff.inMinutes}m ago';
+      if (diff.inDays < 1) return '${diff.inHours}h ago';
+      if (diff.inDays < 7) return '${diff.inDays}d ago';
       return '${dt.month}/${dt.day}/${dt.year}';
     } catch (_) { return ''; }
   }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) return const Center(
+        child: CircularProgressIndicator(color: KodaColors.koda));
+
+    if (!_authorized) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            'Only members who can manage the marketplace can view this server\'s revenue.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: KodaColors.text3, fontSize: 13),
+          ),
+        ),
+      );
+    }
+
+    final balance = _summary?['balance'] as int? ?? 0;
+    final lifetime = _summary?['lifetime_received'] as int? ?? 0;
+    final breakdown = List<Map<String, dynamic>>.from(
+        (_summary?['breakdown'] as List?) ?? []);
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Row(children: [
+          Expanded(child: _statCard('Balance', balance, KodaColors.koda)),
+          const SizedBox(width: 12),
+          Expanded(child: _statCard('Lifetime Earned', lifetime, KodaColors.mint)),
+        ]),
+
+        const SizedBox(height: 16),
+        const Text('Last 30 Days',
+            style: TextStyle(color: KodaColors.text1,
+                fontWeight: FontWeight.w600, fontSize: 14)),
+        const SizedBox(height: 10),
+        _RevenueBarChart(points: _points),
+
+        const SizedBox(height: 20),
+        const Text('Revenue by Source',
+            style: TextStyle(color: KodaColors.text1,
+                fontWeight: FontWeight.w600, fontSize: 14)),
+        const SizedBox(height: 10),
+        if (breakdown.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Text('No revenue yet.',
+                style: TextStyle(color: KodaColors.text3, fontSize: 13)),
+          )
+        else
+          ...breakdown.map((row) {
+            final type = row['source_type'] as String? ?? 'other';
+            final total = row['total'] as int? ?? 0;
+            final count = row['count'] as int? ?? 0;
+            final pct = lifetime > 0 ? (total / lifetime * 100) : 0.0;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: KodaColors.card,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: KodaColors.border),
+              ),
+              child: Row(children: [
+                Icon(_sourceIcon(type), size: 18, color: KodaColors.koda),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(_sourceLabel(type),
+                        style: const TextStyle(color: KodaColors.text1,
+                            fontSize: 13, fontWeight: FontWeight.w600)),
+                    Text('$count transaction${count == 1 ? '' : 's'}',
+                        style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+                  ]),
+                ),
+                Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                  Text('\$${(total / 100).toStringAsFixed(2)}',
+                      style: const TextStyle(color: KodaColors.text1,
+                          fontSize: 13, fontWeight: FontWeight.w700)),
+                  Text('${pct.toStringAsFixed(0)}%',
+                      style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+                ]),
+              ]),
+            );
+          }),
+
+        const SizedBox(height: 20),
+        const Text('Recent Transactions',
+            style: TextStyle(color: KodaColors.text1,
+                fontWeight: FontWeight.w600, fontSize: 14)),
+        const SizedBox(height: 10),
+        if (_transactions.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Text('No transactions yet.',
+                style: TextStyle(color: KodaColors.text3, fontSize: 13)),
+          )
+        else
+          ..._transactions.map((t) {
+            final type = t['source_type'] as String? ?? 'other';
+            final amount = t['amount'] as int? ?? 0;
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(children: [
+                Icon(_sourceIcon(type), size: 14, color: KodaColors.text3),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(_sourceLabel(type),
+                      style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+                ),
+                Text('+\$${(amount / 100).toStringAsFixed(2)}',
+                    style: const TextStyle(color: KodaColors.mint,
+                        fontSize: 12, fontWeight: FontWeight.w600)),
+                const SizedBox(width: 10),
+                Text(_relativeDate(t['inserted_at'] as String? ?? ''),
+                    style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+              ]),
+            );
+          }),
+      ],
+    );
+  }
+
+  Widget _statCard(String label, int cents, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: KodaColors.card,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: KodaColors.border),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label, style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+        const SizedBox(height: 6),
+        Text('\$${(cents / 100).toStringAsFixed(2)}',
+            style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.w800)),
+      ]),
+    );
+  }
 }
 
+/// Lightweight bar chart with no external dependency -- daily totals over
+/// the trailing window, scaled to the tallest day. Horizontally scrollable
+/// so a 30/90-day window stays legible instead of squeezing bars illegibly
+/// thin on a narrow screen.
+class _RevenueBarChart extends StatelessWidget {
+  final List<Map<String, dynamic>> points;
+  const _RevenueBarChart({required this.points});
 
+  @override
+  Widget build(BuildContext context) {
+    if (points.isEmpty) {
+      return const SizedBox(
+        height: 120,
+        child: Center(child: Text('No activity yet',
+            style: TextStyle(color: KodaColors.text3, fontSize: 12))),
+      );
+    }
+
+    final maxTotal = points
+        .map((p) => (p['total'] as int?) ?? 0)
+        .fold<int>(0, (a, b) => a > b ? a : b);
+
+    return SizedBox(
+      height: 120,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        reverse: true,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: points.map((p) {
+            final total = (p['total'] as int?) ?? 0;
+            final frac = maxTotal > 0 ? total / maxTotal : 0.0;
+            final date = p['date'] as String? ?? '';
+            final day = date.length >= 10 ? date.substring(8, 10) : '';
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: Tooltip(
+                message: total > 0
+                    ? '$date: \$${(total / 100).toStringAsFixed(2)}'
+                    : date,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 4 + (frac * 84),
+                      decoration: BoxDecoration(
+                        color: total > 0
+                            ? KodaColors.koda
+                            : KodaColors.elevated,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    SizedBox(
+                      width: 16,
+                      child: Text(day,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: KodaColors.text3, fontSize: 8)),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+}
 

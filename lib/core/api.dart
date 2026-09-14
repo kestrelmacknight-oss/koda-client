@@ -1325,6 +1325,36 @@ class KodaApi {
     } catch (e) { _log('getServerBank', e); return null; }
   }
 
+  /// Balance, lifetime total, and an all-time breakdown by source
+  /// (tips/subscriptions/tickets/digital goods) -- gated server-side to
+  /// manage_marketplace, unlike the plain balance every member can see.
+  Future<Map<String, dynamic>?> getRevenueSummary(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/revenue/summary');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getRevenueSummary', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> getRevenueTimeseries(String serverId, {int days = 30}) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/revenue/timeseries',
+          queryParameters: {'days': days});
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getRevenueTimeseries', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> getRevenueTransactions(String serverId,
+      {int limit = 50, DateTime? before}) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/revenue/transactions',
+          queryParameters: {
+            'limit': limit,
+            if (before != null) 'before': before.toUtc().toIso8601String(),
+          });
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getRevenueTransactions', e); return null; }
+  }
+
   // -- Printful (per-server merch fulfillment) ---------------------------------
 
   /// Returns the URL to open in a browser to start connecting this
