@@ -33,6 +33,11 @@ class _StageScreenState extends ConsumerState<StageScreen> {
   bool _handRaised = false;
   bool _leaving     = false;
   String? _error;
+  // Set when the server rejects the join with 402 "ticket_required" --
+  // shown instead of the generic error state (see build()) with an
+  // actual way to get in, rather than a dead end.
+  Map<String, dynamic>? _ticketRequiredEvent;
+  bool _buyingTicket = false;
 
   // Hand-raise requests visible to admins: {user_id -> username}
   final Map<String, String> _handRaises = {};
@@ -56,7 +61,19 @@ class _StageScreenState extends ConsumerState<StageScreen> {
 
   Future<void> _connect() async {
     try {
-      final result = await KodaApi.instance.joinStage(_channelId);
+      final apiResult = await KodaApi.instance.joinStage(_channelId);
+
+      if (apiResult.errorCode == 'ticket_required') {
+        if (mounted) {
+          setState(() {
+            _connecting = false;
+            _ticketRequiredEvent = apiResult.errorBody?['event'] as Map<String, dynamic>?;
+          });
+        }
+        return;
+      }
+
+      final result = apiResult.data;
       if (result == null) {
         if (mounted) setState(() { _connecting = false; _error = 'Could not join stage.'; });
         return;
@@ -130,6 +147,76 @@ class _StageScreenState extends ConsumerState<StageScreen> {
 
   void _onRoomChange() {
     if (mounted) setState(() {});
+  }
+
+  Widget _buildTicketRequired() {
+    final event = _ticketRequiredEvent!;
+    final priceCents = event['price_cents'] as int? ?? 0;
+    final price = (priceCents / 100).toStringAsFixed(2);
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 360),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.confirmation_number_outlined, size: 48, color: KodaColors.koda),
+            const SizedBox(height: 16),
+            Text(event['title'] as String? ?? 'This stage',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: KodaColors.text1,
+                    fontSize: 17, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 6),
+            const Text('requires a ticket to join',
+                style: TextStyle(color: KodaColors.text3, fontSize: 13)),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: KodaColors.koda,
+                foregroundColor: Colors.black,
+                minimumSize: const Size(double.infinity, 44),
+              ),
+              onPressed: _buyingTicket ? null : _buyTicket,
+              child: Text(_buyingTicket
+                  ? 'Please wait...'
+                  : (priceCents == 0 ? 'Get Free Ticket' : 'Buy Ticket -- \$$price')),
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Not now', style: TextStyle(color: KodaColors.text3)),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _buyTicket() async {
+    final event = _ticketRequiredEvent;
+    if (event == null) return;
+    setState(() => _buyingTicket = true);
+    final result = await KodaApi.instance.purchaseEventTicket(event['id'] as String);
+    if (!mounted) return;
+    setState(() => _buyingTicket = false);
+
+    if (result == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not start ticket purchase.')));
+      return;
+    }
+    if (result['free'] == true) {
+      // Ticket claimed -- retry the join now that we hold one.
+      setState(() { _ticketRequiredEvent = null; _connecting = true; });
+      _connect();
+    } else {
+      // Paid tickets create a real Stripe PaymentIntent server-side,
+      // but this app doesn't have Stripe's payment-collection UI wired
+      // up anywhere yet (tips/subscriptions/digital goods all stop at
+      // the same placeholder today) -- matching that rather than
+      // half-building just this one flow's checkout screen.
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Stripe payment coming soon')));
+    }
   }
 
   Future<void> _toggleMute() async {
@@ -241,7 +328,9 @@ class _StageScreenState extends ConsumerState<StageScreen> {
       ),
       body: _connecting
           ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
-          : _error != null
+          : _ticketRequiredEvent != null
+              ? _buildTicketRequired()
+              : _error != null
               ? Center(child: Text('Could not join: $_error',
                   style: const TextStyle(color: KodaColors.accent)))
               : Column(children: [

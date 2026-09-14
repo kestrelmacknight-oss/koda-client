@@ -23,7 +23,11 @@ class KodaApiResult<T> {
   final T? data;
   final int? statusCode;
   final String? errorCode; // e.g. "outside_allowed_hours", "invalid_credentials"
-  const KodaApiResult({this.data, this.statusCode, this.errorCode});
+  // The full error response body, for callers that need more than just
+  // errorCode -- e.g. joinStage's "ticket_required" carries the event
+  // (price, title) that needs a ticket, not just the bare code.
+  final Map<String, dynamic>? errorBody;
+  const KodaApiResult({this.data, this.statusCode, this.errorCode, this.errorBody});
   bool get ok => data != null;
   bool get isOutsideAllowedHours => errorCode == 'outside_allowed_hours';
 }
@@ -562,11 +566,22 @@ class KodaApi {
 
   // ── Stage channels ────────────────────────────────────────────────────────
 
-  Future<Map<String, dynamic>?> joinStage(String channelId) async {
+  /// errorCode is "ticket_required" when this stage has a currently-live
+  /// paid event the caller hasn't bought a ticket for -- the event
+  /// itself (price, title) rides along in the response body.
+  Future<KodaApiResult<Map<String, dynamic>>> joinStage(String channelId) async {
     try {
       final res = await _dio.post('/channels/$channelId/stage/join');
-      return res.data as Map<String, dynamic>;
-    } catch (e) { _log('joinStage', e); return null; }
+      return KodaApiResult(data: res.data as Map<String, dynamic>, statusCode: res.statusCode);
+    } on DioException catch (e) {
+      _log('joinStage', e);
+      final body = e.response?.data;
+      return KodaApiResult(
+        statusCode: e.response?.statusCode,
+        errorCode: body is Map ? body['error'] as String? : null,
+        errorBody: body is Map<String, dynamic> ? body : null,
+      );
+    }
   }
 
   Future<bool> raiseHand(String channelId) async {
@@ -1171,9 +1186,18 @@ class KodaApi {
 
   // -- Events / Calendar --------------------------------------------------------
 
-  Future<List<Map<String, dynamic>>> getEvents(String channelId) async {
+  /// [from]/[to] scope the window recurring events are expanded within
+  /// -- each occurrence of a "weekly"/"daily"/"monthly" event within
+  /// that range comes back as its own entry (same event `id`, its own
+  /// `start_at`/`end_at`), not just the series' original date. Omit
+  /// both for the server's default (roughly a year centered on now).
+  Future<List<Map<String, dynamic>>> getEvents(String channelId,
+      {DateTime? from, DateTime? to}) async {
     try {
-      final res = await _dio.get('/channels/$channelId/events');
+      final res = await _dio.get('/channels/$channelId/events', queryParameters: {
+        if (from != null) 'from': from.toUtc().toIso8601String(),
+        if (to != null) 'to': to.toUtc().toIso8601String(),
+      });
       return List<Map<String, dynamic>>.from(res.data['events'] ?? []);
     } catch (e) { _log('getEvents', e); return []; }
   }
@@ -1211,6 +1235,17 @@ class KodaApi {
       await _dio.delete('/events/$eventId/subscribe');
       return true;
     } catch (e) { _log('unsubscribeFromEvent', e); return false; }
+  }
+
+  /// Buys (or claims, if free) a ticket for a calendar event linked to
+  /// a stage channel. Returns the response map directly (rather than
+  /// null-on-error) since callers need to branch on `free` vs
+  /// `client_secret` either way; null just means the request failed.
+  Future<Map<String, dynamic>?> purchaseEventTicket(String eventId) async {
+    try {
+      final res = await _dio.post('/events/$eventId/tickets');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('purchaseEventTicket', e); return null; }
   }
 
   // -- Marketplace --------------------------------------------------------------

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/api.dart';
+import '../../core/permissions.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../shared/widgets.dart';
@@ -24,18 +25,53 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   DateTime? _selectedDay;
   List<Map<String, dynamic>> _events = [];
   bool _loading = true;
+  // Ticket price / stage-linking is a marketplace action, same gate as
+  // digital goods and Printful -- see lib/core/permissions.dart.
+  bool _canManageMarketplace = false;
+  List<Map<String, dynamic>> _stageChannels = [];
 
   @override
   void initState() {
     super.initState();
     _loadEvents();
+    _loadPermissionAndStageChannels();
   }
 
+  Future<void> _loadPermissionAndStageChannels() async {
+    final server = ref.read(selectedServerProvider);
+    final user = ref.read(authProvider).user;
+    final canManage = await hasServerPermission(server, 'manage_marketplace',
+        currentUserId: user?.id, isKodaAdmin: user?.isAdmin ?? false);
+    final channels = server != null
+        ? await KodaApi.instance.getChannels(server['id'] as String)
+        : <Map<String, dynamic>>[];
+    if (!mounted) return;
+    setState(() {
+      _canManageMarketplace = canManage;
+      _stageChannels = channels.where((c) => c['type'] == 'stage').toList();
+    });
+  }
+
+  // Occurrences are expanded server-side (see koda-server's
+  // Koda.Events.list_events/2) within this window -- a "weekly"/"daily"/
+  // "monthly" event now genuinely recurs on the calendar instead of only
+  // ever showing on the date it was created. Requested per focused month
+  // (with a little slack for the grid's leading/trailing days from
+  // adjacent months) rather than once for everything, so navigating far
+  // into the future/past of a long-running recurring event still works.
   Future<void> _loadEvents() async {
     setState(() => _loading = true);
-    final events = await KodaApi.instance.getEvents(widget.channel['id'] as String);
+    final from = DateTime(_focusedMonth.year, _focusedMonth.month - 1, 21);
+    final to = DateTime(_focusedMonth.year, _focusedMonth.month + 2, 10);
+    final events = await KodaApi.instance.getEvents(
+        widget.channel['id'] as String, from: from, to: to);
     if (!mounted) return;
     setState(() { _events = events; _loading = false; });
+  }
+
+  void _changeMonth(int delta) {
+    setState(() => _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month + delta));
+    _loadEvents();
   }
 
   List<Map<String, dynamic>> _eventsForDay(DateTime day) {
@@ -56,7 +92,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(authProvider).user;
     return Column(children: [
       // Header
       Container(
@@ -74,7 +109,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           IconButton(
             icon: const Icon(Icons.add, color: KodaColors.koda, size: 20),
             tooltip: 'Create Event',
-            onPressed: () => _showCreateEventDialog(),
+            onPressed: () => _showEventDialog(),
           ),
         ]),
       ),
@@ -111,8 +146,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       child: Row(children: [
         IconButton(
           icon: const Icon(Icons.chevron_left, color: KodaColors.text2),
-          onPressed: () => setState(() =>
-              _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month - 1)),
+          onPressed: () => _changeMonth(-1),
         ),
         Expanded(
           child: Text(
@@ -124,14 +158,16 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         ),
         IconButton(
           icon: const Icon(Icons.chevron_right, color: KodaColors.text2),
-          onPressed: () => setState(() =>
-              _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1)),
+          onPressed: () => _changeMonth(1),
         ),
         TextButton(
-          onPressed: () => setState(() {
-            _focusedMonth = DateTime.now();
-            _selectedDay = DateTime.now();
-          }),
+          onPressed: () {
+            setState(() {
+              _focusedMonth = DateTime.now();
+              _selectedDay = DateTime.now();
+            });
+            _loadEvents();
+          },
           child: const Text('Today', style: TextStyle(color: KodaColors.koda)),
         ),
       ]),
@@ -260,6 +296,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     ]);
   }
 
+  bool _canManageEvent(Map<String, dynamic> event) {
+    final user = ref.read(authProvider).user;
+    if (user == null) return false;
+    return event['created_by'] == user.id || _canManageMarketplace;
+  }
+
   Widget _buildEventCard(Map<String, dynamic> event) {
     final start = DateTime.parse(event['start_at'] as String).toLocal();
     final end = event['end_at'] != null
@@ -268,6 +310,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     final color = Color(int.parse(
         (event['color'] as String? ?? '#2DD4A0').replaceFirst('#', '0xFF')));
     final subscribed = event['subscribed'] == true;
+    final priceCents = event['price_cents'] as int? ?? 0;
+    final hasTicket = event['has_ticket'] == true;
+    final canManage = _canManageEvent(event);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -303,6 +348,24 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 _loadEvents();
               },
             ),
+            if (canManage) ...[
+              const SizedBox(width: 6),
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, color: KodaColors.text3, size: 16),
+                tooltip: 'Edit',
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => _showEventDialog(existing: event),
+              ),
+              const SizedBox(width: 6),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, color: KodaColors.text3, size: 16),
+                tooltip: 'Delete',
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => _confirmDeleteEvent(event),
+              ),
+            ],
           ]),
           const SizedBox(height: 4),
           Row(children: [
@@ -329,41 +392,99 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             Text(event['description'] as String,
                 style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
           ],
-          if (event['recurrence'] != null && event['recurrence'] != 'none') ...[
+          if ((event['recurrence'] != null && event['recurrence'] != 'none') ||
+              priceCents > 0) ...[
             const SizedBox(height: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: KodaColors.elevated,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'Repeats ${event['recurrence']}',
-                style: const TextStyle(color: KodaColors.text3, fontSize: 10),
-              ),
-            ),
+            Wrap(spacing: 6, runSpacing: 4, children: [
+              if (event['recurrence'] != null && event['recurrence'] != 'none')
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: KodaColors.elevated,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'Repeats ${event['recurrence']}',
+                    style: const TextStyle(color: KodaColors.text3, fontSize: 10),
+                  ),
+                ),
+              if (priceCents > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: KodaColors.koda.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Icon(hasTicket ? Icons.confirmation_num : Icons.confirmation_num_outlined,
+                        size: 10, color: KodaColors.koda),
+                    const SizedBox(width: 3),
+                    Text(
+                      hasTicket
+                          ? 'Ticket owned'
+                          : '\$${(priceCents / 100).toStringAsFixed(2)} ticket',
+                      style: const TextStyle(color: KodaColors.koda,
+                          fontSize: 10, fontWeight: FontWeight.w600),
+                    ),
+                  ]),
+                ),
+            ]),
           ],
         ]),
       ),
     );
   }
 
-  Future<void> _showCreateEventDialog() async {
-    final titleCtrl = TextEditingController();
-    final descCtrl = TextEditingController();
-    final locCtrl = TextEditingController();
-    DateTime startAt = DateTime.now().add(const Duration(hours: 1));
-    DateTime? endAt;
-    String recurrence = 'none';
-    String color = '#2DD4A0';
+  Future<void> _confirmDeleteEvent(Map<String, dynamic> event) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Text('Delete Event', style: TextStyle(color: KodaColors.text1)),
+        content: Text('Delete "${event['title']}"? This cannot be undone.',
+            style: const TextStyle(color: KodaColors.text2)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete', style: TextStyle(color: KodaColors.accent)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await KodaApi.instance.deleteEvent(event['id'] as String);
+      if (mounted) _loadEvents();
+    }
+  }
+
+  Future<void> _showEventDialog({Map<String, dynamic>? existing}) async {
+    final isEdit = existing != null;
+    final titleCtrl = TextEditingController(text: existing?['title'] as String? ?? '');
+    final descCtrl = TextEditingController(text: existing?['description'] as String? ?? '');
+    final locCtrl = TextEditingController(text: existing?['location'] as String? ?? '');
+    final priceCtrl = TextEditingController(
+        text: existing != null && (existing['price_cents'] as int? ?? 0) > 0
+            ? ((existing['price_cents'] as int) / 100).toStringAsFixed(2)
+            : '');
+    DateTime startAt = existing != null
+        ? DateTime.parse(existing['start_at'] as String).toLocal()
+        : DateTime.now().add(const Duration(hours: 1));
+    DateTime? endAt = existing?['end_at'] != null
+        ? DateTime.parse(existing!['end_at'] as String).toLocal()
+        : null;
+    String recurrence = existing?['recurrence'] as String? ?? 'none';
+    String color = existing?['color'] as String? ?? '#2DD4A0';
+    String? stageChannelId = existing?['stage_channel_id'] as String?;
 
     await showDialog(
       context: context,
       builder: (_) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: const Text('Create Event',
-              style: TextStyle(color: KodaColors.text1)),
+          title: Text(isEdit ? 'Edit Event' : 'Create Event',
+              style: const TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 400,
             child: SingleChildScrollView(
@@ -485,6 +606,42 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     ),
                   );
                 }).toList()),
+
+                // Ticket price + stage link -- only server members who can
+                // manage the marketplace may turn an event into a paid
+                // ticket, same gate as digital goods / Printful.
+                if (_canManageMarketplace) ...[
+                  const SizedBox(height: 12),
+                  const Text('Ticket price — optional',
+                      style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                  const SizedBox(height: 4),
+                  KodaTextField(
+                    controller: priceCtrl,
+                    hintText: '0.00',
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  ),
+                  if (_stageChannels.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    const Text('Link to stage channel — optional',
+                        style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                    const SizedBox(height: 4),
+                    DropdownButton<String?>(
+                      value: stageChannelId,
+                      dropdownColor: KodaColors.card,
+                      isExpanded: true,
+                      style: const TextStyle(color: KodaColors.text1, fontSize: 13),
+                      onChanged: (v) => setDialogState(() => stageChannelId = v),
+                      items: [
+                        const DropdownMenuItem<String?>(
+                            value: null, child: Text('None')),
+                        ..._stageChannels.map((c) => DropdownMenuItem<String?>(
+                              value: c['id'] as String,
+                              child: Text(c['name'] as String? ?? 'stage'),
+                            )),
+                      ],
+                    ),
+                  ],
+                ],
               ]),
             ),
           ),
@@ -498,21 +655,31 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               onPressed: () async {
                 if (titleCtrl.text.trim().isEmpty) return;
                 Navigator.pop(ctx);
-                final event = await KodaApi.instance.createEvent(
-                  widget.channel['id'] as String,
-                  {
-                    'title': titleCtrl.text.trim(),
-                    'description': descCtrl.text.trim(),
-                    'location': locCtrl.text.trim(),
-                    'start_at': startAt.toUtc().toIso8601String(),
-                    'end_at': endAt?.toUtc().toIso8601String(),
-                    'recurrence': recurrence,
-                    'color': color,
-                  },
-                );
-                if (event != null && mounted) _loadEvents();
+                final priceCents = _canManageMarketplace
+                    ? ((double.tryParse(priceCtrl.text.trim()) ?? 0) * 100).round()
+                    : (existing?['price_cents'] as int? ?? 0);
+                final data = {
+                  'title': titleCtrl.text.trim(),
+                  'description': descCtrl.text.trim(),
+                  'location': locCtrl.text.trim(),
+                  'start_at': startAt.toUtc().toIso8601String(),
+                  'end_at': endAt?.toUtc().toIso8601String(),
+                  'recurrence': recurrence,
+                  'color': color,
+                  if (_canManageMarketplace) 'price_cents': priceCents,
+                  if (_canManageMarketplace) 'stage_channel_id': stageChannelId,
+                };
+                if (isEdit) {
+                  final ok = await KodaApi.instance.updateEvent(
+                      existing['id'] as String, data);
+                  if (ok && mounted) _loadEvents();
+                } else {
+                  final event = await KodaApi.instance.createEvent(
+                      widget.channel['id'] as String, data);
+                  if (event != null && mounted) _loadEvents();
+                }
               },
-              child: const Text('Create'),
+              child: Text(isEdit ? 'Save' : 'Create'),
             ),
           ],
         ),
