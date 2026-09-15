@@ -601,7 +601,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     final mentions = _resolveMentions(text);
-    final msg = await KodaApi.instance.sendMessage(channelId, encrypted.content,
+    final result = await KodaApi.instance.sendMessage(channelId, encrypted.content,
         encrypted: true,
         epoch: encrypted.epoch,
         nonce: encrypted.nonce,
@@ -611,6 +611,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         mentionEveryone: mentions.everyone,
         attachmentUrl: attachment?['url'],
         attachmentContentType: attachment?['contentType']);
+    final msg = result.data;
     if (msg != null && mounted) {
       await SecureStorage.cacheDecryptedContent(msg['id'] as String, text);
       setState(() => _messages.add({...msg, 'content': text}));
@@ -624,8 +625,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       final url = firstUrl(text);
       if (url != null) _attachLinkPreview(channelId, msg['id'] as String, url);
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Message not sent -- you may not have permission to post here.")));
+      final message = result.errorCode == 'rate_limited'
+          ? "You're sending messages too fast -- slow down a bit."
+          : "Message not sent -- you may not have permission to post here.";
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 

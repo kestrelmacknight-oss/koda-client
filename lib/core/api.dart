@@ -277,7 +277,7 @@ class KodaApi {
     } catch (e) { _log('getMessages', e); return []; }
   }
 
-  Future<Map<String, dynamic>?> sendMessage(
+  Future<KodaApiResult<Map<String, dynamic>>> sendMessage(
       String channelId, String content, {
         bool encrypted = false,
         String? replyToId,
@@ -303,8 +303,15 @@ class KodaApi {
             if (attachmentUrl != null) 'attachment_url': attachmentUrl,
             if (attachmentContentType != null) 'attachment_content_type': attachmentContentType,
           });
-      return res.data['message'] as Map<String, dynamic>;
-    } catch (e) { _log('sendMessage', e); return null; }
+      return KodaApiResult(data: res.data['message'] as Map<String, dynamic>);
+    } catch (e) {
+      _log('sendMessage', e);
+      final statusCode = e is DioException ? e.response?.statusCode : null;
+      return KodaApiResult(
+        statusCode: statusCode,
+        errorCode: statusCode == 429 ? 'rate_limited' : null,
+      );
+    }
   }
 
   Future<Map<String, dynamic>?> editMessage(
@@ -541,6 +548,36 @@ class KodaApi {
       await _dio.delete('/servers/$serverId/members/$userId/ban');
       return true;
     } catch (e) { _log('unbanMember', e); return false; }
+  }
+
+  Future<bool> muteMember(String serverId, String userId,
+      {int durationSeconds = 600, String? reason}) async {
+    try {
+      await _dio.post('/servers/$serverId/members/$userId/mute',
+          data: {'duration_seconds': durationSeconds, if (reason != null) 'reason': reason});
+      return true;
+    } catch (e) { _log('muteMember', e); return false; }
+  }
+
+  Future<bool> unmuteMember(String serverId, String userId) async {
+    try {
+      await _dio.delete('/servers/$serverId/members/$userId/mute');
+      return true;
+    } catch (e) { _log('unmuteMember', e); return false; }
+  }
+
+  Future<bool> unlockInvites(String serverId) async {
+    try {
+      await _dio.post('/servers/$serverId/invites/unlock');
+      return true;
+    } catch (e) { _log('unlockInvites', e); return false; }
+  }
+
+  Future<List<Map<String, dynamic>>> getAuditLog(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/audit-log');
+      return List<Map<String, dynamic>>.from(res.data['actions'] ?? []);
+    } catch (e) { _log('getAuditLog', e); return []; }
   }
 
   Future<List<Map<String, dynamic>>> listBans(String serverId) async {

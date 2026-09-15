@@ -33,6 +33,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   List<Map<String, dynamic>> _roles = [];
   List<Map<String, dynamic>> _members = [];
   List<Map<String, dynamic>> _bans = [];
+  List<Map<String, dynamic>> _auditActions = [];
   bool _loading = true;
   bool _showBans = false;
   bool _printfulConnected = false;
@@ -43,7 +44,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   static const List<String> _permissionKeys = [
     'view_channels', 'send_messages', 'connect_voice', 'manage_server',
     'manage_channels', 'manage_roles', 'manage_messages',
-    'kick_members', 'ban_members', 'mention_everyone', 'manage_marketplace',
+    'kick_members', 'ban_members', 'mute_members', 'mention_everyone', 'manage_marketplace',
   ];
 
   static const Map<String, String> _permissionLabels = {
@@ -56,6 +57,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     'manage_messages':  'Manage Messages',
     'kick_members':     'Kick Members',
     'ban_members':      'Ban Members',
+    'mute_members':     'Mute Members',
     'mention_everyone': 'Mention @everyone',
     'manage_marketplace': 'Manage Marketplace',
   };
@@ -68,7 +70,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
     _loadAll();
     _loadPrintfulStatus();
   }
@@ -146,17 +148,19 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       KodaApi.instance.getRoles(serverId),
       KodaApi.instance.getMembers(serverId),
       KodaApi.instance.listBans(serverId),
+      KodaApi.instance.getAuditLog(serverId),
     ]);
     if (!mounted) return;
     final roles = results[2]
       ..sort((a, b) => ((a['position'] ?? 0) as num).compareTo((b['position'] ?? 0) as num));
     setState(() {
-      _categories = results[0];
-      _channels   = results[1];
-      _roles      = roles;
-      _members    = results[3];
-      _bans       = results[4];
-      _loading    = false;
+      _categories    = results[0];
+      _channels      = results[1];
+      _roles         = roles;
+      _members       = results[3];
+      _bans          = results[4];
+      _auditActions  = results[5];
+      _loading       = false;
     });
   }
 
@@ -450,6 +454,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             Tab(text: 'Members'),
             Tab(text: 'Invites'),
             Tab(text: 'Merch'),
+            Tab(text: 'Audit Log'),
           ],
         ),
       ),
@@ -458,7 +463,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           : TabBarView(
               controller: _tabController,
               children: [_buildChannelsTab(), _buildRolesTab(), _buildMembersTab(),
-                  _buildInvitesTab(), _buildMerchTab()],
+                  _buildInvitesTab(), _buildMerchTab(), _buildAuditLogTab()],
             ),
     );
   }
@@ -821,16 +826,29 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                   tooltip: 'Manage Roles',
                   onPressed: () => _showMemberRolesDialog(m),
                 ),
+                if (_isCurrentlyMuted(m))
+                  const Padding(
+                    padding: EdgeInsets.only(right: 4),
+                    child: Icon(Icons.volume_off, size: 14, color: KodaColors.gold),
+                  ),
                 if (!isSelf)
                   PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert, size: 16, color: KodaColors.text3),
                     color: KodaColors.card,
-                    itemBuilder: (_) => const [
-                      PopupMenuItem(value: 'kick', child: Text('Kick')),
-                      PopupMenuItem(value: 'ban',
+                    itemBuilder: (_) => [
+                      if (_isCurrentlyMuted(m))
+                        const PopupMenuItem(value: 'unmute', child: Text('Unmute'))
+                      else
+                        const PopupMenuItem(value: 'mute', child: Text('Mute')),
+                      const PopupMenuItem(value: 'kick', child: Text('Kick')),
+                      const PopupMenuItem(value: 'ban',
                           child: Text('Ban', style: TextStyle(color: KodaColors.accent))),
                     ],
-                    onSelected: (action) => _kickOrBanMember(m, action),
+                    onSelected: (action) => action == 'mute'
+                        ? _muteMember(m)
+                        : action == 'unmute'
+                            ? _unmuteMember(m)
+                            : _kickOrBanMember(m, action),
                   ),
               ]),
               onTap: () => _showMemberRolesDialog(m),
@@ -931,7 +949,165 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           SnackBar(content: Text('Could not ${action == 'ban' ? 'ban' : 'kick'} $username.')));
     }
   }
-Widget _buildInvitesTab() {
+
+  bool _isCurrentlyMuted(Map<String, dynamic> member) {
+    final raw = member['muted_until'] as String?;
+    if (raw == null) return false;
+    final until = DateTime.tryParse(raw);
+    return until != null && until.isAfter(DateTime.now().toUtc());
+  }
+
+  static const _muteDurations = <String, int>{
+    '60 seconds': 60,
+    '5 minutes': 300,
+    '10 minutes': 600,
+    '1 hour': 3600,
+    '1 day': 86400,
+    '1 week': 604800,
+  };
+
+  Future<void> _muteMember(Map<String, dynamic> member) async {
+    final username = member['username'] as String? ?? 'this member';
+    var selected = '10 minutes';
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: KodaColors.card,
+          title: Text('Mute $username', style: const TextStyle(color: KodaColors.text1)),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            DropdownButton<String>(
+              value: selected,
+              dropdownColor: KodaColors.card,
+              isExpanded: true,
+              style: const TextStyle(color: KodaColors.text1, fontSize: 13),
+              onChanged: (v) => setDialogState(() => selected = v!),
+              items: _muteDurations.keys
+                  .map((k) => DropdownMenuItem(value: k, child: Text(k)))
+                  .toList(),
+            ),
+          ]),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Mute', style: TextStyle(color: KodaColors.gold)),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true) return;
+    final ok = await KodaApi.instance.muteMember(
+        _serverId, member['user_id'] as String,
+        durationSeconds: _muteDurations[selected]!);
+    if (ok) {
+      _loadAll();
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not mute $username.')));
+    }
+  }
+
+  Future<void> _unmuteMember(Map<String, dynamic> member) async {
+    final ok = await KodaApi.instance.unmuteMember(_serverId, member['user_id'] as String);
+    if (ok) _loadAll();
+  }
+
+  String? _usernameFor(String? userId) {
+    if (userId == null) return null;
+    return _members.cast<Map<String, dynamic>?>().firstWhere(
+        (m) => m?['user_id'] == userId, orElse: () => null)?['username'] as String?;
+  }
+
+  static const Map<String, String> _actionLabels = {
+    'kick': 'kicked', 'ban': 'banned', 'unban': 'unbanned',
+    'mute': 'muted', 'unmute': 'unmuted',
+    'flood_detected': 'auto-muted for flooding',
+    'raid_lockdown_enabled': 'locked invites (raid protection)',
+    'raid_lockdown_disabled': 'unlocked invites',
+  };
+
+  Widget _buildAuditLogTab() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Row(children: [
+          const Expanded(
+            child: Text(
+              'Tier 1 moderation activity -- kicks, bans, mutes, and automated '
+              'flood/raid protection. Metadata only; never message content.',
+              style: TextStyle(color: KodaColors.text3, fontSize: 12),
+            ),
+          ),
+          const SizedBox(width: 8),
+          OutlinedButton.icon(
+            icon: const Icon(Icons.lock_open, size: 14),
+            label: const Text('Unlock Invites'),
+            onPressed: () async {
+              final ok = await KodaApi.instance.unlockInvites(_serverId);
+              if (ok && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Invites unlocked.')));
+                _loadAll();
+              }
+            },
+          ),
+        ]),
+        const SizedBox(height: 16),
+        if (_auditActions.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Text('No moderation activity yet.',
+                style: TextStyle(color: KodaColors.text3, fontSize: 13)),
+          )
+        else
+          ..._auditActions.map((a) {
+            final actor = _usernameFor(a['actor_id'] as String?) ?? 'System';
+            final target = _usernameFor(a['target_user_id'] as String?);
+            final label = _actionLabels[a['action']] ?? a['action'] as String? ?? 'unknown action';
+            final reason = a['reason'] as String?;
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Icon(Icons.shield_outlined, size: 14, color: KodaColors.text3),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: RichText(
+                    text: TextSpan(
+                      style: const TextStyle(color: KodaColors.text2, fontSize: 12.5),
+                      children: [
+                        TextSpan(text: actor, style: const TextStyle(
+                            color: KodaColors.text1, fontWeight: FontWeight.w600)),
+                        TextSpan(text: ' $label'),
+                        if (target != null) TextSpan(text: ' $target',
+                            style: const TextStyle(
+                                color: KodaColors.text1, fontWeight: FontWeight.w600)),
+                        if (reason != null && reason.isNotEmpty)
+                          TextSpan(text: ' -- $reason',
+                              style: const TextStyle(fontStyle: FontStyle.italic)),
+                      ],
+                    ),
+                  ),
+                ),
+                Text(_formatAuditTime(a['inserted_at'] as String?),
+                    style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+              ]),
+            );
+          }),
+      ],
+    );
+  }
+
+  String _formatAuditTime(String? iso) {
+    if (iso == null) return '';
+    try {
+      final dt = DateTime.parse(iso).toLocal();
+      return '${dt.month}/${dt.day} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    } catch (_) { return ''; }
+  }
+
+  Widget _buildInvitesTab() {
     final server = ref.read(selectedServerProvider);
     if (server == null) return const SizedBox();
     final serverId = server['id'] as String;
