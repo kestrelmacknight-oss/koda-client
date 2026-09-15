@@ -32,6 +32,12 @@ class KodaApiResult<T> {
   bool get isOutsideAllowedHours => errorCode == 'outside_allowed_hours';
 }
 
+class StartEpochResult {
+  final int epoch;
+  final bool created;
+  const StartEpochResult({required this.epoch, required this.created});
+}
+
 class KodaApi {
   KodaApi._() {
     _dio = Dio(BaseOptions(
@@ -277,6 +283,11 @@ class KodaApi {
         String? replyToId,
         String? attachmentUrl,
         String? attachmentContentType,
+        int? epoch,
+        String? nonce,
+        List<String>? mentionedUserIds,
+        List<String>? mentionedRoleIds,
+        bool mentionEveryone = false,
       }) async {
     try {
       final res = await _dio.post('/channels/$channelId/messages',
@@ -284,6 +295,11 @@ class KodaApi {
             'content': content,
             'encrypted': encrypted,
             if (replyToId != null) 'reply_to_id': replyToId,
+            if (epoch != null) 'epoch': epoch,
+            if (nonce != null) 'nonce': nonce,
+            if (mentionedUserIds != null) 'mentioned_user_ids': mentionedUserIds,
+            if (mentionedRoleIds != null) 'mentioned_role_ids': mentionedRoleIds,
+            'mention_everyone': mentionEveryone,
             if (attachmentUrl != null) 'attachment_url': attachmentUrl,
             if (attachmentContentType != null) 'attachment_content_type': attachmentContentType,
           });
@@ -292,10 +308,10 @@ class KodaApi {
   }
 
   Future<Map<String, dynamic>?> editMessage(
-      String channelId, String messageId, String content) async {
+      String channelId, String messageId, String content, {String? nonce}) async {
     try {
       final res = await _dio.patch('/channels/$channelId/messages/$messageId',
-          data: {'content': content});
+          data: {'content': content, if (nonce != null) 'nonce': nonce});
       return res.data['message'] as Map<String, dynamic>;
     } catch (e) { _log('editMessage', e); return null; }
   }
@@ -562,6 +578,59 @@ class KodaApi {
       final res = await _dio.get('/keys/bundle/$userId');
       return res.data['bundle'] as Map<String, dynamic>?;
     } catch (e) { _log('fetchKeyBundle', e); return null; }
+  }
+
+  // ── Channel group encryption ────────────────────────────────────────────
+  // See lib/core/crypto/channel_key_manager.dart for how these are used
+  // together, and koda-server's Koda.ChannelCrypto for the server side.
+
+  /// The channel's current epoch. 0 means it's never been encrypted.
+  Future<int?> getChannelEpoch(String channelId) async {
+    try {
+      final res = await _dio.get('/channels/$channelId/epoch');
+      return res.data['epoch'] as int?;
+    } catch (e) { _log('getChannelEpoch', e); return null; }
+  }
+
+  /// Starts a new epoch (bootstrap, or a post-departure rotation).
+  /// `created` is false if another client's request won the race to
+  /// establish this epoch first -- the caller must NOT generate its own
+  /// key in that case, only wait for a delivery of the winner's.
+  Future<StartEpochResult?> startChannelEpoch(String channelId) async {
+    try {
+      final res = await _dio.post('/channels/$channelId/epoch');
+      return StartEpochResult(
+        epoch: res.data['epoch'] as int,
+        created: res.data['created'] as bool? ?? false,
+      );
+    } catch (e) { _log('startChannelEpoch', e); return null; }
+  }
+
+  Future<List<String>> getPendingEpochRecipients(String channelId, int epoch) async {
+    try {
+      final res = await _dio.get('/channels/$channelId/epoch/$epoch/pending');
+      return List<String>.from(res.data['user_ids'] ?? []);
+    } catch (e) { _log('getPendingEpochRecipients', e); return []; }
+  }
+
+  /// Uploads this sender's encrypted copies of one epoch's key, one per
+  /// recipient. Each entry is `{recipient_id, content, ratchet_key,
+  /// msg_number, prev_chain, nonce, x3dh_header?}` -- the same envelope
+  /// shape DmSessionManager.encryptForSend produces.
+  Future<bool> deliverChannelEpochKeys(
+      String channelId, int epoch, List<Map<String, dynamic>> deliveries) async {
+    try {
+      await _dio.post('/channels/$channelId/epoch/deliveries',
+          data: {'epoch': epoch, 'deliveries': deliveries});
+      return true;
+    } catch (e) { _log('deliverChannelEpochKeys', e); return false; }
+  }
+
+  Future<List<Map<String, dynamic>>> getMyChannelDeliveries(String channelId) async {
+    try {
+      final res = await _dio.get('/channels/$channelId/epoch/my_deliveries');
+      return List<Map<String, dynamic>>.from(res.data['deliveries'] ?? []);
+    } catch (e) { _log('getMyChannelDeliveries', e); return []; }
   }
 
   // ── Stage channels ────────────────────────────────────────────────────────

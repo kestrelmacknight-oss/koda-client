@@ -13,6 +13,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/uploader.dart';
+import '../../core/crypto/channel_key_manager.dart';
 import '../../shared/widgets.dart';
 import '../../shared/channel_edit_dialog.dart';
 import '../../shared/category_edit_dialog.dart';
@@ -910,6 +911,20 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         ? await KodaApi.instance.banMember(_serverId, userId)
         : await KodaApi.instance.kickMember(_serverId, userId);
     if (ok) {
+      // A departed member must not be able to read anything sent after
+      // they're gone -- rotate every encrypted channel's key and
+      // redistribute to whoever's left. Best-effort/fire-and-forget:
+      // this doesn't block the kick/ban itself, and ensureReady's
+      // opportunistic top-up covers anything that doesn't land here.
+      final myUserId = ref.read(authProvider).user?.id;
+      if (myUserId != null) {
+        for (final channel in _channels) {
+          if (channel['type'] == 'text') {
+            ChannelKeyManager.instance
+                .rotateAfterDeparture(channel['id'] as String, myUserId: myUserId);
+          }
+        }
+      }
       _loadAll();
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

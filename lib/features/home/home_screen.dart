@@ -26,6 +26,8 @@ import '../dm/dm_screen.dart';
 import '../../core/socket.dart';
 import '../../core/link_preview.dart';
 import '../../core/message_utils.dart';
+import '../../core/secure_storage.dart';
+import '../../core/crypto/channel_key_manager.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 import '../gallery/gallery_screen.dart';
 import '../stage/stage_screen.dart';
@@ -52,6 +54,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   List<Map<String, dynamic>> _channels = [];
   List<Map<String, dynamic>> _categories = [];
   List<Map<String, dynamic>> _roles = [];
+  List<Map<String, dynamic>> _members = [];
   Map<String, bool> _myPermissions = {};
   bool _isServerOwnerOrAdmin = false;
   List<Map<String, dynamic>> _messages = [];
@@ -251,6 +254,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     setState(() {
       _roles = roles;
+      _members = members;
       _myPermissions = permissions;
       _isServerOwnerOrAdmin = isOwner;
     });
@@ -434,13 +438,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     if (channel['type'] == 'text') {
+      final myUserId = ref.read(authProvider).user?.id;
+      if (myUserId == null) return;
+
       final messages = await KodaApi.instance.getMessages(channelId);
       if (!mounted) return;
       final stillSelected =
           ref.read(selectedChannelProvider)?['id'] == channelId;
       if (!stillSelected) return;
 
-      final decrypted = await _decryptMessages(messages.reversed.toList());
+      // Fire-and-forget: if this device already holds the current epoch
+      // key, top up delivery to anyone who's missing it (a new joiner,
+      // or someone who was offline the first time around) -- without
+      // this, a channel only onboards new members the next time someone
+      // happens to send a message rather than the moment anyone opens it.
+      unawaited(ChannelKeyManager.instance.ensureReady(channelId, myUserId: myUserId));
+
+      final decrypted = await _decryptMessages(messages.reversed.toList(),
+          channelId: channelId, myUserId: myUserId);
       if (!mounted) return;
       setState(() {
         _messages = decrypted;
@@ -457,11 +472,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         if (msg.event == const PhoenixChannelEvent.custom('new_message')) {
           final payload = msg.payload as Map<String, dynamic>?;
           if (payload != null) {
-            // New channel messages always arrive with encrypted: false --
-            // channel/group E2EE is a separate, not-yet-built protocol
-            // (see the "real E2EE" DM work). decryptMessages only exists
-            // to unwrap legacy pre-existing rows, not to do anything real.
-            decryptMessages([payload]).then((decoded) {
+            decryptMessages([payload], channelId: channelId, myUserId: myUserId).then((decoded) {
               if (mounted) setState(() => _messages.add(decoded.first));
             });
             // This channel is open and visible -- the message is immediately read.
@@ -475,13 +486,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           final payload = msg.payload as Map<String, dynamic>?;
           final id = payload?['id'];
           if (id != null) {
-            setState(() {
-              final i = _messages.indexWhere((m) => m['id'] == id);
-              if (i != -1) {
-                _messages[i] = {..._messages[i],
-                  'content': payload!['content'], 'edited_at': payload['edited_at']};
-              }
-            });
+            final i = _messages.indexWhere((m) => m['id'] == id);
+            if (i != -1) {
+              final existing = _messages[i];
+              final merged = {...existing,
+                'content': payload!['content'],
+                'nonce': payload['nonce'],
+                'edited_at': payload['edited_at']};
+              // The edit ciphertext replaces whatever plaintext was
+              // cached for the pre-edit content -- invalidate that cache
+              // entry first so decryptMessages actually decrypts the new
+              // ciphertext instead of returning the stale cache hit.
+              final messageId = id as String;
+              SecureStorage.deleteCachedDecryptedContent(messageId).then((_) {
+                decryptMessages([merged], channelId: channelId, myUserId: myUserId).then((decoded) {
+                  if (mounted) {
+                    setState(() {
+                      final j = _messages.indexWhere((m) => m['id'] == id);
+                      if (j != -1) _messages[j] = decoded.first;
+                    });
+                  }
+                });
+              });
+            }
           }
         } else if (msg.event == const PhoenixChannelEvent.custom('message_pinned') ||
                    msg.event == const PhoenixChannelEvent.custom('message_unpinned')) {
@@ -511,6 +538,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  // Resolves @everyone/@roleName/@username tokens in [text] against
+  // already-loaded server roles/members, mirroring what the server used
+  // to do itself by regex-scanning plaintext content -- now done here
+  // instead, since an encrypted message's content isn't something the
+  // server can read. Role matches take priority over username matches
+  // for the same token, same as the old server-side behavior.
+  ({bool everyone, List<String> userIds, List<String> roleIds}) _resolveMentions(String text) {
+    final everyone = text.contains('@everyone') && _can('mention_everyone');
+    final tokens = RegExp(r'@([A-Za-z0-9_]+)')
+        .allMatches(text)
+        .map((m) => m.group(1)!)
+        .toSet();
+
+    final userIds = <String>{};
+    final roleIds = <String>{};
+    for (final token in tokens) {
+      final role = _roles.cast<Map<String, dynamic>?>().firstWhere(
+          (r) => (r?['name'] as String?)?.toLowerCase() == token.toLowerCase(),
+          orElse: () => null);
+      if (role != null) {
+        roleIds.add(role['id'] as String);
+        continue;
+      }
+      final member = _members.cast<Map<String, dynamic>?>().firstWhere(
+          (m) => ((m?['user'] as Map<String, dynamic>?)?['username'] as String?)
+                  ?.toLowerCase() ==
+              token.toLowerCase(),
+          orElse: () => null);
+      final userId = member?['user_id'] as String?;
+      if (userId != null) userIds.add(userId);
+    }
+    return (everyone: everyone, userIds: userIds.toList(), roleIds: roleIds.toList());
+  }
+
   Future<void> _sendMessage() async {
     final channel = ref.read(selectedChannelProvider);
     final text = _messageController.text.trim();
@@ -520,19 +581,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     setState(() { _replyingTo = null; _pendingAttachment = null; });
     _messageController.clear();
 
-    // Channel/group messages are not end-to-end encrypted -- Double
-    // Ratchet is pairwise by construction (see lib/core/crypto), and
-    // group encryption needs a different protocol (Sender Keys) that
-    // hasn't been built yet. Better to be explicit about that than to
-    // run a per-channel AES layer with no real group key-agreement
-    // behind it, which would look secure without providing any coherent
-    // security property. DMs (dm_screen.dart) are real E2EE.
-    final msg = await KodaApi.instance.sendMessage(channel['id'], text,
-        encrypted: false, replyToId: replyToId,
+    final channelId = channel['id'] as String;
+    final myUserId = ref.read(authProvider).user?.id;
+    if (myUserId == null) return;
+
+    // Every text channel is now end-to-end encrypted using a shared
+    // per-channel key (see lib/core/crypto/channel_key_manager.dart) --
+    // this bootstraps/rotates/distributes that key as needed and only
+    // returns null if the channel genuinely isn't ready yet (e.g. still
+    // waiting on another member's device to deliver the current key).
+    final encrypted = await ChannelKeyManager.instance
+        .encryptForChannel(channelId, text, myUserId: myUserId);
+    if (encrypted == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
+            "Still setting up encryption for this channel -- try sending again in a moment.")));
+      }
+      return;
+    }
+
+    final mentions = _resolveMentions(text);
+    final msg = await KodaApi.instance.sendMessage(channelId, encrypted.content,
+        encrypted: true,
+        epoch: encrypted.epoch,
+        nonce: encrypted.nonce,
+        replyToId: replyToId,
+        mentionedUserIds: mentions.userIds,
+        mentionedRoleIds: mentions.roleIds,
+        mentionEveryone: mentions.everyone,
         attachmentUrl: attachment?['url'],
         attachmentContentType: attachment?['contentType']);
     if (msg != null && mounted) {
-      setState(() => _messages.add(msg));
+      await SecureStorage.cacheDecryptedContent(msg['id'] as String, text);
+      setState(() => _messages.add({...msg, 'content': text}));
       Future.delayed(const Duration(milliseconds: 50), () {
         if (_scroll.hasClients) {
           _scroll.animateTo(_scroll.position.maxScrollExtent,
@@ -541,7 +622,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         }
       });
       final url = firstUrl(text);
-      if (url != null) _attachLinkPreview(channel['id'] as String, msg['id'] as String, url);
+      if (url != null) _attachLinkPreview(channelId, msg['id'] as String, url);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Message not sent -- you may not have permission to post here.")));
@@ -624,7 +705,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<List<Map<String, dynamic>>> _decryptMessages(
-      List<Map<String, dynamic>> msgs) => decryptMessages(msgs);
+      List<Map<String, dynamic>> msgs,
+      {required String channelId, required String myUserId}) =>
+      decryptMessages(msgs, channelId: channelId, myUserId: myUserId);
 
   void _returnToTextChannel() {
     // Clear selected channel immediately so content area shows empty
@@ -911,6 +994,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         );
         if (confirmed == true) {
+          // Deliberately does NOT self-rotate encrypted channels here --
+          // a leaving member generating their own "excluding" key would
+          // still know it afterward, since they're the one who made it.
+          // That only works when someone *else* does the rotating (see
+          // the kick/ban flow in server_settings_screen.dart, where the
+          // actor and the departing member are different people). A
+          // voluntary leaver is cut off for real the next time any
+          // remaining member's client rotates -- e.g. the next kick/ban,
+          // or a future membership-diffing pass; not yet on leave itself.
           await KodaApi.instance.leaveServer(server['id'] as String);
           _loadServers();
         }
@@ -1660,7 +1752,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const SizedBox(height: 2),
                     if (m['reply_to'] != null)
                       _buildReplyPreview(m['reply_to'] as Map<String, dynamic>),
-                    if ((m['content'] as String? ?? '').isNotEmpty)
+                    if (m['_decryptPending'] == true)
+                      const Text('Waiting for the encryption key to arrive...',
+                          style: TextStyle(color: KodaColors.text3,
+                              fontSize: 13, fontStyle: FontStyle.italic))
+                    else if (m['_decryptFailed'] == true)
+                      const Text('Unable to decrypt this message.',
+                          style: TextStyle(color: KodaColors.accent,
+                              fontSize: 13, fontStyle: FontStyle.italic))
+                    else if ((m['content'] as String? ?? '').isNotEmpty)
                       Text(m['content'] as String,
                           style: const TextStyle(
                               color: KodaColors.text1, fontSize: 14)),
@@ -1783,20 +1883,46 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
     if (content == null || content.isEmpty || content == message['content']) return;
-    final updated = await KodaApi.instance.editMessage(
-        channelId, message['id'] as String? ?? '', content);
+
+    final messageId = message['id'] as String? ?? '';
+    final epoch = message['epoch'] as int?;
+    String? nonce;
+    String newContent = content;
+
+    if (epoch != null) {
+      // Re-encrypt under the epoch this message was originally sent
+      // with -- not necessarily the channel's current epoch, since a
+      // message's readability shouldn't shift out from under an edit
+      // (see ChannelKeyManager.encryptForEpoch).
+      final encrypted = await ChannelKeyManager.instance.encryptForEpoch(channelId, epoch, content);
+      if (encrypted == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
+              "Can't edit this message right now -- its encryption key isn't available on this device.")));
+        }
+        return;
+      }
+      newContent = encrypted.content;
+      nonce = encrypted.nonce;
+    }
+
+    final updated = await KodaApi.instance.editMessage(channelId, messageId, newContent, nonce: nonce);
     if (updated != null && mounted) {
+      await SecureStorage.cacheDecryptedContent(messageId, content);
       setState(() {
-        message['content'] = updated['content'];
+        message['content'] = content;
+        message['nonce'] = updated['nonce'];
         message['edited_at'] = updated['edited_at'];
       });
     }
   }
 
   Future<void> _searchChannel(String channelId) async {
+    final myUserId = ref.read(authProvider).user?.id;
+    if (myUserId == null) return;
     final result = await showDialog<MessageSearchResult>(
       context: context,
-      builder: (_) => MessageSearchDialog(channelId: channelId),
+      builder: (_) => MessageSearchDialog(channelId: channelId, myUserId: myUserId),
     );
     if (result == null || !mounted) return;
 

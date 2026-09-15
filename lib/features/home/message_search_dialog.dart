@@ -1,11 +1,11 @@
 // lib/features/home/message_search_dialog.dart
 //
-// Client-side search over channel message history. Content can be
-// end-to-end encrypted (real crypto once the Rust bridge lands, demo
-// base64 today) so the server can't run a meaningful full-text search
-// over it -- this pages backward through history, decrypts each batch
-// the same way the chat view does, and matches locally. Bounded per run
-// so a search can't page through a channel's entire history in one go.
+// Client-side search over channel message history. Content is real
+// end-to-end ciphertext (see core/crypto/channel_key_manager.dart) so
+// the server can't run a meaningful full-text search over it -- this
+// pages backward through history, decrypts each batch the same way the
+// chat view does, and matches locally. Bounded per run so a search
+// can't page through a channel's entire history in one go.
 
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
@@ -24,7 +24,8 @@ class MessageSearchResult {
 
 class MessageSearchDialog extends StatefulWidget {
   final String channelId;
-  const MessageSearchDialog({super.key, required this.channelId});
+  final String myUserId;
+  const MessageSearchDialog({super.key, required this.channelId, required this.myUserId});
   @override
   State<MessageSearchDialog> createState() => _MessageSearchDialogState();
 }
@@ -72,7 +73,8 @@ class _MessageSearchDialogState extends State<MessageSearchDialog> {
       final batch = await KodaApi.instance.getMessages(widget.channelId, beforeId: cursor);
       if (batch.isEmpty) { reachedStart = true; break; }
 
-      final decrypted = await decryptMessages(batch);
+      final decrypted = await decryptMessages(batch,
+          channelId: widget.channelId, myUserId: widget.myUserId);
       final ascending = decrypted.reversed.toList();
       for (final m in decrypted) {
         final content = (m['content'] as String? ?? '').toLowerCase();

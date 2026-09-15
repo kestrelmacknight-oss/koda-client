@@ -123,6 +123,13 @@ Uint8List randomNonce() {
   return Uint8List.fromList(rnd.bytes);
 }
 
+/// Cryptographically random bytes of the given length -- for anything
+/// that isn't specifically a GCM nonce (e.g. a fresh symmetric key).
+Uint8List randomBytes(int length) {
+  final rnd = SecretKeyData.random(length: length);
+  return Uint8List.fromList(rnd.bytes);
+}
+
 /// Encrypts with AES-256-GCM. Returns ciphertext with the auth tag
 /// appended (`cipherText ++ tag`), which is the wire format's single
 /// `payload` field -- there's no separate MAC field on the wire, so the

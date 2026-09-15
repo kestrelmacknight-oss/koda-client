@@ -25,6 +25,8 @@ const _tokenKey = 'koda_jwt_v1';
 
 String _ratchetKey(String conversationId) => 'kcp_ratchet_$conversationId';
 String _pinnedIdentityKey(String userId) => 'kcp_pinned_identity_$userId';
+String _channelEpochKey(String channelId, int epoch) => 'kcp_chan_epoch_${channelId}_$epoch';
+String _channelEpochsIndexKey(String channelId) => 'kcp_chan_epochs_$channelId';
 
 class SecureStorage {
   // ── Auth token ─────────────────────────────────────────────────────────
@@ -84,6 +86,44 @@ class SecureStorage {
   static Future<void> deleteRatchetState(String conversationId) =>
       _storage.delete(key: _ratchetKey(conversationId));
 
+  // ── Channel epoch keys ───────────────────────────────────────────────────
+  // See lib/core/crypto/channel_epoch.dart and channel_key_manager.dart.
+  // One symmetric key per (channel, epoch), plus a small index of which
+  // epochs are actually known locally so the manager doesn't have to
+  // probe epoch numbers one at a time to find what it already has.
+
+  static Future<void> saveChannelEpochKey(String channelId, int epoch, Uint8List key) async {
+    await _storage.write(key: _channelEpochKey(channelId, epoch), value: bytesToB64(key));
+    final known = await _knownChannelEpochs(channelId);
+    if (!known.contains(epoch)) {
+      known.add(epoch);
+      known.sort();
+      await _storage.write(
+          key: _channelEpochsIndexKey(channelId), value: jsonEncode(known));
+    }
+  }
+
+  static Future<Uint8List?> loadChannelEpochKey(String channelId, int epoch) async {
+    final raw = await _storage.read(key: _channelEpochKey(channelId, epoch));
+    if (raw == null) return null;
+    return b64ToBytes(raw);
+  }
+
+  /// The highest epoch this device actually holds the key for, or null
+  /// if it doesn't have any yet (a brand-new install, or hasn't synced
+  /// deliveries for this channel).
+  static Future<int?> latestKnownChannelEpoch(String channelId) async {
+    final known = await _knownChannelEpochs(channelId);
+    if (known.isEmpty) return null;
+    return known.last;
+  }
+
+  static Future<List<int>> _knownChannelEpochs(String channelId) async {
+    final raw = await _storage.read(key: _channelEpochsIndexKey(channelId));
+    if (raw == null) return [];
+    return (jsonDecode(raw) as List).cast<int>();
+  }
+
   // ── Decrypted-content cache ─────────────────────────────────────────────
   // Double Ratchet is forward-secret by design: once a message key is
   // used (receiving) or the sending chain advances past it (sending),
@@ -105,6 +145,12 @@ class SecureStorage {
 
   static Future<String?> getCachedDecryptedContent(String messageId) =>
       _storage.read(key: 'kcp_msg_$messageId');
+
+  /// Invalidates a cached plaintext -- e.g. a message was just edited,
+  /// so the old cached content is stale and must not keep masking the
+  /// freshly-decrypted replacement on the next decryptMessages call.
+  static Future<void> deleteCachedDecryptedContent(String messageId) =>
+      _storage.delete(key: 'kcp_msg_$messageId');
 
   // ── TOFU-pinned peer identities ─────────────────────────────────────────
 
