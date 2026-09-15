@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:livekit_client/livekit_client.dart' as lk;
 import '../../core/api.dart';
+import '../../core/checkout.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
 import '../../shared/widgets.dart';
@@ -209,13 +210,27 @@ class _StageScreenState extends ConsumerState<StageScreen> {
       setState(() { _ticketRequiredEvent = null; _connecting = true; });
       _connect();
     } else {
-      // Paid tickets create a real Stripe PaymentIntent server-side,
-      // but this app doesn't have Stripe's payment-collection UI wired
-      // up anywhere yet (tips/subscriptions/digital goods all stop at
-      // the same placeholder today) -- matching that rather than
-      // half-building just this one flow's checkout screen.
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Stripe payment coming soon')));
+      final checkoutUrl = result['checkout_url'] as String?;
+      if (checkoutUrl == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not start checkout. Try again in a moment.')));
+        return;
+      }
+
+      final eventId = event['id'] as String;
+      final messenger = ScaffoldMessenger.of(context);
+      final confirmed = await launchCheckoutAndWait(context, ref,
+          checkoutUrl: checkoutUrl,
+          matches: (data) =>
+              data['payment_type'] == 'stage_ticket' && data['event_id'] == eventId);
+      if (!mounted) return;
+      if (confirmed) {
+        setState(() { _ticketRequiredEvent = null; _connecting = true; });
+        _connect();
+      } else {
+        messenger.showSnackBar(const SnackBar(content: Text(
+            "Still waiting on that payment -- try joining again once it's confirmed.")));
+      }
     }
   }
 

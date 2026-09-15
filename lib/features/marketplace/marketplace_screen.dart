@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/api.dart';
+import '../../core/checkout.dart';
 import '../../core/permissions.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
@@ -390,11 +391,27 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
       giftedToUserId: giftedTo,
     );
 
-    if (result != null && mounted) {
-      // In a real implementation, use flutter_stripe to present payment sheet
-      // For now, show the client secret for testing
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Payment initiated — Stripe integration coming soon')));
+    final checkoutUrl = result?['checkout_url'] as String?;
+    if (checkoutUrl == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not start checkout. Try again in a moment.')));
+      }
+      return;
+    }
+
+    final messenger = ScaffoldMessenger.of(context);
+    final paymentConfirmed = await launchCheckoutAndWait(context, ref,
+        checkoutUrl: checkoutUrl,
+        // No subscription id exists yet at this point -- it's only
+        // created once the webhook confirms -- so this matches loosely
+        // on payment_type rather than a specific record.
+        matches: (data) => data['payment_type'] == 'subscription');
+    if (mounted) {
+      messenger.showSnackBar(SnackBar(content: Text(paymentConfirmed
+          ? 'Subscription active!'
+          : 'Still waiting on that payment -- it\'ll activate once completed.')));
+      _loadData();
     }
   }
 

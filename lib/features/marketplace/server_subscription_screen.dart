@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api.dart';
+import '../../core/checkout.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../core/time_utils.dart';
@@ -550,9 +551,28 @@ class _ServerSubscriptionScreenState
     if (confirmed != true || !mounted) return;
     final result = await KodaApi.instance.subscribeToServerTier(
         tier['id'] as String);
-    if (result != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Subscription initiated — Stripe payment coming soon')));
+
+    final checkoutUrl = result?['checkout_url'] as String?;
+    if (checkoutUrl == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not start checkout. Try again in a moment.')));
+      }
+      return;
+    }
+
+    final messenger = ScaffoldMessenger.of(context);
+    final paymentConfirmed = await launchCheckoutAndWait(context, ref,
+        checkoutUrl: checkoutUrl,
+        // No subscription record exists yet -- it's only created once
+        // the webhook confirms -- so this matches loosely on
+        // payment_type rather than a specific record id.
+        matches: (data) =>
+            data['payment_type'] == 'server_subscription');
+    if (mounted) {
+      messenger.showSnackBar(SnackBar(content: Text(paymentConfirmed
+          ? 'Subscribed!'
+          : 'Still waiting on that payment -- it\'ll activate once completed.')));
       _load();
     }
   }

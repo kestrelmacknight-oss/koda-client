@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/api.dart';
+import '../../core/checkout.dart';
 import '../../core/permissions.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
@@ -479,9 +480,25 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
       }
       _load();
     } else {
-      // Paid — Stripe payment needed
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Stripe payment coming soon')));
+      final checkoutUrl = result['checkout_url'] as String?;
+      if (checkoutUrl == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not start checkout. Try again in a moment.')));
+        return;
+      }
+
+      final productId = product['id'] as String;
+      final messenger = ScaffoldMessenger.of(context);
+      final confirmed = await launchCheckoutAndWait(context, ref,
+          checkoutUrl: checkoutUrl,
+          matches: (data) =>
+              data['payment_type'] == 'digital_product' && data['product_id'] == productId);
+      if (mounted) {
+        messenger.showSnackBar(SnackBar(content: Text(confirmed
+            ? 'Purchase complete! Find it under My Purchases.'
+            : 'Still waiting on that payment -- it\'ll show up under My Purchases once completed.')));
+        if (confirmed) _load();
+      }
     }
   }
 

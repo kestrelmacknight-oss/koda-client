@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api.dart';
+import '../../core/checkout.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../shared/widgets.dart';
@@ -64,14 +65,38 @@ class _TipDialogState extends ConsumerState<TipDialog> {
     if (!mounted) return;
     setState(() => _sending = false);
 
-    if (result != null) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tip initiated — Stripe payment coming soon')));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to send tip. Creator may not be connected to Stripe.')));
+    if (result == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to send tip. Creator may not be connected to Stripe.')));
+      }
+      return;
     }
+
+    final checkoutUrl = result['checkout_url'] as String?;
+    final tipId = (result['tip'] as Map<String, dynamic>?)?['id'] as String?;
+    if (checkoutUrl == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not start checkout. Try again in a moment.')));
+      }
+      return;
+    }
+
+    // Capture the surrounding screen's context/messenger before popping
+    // this dialog -- this widget's own `context` becomes unusable the
+    // instant it's popped, but the wait dialog and the result SnackBar
+    // both need to live on top of whatever's underneath.
+    final rootContext = Navigator.of(context, rootNavigator: true).context;
+    final messenger = ScaffoldMessenger.of(context);
+    Navigator.pop(context);
+
+    final confirmed = await launchCheckoutAndWait(rootContext, ref,
+        checkoutUrl: checkoutUrl,
+        matches: (data) =>
+            data['payment_type'] == 'tip' && data['tip_id'] == tipId);
+    messenger.showSnackBar(SnackBar(content: Text(
+        confirmed ? 'Tip sent!' : 'Still waiting on that payment -- it\'ll go through once completed.')));
   }
 
   @override
