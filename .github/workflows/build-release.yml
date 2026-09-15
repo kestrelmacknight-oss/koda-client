@@ -141,10 +141,155 @@ jobs:
           path: installer/Koda-*.tar.gz
           retention-days: 30
 
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+    needs: version
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get
+      # Only present once the four ANDROID_* secrets are set (see
+      # android/KEYSTORE.md) -- without them this step is skipped and the
+      # build below falls back to debug signing (fine for CI/testing,
+      # not accepted by Google Play).
+      - name: Decode release keystore
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.jks
+          cat > android/key.properties <<EOF
+          storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          storeFile=release.jks
+          EOF
+      - name: Build APK
+        run: flutter build apk --release
+      - name: Build App Bundle
+        run: flutter build appbundle --release
+      - name: Upload Android build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Koda-Android-${{ needs.version.outputs.version }}
+          path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+  build-ios:
+    name: Build iOS
+    runs-on: macos-latest
+    needs: version
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Install CocoaPods dependencies
+        run: |
+          cd ios
+          pod install --repo-update
+      # Always runs, needs no secrets -- a real build-correctness check
+      # (Info.plist errors, plugin incompatibilities) even before any
+      # Apple Developer account is involved. Not installable anywhere.
+      - name: Build unsigned iOS app
+        run: flutter build ios --release --no-codesign
+      - name: Upload unsigned iOS build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Koda-iOS-unsigned-${{ needs.version.outputs.version }}
+          path: build/ios/iphoneos/Runner.app
+          retention-days: 30
+
+      # Everything below only runs once the five IOS_* secrets are set
+      # (see ios/SIGNING.md) -- produces an actual signed, submittable
+      # .ipa. Untested against a real Apple account as of writing; the
+      # first run after adding the secrets is the real test.
+      - name: Import signing certificate & provisioning profile
+        if: ${{ secrets.IOS_DIST_CERT_BASE64 != '' }}
+        env:
+          IOS_DIST_CERT_BASE64: ${{ secrets.IOS_DIST_CERT_BASE64 }}
+          IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD }}
+        run: |
+          echo "$IOS_DIST_CERT_BASE64" | base64 -d -o "$RUNNER_TEMP/dist_cert.p12"
+          echo "$IOS_PROVISION_PROFILE_BASE64" | base64 -d -o "$RUNNER_TEMP/profile.mobileprovision"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -lut 21600 build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security import "$RUNNER_TEMP/dist_cert.p12" -k build.keychain -P "$IOS_DIST_CERT_PASSWORD" -T /usr/bin/codesign
+          security list-keychain -d user -s build.keychain
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+
+          PROFILE_UUID=$(security cms -D -i "$RUNNER_TEMP/profile.mobileprovision" | plutil -extract UUID xml1 -o - - | sed -n 's/.*<string>\(.*\)<\/string>.*/\1/p')
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp "$RUNNER_TEMP/profile.mobileprovision" ~/Library/MobileDevice/Provisioning\ Profiles/"$PROFILE_UUID".mobileprovision
+          echo "PROFILE_UUID=$PROFILE_UUID" >> "$GITHUB_ENV"
+
+      - name: Generate ExportOptions.plist
+        if: ${{ secrets.IOS_DIST_CERT_BASE64 != '' }}
+        run: |
+          cat > ios/ExportOptions.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store-connect</string>
+            <key>teamID</key>
+            <string>${{ secrets.IOS_TEAM_ID }}</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>com.gryphonheart.koda</key>
+              <string>${PROFILE_UUID}</string>
+            </dict>
+          </dict>
+          </plist>
+          EOF
+      - name: Build & archive signed IPA
+        if: ${{ secrets.IOS_DIST_CERT_BASE64 != '' }}
+        env:
+          # ios/Runner.xcodeproj sets CODE_SIGN_STYLE=Manual for Release
+          # but deliberately leaves these two account-specific values
+          # unset -- xcodebuild picks up env vars matching a build
+          # setting's name as an override, so this is how they reach it
+          # without ever being committed to the project file.
+          DEVELOPMENT_TEAM: ${{ secrets.IOS_TEAM_ID }}
+          PROVISIONING_PROFILE_SPECIFIER: ${{ env.PROFILE_UUID }}
+        run: |
+          flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+      - name: Upload signed IPA
+        if: ${{ secrets.IOS_DIST_CERT_BASE64 != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Koda-iOS-${{ needs.version.outputs.version }}
+          path: build/ios/ipa/*.ipa
+          retention-days: 30
+
   release:
     name: Create Release
     runs-on: ubuntu-latest
-    needs: [version, build-windows, build-macos, build-linux]
+    needs: [version, build-windows, build-macos, build-linux, build-android, build-ios]
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: write
@@ -166,6 +311,8 @@ jobs:
             - **Windows**: Download `KodaSetup-${{ needs.version.outputs.version }}.exe` and run the installer
             - **macOS**: Download the `.dmg` and drag Koda to Applications
             - **Linux**: Download the `.tar.gz`, extract, and run `./koda`
+            - **Android**: Download the `.apk` to sideload directly, or grab the `.aab` for Play Console (see android/KEYSTORE.md for release signing setup)
+            - **iOS**: Not attached here -- TestFlight/App Store builds go through App Store Connect once ios/SIGNING.md's signing secrets are set up
 
             ### What's New
             See [CHANGELOG.md](https://github.com/kestrelmacknight-oss/koda-client/blob/main/CHANGELOG.md) for details.
@@ -174,6 +321,8 @@ jobs:
             release-artifacts/**/*.dmg
             release-artifacts/**/*.zip
             release-artifacts/**/*.tar.gz
+            release-artifacts/**/*.apk
+            release-artifacts/**/*.aab
           draft: false
           prerelease: true
           generate_release_notes: true

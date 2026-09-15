@@ -30,12 +30,31 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.1
 
 flutter:
   uses-material-design: true
   assets:
     - assets/badges/
     - assets/frames/
+
+# Regenerate with: dart run flutter_launcher_icons
+# Source is the same brand mark already shipping in the macOS/Windows
+# builds (macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_1024.png),
+# pre-flattened onto an opaque #09090F background rather than left
+# transparent -- iOS requires a fully opaque App Store icon (no alpha
+# channel at all), and naive alpha-removal by the icon generator itself
+# produced visible artifacts around the glow/smoke effect, so this was
+# composited properly ahead of time instead.
+flutter_launcher_icons:
+  image_path: "assets/app_icon_source.png"
+  android: true
+  ios: true
+  # Not using an adaptive-icon foreground/background split -- the source
+  # mark already has its own baked-in glow/background, and Android's
+  # adaptive mask crops a separate foreground layer to its center ~66%,
+  # which would clip this design. A standard (non-adaptive) icon renders
+  # it correctly on every launcher.
 
 
 

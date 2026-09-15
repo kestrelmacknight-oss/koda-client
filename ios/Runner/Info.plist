@@ -26,6 +26,25 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Koda uses your camera for video calls and to attach photos to messages.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Koda uses your microphone for voice and video calls.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Koda uses your photo library to attach images to messages and set avatars.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Koda saves images you download to your photo library.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Koda uses the local network to discover and connect to nearby devices for voice and video calls.</string>
+	<!-- Deliberately NOT setting ITSAppUsesNonExemptEncryption here.
+	     Koda ships its own end-to-end encryption (X3DH + Double Ratchet)
+	     for direct messages on top of standard TLS -- the same category
+	     Signal/WhatsApp are in, which typically qualifies for the
+	     mass-market exemption (License Exception ENC) but still requires
+	     a real export-compliance self-classification, not a guess baked
+	     into a config file. Leaving this key out makes App Store Connect
+	     ask the real Export Compliance questions at each submission
+	     instead of silently skipping them. -->
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

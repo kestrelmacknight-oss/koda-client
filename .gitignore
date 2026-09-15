@@ -43,3 +43,15 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android release signing -- never commit the real keystore or its
+# passwords. CI decodes these from GitHub secrets at build time instead
+# (see .github/workflows/build-release.yml and android/KEYSTORE.md).
+/android/key.properties
+/android/app/*.jks
+/android/app/*.keystore
+
+# iOS release signing -- same reasoning, decoded from secrets in CI.
+/ios/certs/
+*.p12
+*.mobileprovision
