@@ -446,7 +446,7 @@ class _ServerSubscriptionScreenState
     final priceCents = (price * 100).round();
 
     if (existing == null) {
-      final tier = await KodaApi.instance.createServerSubscriptionTier(
+      final result = await KodaApi.instance.createServerSubscriptionTier(
         widget.server['id'] as String,
         {
           'name':                         nameCtrl.text.trim(),
@@ -456,7 +456,15 @@ class _ServerSubscriptionScreenState
           'position':                     position,
         },
       );
-      if (tier != null && mounted) _load();
+      if (result != null && mounted) {
+        _load();
+        if (result['owner_payable'] != true) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text(
+                  'Tier created -- connect Stripe under Marketplace → Creator before members can subscribe to it.'),
+              duration: Duration(seconds: 6)));
+        }
+      }
     } else {
       final ok = await KodaApi.instance.updateServerSubscriptionTier(
         existing['id'] as String,
@@ -556,7 +564,8 @@ class _ServerSubscriptionScreenState
     if (checkoutUrl == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not start checkout. Try again in a moment.')));
+            const SnackBar(content: Text(
+                "Could not start checkout -- this server's owner may not have connected Stripe yet.")));
       }
       return;
     }

@@ -213,7 +213,8 @@ class _StageScreenState extends ConsumerState<StageScreen> {
       final checkoutUrl = result['checkout_url'] as String?;
       if (checkoutUrl == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not start checkout. Try again in a moment.')));
+            const SnackBar(content: Text(
+                "Could not start checkout -- this server's owner may not have connected Stripe yet.")));
         return;
       }
 

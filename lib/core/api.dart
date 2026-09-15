@@ -1525,10 +1525,15 @@ class KodaApi {
     } catch (e) { _log('getServerSubscriptionTiers', e); return []; }
   }
 
+  /// Returns the raw response ({'tier': {...}, 'owner_payable': bool}),
+  /// not just the tier -- owner_payable tells the caller whether members
+  /// can actually pay into this tier yet (the server owner needs Stripe
+  /// Connect set up), so a UI can warn immediately instead of members
+  /// hitting a checkout error later.
   Future<Map<String, dynamic>?> createServerSubscriptionTier(String serverId, Map<String, dynamic> data) async {
     try {
       final res = await _dio.post('/servers/$serverId/subscription-tiers', data: data);
-      return res.data['tier'] as Map<String, dynamic>;
+      return res.data as Map<String, dynamic>;
     } catch (e) { _log('createServerSubscriptionTier', e); return null; }
   }
 
