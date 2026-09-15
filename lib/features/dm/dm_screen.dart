@@ -638,6 +638,11 @@ class _DmScreenState extends ConsumerState<DmScreen>
                                         ],
                                       ),
                               ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2, left: 2, right: 2),
+                                child: Text(_formatTime(m['inserted_at']),
+                                    style: const TextStyle(color: KodaColors.text3, fontSize: 10)),
+                              ),
                               if (isMe && i == _messages.length - 1 && _seenByPeer(m))
                                 const Padding(
                                   padding: EdgeInsets.only(top: 2, right: 2),
