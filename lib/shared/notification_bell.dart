@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../core/notifications_provider.dart';
 import '../core/theme.dart';
+import '../core/time_utils.dart';
 
 class NotificationBell extends ConsumerWidget {
   const NotificationBell({super.key});
@@ -193,7 +194,7 @@ class NotificationBell extends ConsumerWidget {
   String _formatTime(dynamic raw) {
     if (raw == null) return '';
     try {
-      final dt = DateTime.parse(raw.toString()).toLocal();
+      final dt = parseServerTimestamp(raw.toString());
       final now = DateTime.now();
       if (now.difference(dt).inHours < 24) {
         return DateFormat('h:mm a').format(dt);

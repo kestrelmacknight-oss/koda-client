@@ -10,6 +10,7 @@ import '../../core/api.dart';
 import '../../core/permissions.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
+import '../../core/time_utils.dart';
 import '../../shared/tier_badge.dart';
 import '../../shared/widgets.dart';
 import 'digital_goods_screen.dart';
@@ -611,7 +612,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   String _formatDate(dynamic raw) {
     if (raw == null) return '';
     try {
-      final dt = DateTime.parse(raw.toString()).toLocal();
+      final dt = parseServerTimestamp(raw.toString());
       return '${dt.month}/${dt.day}/${dt.year}';
     } catch (_) { return ''; }
   }
@@ -884,7 +885,7 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
 
   String _relativeDate(String iso) {
     try {
-      final dt = DateTime.parse(iso).toLocal();
+      final dt = parseServerTimestamp(iso);
       final diff = DateTime.now().difference(dt);
       if (diff.inMinutes < 1) return 'just now';
       if (diff.inHours < 1) return '${diff.inMinutes}m ago';

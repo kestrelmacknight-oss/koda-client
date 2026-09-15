@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
+import '../../core/time_utils.dart';
 import '../../shared/widgets.dart';
 
 class ServerSubscriptionScreen extends ConsumerStatefulWidget {
@@ -559,7 +560,7 @@ class _ServerSubscriptionScreenState
   String _formatDate(dynamic raw) {
     if (raw == null) return '';
     try {
-      final dt = DateTime.parse(raw.toString()).toLocal();
+      final dt = parseServerTimestamp(raw.toString());
       return '${dt.month}/${dt.day}/${dt.year}';
     } catch (_) { return ''; }
   }

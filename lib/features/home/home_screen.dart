@@ -28,6 +28,7 @@ import '../../core/link_preview.dart';
 import '../../core/message_utils.dart';
 import '../../core/secure_storage.dart';
 import '../../core/crypto/channel_key_manager.dart';
+import '../../core/time_utils.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 import '../gallery/gallery_screen.dart';
 import '../stage/stage_screen.dart';
@@ -1053,7 +1054,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         final asInt = int.tryParse(raw.toString());
         dt = asInt != null
             ? DateTime.fromMillisecondsSinceEpoch(asInt, isUtc: true).toLocal()
-            : DateTime.parse(raw.toString()).toLocal();
+            : parseServerTimestamp(raw.toString());
       }
       return DateFormat('MMM d, yyyy h:mm a').format(dt);
     } catch (_) {

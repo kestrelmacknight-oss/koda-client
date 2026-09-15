@@ -14,6 +14,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/uploader.dart';
 import '../../core/crypto/channel_key_manager.dart';
+import '../../core/time_utils.dart';
 import '../../shared/widgets.dart';
 import '../../shared/channel_edit_dialog.dart';
 import '../../shared/category_edit_dialog.dart';
@@ -1102,7 +1103,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   String _formatAuditTime(String? iso) {
     if (iso == null) return '';
     try {
-      final dt = DateTime.parse(iso).toLocal();
+      final dt = parseServerTimestamp(iso);
       return '${dt.month}/${dt.day} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
     } catch (_) { return ''; }
   }

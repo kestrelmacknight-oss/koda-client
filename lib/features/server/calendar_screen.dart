@@ -11,6 +11,7 @@ import '../../core/api.dart';
 import '../../core/permissions.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
+import '../../core/time_utils.dart';
 import '../../shared/widgets.dart';
 
 class CalendarScreen extends ConsumerStatefulWidget {
@@ -77,7 +78,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   List<Map<String, dynamic>> _eventsForDay(DateTime day) {
     return _events.where((e) {
       try {
-        final start = DateTime.parse(e['start_at'] as String).toLocal();
+        final start = parseServerTimestamp(e['start_at'] as String);
         return start.year == day.year &&
                start.month == day.month &&
                start.day == day.day;
@@ -303,9 +304,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   }
 
   Widget _buildEventCard(Map<String, dynamic> event) {
-    final start = DateTime.parse(event['start_at'] as String).toLocal();
+    final start = parseServerTimestamp(event['start_at'] as String);
     final end = event['end_at'] != null
-        ? DateTime.parse(event['end_at'] as String).toLocal()
+        ? parseServerTimestamp(event['end_at'] as String)
         : null;
     final color = Color(int.parse(
         (event['color'] as String? ?? '#2DD4A0').replaceFirst('#', '0xFF')));
@@ -469,10 +470,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             ? ((existing['price_cents'] as int) / 100).toStringAsFixed(2)
             : '');
     DateTime startAt = existing != null
-        ? DateTime.parse(existing['start_at'] as String).toLocal()
+        ? parseServerTimestamp(existing['start_at'] as String)
         : DateTime.now().add(const Duration(hours: 1));
     DateTime? endAt = existing?['end_at'] != null
-        ? DateTime.parse(existing!['end_at'] as String).toLocal()
+        ? parseServerTimestamp(existing!['end_at'] as String)
         : null;
     String recurrence = existing?['recurrence'] as String? ?? 'none';
     String color = existing?['color'] as String? ?? '#2DD4A0';

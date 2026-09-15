@@ -13,6 +13,7 @@ import '../../core/api.dart';
 import '../../core/permissions.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
+import '../../core/time_utils.dart';
 import '../../core/uploader.dart';
 import '../../shared/widgets.dart';
 
@@ -781,7 +782,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
   String _formatDate(dynamic raw) {
     if (raw == null) return '';
     try {
-      final dt = DateTime.parse(raw.toString()).toLocal();
+      final dt = parseServerTimestamp(raw.toString());
       return '${dt.month}/${dt.day}/${dt.year}';
     } catch (_) { return ''; }
   }

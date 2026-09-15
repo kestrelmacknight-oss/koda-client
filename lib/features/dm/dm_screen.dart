@@ -15,6 +15,7 @@ import '../../core/socket.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
 import '../../core/secure_storage.dart';
+import '../../core/time_utils.dart';
 import '../../core/crypto/dm_attachments.dart';
 import '../../core/crypto/dm_session_manager.dart';
 import '../../core/crypto/double_ratchet.dart' show DoubleRatchetDecryptFailure;
@@ -358,7 +359,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
     final sentAt = message['inserted_at'] as String?;
     if (readAt == null || sentAt == null) return false;
     try {
-      return !DateTime.parse(readAt).isBefore(DateTime.parse(sentAt));
+      return !parseServerTimestamp(readAt).isBefore(parseServerTimestamp(sentAt));
     } catch (_) {
       return false;
     }
@@ -389,7 +390,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
   String _formatTime(dynamic raw) {
     if (raw == null) return '';
     try {
-      final dt = DateTime.parse(raw.toString()).toLocal();
+      final dt = parseServerTimestamp(raw.toString());
       return DateFormat('h:mm a').format(dt);
     } catch (_) { return ''; }
   }
