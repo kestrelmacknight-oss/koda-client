@@ -29,6 +29,7 @@ class ServerSubscriptionScreen extends ConsumerStatefulWidget {
 class _ServerSubscriptionScreenState
     extends ConsumerState<ServerSubscriptionScreen> {
   List<Map<String, dynamic>> _tiers = [];
+  List<Map<String, dynamic>> _roles = [];
   Map<String, dynamic>? _mySubscription;
   bool _loading = true;
 
@@ -41,10 +42,16 @@ class _ServerSubscriptionScreenState
   Future<void> _load() async {
     setState(() => _loading = true);
     if (widget.isOwner) {
-      final tiers = await KodaApi.instance.getServerSubscriptionTiers(
-          widget.server['id'] as String);
+      final results = await Future.wait([
+        KodaApi.instance.getServerSubscriptionTiers(widget.server['id'] as String),
+        KodaApi.instance.getRoles(widget.server['id'] as String),
+      ]);
       if (!mounted) return;
-      setState(() { _tiers = tiers; _loading = false; });
+      setState(() {
+        _tiers = results[0];
+        _roles = results[1];
+        _loading = false;
+      });
     } else {
       final data = await KodaApi.instance.getMyServerSubscription(
           widget.server['id'] as String);
@@ -368,6 +375,7 @@ class _ServerSubscriptionScreenState
             : '');
     int discount = existing?['marketplace_discount_percent'] as int? ?? 0;
     int position = existing?['position'] as int? ?? (_tiers.length + 1);
+    String? selectedRoleId = existing?['role_id'] as String?;
 
     final saved = await showDialog<bool>(
       context: context,
@@ -417,9 +425,28 @@ class _ServerSubscriptionScreenState
                     child: Text('Tier $p'),
                   )).toList(),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
+                const Text('Grants role on subscribe — optional',
+                    style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                const SizedBox(height: 4),
+                DropdownButton<String?>(
+                  value: selectedRoleId,
+                  isExpanded: true,
+                  dropdownColor: KodaColors.card,
+                  style: const TextStyle(color: KodaColors.text1, fontSize: 13),
+                  onChanged: (v) => setDialogState(() => selectedRoleId = v),
+                  items: [
+                    const DropdownMenuItem<String?>(value: null, child: Text('None')),
+                    ..._roles.map((r) => DropdownMenuItem<String?>(
+                          value: r['id'] as String,
+                          child: Text(r['name'] as String? ?? 'role'),
+                        )),
+                  ],
+                ),
+                const SizedBox(height: 6),
                 const Text(
-                  'Tip: Assign a role in server settings to automatically grant subscribers access to subscriber-only channels.',
+                  'Automatically given to a member the moment they subscribe, '
+                  'and taken away the moment their subscription expires.',
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
                 ),
               ]),
@@ -454,6 +481,7 @@ class _ServerSubscriptionScreenState
           'price_cents':                  priceCents,
           'marketplace_discount_percent': discount,
           'position':                     position,
+          'role_id':                      selectedRoleId,
         },
       );
       if (result != null && mounted) {
@@ -474,6 +502,7 @@ class _ServerSubscriptionScreenState
           'price_cents':                  priceCents,
           'marketplace_discount_percent': discount,
           'position':                     position,
+          'role_id':                      selectedRoleId,
         },
       );
       if (ok && mounted) _load();
