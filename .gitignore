@@ -33,6 +33,12 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# The Flutter SDK itself lives outside this repo (E:\flutter) -- never
+# vendor/commit an SDK checkout here again (see the corrupted
+# flutter_windows_3.41.9-stable incident it caused).
+/flutter/
+/flutter_windows*/
+
 # Symbolication related
 app.*.symbols
 
@@ -55,3 +61,9 @@ app.*.map.json
 /ios/certs/
 *.p12
 *.mobileprovision
+
+# Firebase (mobile push) config -- project-identifying but not secret in
+# the strict sense; still never committed, decoded from secrets in CI
+# same as the signing files above (see PUSH_NOTIFICATIONS.md).
+/android/app/google-services.json
+/ios/Runner/GoogleService-Info.plist
