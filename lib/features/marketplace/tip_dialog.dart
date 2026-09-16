@@ -1,4 +1,4 @@
-// lib/features/marketplace/tip_dialog.dart
+﻿// lib/features/marketplace/tip_dialog.dart
 //
 // Tip dialog — shown from user profile popup.
 // Calculates split, shows preview, initiates Stripe payment.
@@ -132,7 +132,7 @@ class _TipDialogState extends ConsumerState<TipDialog> {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
                       color: selected
-                          ? KodaColors.koda.withOpacity(0.2)
+                          ? KodaColors.koda.withValues(alpha: 0.2)
                           : KodaColors.elevated,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
@@ -178,13 +178,6 @@ class _TipDialogState extends ConsumerState<TipDialog> {
                 const SizedBox(height: 4),
                 _previewRow('$username receives',
                     '\$${((_preview!['creator_amount_cents'] as int) / 100).toStringAsFixed(2)}'),
-                const Divider(color: KodaColors.border, height: 12),
-                _previewRow('Processing fee (5%)',
-                    '\$${((_preview!['fee_cents'] as int) / 100).toStringAsFixed(2)}',
-                    small: true),
-                _previewRow('Server bank earns',
-                    '${_preview!['points_credited']} pts',
-                    small: true, color: KodaColors.koda),
               ]),
             ),
         ]),
