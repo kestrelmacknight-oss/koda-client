@@ -6,6 +6,7 @@
 // Same construction Signal uses. Output feeds directly into
 // double_ratchet.dart as the initial root key.
 
+import 'dart:convert';
 import 'dart:typed_data';
 import 'kcp_primitives.dart';
 
@@ -99,7 +100,9 @@ class X3dhInitiatorResult {
   final Uint8List sharedSecret; // 32 bytes -- feeds the Double Ratchet as RK
   final Uint8List associatedData;
   final X25519KeyPair ephemeral; // discard the private half immediately after this call site is done
-  const X3dhInitiatorResult(this.sharedSecret, this.associatedData, this.ephemeral);
+  final Uint8List sessionProof; // see computeSessionProof -- goes in the X3DH header
+  const X3dhInitiatorResult(
+      this.sharedSecret, this.associatedData, this.ephemeral, this.sessionProof);
 }
 
 class X3dhHandshakeInvalid implements Exception {
@@ -107,6 +110,51 @@ class X3dhHandshakeInvalid implements Exception {
   const X3dhHandshakeInvalid(this.message);
   @override
   String toString() => 'X3dhHandshakeInvalid: $message';
+}
+
+/// Thrown when a session proof (see [computeSessionProof]) doesn't match
+/// what the peer sent -- both sides derived a *different* shared secret
+/// from the same handshake, which the Double Ratchet's own AEAD tags
+/// would eventually catch too (they fail closed on the first message),
+/// but this catches it immediately, before any ratchet state is created,
+/// and gives a specific diagnosis instead of a generic decrypt failure.
+class X3dhSessionProofMismatch implements Exception {
+  final String message;
+  const X3dhSessionProofMismatch(this.message);
+  @override
+  String toString() => 'X3dhSessionProofMismatch: $message';
+}
+
+/// TLS-Finished-style handshake confirmation: an HMAC over the session's
+/// associated data (which identity-key pair this handshake is between),
+/// keyed by the shared secret itself. Since HMAC is a PRF, publishing this
+/// value leaks nothing about the shared secret -- so it's safe to send in
+/// the clear in the X3DH header. Both sides compute it independently right
+/// after deriving the shared secret; if the values don't match, one side
+/// took a different path through the X3DH math (wrong prekey, stale
+/// bundle, implementation bug) and the session must not be trusted.
+const _sessionProofLabel = 'KodaX3DH-SessionProof';
+
+Future<Uint8List> computeSessionProof({
+  required Uint8List sharedSecret,
+  required Uint8List associatedData,
+}) =>
+    hmacSha256(sharedSecret, [...associatedData, ...utf8.encode(_sessionProofLabel)]);
+
+/// Verifies a peer-supplied session proof against one computed locally.
+/// Throws [X3dhSessionProofMismatch] (rather than returning a bool) so
+/// callers can't accidentally ignore a failed check the way a discarded
+/// boolean return value could be.
+Future<void> verifySessionProof({
+  required Uint8List sharedSecret,
+  required Uint8List associatedData,
+  required Uint8List theirProof,
+}) async {
+  final expected = await computeSessionProof(sharedSecret: sharedSecret, associatedData: associatedData);
+  if (!constantTimeEquals(expected, theirProof)) {
+    throw const X3dhSessionProofMismatch(
+        'Session proof does not match -- the two sides derived different shared secrets.');
+  }
 }
 
 /// Alice's side: she has Bob's bundle, computes the shared secret, and
@@ -138,9 +186,17 @@ Future<X3dhInitiatorResult> initiateSession({
     info: 'KodaX3DH',
     outputLength: 32,
   );
+  // Raw ECDH outputs and their concatenation are only needed as HKDF
+  // input keying material -- wipe them once the derivation is done.
+  secureZero(dh1);
+  secureZero(dh2);
+  secureZero(dh3);
+  if (dh4 != null) secureZero(dh4);
+  ikm.fillRange(0, ikm.length, 0);
 
   final ad = Uint8List.fromList([...myIdentity.dh.publicKeyBytes, ...theirBundle.ikDhPub]);
-  return X3dhInitiatorResult(sharedSecret, ad, ephemeral);
+  final sessionProof = await computeSessionProof(sharedSecret: sharedSecret, associatedData: ad);
+  return X3dhInitiatorResult(sharedSecret, ad, ephemeral, sessionProof);
 }
 
 /// Bob's side: he receives Alice's prekey message header and completes
@@ -165,6 +221,11 @@ Future<({Uint8List sharedSecret, Uint8List associatedData})> respondToSession({
     info: 'KodaX3DH',
     outputLength: 32,
   );
+  secureZero(dh1);
+  secureZero(dh2);
+  secureZero(dh3);
+  if (dh4 != null) secureZero(dh4);
+  ikm.fillRange(0, ikm.length, 0);
 
   final ad = Uint8List.fromList([...theirIdentityDhPub, ...myIdentity.dh.publicKeyBytes]);
   return (sharedSecret: sharedSecret, associatedData: ad);
@@ -177,9 +238,11 @@ Future<({Uint8List sharedSecret, Uint8List associatedData})> respondToSession({
 Map<String, dynamic> x3dhHeaderJson({
   required IdentityKeyPair myIdentity,
   required X25519KeyPair ephemeral,
+  required Uint8List sessionProof,
   Uint8List? opkPublicUsed,
 }) => {
       'identity_pub':  bytesToB64(myIdentity.dh.publicKeyBytes),
       'ephemeral_pub': bytesToB64(ephemeral.publicKeyBytes),
+      'session_proof': bytesToB64(sessionProof),
       if (opkPublicUsed != null) 'opk_public': bytesToB64(opkPublicUsed),
     };

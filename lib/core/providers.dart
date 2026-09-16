@@ -1,5 +1,6 @@
 // lib/core/providers.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'api.dart';
 class KodaUser {
   final String id;
   final String username;
@@ -84,6 +85,24 @@ final authProvider =
 final selectedServerProvider = StateProvider<Map<String, dynamic>?>((ref) => null);
 final selectedChannelProvider = StateProvider<Map<String, dynamic>?>((ref) => null);
 
+// Which DM conversation (if any) is currently on screen -- set/cleared by
+// dm_screen.dart. home_screen.dart's live-notification handler reads this
+// to suppress a toast/tray popup for a DM the user is already looking at
+// (channels use their own local _activeChannelId for the same purpose,
+// no provider needed there since the check happens in the same widget).
+final activeConversationProvider = StateProvider<String?>((ref) => null);
+
+// A server's custom emoji (see Koda.Emoji, lib/shared/custom_emoji.dart)
+// -- cached per server so the reaction picker, the composer's shortcode
+// autocomplete, and the emoji-management tab in server_settings_screen.dart
+// all share one fetch instead of each hitting the API independently.
+// Invalidate with `ref.invalidate(serverEmojiProvider(serverId))` after
+// an upload/delete so every consumer picks up the change.
+final serverEmojiProvider =
+    FutureProvider.family<List<Map<String, dynamic>>, String>((ref, serverId) {
+  return KodaApi.instance.getServerEmoji(serverId);
+});
+
 // -- Voice & video settings --------------------------------------------------
 // Pure state holder, same convention as AuthNotifier above -- the settings
 // screen itself calls KodaApi.getSettings()/putSettings() directly and
@@ -93,6 +112,12 @@ class VoiceSettings {
   final bool noiseSuppression;
   final bool echoCancellation;
   final bool autoGainControl;
+  // Real WebRTC capture constraints (see AudioCaptureOptions in
+  // lib/core/voice_session.dart) -- distinct from VOX/PTT below, which
+  // are gated client-side rather than passed to WebRTC at all.
+  final bool highPassFilter;
+  final bool typingNoiseDetection;
+  final bool voiceIsolation;
   final bool vadEnabled;
   final double vadThreshold;
   final String? pushToTalkKey;
@@ -102,16 +127,14 @@ class VoiceSettings {
   final String? varmSilentUrl;
   final String? varmTalkingUrl;
   final double varmThreshold;
-  final bool loudnessNormalization;
-  final bool autoDucking;
-  final double eqBass;
-  final double eqMid;
-  final double eqTreble;
 
   const VoiceSettings({
     this.noiseSuppression = true,
     this.echoCancellation = true,
     this.autoGainControl = true,
+    this.highPassFilter = false,
+    this.typingNoiseDetection = true,
+    this.voiceIsolation = true,
     this.vadEnabled = false,
     this.vadThreshold = 0.05,
     this.pushToTalkKey,
@@ -121,11 +144,6 @@ class VoiceSettings {
     this.varmSilentUrl,
     this.varmTalkingUrl,
     this.varmThreshold = 0.1,
-    this.loudnessNormalization = false,
-    this.autoDucking = false,
-    this.eqBass = 0.0,
-    this.eqMid = 0.0,
-    this.eqTreble = 0.0,
   });
 
   bool get varmEnabled => varmSilentUrl != null && varmTalkingUrl != null;
@@ -134,6 +152,9 @@ class VoiceSettings {
         noiseSuppression:      j['noise_suppression'] as bool? ?? true,
         echoCancellation:      j['echo_cancellation'] as bool? ?? true,
         autoGainControl:       j['auto_gain_control'] as bool? ?? true,
+        highPassFilter:        j['high_pass_filter'] as bool? ?? false,
+        typingNoiseDetection:  j['typing_noise_detection'] as bool? ?? true,
+        voiceIsolation:        j['voice_isolation'] as bool? ?? true,
         vadEnabled:            j['vad_enabled'] as bool? ?? false,
         vadThreshold:          (j['vad_threshold'] as num?)?.toDouble() ?? 0.05,
         pushToTalkKey:         j['push_to_talk_key'] as String?,
@@ -143,37 +164,33 @@ class VoiceSettings {
         varmSilentUrl:         j['varm_silent_url'] as String?,
         varmTalkingUrl:        j['varm_talking_url'] as String?,
         varmThreshold:         (j['varm_threshold'] as num?)?.toDouble() ?? 0.1,
-        loudnessNormalization: j['loudness_normalization'] as bool? ?? false,
-        autoDucking:           j['auto_ducking'] as bool? ?? false,
-        eqBass:                (j['eq_bass'] as num?)?.toDouble() ?? 0.0,
-        eqMid:                 (j['eq_mid'] as num?)?.toDouble() ?? 0.0,
-        eqTreble:              (j['eq_treble'] as num?)?.toDouble() ?? 0.0,
       );
 
   Map<String, dynamic> toJson() => {
-        'noise_suppression':    noiseSuppression,
-        'echo_cancellation':    echoCancellation,
-        'auto_gain_control':    autoGainControl,
-        'vad_enabled':          vadEnabled,
-        'vad_threshold':        vadThreshold,
-        'push_to_talk_key':     pushToTalkKey,
-        'audio_input_id':       audioInputId,
-        'audio_output_id':      audioOutputId,
-        'video_input_id':       videoInputId,
-        'varm_silent_url':      varmSilentUrl,
-        'varm_talking_url':     varmTalkingUrl,
-        'varm_threshold':       varmThreshold,
-        'loudness_normalization': loudnessNormalization,
-        'auto_ducking':         autoDucking,
-        'eq_bass':              eqBass,
-        'eq_mid':               eqMid,
-        'eq_treble':            eqTreble,
+        'noise_suppression':      noiseSuppression,
+        'echo_cancellation':      echoCancellation,
+        'auto_gain_control':      autoGainControl,
+        'high_pass_filter':       highPassFilter,
+        'typing_noise_detection': typingNoiseDetection,
+        'voice_isolation':        voiceIsolation,
+        'vad_enabled':            vadEnabled,
+        'vad_threshold':          vadThreshold,
+        'push_to_talk_key':       pushToTalkKey,
+        'audio_input_id':         audioInputId,
+        'audio_output_id':        audioOutputId,
+        'video_input_id':         videoInputId,
+        'varm_silent_url':        varmSilentUrl,
+        'varm_talking_url':       varmTalkingUrl,
+        'varm_threshold':         varmThreshold,
       };
 
   VoiceSettings copyWith({
     bool? noiseSuppression,
     bool? echoCancellation,
     bool? autoGainControl,
+    bool? highPassFilter,
+    bool? typingNoiseDetection,
+    bool? voiceIsolation,
     bool? vadEnabled,
     double? vadThreshold,
     String? pushToTalkKey,
@@ -185,29 +202,22 @@ class VoiceSettings {
     String? varmTalkingUrl,
     double? varmThreshold,
     bool clearVarm = false,
-    bool? loudnessNormalization,
-    bool? autoDucking,
-    double? eqBass,
-    double? eqMid,
-    double? eqTreble,
   }) => VoiceSettings(
-        noiseSuppression:      noiseSuppression ?? this.noiseSuppression,
-        echoCancellation:      echoCancellation ?? this.echoCancellation,
-        autoGainControl:       autoGainControl ?? this.autoGainControl,
-        vadEnabled:            vadEnabled ?? this.vadEnabled,
-        vadThreshold:          vadThreshold ?? this.vadThreshold,
-        pushToTalkKey:         clearPushToTalkKey ? null : (pushToTalkKey ?? this.pushToTalkKey),
-        audioInputId:          audioInputId ?? this.audioInputId,
-        audioOutputId:         audioOutputId ?? this.audioOutputId,
-        videoInputId:          videoInputId ?? this.videoInputId,
-        varmSilentUrl:         clearVarm ? null : (varmSilentUrl ?? this.varmSilentUrl),
-        varmTalkingUrl:        clearVarm ? null : (varmTalkingUrl ?? this.varmTalkingUrl),
-        varmThreshold:         varmThreshold ?? this.varmThreshold,
-        loudnessNormalization: loudnessNormalization ?? this.loudnessNormalization,
-        autoDucking:           autoDucking ?? this.autoDucking,
-        eqBass:                eqBass ?? this.eqBass,
-        eqMid:                 eqMid ?? this.eqMid,
-        eqTreble:              eqTreble ?? this.eqTreble,
+        noiseSuppression:     noiseSuppression ?? this.noiseSuppression,
+        echoCancellation:     echoCancellation ?? this.echoCancellation,
+        autoGainControl:      autoGainControl ?? this.autoGainControl,
+        highPassFilter:       highPassFilter ?? this.highPassFilter,
+        typingNoiseDetection: typingNoiseDetection ?? this.typingNoiseDetection,
+        voiceIsolation:       voiceIsolation ?? this.voiceIsolation,
+        vadEnabled:           vadEnabled ?? this.vadEnabled,
+        vadThreshold:         vadThreshold ?? this.vadThreshold,
+        pushToTalkKey:        clearPushToTalkKey ? null : (pushToTalkKey ?? this.pushToTalkKey),
+        audioInputId:         audioInputId ?? this.audioInputId,
+        audioOutputId:        audioOutputId ?? this.audioOutputId,
+        videoInputId:         videoInputId ?? this.videoInputId,
+        varmSilentUrl:        clearVarm ? null : (varmSilentUrl ?? this.varmSilentUrl),
+        varmTalkingUrl:       clearVarm ? null : (varmTalkingUrl ?? this.varmTalkingUrl),
+        varmThreshold:        varmThreshold ?? this.varmThreshold,
       );
 }
 class VoiceSettingsNotifier extends StateNotifier<VoiceSettings> {

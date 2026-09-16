@@ -11,6 +11,7 @@ import 'core/api.dart';
 import 'core/crypto/dm_session_manager.dart';
 import 'core/platform.dart';
 import 'core/providers.dart';
+import 'core/push_notifications.dart';
 import 'core/socket.dart';
 import 'core/theme.dart';
 import 'features/auth/auth_screen.dart';
@@ -157,7 +158,11 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   }
 
   void _handleLockoutLogout() {
-    KodaApi.instance.logout();
+    unawaited(() async {
+      // Unregister before logout() clears the token -- unregistering needs auth.
+      await PushNotifications.instance.unregister();
+      await KodaApi.instance.logout();
+    }());
     ref.read(authProvider.notifier).clear();
     setState(() => _lockedOut = false);
   }

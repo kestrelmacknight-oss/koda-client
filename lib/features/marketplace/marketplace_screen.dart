@@ -1,4 +1,4 @@
-// lib/features/marketplace/marketplace_screen.dart
+﻿// lib/features/marketplace/marketplace_screen.dart
 //
 // Marketplace hub: Creator setup, Spark/Pulse subscriptions,
 // server bank balance, tip history.
@@ -243,7 +243,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
           ),
           child: Row(children: [
@@ -277,7 +277,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text('Current Plan',
@@ -440,7 +440,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: KodaColors.koda.withOpacity(0.1),
+                  color: KodaColors.koda.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.payments_outlined,
@@ -506,9 +506,9 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: KodaColors.koda.withOpacity(0.1),
+                  color: KodaColors.koda.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: KodaColors.koda.withOpacity(0.3)),
+                  border: Border.all(color: KodaColors.koda.withValues(alpha: 0.3)),
                 ),
                 child: const Row(children: [
                   Icon(Icons.check_circle, color: KodaColors.koda, size: 18),
@@ -569,7 +569,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
         Container(
           width: 22, height: 22,
           decoration: BoxDecoration(
-            color: KodaColors.koda.withOpacity(0.15),
+            color: KodaColors.koda.withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
           child: Center(child: Text(step,
@@ -698,6 +698,30 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
     _load();
   }
 
+  // Boost-count thresholds for the next level -- mirrors
+  // Koda.Boosts.boost_level/1 server-side. Purely informational text
+  // here; the server is the actual source of truth for the level.
+  static const _levelThresholds = {0: 2, 1: 5, 2: 10, 3: 15, 4: 20};
+
+  String get _emojiSlotText {
+    final limit = _boostStatus?['emoji_slot_limit'] as int? ?? 10;
+    return '$limit custom emoji slots';
+  }
+
+  String? get _nextLevelHint {
+    final level = _boostStatus?['level'] as int? ?? 0;
+    final count = _boostStatus?['count'] as int? ?? 0;
+    final needed = _levelThresholds[level];
+    if (needed == null) return null; // already at the top level
+    final more = needed - count;
+    final unlock = switch (level) {
+      3 => ' and unlock a custom server background',
+      4 => ' and unlock a custom server icon border',
+      _ => '',
+    };
+    return '$more more boost${more == 1 ? '' : 's'} to reach level ${level + 1}$unlock';
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) return const Center(
@@ -714,14 +738,14 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                KodaColors.koda.withOpacity(0.3),
+                KodaColors.koda.withValues(alpha: 0.3),
                 KodaColors.card,
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: KodaColors.koda.withOpacity(0.3)),
+            border: Border.all(color: KodaColors.koda.withValues(alpha: 0.3)),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
@@ -768,8 +792,14 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
                       fontWeight: FontWeight.w700, fontSize: 13)),
             ]),
             const SizedBox(height: 4),
-            Text('${_boostStatus?['count'] ?? 0} active boost${(_boostStatus?['count'] ?? 0) == 1 ? '' : 's'}',
+            Text('${_boostStatus?['count'] ?? 0} active boost${(_boostStatus?['count'] ?? 0) == 1 ? '' : 's'}'
+                ' -- $_emojiSlotText',
                 style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+            if (_nextLevelHint != null) ...[
+              const SizedBox(height: 4),
+              Text(_nextLevelHint!,
+                  style: const TextStyle(color: KodaColors.koda, fontSize: 11)),
+            ],
             const SizedBox(height: 12),
             Text(
               _myTokenCount > 0

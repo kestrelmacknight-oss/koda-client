@@ -1,4 +1,4 @@
-// lib/features/dm/dm_screen.dart
+﻿// lib/features/dm/dm_screen.dart
 //
 // Direct messages with three tabs: All (conversations), Friends, Requests.
 
@@ -76,6 +76,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
     if (_activeConversationId != null) {
       KodaSocket.instance.leave('dm:$_activeConversationId');
     }
+    ref.read(activeConversationProvider.notifier).state = null;
     _tabs.dispose();
     _msgCtrl.dispose();
     _scroll.dispose();
@@ -124,21 +125,26 @@ class _DmScreenState extends ConsumerState<DmScreen>
   /// message key is used once and then gone by design, so plaintext is
   /// cached locally the moment it's known (send or decrypt) -- that
   /// cache, not the ratchet, is what lets history redisplay later.
+  ///
+  /// Cached by message_group_id, not row id -- multi-device fan-out
+  /// means a single logical message can be N rows (one per target
+  /// device) sharing one group id, and all N should hit the same cache
+  /// entry (see _dedupeByGroup). Legacy rows (no group id) fall back to
+  /// their own row id, exactly as before multi-device existed.
   Future<Map<String, dynamic>> _decryptForDisplay(
-      Map<String, dynamic> message, String conversationId, String peerUserId) async {
+      Map<String, dynamic> message, String conversationId) async {
     if (message['encrypted'] != true) return message;
-    final id = message['id'] as String;
+    final cacheKey = (message['message_group_id'] as String?) ?? message['id'] as String;
 
-    final cached = await SecureStorage.getCachedDecryptedContent(id);
+    final cached = await SecureStorage.getCachedDecryptedContent(cacheKey);
     if (cached != null) return _applyPayload(message, cached);
 
     try {
       final plain = await DmSessionManager.instance.decryptReceived(
         conversationId: conversationId,
-        senderUserId: peerUserId,
         message: message,
       );
-      await SecureStorage.cacheDecryptedContent(id, plain);
+      await SecureStorage.cacheDecryptedContent(cacheKey, plain);
       return _applyPayload(message, plain);
     } on SafetyNumberChanged {
       if (mounted) setState(() => _safetyNumberChanged = true);
@@ -148,6 +154,22 @@ class _DmScreenState extends ConsumerState<DmScreen>
     } catch (_) {
       return {...message, 'content': '', '_undecryptable': 'failed'};
     }
+  }
+
+  /// Folds N per-device rows sharing one message_group_id into one
+  /// displayed bubble (keeps the first occurrence -- order-preserving,
+  /// and content is identical across every device's copy of the same
+  /// logical message by construction). Legacy rows (no group id, or a
+  /// plaintext/never-encrypted row) each keep their own row id as their
+  /// dedup key, so they're never folded into each other.
+  List<Map<String, dynamic>> _dedupeByGroup(List<Map<String, dynamic>> messages) {
+    final seen = <String>{};
+    final result = <Map<String, dynamic>>[];
+    for (final m in messages) {
+      final key = (m['message_group_id'] as String?) ?? m['id'] as String;
+      if (seen.add(key)) result.add(m);
+    }
+    return result;
   }
 
   /// Decrypted DM content is a [DmPayload] envelope, not a bare string --
@@ -179,15 +201,19 @@ class _DmScreenState extends ConsumerState<DmScreen>
       _peerLastReadAt = null;
       _safetyNumberChanged = false;
     });
+    ref.read(activeConversationProvider.notifier).state = conversationId;
 
-    final msgs = await KodaApi.instance.getDmMessages(conversationId);
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
+    final msgs = await KodaApi.instance.getDmMessages(conversationId, myDeviceId);
     if (!mounted) return;
     final decrypted = peerUserId == null
         ? msgs
-        : await Future.wait(
-            msgs.map((m) => _decryptForDisplay(m, conversationId, peerUserId)));
+        : await Future.wait(msgs.map((m) => _decryptForDisplay(m, conversationId)));
     if (!mounted) return;
-    setState(() { _messages = decrypted.reversed.toList(); _loadingMessages = false; });
+    setState(() {
+      _messages = _dedupeByGroup(decrypted.reversed.toList());
+      _loadingMessages = false;
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scroll.hasClients) {
         _scroll.jumpTo(_scroll.position.maxScrollExtent);
@@ -208,10 +234,23 @@ class _DmScreenState extends ConsumerState<DmScreen>
       if (msg.event == const PhoenixChannelEvent.custom('new_message')) {
         final payload = msg.payload as Map<String, dynamic>?;
         if (payload == null) return;
+        // Every device-delivery row for this conversation broadcasts on
+        // this same topic -- only handle the copy addressed to this
+        // device (or a legacy row, recipient_device_id == null). A
+        // sender's own outgoing fan-out is never addressed to the
+        // sending device itself, so this also correctly skips the
+        // "echo" of a message this client just sent -- that's already
+        // shown optimistically in _sendMessage.
+        final rowDeviceId = payload['recipient_device_id'] as String?;
+        if (rowDeviceId != null && rowDeviceId != myDeviceId) return;
+        // Already displayed (own optimistic send, or another of this
+        // device's own fan-out copies already arrived) -- skip the dup.
+        final groupId = payload['message_group_id'] as String?;
+        if (groupId != null && _messages.any((m) => m['message_group_id'] == groupId)) return;
         () async {
           final display = peerUserId == null
               ? payload
-              : await _decryptForDisplay(payload, conversationId, peerUserId);
+              : await _decryptForDisplay(payload, conversationId);
           if (!mounted || _activeConversationId != conversationId) return;
           setState(() => _messages.add(display));
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -249,27 +288,39 @@ class _DmScreenState extends ConsumerState<DmScreen>
     setState(() => _pendingAttachment = null);
 
     try {
+      final me = ref.read(authProvider).user;
+      if (me == null) return;
+
       // The attachment's decryption key/nonce never leave this envelope --
       // it gets Double Ratchet-encrypted below exactly like ordinary text,
       // so the server only ever sees ciphertext for both the message and
       // (separately) the file itself.
       final payload = encodeDmPayload(text, attachment: attachment);
-      final envelope = await DmSessionManager.instance.encryptForSend(
+      final fanOut = await DmSessionManager.instance.encryptForSend(
         conversationId: convo['id'] as String,
         peerUserId: peerUserId,
+        myUserId: me.id,
         plaintext: payload,
       );
-      final msg = await KodaApi.instance.sendDmMessage(convo['id'] as String, envelope.content,
-          encrypted: true,
-          ratchetKey: envelope.ratchetKey,
-          msgNumber: envelope.msgNumber,
-          prevChain: envelope.prevChain,
-          nonce: envelope.nonce,
-          x3dhHeader: envelope.x3dhHeader);
-      if (msg != null && mounted) {
-        await SecureStorage.cacheDecryptedContent(msg['id'] as String, payload);
+      final groupId = await KodaApi.instance.sendDmMessage(
+          convo['id'] as String, fanOut.messageGroupId,
+          fanOut.deliveries.map((d) => d.toJson()).toList());
+
+      if (groupId != null && mounted) {
+        // Fan-out never addresses a copy back to this device (see
+        // encryptForSend) -- this local, already-known plaintext is the
+        // only way the sender ever sees their own message, live or on
+        // reload (SecureStorage cache lookup by message_group_id, see
+        // _decryptForDisplay).
+        await SecureStorage.cacheDecryptedContent(groupId, payload);
         setState(() => _messages.add({
-              ...msg,
+              'id': groupId,
+              'message_group_id': groupId,
+              'conversation_id': convo['id'],
+              'sender_id': me.id,
+              'author': {'id': me.id, 'username': me.username},
+              'encrypted': true,
+              'inserted_at': DateTime.now().toUtc().toIso8601String(),
               'content': text,
               if (attachment != null) '_attachment': attachment,
             }));
@@ -467,7 +518,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                           final unread = _unreadCounts[c['id']] ?? 0;
                           return ListTile(
                             selected: active,
-                            selectedTileColor: KodaColors.koda.withOpacity(0.1),
+                            selectedTileColor: KodaColors.koda.withValues(alpha: 0.1),
                             leading: KodaAvatar(username: name, size: 32,
                                 avatarUrl: other?['avatar_url'] as String?,
                                 tier: other?['koda_tier'] as String?),
@@ -548,7 +599,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
       if (_safetyNumberChanged)
         Container(
           width: double.infinity,
-          color: KodaColors.accent.withOpacity(0.15),
+          color: KodaColors.accent.withValues(alpha: 0.15),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
             "${peerName}'s safety number changed -- verify it before sending. "
@@ -599,7 +650,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                                     horizontal: 12, vertical: 8),
                                 decoration: BoxDecoration(
                                   color: isMe
-                                      ? KodaColors.koda.withOpacity(0.2)
+                                      ? KodaColors.koda.withValues(alpha: 0.2)
                                       : KodaColors.card,
                                   borderRadius: BorderRadius.circular(12),
                                 ),

@@ -11,6 +11,7 @@ import '../../core/api.dart';
 import '../../core/platform.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
+import '../../core/voice_activity_controller.dart';
 import '../../core/voice_session.dart';
 import '../../shared/widgets.dart';
 import 'varm_widget.dart';
@@ -46,6 +47,11 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
   lk.LocalVideoTrack? _localVideoTrack;
   lk.LocalVideoTrack? _screenShareTrack;
   Timer? _levelTimer;
+  // Only started for a fresh connection (existingSession == null) --
+  // when reusing the persistent session, VoiceSessionNotifier already
+  // runs one for the room's whole lifetime (see voice_session.dart), so
+  // starting a second one here would double-drive the same track.
+  VoiceActivityController? _voiceActivity;
 
   @override
   void initState() {
@@ -101,6 +107,11 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
         })
         ..on<lk.TrackSubscribedEvent>((_) {
           if (mounted) setState(() {});
+        })
+        ..on<lk.ParticipantMetadataUpdatedEvent>((_) {
+          // Catches VARM's active/inactive toggle from every participant
+          // (setMetadata below), not just our own.
+          if (mounted) setState(() {});
         });
 
       _room.addListener(_onRoomChange);
@@ -109,8 +120,15 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
         if (mounted) setState(() {});
       });
 
+      _voiceActivity = VoiceActivityController()
+        ..start(
+          room: _room,
+          settingsOf: () => ref.read(voiceSettingsProvider),
+          isManuallyMuted: () => _muted,
+        );
+
       final settings = ref.read(voiceSettingsProvider);
-      if (settings.varmEnabled) setState(() => _showVarm = true);
+      if (settings.varmEnabled) await _setShowVarm(true);
 
       if (mounted) setState(() => _connecting = false);
     } catch (e) {
@@ -120,6 +138,49 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
 
   void _onRoomChange() {
     if (mounted) setState(() {});
+  }
+
+  /// Flips local VARM visibility and pushes it onto our own LiveKit
+  /// participant metadata (merged with whatever's already there --
+  /// setMetadata replaces the whole string, it doesn't merge) so every
+  /// other participant's client picks it up via
+  /// ParticipantMetadataUpdatedEvent. Requires the `canUpdateOwnMetadata`
+  /// grant koda-server's generate_token/3 puts in the join token.
+  Future<void> _setShowVarm(bool value) async {
+    if (mounted) setState(() => _showVarm = value);
+    final lp = _room.localParticipant;
+    if (lp == null) return;
+    Map<String, dynamic> meta = {};
+    try {
+      final raw = lp.metadata;
+      if (raw != null && raw.isNotEmpty) meta = jsonDecode(raw) as Map<String, dynamic>;
+    } catch (_) {}
+    meta['varm_active'] = value;
+    try {
+      await lp.setMetadata(jsonEncode(meta));
+    } catch (e) {
+      debugPrint('[VARM] metadata sync failed: ' + e.toString());
+    }
+  }
+
+  /// VARM config for [p] as everyone else in the call would see it --
+  /// pulled from their LiveKit participant metadata (silent/talking URLs
+  /// and threshold baked in at token mint, `varm_active` flipped live via
+  /// setMetadata). Null if VARM isn't configured or isn't active for them.
+  ({String silentUrl, String talkingUrl, double threshold})? _varmConfigFor(lk.Participant p) {
+    try {
+      final raw = p.metadata;
+      if (raw == null || raw.isEmpty) return null;
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      if (decoded['varm_active'] != true) return null;
+      final silentUrl = decoded['varm_silent_url'] as String?;
+      final talkingUrl = decoded['varm_talking_url'] as String?;
+      if (silentUrl == null || talkingUrl == null) return null;
+      final threshold = (decoded['varm_threshold'] as num?)?.toDouble() ?? 0.1;
+      return (silentUrl: silentUrl, talkingUrl: talkingUrl, threshold: threshold);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> _toggleMute() async {
@@ -221,6 +282,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
   @override
   void dispose() {
     _levelTimer?.cancel();
+    _voiceActivity?.stop();
     if (widget.existingSession == null) {
       _room.removeListener(_onRoomChange);
     }
@@ -339,6 +401,19 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                 final name = _displayName(p);
                                 final isLocal = p == _room.localParticipant;
                                 final videoTrack = _getVideoTrack(p);
+                                // Local reads its own toggle state directly
+                                // (instant feedback); remote participants'
+                                // VARM state can only be known via their
+                                // synced metadata, which lags a round trip.
+                                final varmConfig = isLocal
+                                    ? (_showVarm && settings.varmEnabled
+                                        ? (
+                                            silentUrl: settings.varmSilentUrl!,
+                                            talkingUrl: settings.varmTalkingUrl!,
+                                            threshold: settings.varmThreshold,
+                                          )
+                                        : null)
+                                    : _varmConfigFor(p);
 
                                 return GestureDetector(
                                   onDoubleTap: () => _popOutParticipant(context, name, videoTrack),
@@ -361,6 +436,17 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                               child: ColoredBox(color: Colors.black,
                                                   child: lk.VideoTrackRenderer(videoTrack)),
                                             )
+                                          else if (varmConfig != null)
+                                            ClipRRect(
+                                              borderRadius: const BorderRadius.vertical(top: Radius.circular(9)),
+                                              child: ColoredBox(color: Colors.black,
+                                                  child: VarmWidget(
+                                                    participant: p,
+                                                    silentUrl: varmConfig.silentUrl,
+                                                    talkingUrl: varmConfig.talkingUrl,
+                                                    threshold: varmConfig.threshold,
+                                                  )),
+                                            )
                                           else
                                             Center(child: KodaAvatar(username: name, size: 48)),
                                           if (isLocal && _cameraOn)
@@ -381,19 +467,6 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                 );
                               },
                             ),
-
-                      // VARM overlay
-                      if (_showVarm && settings.varmEnabled)
-                        Positioned(
-                          bottom: 12, left: 12,
-                          child: VarmWidget(
-                            participant: _room.localParticipant,
-                            silentUrl:  settings.varmSilentUrl!,
-                            talkingUrl: settings.varmTalkingUrl!,
-                            threshold:  settings.varmThreshold,
-                            size: 160,
-                          ),
-                        ),
                     ]),
                   ),
 
@@ -420,7 +493,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                           tooltip: _showVarm ? 'Hide VARM' : 'Show VARM',
                           onPressed: () async {
                             if (!_showVarm && _cameraOn) await _toggleCamera();
-                            setState(() => _showVarm = !_showVarm);
+                            await _setShowVarm(!_showVarm);
                           },
                         ),
                         const SizedBox(width: 8),
@@ -433,7 +506,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                           color: _cameraOn ? KodaColors.mint : KodaColors.text2,
                         ),
                         onPressed: () async {
-                          if (!_cameraOn && _showVarm) setState(() => _showVarm = false);
+                          if (!_cameraOn && _showVarm) await _setShowVarm(false);
                           await _toggleCamera();
                         },
                         tooltip: _cameraOn ? 'Stop camera' : 'Start camera',

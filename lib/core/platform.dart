@@ -11,3 +11,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 bool get isDesktop =>
     !kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
+
+bool get isMobile => !kIsWeb && (Platform.isAndroid || Platform.isIOS);
+bool get isIOS => !kIsWeb && Platform.isIOS;

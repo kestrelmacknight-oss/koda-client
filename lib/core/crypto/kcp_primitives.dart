@@ -115,6 +115,32 @@ Future<Uint8List> hmacSha256(List<int> key, List<int> message) async {
   return Uint8List.fromList(mac.bytes);
 }
 
+/// Best-effort explicit wipe of key material, called at defined lifecycle
+/// points (message-key consumption, chain/ratchet advancement, prekey
+/// rotation/retirement) -- Dart has no deterministic destructors (no
+/// Rust-style ZeroizeOnDrop), so nothing here runs on GC and this must be
+/// invoked deliberately by callers instead of relied on implicitly. This
+/// only mutates the exact buffer passed in; any bytes already copied out
+/// of it (e.g. via `Uint8List.sublist`) are untouched, and unlike Rust's
+/// `zeroize` crate this can't guarantee the write survives dead-store
+/// elimination -- it's defense in depth, not a hard guarantee.
+void secureZero(Uint8List bytes) {
+  bytes.fillRange(0, bytes.length, 0);
+}
+
+/// Constant-time byte comparison for security-sensitive equality checks
+/// (e.g. session-proof verification) where a length-preserving early-exit
+/// comparison could leak timing information useful to an attacker probing
+/// for the correct value.
+bool constantTimeEquals(List<int> a, List<int> b) {
+  if (a.length != b.length) return false;
+  var diff = 0;
+  for (var i = 0; i < a.length; i++) {
+    diff |= a[i] ^ b[i];
+  }
+  return diff == 0;
+}
+
 const _aesGcmTagLength = 16; // AES-GCM's authentication tag is always 128 bits.
 const _aesGcmNonceLength = 12; // 96 bits, the standard/recommended GCM nonce size.
 

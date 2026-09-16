@@ -25,6 +25,13 @@ dependencies:
   cryptography: ^2.9.0
   flutter_secure_storage: ^9.2.2
   flutter_svg: ^2.0.10+1
+  # Mobile OS push (Android + iOS, iOS via FCM's own APNs bridge) --
+  # Android/iOS only, see lib/core/push_notifications.dart. No Windows/
+  # Linux implementation exists or is needed: local_notifier already
+  # covers desktop tray notifications over the live socket connection
+  # those platforms keep open (see home_screen.dart's _showTrayNotification).
+  firebase_core: ^3.6.0
+  firebase_messaging: ^15.1.3
 
 dev_dependencies:
   flutter_test:

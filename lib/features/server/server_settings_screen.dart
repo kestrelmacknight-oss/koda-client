@@ -1,4 +1,4 @@
-// lib/features/server/server_settings_screen.dart
+﻿// lib/features/server/server_settings_screen.dart
 //
 // Server-level settings: channels & categories, roles, and member role
 // assignment. Reachable from the settings icon next to the server name
@@ -18,6 +18,7 @@ import '../../core/time_utils.dart';
 import '../../shared/widgets.dart';
 import '../../shared/channel_edit_dialog.dart';
 import '../../shared/category_edit_dialog.dart';
+import '../../shared/custom_emoji.dart';
 import 'discord_import_dialog.dart';
 
 class ServerSettingsScreen extends ConsumerStatefulWidget {
@@ -40,6 +41,11 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   bool _printfulConnected = false;
   bool _loadingPrintful = true;
   bool _connectingPrintful = false;
+  List<Map<String, dynamic>> _emoji = [];
+  bool _loadingEmoji = true;
+  Map<String, dynamic>? _boostStatus;
+  bool _uploadingEmoji = false;
+  bool _uploadingBackground = false;
 
   // Matches the flat permission map used server-side on Koda.Servers.Role.
   static const List<String> _permissionKeys = [
@@ -71,9 +77,30 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 8, vsync: this);
     _loadAll();
     _loadPrintfulStatus();
+    _loadEmoji();
+    _loadBoostStatus();
+  }
+
+  Future<void> _loadEmoji() async {
+    final serverId = _serverId;
+    if (serverId.isEmpty) {
+      if (mounted) setState(() => _loadingEmoji = false);
+      return;
+    }
+    final emoji = await KodaApi.instance.getServerEmoji(serverId);
+    if (!mounted) return;
+    setState(() { _emoji = emoji; _loadingEmoji = false; });
+  }
+
+  Future<void> _loadBoostStatus() async {
+    final serverId = _serverId;
+    if (serverId.isEmpty) return;
+    final status = await KodaApi.instance.getServerBoostStatus(serverId);
+    if (!mounted) return;
+    setState(() => _boostStatus = status);
   }
 
   Future<void> _loadPrintfulStatus() async {
@@ -311,7 +338,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                   subtitle: const Text('Members can assign this role themselves',
                       style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                   value: selfAssignable,
-                  activeColor: KodaColors.koda,
+                  activeThumbColor: KodaColors.koda,
                   onChanged: (v) => setDialogState(() => selfAssignable = v),
                 ),
               ]),
@@ -449,12 +476,15 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           indicatorColor: KodaColors.koda,
           labelColor: KodaColors.text1,
           unselectedLabelColor: KodaColors.text3,
+          isScrollable: true,
           tabs: const [
             Tab(text: 'Channels'),
             Tab(text: 'Roles'),
             Tab(text: 'Members'),
             Tab(text: 'Invites'),
             Tab(text: 'Merch'),
+            Tab(text: 'Emoji'),
+            Tab(text: 'Customize'),
             Tab(text: 'Audit Log'),
           ],
         ),
@@ -464,7 +494,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           : TabBarView(
               controller: _tabController,
               children: [_buildChannelsTab(), _buildRolesTab(), _buildMembersTab(),
-                  _buildInvitesTab(), _buildMerchTab(), _buildAuditLogTab()],
+                  _buildInvitesTab(), _buildMerchTab(), _buildEmojiTab(),
+                  _buildCustomizeTab(), _buildAuditLogTab()],
             ),
     );
   }
@@ -535,6 +566,285 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         ),
       ],
     );
+  }
+
+  // -- Emoji ----------------------------------------------------------------
+
+  Widget _buildEmojiTab() {
+    if (_loadingEmoji) {
+      return const Center(child: CircularProgressIndicator(color: KodaColors.koda));
+    }
+    final limit = _boostStatus?['emoji_slot_limit'] as int? ?? 10;
+    final level = _boostStatus?['level'] as int? ?? 0;
+    final full = _emoji.length >= limit;
+    return Column(children: [
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        color: KodaColors.elevated,
+        child: Row(children: [
+          Icon(Icons.emoji_emotions_outlined, size: 18,
+              color: full ? KodaColors.accent : KodaColors.koda),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text('${_emoji.length} / $limit slots used -- boost level $level',
+                style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+          ),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: KodaColors.koda, foregroundColor: Colors.black),
+            icon: _uploadingEmoji
+                ? const SizedBox(width: 14, height: 14,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                : const Icon(Icons.add, size: 16),
+            label: const Text('Upload'),
+            onPressed: (_uploadingEmoji || full) ? null : _uploadEmoji,
+          ),
+        ]),
+      ),
+      Expanded(
+        child: _emoji.isEmpty
+            ? const Center(child: Text('No custom emoji yet.',
+                style: TextStyle(color: KodaColors.text3, fontSize: 13)))
+            : GridView.builder(
+                padding: const EdgeInsets.all(16),
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 96, mainAxisSpacing: 12, crossAxisSpacing: 12,
+                  childAspectRatio: 0.85,
+                ),
+                itemCount: _emoji.length,
+                itemBuilder: (_, i) {
+                  final e = _emoji[i];
+                  return Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: KodaColors.card,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: KodaColors.border),
+                    ),
+                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      EmojiGlyph(value: '$kCustomEmojiPrefix${e['id']}', serverEmoji: _emoji, size: 36),
+                      const SizedBox(height: 4),
+                      Text(e['name'] as String, overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: KodaColors.text2, fontSize: 10)),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, size: 14, color: KodaColors.accent),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () => _deleteEmoji(e['id'] as String),
+                      ),
+                    ]),
+                  );
+                },
+              ),
+      ),
+    ]);
+  }
+
+  Future<void> _uploadEmoji() async {
+    final nameCtrl = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Text('Upload Emoji', style: TextStyle(color: KodaColors.text1)),
+        content: KodaTextField(controller: nameCtrl, hintText: 'name (letters, numbers, _)'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, nameCtrl.text.trim()),
+              child: const Text('Choose Image')),
+        ],
+      ),
+    );
+    if (name == null || name.isEmpty || !mounted) return;
+
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
+    );
+    if (result == null || result.files.single.path == null) return;
+    final path = result.files.single.path!;
+    final ext = path.split('.').last.toLowerCase();
+    final contentType = ext == 'png' ? 'image/png'
+        : ext == 'gif' ? 'image/gif'
+        : ext == 'webp' ? 'image/webp'
+        : 'image/jpeg';
+
+    setState(() => _uploadingEmoji = true);
+    try {
+      final uploaded = await KodaUploader.instance.upload(
+          file: File(path), uploadType: 'server_emoji', contentType: contentType);
+      final error = await KodaApi.instance.createServerEmoji(_serverId, name, uploaded.cdnUrl);
+      if (!mounted) return;
+      setState(() => _uploadingEmoji = false);
+      if (error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+        return;
+      }
+      ref.invalidate(serverEmojiProvider(_serverId));
+      await _loadEmoji();
+    } on UploadException catch (e) {
+      if (mounted) {
+        setState(() => _uploadingEmoji = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+      }
+    }
+  }
+
+  Future<void> _deleteEmoji(String id) async {
+    final ok = await KodaApi.instance.deleteServerEmoji(_serverId, id);
+    if (ok && mounted) {
+      ref.invalidate(serverEmojiProvider(_serverId));
+      await _loadEmoji();
+    }
+  }
+
+  // -- Customize (boost-level-gated cosmetics) -------------------------------
+
+  Widget _buildCustomizeTab() {
+    final level = _boostStatus?['level'] as int? ?? 0;
+    final cosmeticsUnlocked = _boostStatus?['cosmetics_unlocked'] as bool? ?? false;
+    final iconBorderUnlocked = _boostStatus?['icon_border_unlocked'] as bool? ?? false;
+    final server = ref.watch(selectedServerProvider);
+    final cosmetics = (server?['cosmetics'] as Map?) ?? {};
+
+    return ListView(padding: const EdgeInsets.all(20), children: [
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Text('Current boost level: $level',
+            style: const TextStyle(color: KodaColors.text2, fontSize: 12, fontWeight: FontWeight.w600)),
+      ),
+      _customizeCard(
+        title: 'Server Background',
+        description: 'A custom background shown behind the channel view to '
+            'everyone in this server.',
+        unlocked: cosmeticsUnlocked,
+        lockedHint: 'Reach boost level 4 to unlock a custom background.',
+        child: cosmeticsUnlocked
+            ? Row(children: [
+                if ((cosmetics['background_url'] as String?)?.isNotEmpty == true)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(cosmetics['background_url'] as String,
+                        width: 64, height: 40, fit: BoxFit.cover),
+                  ),
+                const SizedBox(width: 10),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: KodaColors.koda, foregroundColor: Colors.black),
+                  icon: _uploadingBackground
+                      ? const SizedBox(width: 14, height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                      : const Icon(Icons.image_outlined, size: 16),
+                  label: const Text('Choose Image'),
+                  onPressed: _uploadingBackground ? null : _pickBackground,
+                ),
+              ])
+            : null,
+      ),
+      const SizedBox(height: 16),
+      _customizeCard(
+        title: 'Server Icon Border',
+        description: "An accent border around this server's icon in every "
+            "member's server list.",
+        unlocked: iconBorderUnlocked,
+        lockedHint: 'Reach boost level 5 to unlock a custom icon border.',
+        child: iconBorderUnlocked
+            ? Wrap(spacing: 8, runSpacing: 8, children: _colorSwatches.map((hex) {
+                final selected = cosmetics['icon_border_color'] == hex;
+                return GestureDetector(
+                  onTap: () => _setIconBorderColor(hex),
+                  child: Container(
+                    width: 32, height: 32,
+                    decoration: BoxDecoration(
+                      color: _parseColor(hex),
+                      shape: BoxShape.circle,
+                      border: selected ? Border.all(color: Colors.white, width: 2) : null,
+                    ),
+                  ),
+                );
+              }).toList())
+            : null,
+      ),
+      if (!cosmeticsUnlocked || !iconBorderUnlocked) ...[
+        const SizedBox(height: 16),
+        Text('Boost this server from the Server Bank in Marketplace to raise its level.',
+            style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+      ],
+    ]);
+  }
+
+  Widget _customizeCard({
+    required String title,
+    required String description,
+    required bool unlocked,
+    required String lockedHint,
+    required Widget? child,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: KodaColors.card,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: KodaColors.border),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(unlocked ? Icons.auto_awesome : Icons.lock_outline, size: 18,
+              color: unlocked ? KodaColors.koda : KodaColors.text3),
+          const SizedBox(width: 8),
+          Text(title, style: const TextStyle(color: KodaColors.text1,
+              fontSize: 14, fontWeight: FontWeight.w600)),
+        ]),
+        const SizedBox(height: 6),
+        Text(description, style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+        const SizedBox(height: 12),
+        if (unlocked && child != null)
+          child
+        else
+          Text(lockedHint, style: const TextStyle(
+              color: KodaColors.text3, fontSize: 12, fontStyle: FontStyle.italic)),
+      ]),
+    );
+  }
+
+  Future<void> _pickBackground() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['png', 'jpg', 'jpeg', 'webp'],
+    );
+    if (result == null || result.files.single.path == null) return;
+    final path = result.files.single.path!;
+    final ext = path.split('.').last.toLowerCase();
+    final contentType = ext == 'png' ? 'image/png'
+        : ext == 'webp' ? 'image/webp'
+        : 'image/jpeg';
+
+    setState(() => _uploadingBackground = true);
+    try {
+      final uploaded = await KodaUploader.instance.upload(
+          file: File(path), uploadType: 'server_cosmetic', contentType: contentType);
+      final updated = await KodaApi.instance.updateServerCosmetics(
+          _serverId, backgroundUrl: uploaded.cdnUrl);
+      if (!mounted) return;
+      setState(() => _uploadingBackground = false);
+      if (updated != null) {
+        ref.read(selectedServerProvider.notifier).state = updated;
+      }
+    } on UploadException catch (e) {
+      if (mounted) {
+        setState(() => _uploadingBackground = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+      }
+    }
+  }
+
+  Future<void> _setIconBorderColor(String hex) async {
+    final updated = await KodaApi.instance.updateServerCosmetics(
+        _serverId, iconBorderColor: hex);
+    if (updated != null && mounted) {
+      ref.read(selectedServerProvider.notifier).state = updated;
+    }
   }
 
   Future<void> _uploadServerIcon(Map<String, dynamic>? server) async {
@@ -813,9 +1123,9 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                           margin: const EdgeInsets.only(top: 4),
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: c.withOpacity(0.15),
+                            color: c.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(99),
-                            border: Border.all(color: c.withOpacity(0.4)),
+                            border: Border.all(color: c.withValues(alpha: 0.4)),
                           ),
                           child: Text(r['name'], style: TextStyle(color: c, fontSize: 10)),
                         );

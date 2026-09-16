@@ -20,6 +20,17 @@ if (hasReleaseKeystore) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+// Google Services (Firebase/FCM), same "optional until the real config
+// exists" pattern as the keystore above -- applied only once
+// google-services.json is actually placed here (see
+// PUSH_NOTIFICATIONS.md), so CI and any local build before Firebase is
+// set up keep working. Without it, mobile push is just disabled for
+// this build rather than failing it outright.
+val hasGoogleServicesConfig = file("google-services.json").exists()
+if (hasGoogleServicesConfig) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 android {
     namespace = "com.gryphonheart.koda"
     compileSdk = flutter.compileSdkVersion

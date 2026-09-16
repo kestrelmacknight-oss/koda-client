@@ -1,4 +1,4 @@
-// lib/features/settings/settings_screen.dart
+﻿// lib/features/settings/settings_screen.dart
 
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
@@ -8,12 +8,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/config.dart';
 import '../../core/api.dart';
+import '../../core/push_notifications.dart';
 import '../../core/socket.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
 import '../../core/uploader.dart';
 import '../../shared/widgets.dart';
 import 'content_filters_screen.dart';
+import 'devices_screen.dart';
 import 'totp_setup_screen.dart';
 import 'voice_video_settings_screen.dart';
 import '../auth/auth_screen.dart';
@@ -159,6 +161,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _signOut() async {
     KodaSocket.instance.disconnect();
+    // Before the token is cleared below -- unregistering needs auth.
+    await PushNotifications.instance.unregister();
     await KodaApi.instance.logout();
     ref.read(authProvider.notifier).clear();
     if (mounted) {
@@ -207,7 +211,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           fontSize: 13,
                           color: selected ? KodaColors.text1 : KodaColors.text3)),
                       selected: selected,
-                      selectedTileColor: KodaColors.koda.withOpacity(0.12),
+                      selectedTileColor: KodaColors.koda.withValues(alpha: 0.12),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8)),
                       onTap: () => setState(() {
@@ -252,6 +256,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               'Add an authenticator app for extra security',
               () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const TotpSetupScreen()))),
+          _tile(Icons.devices_outlined, 'Linked Devices',
+              'See and remove devices signed into this account',
+              () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const DevicesScreen()))),
           // Child accounts have labeled channels hard-blocked server-side
           // and don't get a personal filter preference to configure --
           // see content_filters_screen.dart's doc comment.
@@ -271,7 +279,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   style: TextStyle(color: KodaColors.text1, fontSize: 13)),
               subtitle: const Text('Non-friends cannot start a new conversation with you',
                   style: TextStyle(color: KodaColors.text3, fontSize: 11)),
-              activeColor: KodaColors.koda,
+              activeThumbColor: KodaColors.koda,
               value: friendsOnlyDms,
               onChanged: (v) async {
                 ref.read(authProvider.notifier).setFriendsOnlyDms(v);
@@ -386,9 +394,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                      color: KodaColors.gold.withOpacity(0.15),
+                      color: KodaColors.gold.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(99),
-                      border: Border.all(color: KodaColors.gold.withOpacity(0.3))),
+                      border: Border.all(color: KodaColors.gold.withValues(alpha: 0.3))),
                   child: const Text('Alpha v0.34',
                       style: TextStyle(color: KodaColors.gold, fontSize: 10)),
                 ),
@@ -396,7 +404,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                      color: (_statusColors[_status] ?? KodaColors.mint).withOpacity(0.15),
+                      color: (_statusColors[_status] ?? KodaColors.mint).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(99)),
                   child: Text(_statusLabels[_status] ?? 'Online',
                       style: TextStyle(

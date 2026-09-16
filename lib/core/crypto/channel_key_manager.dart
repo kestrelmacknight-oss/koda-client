@@ -67,7 +67,6 @@ class ChannelKeyManager {
       try {
         final plaintext = await DmSessionManager.instance.decryptReceived(
           conversationId: _channelKeySessionId(myUserId, senderId),
-          senderUserId: senderId,
           message: d,
         );
         final payload = jsonDecode(plaintext) as Map<String, dynamic>;
@@ -141,7 +140,7 @@ class ChannelKeyManager {
     for (final recipientId in pending) {
       if (recipientId == myUserId) continue; // I already have it, nothing to deliver to myself
       try {
-        final envelope = await DmSessionManager.instance.encryptForSend(
+        final envelope = await DmSessionManager.instance.encryptForSendSingleSession(
           conversationId: _channelKeySessionId(myUserId, recipientId),
           peerUserId: recipientId,
           plaintext: payload,

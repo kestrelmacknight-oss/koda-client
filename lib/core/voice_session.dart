@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:livekit_client/livekit_client.dart' as lk;
 import 'providers.dart';
+import 'voice_activity_controller.dart';
 
 class VoiceSession {
   final lk.Room room;
@@ -61,15 +62,23 @@ class VoiceSession {
 
 lk.AudioCaptureOptions audioCaptureOptionsFor(VoiceSettings settings) =>
     lk.AudioCaptureOptions(
-      deviceId:         settings.audioInputId,
-      noiseSuppression: settings.noiseSuppression,
-      echoCancellation: settings.echoCancellation,
-      autoGainControl:  settings.autoGainControl,
+      deviceId:            settings.audioInputId,
+      noiseSuppression:    settings.noiseSuppression,
+      echoCancellation:    settings.echoCancellation,
+      autoGainControl:     settings.autoGainControl,
+      highPassFilter:      settings.highPassFilter,
+      typingNoiseDetection: settings.typingNoiseDetection,
+      voiceIsolation:      settings.voiceIsolation,
+      // VOX/push-to-talk gate the published track's mute state directly
+      // (see VoiceActivityController) rather than stopping capture on
+      // every toggle -- that would be slow/glitchy at VOX's cadence.
+      stopAudioCaptureOnMute: false,
     );
 
 class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
   VoiceSessionNotifier(this._ref) : super(null);
   final Ref _ref;
+  final VoiceActivityController _voiceActivity = VoiceActivityController();
 
   Future<bool> join({
     required String url,
@@ -93,8 +102,15 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
         url:         url,
       );
 
-
-
+      // Runs for the whole life of the session -- including while
+      // collapsed to the VoiceBar, not just while VoiceScreen's full
+      // grid view is open, since that's exactly when VOX/PTT matter
+      // most (you're doing something else, not looking at the call).
+      _voiceActivity.start(
+        room: room,
+        settingsOf: () => _ref.read(voiceSettingsProvider),
+        isManuallyMuted: () => state?.muted ?? false,
+      );
 
       return true;
     } catch (e) {
@@ -108,6 +124,7 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
   Future<void> leave() async {
     final s = state;
     if (s == null) return;
+    _voiceActivity.stop();
     state = null;
     await s.localVideoTrack?.stop();
     try { await s.room.disconnect(); } catch (_) {}

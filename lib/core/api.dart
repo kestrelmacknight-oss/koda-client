@@ -610,11 +610,47 @@ class KodaApi {
     } catch (e) { _log('uploadKeyBundle', e); return false; }
   }
 
-  Future<Map<String, dynamic>?> fetchKeyBundle(String userId) async {
+  /// One specific device's bundle -- side-effecting (consumes one of
+  /// that device's one-time prekeys), so only call this for a device
+  /// you don't already hold a Double Ratchet session with (see
+  /// getDeviceIdsFor, the non-side-effecting way to find out which
+  /// device_ids exist before deciding which ones are actually new).
+  Future<Map<String, dynamic>?> fetchKeyBundle(String userId, String deviceId) async {
     try {
-      final res = await _dio.get('/keys/bundle/$userId');
+      final res = await _dio.get('/keys/bundle/$userId', queryParameters: {'device_id': deviceId});
       return res.data['bundle'] as Map<String, dynamic>?;
     } catch (e) { _log('fetchKeyBundle', e); return null; }
+  }
+
+  // ── Multi-device registry ─────────────────────────────────────────────────
+
+  /// This account's own devices (name, last active) -- for the "Linked
+  /// Devices" settings screen and, filtered to exclude this install's
+  /// own id, the self-sync fan-out target list.
+  Future<List<Map<String, dynamic>>> getMyDevices() async {
+    try {
+      final res = await _dio.get('/devices/mine');
+      return List<Map<String, dynamic>>.from(res.data['devices'] ?? []);
+    } catch (e) { _log('getMyDevices', e); return []; }
+  }
+
+  /// Just the device_ids [userId] currently has -- not side-effecting,
+  /// unlike fetchKeyBundle. Fan-out encryption calls this first (for
+  /// both the recipient and, separately, the sender's own account) to
+  /// figure out which device_ids are worth an X3DH handshake for.
+  Future<List<String>> getDeviceIdsFor(String userId) async {
+    try {
+      final res = await _dio.get('/devices/user/$userId');
+      final devices = List<Map<String, dynamic>>.from(res.data['devices'] ?? []);
+      return devices.map((d) => d['device_id'] as String).toList();
+    } catch (e) { _log('getDeviceIdsFor', e); return []; }
+  }
+
+  Future<bool> removeDevice(String deviceId) async {
+    try {
+      await _dio.delete('/devices/$deviceId');
+      return true;
+    } catch (e) { _log('removeDevice', e); return false; }
   }
 
   // ── Channel group encryption ────────────────────────────────────────────
@@ -797,33 +833,31 @@ class KodaApi {
     } catch (e) { _log('openDmConversation', e); return null; }
   }
 
-  Future<List<Map<String, dynamic>>> getDmMessages(String conversationId) async {
+  /// [myDeviceId] scopes the result to deliveries addressed to this
+  /// device plus every legacy (pre-multi-device) row -- see
+  /// Koda.Chat.get_dm_messages/3 server-side.
+  Future<List<Map<String, dynamic>>> getDmMessages(String conversationId, String myDeviceId) async {
     try {
-      final res = await _dio.get('/dms/$conversationId/messages');
+      final res = await _dio.get('/dms/$conversationId/messages',
+          queryParameters: {'device_id': myDeviceId});
       return List<Map<String, dynamic>>.from(res.data['messages'] ?? []);
     } catch (e) { _log('getDmMessages', e); return []; }
   }
 
-  Future<Map<String, dynamic>?> sendDmMessage(
-      String conversationId, String content, {
-        bool encrypted = false,
-        String? ratchetKey,
-        int? msgNumber,
-        int? prevChain,
-        String? nonce,
-        Map<String, dynamic>? x3dhHeader,
-      }) async {
+  /// Fan-out send: [deliveries] is one map per target device (see
+  /// dm_session_manager.dart's encryptForSend), each already fully
+  /// shaped for the wire -- content/ratchet_key/msg_number/prev_chain/
+  /// nonce/sender_device_id/recipient_device_id, plus x3dh_header on a
+  /// session-establishing delivery. Returns the shared
+  /// message_group_id on success.
+  Future<String?> sendDmMessage(
+      String conversationId, String messageGroupId, List<Map<String, dynamic>> deliveries) async {
     try {
       final res = await _dio.post('/dms/$conversationId/messages', data: {
-        'content': content,
-        'encrypted': encrypted,
-        if (ratchetKey != null) 'ratchet_key': ratchetKey,
-        if (msgNumber != null) 'msg_number': msgNumber,
-        if (prevChain != null) 'prev_chain': prevChain,
-        if (nonce != null) 'nonce': nonce,
-        if (x3dhHeader != null) 'x3dh_header': x3dhHeader,
+        'message_group_id': messageGroupId,
+        'deliveries': deliveries,
       });
-      return res.data['message'] as Map<String, dynamic>;
+      return res.data['message_group_id'] as String?;
     } catch (e) { _log('sendDmMessage', e); return null; }
   }
 
@@ -1259,6 +1293,31 @@ class KodaApi {
     } catch (e) { _log('markAllNotificationsRead', e); return false; }
   }
 
+  // -- Mobile push device registration (see lib/core/push_notifications.dart) --
+
+  /// [deviceId] ties this push token to a Koda.Devices row (see
+  /// SecureStorage.getOrCreateDeviceId) so removing a device from the
+  /// "Linked Devices" settings screen also stops push to it in the same
+  /// action -- optional (server column is nullable) so this still works
+  /// before that concept exists on a given call site.
+  Future<bool> registerPushToken(String token, String platform, {String? deviceId}) async {
+    try {
+      await _dio.post('/push_tokens', data: {
+        'token': token,
+        'platform': platform,
+        if (deviceId != null) 'device_id': deviceId,
+      });
+      return true;
+    } catch (e) { _log('registerPushToken', e); return false; }
+  }
+
+  Future<bool> unregisterPushToken(String token) async {
+    try {
+      await _dio.delete('/push_tokens', data: {'token': token});
+      return true;
+    } catch (e) { _log('unregisterPushToken', e); return false; }
+  }
+
   // -- Threads ------------------------------------------------------------------
 
   Future<Map<String, dynamic>?> createThread({
@@ -1514,6 +1573,57 @@ class KodaApi {
       final err = e.response?.data is Map ? e.response?.data['error'] as String? : null;
       return err ?? 'Could not boost this server.';
     } catch (e) { _log('boostServer', e); return 'Could not boost this server.'; }
+  }
+
+  // -- Custom server emoji (boost-level-gated slots, see Koda.Emoji) -----------
+
+  Future<List<Map<String, dynamic>>> getServerEmoji(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/emoji');
+      return List<Map<String, dynamic>>.from(res.data['emoji'] ?? []);
+    } catch (e) { _log('getServerEmoji', e); return []; }
+  }
+
+  /// Returns the error message ("Name must be 2-32 letters...", "out of
+  /// custom emoji slots...") on failure so the UI can show it directly,
+  /// or null on success.
+  Future<String?> createServerEmoji(String serverId, String name, String imageUrl) async {
+    try {
+      await _dio.post('/servers/$serverId/emoji',
+          data: {'name': name, 'image_url': imageUrl});
+      return null;
+    } on DioException catch (e) {
+      final err = e.response?.data is Map ? e.response?.data['error'] as String? : null;
+      return err ?? 'Could not add this emoji.';
+    } catch (e) { _log('createServerEmoji', e); return 'Could not add this emoji.'; }
+  }
+
+  Future<bool> deleteServerEmoji(String serverId, String emojiId) async {
+    try {
+      await _dio.delete('/servers/$serverId/emoji/$emojiId');
+      return true;
+    } catch (e) { _log('deleteServerEmoji', e); return false; }
+  }
+
+  // -- Boost-level-gated server cosmetics (Koda.Servers.update_cosmetics/3) ----
+
+  /// [backgroundUrl]/[iconBorderColor] are only sent if non-null, and
+  /// the server silently drops whichever key the server's current boost
+  /// level hasn't unlocked -- callers should still gate the UI on
+  /// getServerBoostStatus's cosmetics_unlocked/icon_border_unlocked so
+  /// there's no dead control to tap in the first place.
+  Future<Map<String, dynamic>?> updateServerCosmetics(
+    String serverId, {
+    String? backgroundUrl,
+    String? iconBorderColor,
+  }) async {
+    try {
+      final res = await _dio.patch('/servers/$serverId/cosmetics', data: {
+        if (backgroundUrl != null) 'background_url': backgroundUrl,
+        if (iconBorderColor != null) 'icon_border_color': iconBorderColor,
+      });
+      return res.data['server'] as Map<String, dynamic>?;
+    } catch (e) { _log('updateServerCosmetics', e); return null; }
   }
 
   // -- Server subscriptions ----------------------------------------------------

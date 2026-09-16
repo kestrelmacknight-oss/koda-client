@@ -22,9 +22,23 @@ const _storage = FlutterSecureStorage(
 
 const _keyMaterialKey = 'kcp_key_material_v1';
 const _tokenKey = 'koda_jwt_v1';
+const _deviceIdKey = 'kcp_device_id';
 
-String _ratchetKey(String conversationId) => 'kcp_ratchet_$conversationId';
-String _pinnedIdentityKey(String userId) => 'kcp_pinned_identity_$userId';
+/// [peerDeviceId] null selects the original (pre-multi-device) storage
+/// key -- used only for legacy conversations that predate per-device
+/// ratchet sessions (see dm_session_manager.dart's decryptReceived).
+/// Every new session is keyed by device.
+String _ratchetKey(String conversationId, [String? peerDeviceId]) =>
+    peerDeviceId == null ? 'kcp_ratchet_$conversationId' : 'kcp_ratchet_${conversationId}_$peerDeviceId';
+/// Each of a peer's devices has its own independent identity keypair
+/// (see SecureStorage.getOrCreateDeviceId's doc on why), so TOFU pinning
+/// -- and the safety number computed from a pinned identity -- is now
+/// per (peer user, peer device), not per peer user alone. [deviceId]
+/// null selects the original pre-multi-device key, used only to keep
+/// legacy (pre-migration) pins meaningful for their existing single
+/// session -- see dm_session_manager.dart.
+String _pinnedIdentityKey(String userId, [String? deviceId]) =>
+    deviceId == null ? 'kcp_pinned_identity_$userId' : 'kcp_pinned_identity_${userId}_$deviceId';
 String _channelEpochKey(String channelId, int epoch) => 'kcp_chan_epoch_${channelId}_$epoch';
 String _channelEpochsIndexKey(String channelId) => 'kcp_chan_epochs_$channelId';
 
@@ -72,19 +86,56 @@ class SecureStorage {
     ));
   }
 
-  // ── Per-conversation Double Ratchet state ───────────────────────────────
+  // ── Device identity (multi-device E2EE, see Koda.Devices server-side) ──
 
-  static Future<void> saveRatchetState(String conversationId, RatchetState state) =>
-      _storage.write(key: _ratchetKey(conversationId), value: jsonEncode(state.toJson()));
+  /// A random id generated once per install and never regenerated --
+  /// each device has its own independent X3DH identity keypair (no
+  /// device-linking ceremony exists to transfer one securely between
+  /// devices, so each has to generate its own; see PUSH_NOTIFICATIONS.md-
+  /// style docs on why that's an accepted trade-off, not an oversight).
+  ///
+  /// An *existing* single-device install (one that already has local
+  /// key material the first time this runs on the multi-device-aware
+  /// client) deliberately adopts the fixed id "legacy" instead of a
+  /// fresh random one -- matching the server-side migration's backfill
+  /// default for pre-existing key_bundles rows (see
+  /// 20260919000002_add_device_id_to_key_bundles.exs) -- so this
+  /// device's next bundle upload updates that same row instead of
+  /// orphaning it under a brand-new device id. Only a genuinely fresh
+  /// install (no local key material yet) gets a random one.
+  static Future<String> getOrCreateDeviceId() async {
+    final existing = await _storage.read(key: _deviceIdKey);
+    if (existing != null) return existing;
 
-  static Future<RatchetState?> loadRatchetState(String conversationId) async {
-    final raw = await _storage.read(key: _ratchetKey(conversationId));
+    final hasExistingMaterial = await loadKeyMaterial() != null;
+    // Hex, not base64 -- this id is embedded directly in a URL path
+    // segment (DELETE /devices/:device_id) server-side, so it needs to
+    // be unambiguously URL-safe with zero encoding questions, not just
+    // "safe enough" after stripping a couple of characters.
+    final id = hasExistingMaterial ? 'legacy' : _toHex(randomBytes(16));
+    await _storage.write(key: _deviceIdKey, value: id);
+    return id;
+  }
+
+  // ── Per-conversation, per-peer-device Double Ratchet state ──────────────
+  // peerDeviceId identifies which of the *other* participant's devices
+  // this session is with -- a conversation now holds N independent
+  // ratchet sessions, one per fan-out target (every device of the peer,
+  // plus every one of this account's own *other* devices, for
+  // self-sync). null selects the original single-session storage key,
+  // used only to decrypt legacy history (see dm_session_manager.dart).
+
+  static Future<void> saveRatchetState(String conversationId, RatchetState state, [String? peerDeviceId]) =>
+      _storage.write(key: _ratchetKey(conversationId, peerDeviceId), value: jsonEncode(state.toJson()));
+
+  static Future<RatchetState?> loadRatchetState(String conversationId, [String? peerDeviceId]) async {
+    final raw = await _storage.read(key: _ratchetKey(conversationId, peerDeviceId));
     if (raw == null) return null;
     return RatchetState.fromJson(jsonDecode(raw) as Map<String, dynamic>);
   }
 
-  static Future<void> deleteRatchetState(String conversationId) =>
-      _storage.delete(key: _ratchetKey(conversationId));
+  static Future<void> deleteRatchetState(String conversationId, [String? peerDeviceId]) =>
+      _storage.delete(key: _ratchetKey(conversationId, peerDeviceId));
 
   // ── Channel epoch keys ───────────────────────────────────────────────────
   // See lib/core/crypto/channel_epoch.dart and channel_key_manager.dart.
@@ -154,11 +205,11 @@ class SecureStorage {
 
   // ── TOFU-pinned peer identities ─────────────────────────────────────────
 
-  static Future<void> savePinnedIdentity(String userId, PinnedIdentity identity) =>
-      _storage.write(key: _pinnedIdentityKey(userId), value: jsonEncode(identity.toJson()));
+  static Future<void> savePinnedIdentity(String userId, PinnedIdentity identity, [String? deviceId]) =>
+      _storage.write(key: _pinnedIdentityKey(userId, deviceId), value: jsonEncode(identity.toJson()));
 
-  static Future<PinnedIdentity?> loadPinnedIdentity(String userId) async {
-    final raw = await _storage.read(key: _pinnedIdentityKey(userId));
+  static Future<PinnedIdentity?> loadPinnedIdentity(String userId, [String? deviceId]) async {
+    final raw = await _storage.read(key: _pinnedIdentityKey(userId, deviceId));
     if (raw == null) return null;
     return PinnedIdentity.fromJson(jsonDecode(raw) as Map<String, dynamic>);
   }
@@ -224,4 +275,7 @@ class SecureStorage {
           previousExpiresRaw != null ? DateTime.parse(previousExpiresRaw) : null,
     );
   }
+
+  static String _toHex(Uint8List bytes) =>
+      bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
 }

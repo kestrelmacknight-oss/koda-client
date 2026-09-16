@@ -1,4 +1,4 @@
-// lib/features/settings/voice_video_settings_screen.dart
+﻿// lib/features/settings/voice_video_settings_screen.dart
 //
 // Voice & Video settings: noise/echo/gain processing toggles, voice
 // activity detection (VOX) with a sensitivity threshold, push-to-talk
@@ -126,6 +126,24 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                   value: settings.autoGainControl,
                   onChanged: (v) => _save(settings.copyWith(autoGainControl: v)),
                 ),
+                _toggleTile(
+                  title: 'High-Pass Filter',
+                  subtitle: 'Cut low-frequency rumble (fans, AC, desk bumps)',
+                  value: settings.highPassFilter,
+                  onChanged: (v) => _save(settings.copyWith(highPassFilter: v)),
+                ),
+                _toggleTile(
+                  title: 'Typing Noise Detection',
+                  subtitle: 'Suppress keyboard clatter picked up by your mic',
+                  value: settings.typingNoiseDetection,
+                  onChanged: (v) => _save(settings.copyWith(typingNoiseDetection: v)),
+                ),
+                _toggleTile(
+                  title: 'Voice Isolation',
+                  subtitle: "Focus on your voice, filtering out other people and sounds nearby",
+                  value: settings.voiceIsolation,
+                  onChanged: (v) => _save(settings.copyWith(voiceIsolation: v)),
+                ),
 
                 const SizedBox(height: 24),
                 _sectionLabel('Voice Activity Detection (VOX)'),
@@ -196,39 +214,6 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                   'This takes priority over VOX while you\'re in a voice channel.',
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
                 ),
-                const SizedBox(height: 24),
-                _sectionLabel('Audio Processing'),
-                _toggleTile(
-                  title: 'Loudness Normalization',
-                  subtitle: 'Normalize mic input to a consistent volume level',
-                  value: settings.loudnessNormalization,
-                  onChanged: (v) => _save(settings.copyWith(loudnessNormalization: v)),
-                ),
-                _toggleTile(
-                  title: 'Auto-Ducking',
-                  subtitle: 'Automatically lower your volume when others speak',
-                  value: settings.autoDucking,
-                  onChanged: (v) => _save(settings.copyWith(autoDucking: v)),
-                ),
-
-                const SizedBox(height: 24),
-                _sectionLabel('Equalizer'),
-                const Text('Adjust output audio tone',
-                    style: TextStyle(color: KodaColors.text3, fontSize: 11)),
-                const SizedBox(height: 8),
-                _eqSlider('Bass', settings.eqBass, -10, 10,
-                  (v) => ref.read(voiceSettingsProvider.notifier).update((s) => s.copyWith(eqBass: v)),
-                  (v) => _save(settings.copyWith(eqBass: v)),
-                ),
-                _eqSlider('Mid', settings.eqMid, -10, 10,
-                  (v) => ref.read(voiceSettingsProvider.notifier).update((s) => s.copyWith(eqMid: v)),
-                  (v) => _save(settings.copyWith(eqMid: v)),
-                ),
-                _eqSlider('Treble', settings.eqTreble, -10, 10,
-                  (v) => ref.read(voiceSettingsProvider.notifier).update((s) => s.copyWith(eqTreble: v)),
-                  (v) => _save(settings.copyWith(eqTreble: v)),
-                ),
-
                 const SizedBox(height: 24),
                 _sectionLabel('VARM - Virtual Avatar Reactive Model'),
                 const Text(
@@ -332,7 +317,7 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: KodaColors.accent.withOpacity(0.85),
+                      color: KodaColors.accent.withValues(alpha: 0.85),
                       borderRadius: BorderRadius.circular(4)),
                     child: const Icon(Icons.close, size: 12, color: Colors.white),
                   ),
@@ -368,40 +353,6 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                 color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
       );
 
-  Widget _eqSlider(String label, double value, double min, double max,
-      ValueChanged<double> onChanged, ValueChanged<double> onChangeEnd) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(children: [
-        SizedBox(
-          width: 48,
-          child: Text(label,
-              style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
-        ),
-        Expanded(
-          child: Slider(
-            value: value,
-            min: min,
-            max: max,
-            divisions: 20,
-            activeColor: KodaColors.koda,
-            inactiveColor: KodaColors.border,
-            onChanged: onChanged,
-            onChangeEnd: onChangeEnd,
-          ),
-        ),
-        SizedBox(
-          width: 36,
-          child: Text(
-            '${value.toStringAsFixed(0)}dB',
-            textAlign: TextAlign.right,
-            style: const TextStyle(color: KodaColors.text3, fontSize: 11),
-          ),
-        ),
-      ]),
-    );
-  }
-
   Widget _toggleTile({
     required String title,
     required String subtitle,
@@ -420,7 +371,7 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
           title: Text(title, style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
           subtitle: Text(subtitle, style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
           value: value,
-          activeColor: KodaColors.koda,
+          activeThumbColor: KodaColors.koda,
           onChanged: onChanged,
         ),
       );

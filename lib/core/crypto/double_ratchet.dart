@@ -131,7 +131,9 @@ class RatchetState {
       throw StateError('No sending chain yet -- responder must receive before it can reply.');
     }
     final mk = await hmacSha256(sendingChainKey!, [0x01]);
+    final oldSendingChainKey = sendingChainKey!;
     sendingChainKey = await hmacSha256(sendingChainKey!, [0x02]);
+    secureZero(oldSendingChainKey); // forward secrecy: never needed again once advanced
 
     final header = _currentSendHeader;
     ns += 1;
@@ -142,6 +144,7 @@ class RatchetState {
     final aad = Uint8List.fromList([...associatedData, ...header.bytesForAad()]);
     final payload =
         await aesGcmEncrypt(key: aesKey, nonce: nonce, plaintext: plaintext, aad: aad);
+    secureZero(mk); // single-use message key, discarded now that encryption is done
     return (header: header, nonce: nonce, payload: payload);
   }
 
@@ -154,7 +157,9 @@ class RatchetState {
     final skipped = skippedKeys[skippedId.storageKey];
     if (skipped != null) {
       skippedKeys.remove(skippedId.storageKey); // forward secrecy: use once, then discard
-      return _decryptWithMessageKey(skipped, header, nonce, payload);
+      final plaintext = await _decryptWithMessageKey(skipped, header, nonce, payload);
+      secureZero(skipped);
+      return plaintext;
     }
 
     if (dhRemote == null || !_bytesEqual(header.ratchetKey, dhRemote!)) {
@@ -167,10 +172,14 @@ class RatchetState {
       throw const DoubleRatchetDecryptFailure('No receiving chain established.');
     }
     final mk = await hmacSha256(receivingChainKey!, [0x01]);
+    final oldReceivingChainKey = receivingChainKey!;
     receivingChainKey = await hmacSha256(receivingChainKey!, [0x02]);
+    secureZero(oldReceivingChainKey);
     nr += 1;
 
-    return _decryptWithMessageKey(mk, header, nonce, payload);
+    final plaintext = await _decryptWithMessageKey(mk, header, nonce, payload);
+    secureZero(mk);
+    return plaintext;
   }
 
   Future<Uint8List> _decryptWithMessageKey(
@@ -197,7 +206,9 @@ class RatchetState {
     final dhRemoteB64 = bytesToB64(dhRemote!);
     while (nr < until) {
       final mk = await hmacSha256(receivingChainKey!, [0x01]);
+      final oldReceivingChainKey = receivingChainKey!;
       receivingChainKey = await hmacSha256(receivingChainKey!, [0x02]);
+      secureZero(oldReceivingChainKey); // superseded chain step, not the stored skipped key itself
       skippedKeys['$dhRemoteB64:$nr'] = mk;
       nr += 1;
     }
@@ -206,7 +217,8 @@ class RatchetState {
 
   void _evictOldSkippedKeysIfNeeded() {
     while (skippedKeys.length > maxStoredSkippedKeys) {
-      skippedKeys.remove(skippedKeys.keys.first);
+      final evicted = skippedKeys.remove(skippedKeys.keys.first);
+      if (evicted != null) secureZero(evicted);
     }
   }
 
@@ -216,18 +228,32 @@ class RatchetState {
     nr = 0;
     dhRemote = theirNewRatchetPublicKey;
 
+    final oldSendingChainKey = sendingChainKey;
+    final oldReceivingChainKey = receivingChainKey;
+
+    final rk0 = rootKey;
     final dhOut1 = await dh(dhSelf, dhRemote!);
     final derived1 = await hkdfSha256(
-        ikm: dhOut1, salt: rootKey, info: 'KodaDR-RootKey', outputLength: 64);
-    rootKey = derived1.sublist(0, 32);
+        ikm: dhOut1, salt: rk0, info: 'KodaDR-RootKey', outputLength: 64);
+    secureZero(dhOut1);
+    secureZero(rk0); // superseded the moment it's been used as this step's salt
+    final rk1 = derived1.sublist(0, 32);
+    rootKey = rk1;
     receivingChainKey = derived1.sublist(32, 64);
 
+    final oldDhSelf = dhSelf;
     dhSelf = await generateX25519KeyPair();
     final dhOut2 = await dh(dhSelf, dhRemote!);
+    secureZero(oldDhSelf.privateKeyBytes); // post-compromise security: old ratchet key is done
     final derived2 = await hkdfSha256(
-        ikm: dhOut2, salt: rootKey, info: 'KodaDR-RootKey', outputLength: 64);
+        ikm: dhOut2, salt: rk1, info: 'KodaDR-RootKey', outputLength: 64);
+    secureZero(dhOut2);
+    secureZero(rk1);
     rootKey = derived2.sublist(0, 32);
     sendingChainKey = derived2.sublist(32, 64);
+
+    if (oldSendingChainKey != null) secureZero(oldSendingChainKey);
+    if (oldReceivingChainKey != null) secureZero(oldReceivingChainKey);
   }
 
   Map<String, dynamic> toJson() => {

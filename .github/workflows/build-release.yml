@@ -151,6 +151,7 @@ jobs:
     # whether a secret is set.
     env:
       HAS_ANDROID_SECRETS: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+      HAS_PUSH_SECRETS: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 != '' }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Java
@@ -166,6 +167,14 @@ jobs:
           cache: true
       - name: Install dependencies
         run: flutter pub get
+      # Only present once GOOGLE_SERVICES_JSON_BASE64 is set (see
+      # PUSH_NOTIFICATIONS.md) -- without it the Google Services Gradle
+      # plugin is skipped entirely (see android/app/build.gradle.kts) and
+      # this build just ships without mobile push, same as any local
+      # build before Firebase is set up.
+      - name: Decode Firebase config (google-services.json)
+        if: ${{ env.HAS_PUSH_SECRETS == 'true' }}
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 -d > android/app/google-services.json
       # Only present once the four ANDROID_* secrets are set (see
       # android/KEYSTORE.md) -- without them this step is skipped and the
       # build below falls back to debug signing (fine for CI/testing,
@@ -201,6 +210,7 @@ jobs:
     # inside `if:`, so it's bridged through this job-level env var.
     env:
       HAS_IOS_SECRETS: ${{ secrets.IOS_DIST_CERT_BASE64 != '' }}
+      HAS_PUSH_SECRETS: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_BASE64 != '' }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Flutter
@@ -211,6 +221,14 @@ jobs:
           cache: true
       - name: Install dependencies
         run: flutter pub get
+      # Only present once GOOGLE_SERVICE_INFO_PLIST_BASE64 is set (see
+      # PUSH_NOTIFICATIONS.md) -- without it the app just builds without
+      # a Firebase config bundled in, same as any local build before
+      # Firebase is set up (push registration fails closed at runtime,
+      # see lib/core/push_notifications.dart).
+      - name: Decode Firebase config (GoogleService-Info.plist)
+        if: ${{ env.HAS_PUSH_SECRETS == 'true' }}
+        run: echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST_BASE64 }}" | base64 -d > ios/Runner/GoogleService-Info.plist
       - name: Install CocoaPods dependencies
         run: |
           cd ios

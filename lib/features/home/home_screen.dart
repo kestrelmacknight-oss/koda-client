@@ -1,4 +1,4 @@
-// lib/features/home/home_screen.dart
+﻿// lib/features/home/home_screen.dart
 
 import 'dart:async';
 import 'dart:io' show File;
@@ -15,6 +15,9 @@ import '../../core/providers.dart';
 import '../../core/uploader.dart';
 import '../../shared/widgets.dart';
 import '../../shared/channel_edit_dialog.dart';
+import '../../shared/toast.dart';
+import '../../shared/custom_emoji.dart';
+import '../../core/push_notifications.dart';
 import '../../shared/category_edit_dialog.dart';
 import '../settings/settings_screen.dart';
 import '../settings/content_filters_screen.dart';
@@ -75,6 +78,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _showMemberPanel = true;
   final Set<String> _expandedThreads = {};
   Map<String, int> _channelUnread = {};
+  // :name shortcode autocomplete matches for the currently-typed,
+  // not-yet-closed token (see _updateShortcodeMatches). Empty hides the
+  // suggestion row entirely.
+  List<Map<String, dynamic>> _shortcodeMatches = [];
   // Channels with an unread @mention or @role pending -- rendered as a
   // distinct (red, not violet) badge from plain unread, per
   // notifications carrying type "mention"/"role_mention" (see
@@ -90,6 +97,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _loadServers();
     _loadUnreadCounts();
     _loadContentFilters();
+    PushNotifications.instance.init();
   }
 
   // A standard account's personal hide/warn/show preferences (see
@@ -136,8 +144,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         final payload = msg.payload as Map<String, dynamic>?;
         if (payload != null) {
           ref.read(notificationsProvider.notifier).addNotification(payload);
-          // Show system tray notification (location only, no content)
-          _showTrayNotification(payload);
+
+          // Don't pop a toast/tray notification for something the user is
+          // already looking at right now -- a mention in the channel
+          // that's open, or a message in the DM conversation that's open.
+          // Other notification types (payments, etc.) have no "currently
+          // viewing" concept, so they're never suppressed.
+          if (!_isCurrentlyViewing(payload)) {
+            // Show system tray notification (location only, no content)
+            _showTrayNotification(payload);
+            // In-app toast -- title only (e.g. "Mentioned in #general" /
+            // "Alex sent you a message"), never the notification body, so
+            // it can never leak message content to anyone glancing at the
+            // screen.
+            _showNotificationToast(payload);
+          }
 
           // A mention/role-mention (as opposed to plain channel activity)
           // gets its own distinct badge in the sidebar -- see
@@ -176,6 +197,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: title,
     );
     notification.show();
+  }
+
+  bool _isCurrentlyViewing(Map<String, dynamic> notif) {
+    final type = notif['type'] as String?;
+    final data = notif['data'] as Map<String, dynamic>?;
+    switch (type) {
+      case 'mention':
+      case 'role_mention':
+        final channelId = data?['channel_id'] as String?;
+        return channelId != null && channelId == _activeChannelId;
+      case 'dm_message':
+        final conversationId = data?['conversation_id'] as String?;
+        return _showingDms &&
+            conversationId != null &&
+            conversationId == ref.read(activeConversationProvider);
+      default:
+        return false;
+    }
+  }
+
+  IconData _iconForNotificationType(String? type) {
+    switch (type) {
+      case 'mention':
+      case 'role_mention':
+        return Icons.alternate_email;
+      case 'dm_message':
+        return Icons.mail_outline;
+      default:
+        return Icons.notifications_none;
+    }
+  }
+
+  void _showNotificationToast(Map<String, dynamic> notif) {
+    final title = notif['title'] as String?;
+    if (title == null || title.isEmpty) return;
+    showKodaToast(context, title: title, icon: _iconForNotificationType(notif['type'] as String?));
   }
 
 
@@ -1202,9 +1259,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  Color _hexColor(String hex) {
+    try {
+      return Color(int.parse(hex.replaceFirst('#', '0xFF')));
+    } catch (_) {
+      return KodaColors.koda;
+    }
+  }
+
+  List<Map<String, dynamic>> _currentServerEmoji() {
+    final serverId = ref.read(selectedServerProvider)?['id'] as String?;
+    if (serverId == null) return const [];
+    return ref.watch(serverEmojiProvider(serverId)).value ?? const [];
+  }
+
   Widget _buildReactions(Map<String, dynamic> m) {
     final reactions = m['reactions'] as List? ?? [];
     final me = ref.read(authProvider).user;
+    final serverEmoji = _currentServerEmoji();
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: Wrap(
@@ -1231,7 +1303,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   border: Border.all(
                     color: reacted ? KodaColors.koda.withValues(alpha: 0.5) : KodaColors.border),
                 ),
-                child: Text('$emoji $count', style: const TextStyle(fontSize: 12)),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  EmojiGlyph(value: emoji, serverEmoji: serverEmoji, size: 14),
+                  const SizedBox(width: 4),
+                  Text('$count', style: const TextStyle(fontSize: 12)),
+                ]),
               ),
             );
           }),
@@ -1253,26 +1329,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _showReactionPicker(Map<String, dynamic> message) async {
+    final serverEmoji = _currentServerEmoji();
     final emoji = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
         title: const Text('Add Reaction',
             style: TextStyle(color: KodaColors.text1, fontSize: 14)),
-        content: Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: _kQuickReactions.map((e) => GestureDetector(
-            onTap: () => Navigator.pop(context, e),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: KodaColors.elevated,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(e, style: const TextStyle(fontSize: 24)),
-            ),
-          )).toList(),
+        content: SingleChildScrollView(
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              ..._kQuickReactions.map((e) => GestureDetector(
+                onTap: () => Navigator.pop(context, e),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: KodaColors.elevated,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(e, style: const TextStyle(fontSize: 24)),
+                ),
+              )),
+              ...serverEmoji.map((e) => GestureDetector(
+                onTap: () => Navigator.pop(context, '$kCustomEmojiPrefix${e['id']}'),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: KodaColors.elevated,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: EmojiGlyph(value: '$kCustomEmojiPrefix${e['id']}',
+                      serverEmoji: serverEmoji, size: 24),
+                ),
+              )),
+            ],
+          ),
         ),
       ),
     );
@@ -1282,6 +1375,52 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (updated != null && mounted) {
       setState(() => message['reactions'] = updated);
     }
+  }
+
+  /// Looks at the text immediately before the cursor for an open,
+  /// unterminated :name token (kOpenShortcodePattern) and updates
+  /// _shortcodeMatches to whatever custom emoji currently match it as a
+  /// prefix -- empty (hiding the suggestion row) once there's no such
+  /// token, the token's too short, or nothing matches.
+  void _updateShortcodeMatches(String text) {
+    final cursor = _messageController.selection.baseOffset;
+    if (cursor < 0) {
+      if (_shortcodeMatches.isNotEmpty) setState(() => _shortcodeMatches = []);
+      return;
+    }
+    final upToCursor = text.substring(0, cursor);
+    final open = kOpenShortcodePattern.firstMatch(upToCursor);
+    if (open == null) {
+      if (_shortcodeMatches.isNotEmpty) setState(() => _shortcodeMatches = []);
+      return;
+    }
+    final prefix = open.group(1)!.toLowerCase();
+    final matches = _currentServerEmoji()
+        .where((e) => (e['name'] as String).toLowerCase().startsWith(prefix))
+        .take(8)
+        .toList();
+    setState(() => _shortcodeMatches = matches);
+  }
+
+  /// Replaces the open :name token the suggestion row is currently
+  /// showing matches for with the full ":name: " (trailing space so the
+  /// cursor lands ready to keep typing), then re-focuses the input.
+  void _insertShortcode(Map<String, dynamic> emoji) {
+    final text = _messageController.text;
+    final cursor = _messageController.selection.baseOffset;
+    if (cursor < 0) return;
+    final upToCursor = text.substring(0, cursor);
+    final open = kOpenShortcodePattern.firstMatch(upToCursor);
+    if (open == null) return;
+
+    final name = emoji['name'] as String;
+    final newText = text.replaceRange(open.start, cursor, ':$name: ');
+    final newCursor = open.start + name.length + 3;
+    _messageController.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newCursor),
+    );
+    setState(() => _shortcodeMatches = []);
   }
 
   Widget _buildReplyPreview(Map<String, dynamic> replyTo) {
@@ -1545,7 +1684,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               )
             : null,
         selected: selected,
-        selectedTileColor: KodaColors.koda.withOpacity(0.1),
+        selectedTileColor: KodaColors.koda.withValues(alpha: 0.1),
         onTap: () => _openChannel(c),
       ),
     );
@@ -1556,6 +1695,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }
     return tile;
+  }
+
+  /// Boost-level-4 perk (Koda.Boosts.cosmetics_unlocked?/1) -- a custom
+  /// image behind the channel content for everyone currently viewing
+  /// this server, replacing the flat KodaColors.voidBg there. A dark
+  /// scrim keeps message text readable regardless of the image.
+  Widget _buildBackgroundedContent(
+      Map<String, dynamic>? server, Map<String, dynamic>? selectedChannel) {
+    final backgroundUrl = (server?['cosmetics'] as Map?)?['background_url'] as String?;
+    final content = _buildContentArea(selectedChannel);
+    if (backgroundUrl == null || backgroundUrl.isEmpty) return content;
+
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: NetworkImage(backgroundUrl),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+              Colors.black.withValues(alpha: 0.55), BlendMode.darken),
+        ),
+      ),
+      child: content,
+    );
   }
 
   Widget _buildContentArea(Map<String, dynamic>? selectedChannel) {
@@ -1765,9 +1927,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           style: TextStyle(color: KodaColors.accent,
                               fontSize: 13, fontStyle: FontStyle.italic))
                     else if ((m['content'] as String? ?? '').isNotEmpty)
-                      Text(m['content'] as String,
-                          style: const TextStyle(
-                              color: KodaColors.text1, fontSize: 14)),
+                      Text.rich(TextSpan(children: renderMessageWithEmoji(
+                          m['content'] as String, _currentServerEmoji(),
+                          const TextStyle(color: KodaColors.text1, fontSize: 14)))),
                     if (m['attachment_url'] != null) ...[
                       const SizedBox(height: 4),
                       _buildAttachment(m),
@@ -1827,6 +1989,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ]),
         ),
+      if (_shortcodeMatches.isNotEmpty)
+        Container(
+          height: 40,
+          color: KodaColors.elevated,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: _shortcodeMatches.map((e) => GestureDetector(
+              onTap: () => _insertShortcode(e),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                  color: KodaColors.card,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: KodaColors.border),
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  EmojiGlyph(value: '$kCustomEmojiPrefix${e['id']}',
+                      serverEmoji: _shortcodeMatches, size: 18),
+                  const SizedBox(width: 6),
+                  Text(':${e['name']}:',
+                      style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+                ]),
+              ),
+            )).toList(),
+          ),
+        ),
       Padding(
         padding: const EdgeInsets.all(14),
         child: Row(children: [
@@ -1847,14 +2037,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: KodaTextField(
               controller: _messageController,
               hintText: 'Message #${selectedChannel['name']}',
-              onChanged: (_) {
+              onChanged: (text) {
                 final channel = ref.read(selectedChannelProvider);
-                if (channel == null) return;
-                KodaSocket.instance.push(
-                  'channel:${channel['id']}',
-                  'typing',
-                  {'typing': true},
-                );
+                if (channel != null) {
+                  KodaSocket.instance.push(
+                    'channel:${channel['id']}',
+                    'typing',
+                    {'typing': true},
+                  );
+                }
+                _updateShortcodeMatches(text);
               },
               onSubmitted: (_) => _sendMessage(),
 
@@ -2086,6 +2278,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       children: _servers.map((s) {
                         final selected =
                             !_showingDms && selectedServer?['id'] == s['id'];
+                        // Boost-level-5 perk (Koda.Boosts.icon_border_unlocked?/1)
+                        // -- visible in every member's own rail, not just
+                        // while that server is open, same as Discord's
+                        // boosted-server ring.
+                        final borderHex =
+                            (s['cosmetics'] as Map?)?['icon_border_color'] as String?;
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 6),
                           child: GestureDetector(
@@ -2101,6 +2299,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     : KodaColors.elevated,
                                 borderRadius:
                                     BorderRadius.circular(selected ? 14 : 24),
+                                border: borderHex != null
+                                    ? Border.all(color: _hexColor(borderHex), width: 2)
+                                    : null,
                               ),
                               alignment: Alignment.center,
                               child: s['icon_url'] != null && (s['icon_url'] as String).isNotEmpty
@@ -2196,7 +2397,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           color: _showingMarketplace ? KodaColors.text1 : KodaColors.text3,
                           fontWeight: _showingMarketplace ? FontWeight.w600 : FontWeight.w400)),
                   selected: _showingMarketplace,
-                  selectedTileColor: KodaColors.koda.withOpacity(0.1),
+                  selectedTileColor: KodaColors.koda.withValues(alpha: 0.1),
                   onTap: () => setState(() {
                     _showingMarketplace = true;
                     ref.read(selectedChannelProvider.notifier).state = null;
@@ -2251,7 +2452,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           // Content area + optional member panel
           Expanded(child: Row(children: [
             Expanded(child: Column(children: [
-              Expanded(child: _buildContentArea(selectedChannel)),
+              Expanded(child: _buildBackgroundedContent(selectedServer, selectedChannel)),
               const VoiceBar(),
             ])),
             if (_showMemberPanel && selectedServer != null)
