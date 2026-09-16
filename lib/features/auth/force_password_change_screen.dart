@@ -1,4 +1,4 @@
-// lib/features/auth/force_password_change_screen.dart
+﻿// lib/features/auth/force_password_change_screen.dart
 //
 // Shown when the server returns must_change_password: true on login
 // (this is exactly how the Kestrel_MacKnight admin account, and any
@@ -75,9 +75,9 @@ class _ForcePasswordChangeScreenState
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: KodaColors.gold.withOpacity(0.1),
+                  color: KodaColors.gold.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: KodaColors.gold.withOpacity(0.3)),
+                  border: Border.all(color: KodaColors.gold.withValues(alpha: 0.3)),
                 ),
                 child: Column(children: [
                   const Icon(Icons.lock_reset, color: KodaColors.gold, size: 40),

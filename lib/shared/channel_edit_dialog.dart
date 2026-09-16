@@ -45,7 +45,7 @@ Future<void> showChannelEditDialog(
               KodaTextField(controller: nameController, hintText: 'Channel name'),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: type,
+                initialValue: type,
                 dropdownColor: KodaColors.card,
                 decoration: const InputDecoration(labelText: 'Type'),
                 items: const [
@@ -75,7 +75,7 @@ Future<void> showChannelEditDialog(
               ],
               const SizedBox(height: 12),
               DropdownButtonFormField<String?>(
-                value: selectedCategoryId,
+                initialValue: selectedCategoryId,
                 dropdownColor: KodaColors.card,
                 decoration: const InputDecoration(labelText: 'Category'),
                 items: [

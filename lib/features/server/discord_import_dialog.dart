@@ -1,4 +1,4 @@
-// lib/features/server/discord_import_dialog.dart
+﻿// lib/features/server/discord_import_dialog.dart
 
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
@@ -152,9 +152,9 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: KodaColors.accent.withOpacity(0.1),
+                    color: KodaColors.accent.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: KodaColors.accent.withOpacity(0.3)),
+                    border: Border.all(color: KodaColors.accent.withValues(alpha: 0.3)),
                   ),
                   child: Text(_error!,
                       style: const TextStyle(color: KodaColors.accent, fontSize: 12)),
@@ -192,12 +192,12 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: _replace
-                        ? KodaColors.accent.withOpacity(0.12)
+                        ? KodaColors.accent.withValues(alpha: 0.12)
                         : KodaColors.elevated,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: _replace
-                          ? KodaColors.accent.withOpacity(0.5)
+                          ? KodaColors.accent.withValues(alpha: 0.5)
                           : KodaColors.border,
                       width: _replace ? 1.5 : 1,
                     ),
@@ -221,7 +221,7 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                               : 'Template will be added to your existing server structure.',
                           style: TextStyle(
                             color: _replace
-                                ? KodaColors.accent.withOpacity(0.8)
+                                ? KodaColors.accent.withValues(alpha: 0.8)
                                 : KodaColors.text3,
                             fontSize: 11,
                           ),
@@ -230,7 +230,7 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                     ),
                     Switch(
                       value: _replace,
-                      activeColor: KodaColors.accent,
+                      activeThumbColor: KodaColors.accent,
                       onChanged: (v) async {
                         if (v) {
                           final confirmed = await showDialog<bool>(

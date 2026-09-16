@@ -301,7 +301,7 @@ class _ChildScheduleTabState extends State<_ChildScheduleTab> {
                 style: TextStyle(color: KodaColors.text1, fontSize: 13)),
             subtitle: const Text('Off means unrestricted access at any time',
                 style: TextStyle(color: KodaColors.text3, fontSize: 11)),
-            activeColor: KodaColors.koda,
+            activeThumbColor: KodaColors.koda,
             value: _restricted,
             onChanged: (v) => setState(() => _restricted = v),
           ),

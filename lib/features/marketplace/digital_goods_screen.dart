@@ -1,4 +1,4 @@
-// lib/features/marketplace/digital_goods_screen.dart
+﻿// lib/features/marketplace/digital_goods_screen.dart
 //
 // Digital products listing — browse, purchase, download.
 // Creator view: create/manage products, upload license keys.
@@ -201,7 +201,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: KodaColors.koda.withOpacity(0.1),
+                color: KodaColors.koda.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -246,7 +246,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: KodaColors.koda.withOpacity(0.15),
+                    color: KodaColors.koda.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: const Text('Free for you',

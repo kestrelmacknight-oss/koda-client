@@ -54,12 +54,13 @@ class _PopOutVideoWindowState extends State<PopOutVideoWindow> {
     debugPrint('[PopOut] Connecting to: $url');
     debugPrint('[PopOut] Token length: ${token.length}');
     try {
-      final room = lk.Room();
-      await room.connect(url, token,
-          roomOptions: const lk.RoomOptions(
-            adaptiveStream: true,
-            dynacast: true,
-          )).timeout(const Duration(seconds: 15), onTimeout: () {
+      final room = lk.Room(
+        roomOptions: const lk.RoomOptions(
+          adaptiveStream: true,
+          dynacast: true,
+        ),
+      );
+      await room.connect(url, token).timeout(const Duration(seconds: 15), onTimeout: () {
         throw Exception('Connection timed out after 15 seconds');
       });
 

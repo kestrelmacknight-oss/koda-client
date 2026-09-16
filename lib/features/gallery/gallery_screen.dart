@@ -1,4 +1,4 @@
-// lib/features/gallery/gallery_screen.dart
+﻿// lib/features/gallery/gallery_screen.dart
 //
 // Gallery channel view: two modes selectable via a tab bar at the top.
 //   Feed    -- all posts in the channel, newest first, image grid
@@ -84,7 +84,6 @@ Future<void> _showCreatePost({String? collectionId}) async {
     String mediaType  = 'image';
     String? pickedFilePath;
     String? pickedFileName;
-    bool uploading = false;
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -132,7 +131,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
               ),
               const SizedBox(height: 10),
               DropdownButtonFormField<String>(
-                value: mediaType,
+                initialValue: mediaType,
                 dropdownColor: KodaColors.card,
                 decoration: const InputDecoration(labelText: 'Type'),
                 items: const [
@@ -146,24 +145,15 @@ Future<void> _showCreatePost({String? collectionId}) async {
                 controller: captionCtrl,
                 hintText: 'Caption (optional)',
               ),
-              if (uploading) ...[
-                const SizedBox(height: 12),
-                const Row(children: [
-                  SizedBox(width: 16, height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda)),
-                  SizedBox(width: 8),
-                  Text('Uploading...', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
-                ]),
-              ],
             ]),
           ),
           actions: [
             TextButton(
-              onPressed: uploading ? null : () => Navigator.pop(ctx, false),
+              onPressed: () => Navigator.pop(ctx, false),
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: uploading ? null : () => Navigator.pop(ctx, true),
+              onPressed: () => Navigator.pop(ctx, true),
               child: const Text('Post'),
             ),
           ],
@@ -416,7 +406,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
                       return ListTile(
                         dense: true,
                         selected: active,
-                        selectedTileColor: KodaColors.koda.withOpacity(0.1),
+                        selectedTileColor: KodaColors.koda.withValues(alpha: 0.1),
                         leading: const Icon(Icons.photo_album_outlined,
                             size: 16, color: KodaColors.text3),
                         title: Text(col['name'] as String? ?? '',
@@ -532,7 +522,7 @@ class _PostTileState extends State<_PostTile> {
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
+                  color: Colors.black.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 padding: const EdgeInsets.all(8),
@@ -562,7 +552,7 @@ class _PostTileState extends State<_PostTile> {
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: KodaColors.accent.withOpacity(0.85),
+                    color: KodaColors.accent.withValues(alpha: 0.85),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: const Icon(Icons.delete_outline,

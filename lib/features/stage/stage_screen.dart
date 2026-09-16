@@ -1,4 +1,4 @@
-// lib/features/stage/stage_screen.dart
+﻿// lib/features/stage/stage_screen.dart
 //
 // Stage channel: a broadcast room where admins/owners are speakers,
 // everyone else joins as a listener and can request to speak via hand-raise.
@@ -312,10 +312,10 @@ class _StageScreenState extends ConsumerState<StageScreen> {
   @override
   Widget build(BuildContext context) {
     final speakers  = _room.remoteParticipants.values
-        .where((p) => p.permissions?.canPublish == true)
+        .where((p) => p.permissions.canPublish == true)
         .toList();
     final listeners = _room.remoteParticipants.values
-        .where((p) => p.permissions?.canPublish != true)
+        .where((p) => p.permissions.canPublish != true)
         .toList();
     final speakingSids = _room.activeSpeakers.map((p) => p.sid).toSet();
 
@@ -332,7 +332,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: KodaColors.koda.withOpacity(0.15),
+              color: KodaColors.koda.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(99),
             ),
             child: Text(_isSpeaker ? 'Speaker' : 'Listener',
@@ -407,7 +407,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
                               color: KodaColors.card,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                  color: KodaColors.gold.withOpacity(0.4)),
+                                  color: KodaColors.gold.withValues(alpha: 0.4)),
                             ),
                             child: Row(children: [
                               const Icon(Icons.back_hand_outlined,
@@ -584,7 +584,7 @@ class _ListenerChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(99),
         border: Border.all(
             color: handRaised
-                ? KodaColors.gold.withOpacity(0.6)
+                ? KodaColors.gold.withValues(alpha: 0.6)
                 : KodaColors.border),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [

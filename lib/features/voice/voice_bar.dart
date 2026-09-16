@@ -1,4 +1,4 @@
-// lib/features/voice/voice_bar.dart
+﻿// lib/features/voice/voice_bar.dart
 //
 // Slim persistent bottom bar shown while connected to a voice channel.
 // Allows mute/camera toggle and leaving voice without navigating away
@@ -45,7 +45,7 @@ class VoiceBar extends ConsumerWidget {
           border: Border(
             top: BorderSide(
               color: isSpeaking
-                  ? KodaColors.mint.withOpacity(0.6)
+                  ? KodaColors.mint.withValues(alpha: 0.6)
                   : KodaColors.border,
               width: isSpeaking ? 2 : 1,
             ),

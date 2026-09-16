@@ -1,4 +1,4 @@
-// lib/shared/notification_bell.dart
+﻿// lib/shared/notification_bell.dart
 //
 // Bell icon with unread badge and dropdown panel.
 // Shows in the home screen header.
@@ -130,7 +130,7 @@ class NotificationBell extends ConsumerWidget {
                             child: Container(
                               color: read
                                   ? Colors.transparent
-                                  : KodaColors.koda.withOpacity(0.06),
+                                  : KodaColors.koda.withValues(alpha: 0.06),
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 12),
                               child: Row(children: [

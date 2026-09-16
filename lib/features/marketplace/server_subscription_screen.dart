@@ -1,4 +1,4 @@
-// lib/features/marketplace/server_subscription_screen.dart
+﻿// lib/features/marketplace/server_subscription_screen.dart
 //
 // Two views:
 // 1. Owner view — manage tiers (create/edit/delete), see subscriber counts
@@ -153,7 +153,7 @@ class _ServerSubscriptionScreenState
             Container(
               width: 28, height: 28,
               decoration: BoxDecoration(
-                color: KodaColors.koda.withOpacity(0.2),
+                color: KodaColors.koda.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Center(child: Text('$position',
@@ -245,9 +245,9 @@ class _ServerSubscriptionScreenState
             padding: const EdgeInsets.all(14),
             margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
-              color: KodaColors.koda.withOpacity(0.1),
+              color: KodaColors.koda.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: KodaColors.koda.withOpacity(0.3)),
+              border: Border.all(color: KodaColors.koda.withValues(alpha: 0.3)),
             ),
             child: Row(children: [
               const Icon(Icons.check_circle, color: KodaColors.koda, size: 20),
@@ -322,7 +322,7 @@ class _ServerSubscriptionScreenState
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 10),
               decoration: BoxDecoration(
-                color: KodaColors.koda.withOpacity(0.15),
+                color: KodaColors.koda.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Text('Currently Subscribed',

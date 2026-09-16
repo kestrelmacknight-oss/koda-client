@@ -1,4 +1,4 @@
-// lib/features/server/calendar_screen.dart
+﻿// lib/features/server/calendar_screen.dart
 //
 // Server calendar channel — month view with event creation,
 // role-locked via channel_allowed_roles, subscribe to notifications.
@@ -226,7 +226,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             margin: const EdgeInsets.all(2),
             decoration: BoxDecoration(
               color: isSelected
-                  ? KodaColors.koda.withOpacity(0.2)
+                  ? KodaColors.koda.withValues(alpha: 0.2)
                   : isToday
                       ? KodaColors.elevated
                       : Colors.transparent,
@@ -413,7 +413,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: KodaColors.koda.withOpacity(0.15),
+                    color: KodaColors.koda.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [

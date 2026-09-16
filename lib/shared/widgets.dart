@@ -1,4 +1,4 @@
-// lib/shared/widgets.dart
+﻿// lib/shared/widgets.dart
 
 import 'package:flutter/material.dart';
 import '../core/theme.dart';
@@ -143,9 +143,9 @@ class KodaErrorBanner extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         margin: const EdgeInsets.only(bottom: 14),
         decoration: BoxDecoration(
-          color: KodaColors.accent.withOpacity(0.12),
+          color: KodaColors.accent.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: KodaColors.accent.withOpacity(0.3)),
+          border: Border.all(color: KodaColors.accent.withValues(alpha: 0.3)),
         ),
         child: Row(children: [
           const Icon(Icons.error_outline, color: KodaColors.accent, size: 16),

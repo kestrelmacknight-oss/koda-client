@@ -1,4 +1,4 @@
-// lib/features/server/role_select_screen.dart
+﻿// lib/features/server/role_select_screen.dart
 //
 // Shown when a user selects a role-select channel.
 // Displays self-assignable roles as cards the user can toggle on/off.
@@ -108,12 +108,12 @@ class _RoleSelectScreenState extends State<RoleSelectScreen> {
                         margin: const EdgeInsets.only(bottom: 10),
                         decoration: BoxDecoration(
                           color: isAssigned
-                              ? color.withOpacity(0.12)
+                              ? color.withValues(alpha: 0.12)
                               : KodaColors.card,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: isAssigned
-                                ? color.withOpacity(0.5)
+                                ? color.withValues(alpha: 0.5)
                                 : KodaColors.border,
                             width: isAssigned ? 1.5 : 1,
                           ),
