@@ -40,6 +40,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   late TextEditingController _displayNameCtrl;
   late TextEditingController _avatarUrlCtrl;
   late TextEditingController _bioCtrl;
+  late TextEditingController _pronounsCtrl;
+  bool _showPronouns = false;
   String _status = 'online';
   String? _throneWebhookUrl;
   bool _loadingThroneUrl = false;
@@ -74,6 +76,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _displayNameCtrl = TextEditingController(text: user?.username ?? '');
     _avatarUrlCtrl   = TextEditingController();
     _bioCtrl         = TextEditingController();
+    _pronounsCtrl    = TextEditingController();
     _status = 'online';
   }
 
@@ -82,6 +85,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _displayNameCtrl.dispose();
     _avatarUrlCtrl.dispose();
     _bioCtrl.dispose();
+    _pronounsCtrl.dispose();
     super.dispose();
   }
 
@@ -142,13 +146,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (_bioCtrl.text.trim().isNotEmpty) {
       data['bio'] = _bioCtrl.text.trim();
     }
+    if (_pronounsCtrl.text.trim().isNotEmpty) {
+      data['pronouns'] = _pronounsCtrl.text.trim();
+    }
     data['status'] = _status;
 
     await KodaApi.instance.updateProfile(
-      displayName: data['display_name'],
-      avatarUrl:   data['avatar_url'],
-      bio:         data['bio'],
-      status:      _status,
+      displayName:  data['display_name'],
+      avatarUrl:    data['avatar_url'],
+      bio:          data['bio'],
+      pronouns:     data['pronouns'],
+      showPronouns: _showPronouns,
+      status:       _status,
     );
 
     if (mounted) setState(() { _editingProfile = false; _savingProfile = false; });
@@ -568,6 +577,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               fontWeight: FontWeight.w700, letterSpacing: 1)),
       const SizedBox(height: 8),
       KodaTextField(controller: _bioCtrl, hintText: 'Tell people a little about yourself'),
+      const SizedBox(height: 20),
+
+      // Pronouns
+      const Text('PRONOUNS',
+          style: TextStyle(color: KodaColors.text3, fontSize: 11,
+              fontWeight: FontWeight.w700, letterSpacing: 1)),
+      const SizedBox(height: 8),
+      KodaTextField(controller: _pronounsCtrl, hintText: 'e.g. they/them'),
+      const SizedBox(height: 8),
+      SwitchListTile(
+        contentPadding: EdgeInsets.zero,
+        title: const Text('Show my pronouns to others',
+            style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+        subtitle: const Text('Shown next to your name in chat, member lists, and voice',
+            style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+        value: _showPronouns,
+        activeThumbColor: KodaColors.koda,
+        onChanged: (v) => setState(() => _showPronouns = v),
+      ),
       const SizedBox(height: 20),
 
       // Status

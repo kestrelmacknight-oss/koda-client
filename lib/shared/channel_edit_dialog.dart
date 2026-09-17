@@ -28,6 +28,7 @@ Future<void> showChannelEditDialog(
   bool isReadOnly = existing?['is_read_only'] == true;
   final allowedRoleIds = List<String>.from(existing?['allowed_role_ids'] ?? []);
   final selectedRoleIds = List<String>.from(allowedRoleIds);
+  final announcementRoleIds = List<String>.from(existing?['announcement_role_ids'] ?? []);
   final selectedLabels = List<String>.from(existing?['content_labels'] ?? []);
 
   final saved = await showDialog<bool>(
@@ -72,6 +73,31 @@ Future<void> showChannelEditDialog(
                   activeColor: KodaColors.koda,
                   onChanged: (v) => setDialogState(() => isReadOnly = v ?? false),
                 ),
+                if (isReadOnly && roles.isNotEmpty) ...[
+                  const Text('Notify these roles when posted (optional)',
+                      style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                  const SizedBox(height: 4),
+                  ...roles.where((r) => r['is_default'] != true).map((role) {
+                    final roleId = role['id'] as String;
+                    final isSelected = announcementRoleIds.contains(roleId);
+                    return CheckboxListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      title: Text(role['name'] as String? ?? '',
+                          style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+                      value: isSelected,
+                      activeColor: KodaColors.koda,
+                      onChanged: (v) => setDialogState(() {
+                        if (v == true) {
+                          announcementRoleIds.add(roleId);
+                        } else {
+                          announcementRoleIds.remove(roleId);
+                        }
+                      }),
+                    );
+                  }),
+                ],
               ],
               const SizedBox(height: 12),
               DropdownButtonFormField<String?>(
@@ -166,6 +192,7 @@ Future<void> showChannelEditDialog(
     await KodaApi.instance.updateChannel(existing['id'], {
       'name': name, 'type': type, 'category_id': selectedCategoryId,
       'is_read_only': isReadOnly, 'content_labels': selectedLabels,
+      'announcement_role_ids': announcementRoleIds,
     });
     await KodaApi.instance.setChannelAllowedRoles(existing['id'] as String, selectedRoleIds);
   }

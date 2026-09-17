@@ -15,6 +15,7 @@ import '../../core/time_utils.dart';
 import '../../shared/tier_badge.dart';
 import '../../shared/widgets.dart';
 import 'digital_goods_screen.dart';
+import 'printful_merch_screen.dart';
 
 class MarketplaceScreen extends ConsumerStatefulWidget {
   /// When true, renders just the tab bar + tab content (no Scaffold/AppBar
@@ -42,7 +43,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 5, vsync: this);
+    _tabs = TabController(length: 6, vsync: this);
     _loadData();
   }
 
@@ -78,6 +79,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
         Tab(text: 'Creator'),
         Tab(text: 'Server Bank'),
         Tab(text: 'Digital Goods'),
+        Tab(text: 'Merch'),
         Tab(text: 'Revenue'),
       ],
     );
@@ -88,6 +90,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
         _buildCreatorTab(),
         _buildServerBankTab(),
         _buildDigitalGoodsTab(),
+        _buildMerchTab(),
         _buildRevenueTab(),
       ],
     );
@@ -621,6 +624,14 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
     final user = ref.watch(authProvider).user;
     final server = ref.watch(selectedServerProvider);
     return DigitalGoodsScreen(
+      server: server,
+      creatorMode: false,
+    );
+  }
+
+  Widget _buildMerchTab() {
+    final server = ref.watch(selectedServerProvider);
+    return PrintfulMerchScreen(
       server: server,
       creatorMode: false,
     );

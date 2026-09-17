@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Required for FirebaseMessaging's APNs bridge (lib/core/push_notifications.dart)
+	     to actually register for and receive remote notifications -- without this
+	     entitlement the signed build has no push capability at all, regardless of
+	     what Info.plist or the Firebase console say. Must be flipped to "production"
+	     before an App Store archive/TestFlight build, or push silently targets the
+	     wrong APNs environment -- Xcode does not do this switch automatically. -->
+	<key>aps-environment</key>
+	<string>development</string>
+	<!-- Universal Links for https://koda.fyi/invite/<code> (see
+	     lib/core/deep_links.dart). This half only takes effect once
+	     apple-app-site-association is published at koda.fyi's web root
+	     (a separate deployment from this app -- not something this repo
+	     can serve) -- see the AASA content handed off alongside this
+	     change. The koda:// custom scheme (Info.plist's CFBundleURLTypes)
+	     works right now regardless, with no server-side dependency. -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:koda.fyi</string>
+	</array>
+</dict>
+</plist>

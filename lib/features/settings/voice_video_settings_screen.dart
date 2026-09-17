@@ -122,9 +122,15 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                 ),
                 _toggleTile(
                   title: 'Auto Gain Control',
-                  subtitle: 'Automatically balance mic volume',
+                  subtitle: 'Automatically balance mic volume (loudness normalization)',
                   value: settings.autoGainControl,
                   onChanged: (v) => _save(settings.copyWith(autoGainControl: v)),
+                ),
+                _toggleTile(
+                  title: 'Auto-Ducking',
+                  subtitle: "Lower other participants' volume while you're talking",
+                  value: settings.autoDucking,
+                  onChanged: (v) => _save(settings.copyWith(autoDucking: v)),
                 ),
                 _toggleTile(
                   title: 'High-Pass Filter',

@@ -504,6 +504,16 @@ class KodaApi {
     } catch (e) { _log('deleteInvite', e); return false; }
   }
 
+  /// Public preview of an invite -- no auth required, this is what a deep
+  /// link (see lib/core/deep_links.dart) hits before the user has decided
+  /// to join, same as tapping a Discord invite link before you're a member.
+  Future<Map<String, dynamic>?> getInvitePreview(String code) async {
+    try {
+      final res = await _dio.get('/invite/$code');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getInvitePreview', e); return null; }
+  }
+
   Future<Map<String, dynamic>?> redeemInvite(String code) async {
     try {
       final res = await _dio.post('/invites/$code/redeem');
@@ -936,14 +946,18 @@ class KodaApi {
     String? displayName,
     String? avatarUrl,
     String? bio,
+    String? pronouns,
+    bool? showPronouns,
     String? status,
   }) async {
     try {
       final res = await _dio.patch('/users/me', data: {
-        if (displayName != null) 'display_name': displayName,
-        if (avatarUrl   != null) 'avatar_url':   avatarUrl,
-        if (bio         != null) 'bio':          bio,
-        if (status      != null) 'status':       status,
+        if (displayName  != null) 'display_name':  displayName,
+        if (avatarUrl    != null) 'avatar_url':    avatarUrl,
+        if (bio           != null) 'bio':           bio,
+        if (pronouns      != null) 'pronouns':      pronouns,
+        if (showPronouns  != null) 'show_pronouns': showPronouns,
+        if (status        != null) 'status':        status,
       });
       return res.data['user'] as Map<String, dynamic>;
     } catch (e) { _log('updateProfile', e); return null; }
@@ -1544,6 +1558,68 @@ class KodaApi {
       await _dio.delete('/servers/$serverId/printful');
       return true;
     } catch (e) { _log('disconnectPrintful', e); return false; }
+  }
+
+  /// Re-pulls the connected store's live catalog from Printful and
+  /// returns it (creator-facing -- includes unpublished products).
+  Future<List<Map<String, dynamic>>?> syncPrintfulCatalog(String serverId) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/printful/sync');
+      return List<Map<String, dynamic>>.from(res.data['products'] ?? []);
+    } catch (e) { _log('syncPrintfulCatalog', e); return null; }
+  }
+
+  /// Every synced product regardless of publish state (creator-facing).
+  Future<List<Map<String, dynamic>>> getPrintfulCatalog(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/printful/catalog');
+      return List<Map<String, dynamic>>.from(res.data['products'] ?? []);
+    } catch (e) { _log('getPrintfulCatalog', e); return []; }
+  }
+
+  /// Published products only, for the buyer-facing storefront.
+  Future<List<Map<String, dynamic>>> getPrintfulMerch(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/printful/merch');
+      return List<Map<String, dynamic>>.from(res.data['products'] ?? []);
+    } catch (e) { _log('getPrintfulMerch', e); return []; }
+  }
+
+  Future<bool> setPrintfulProductPublished(
+      String serverId, String productId, bool published) async {
+    try {
+      await _dio.patch('/servers/$serverId/printful/products/$productId/publish',
+          data: {'published': published});
+      return true;
+    } catch (e) { _log('setPrintfulProductPublished', e); return false; }
+  }
+
+  /// Real shipping-rate options from Printful for a cart + address --
+  /// no order is created yet. `items` is `[{'variant_id': ..., 'quantity': ...}]`.
+  Future<List<Map<String, dynamic>>?> getPrintfulShippingRates(
+      String serverId, List<Map<String, dynamic>> items, Map<String, dynamic> address) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/printful/shipping-rates',
+          data: {'items': items, 'address': address});
+      return List<Map<String, dynamic>>.from(res.data['rates'] ?? []);
+    } catch (e) { _log('getPrintfulShippingRates', e); return null; }
+  }
+
+  /// Places a real Printful draft order to get the authoritative total
+  /// and opens a Stripe Checkout session for it. Returns
+  /// {checkout_url, order_id} -- order_id is what launchCheckoutAndWait's
+  /// `matches` predicate checks the confirmation notification against,
+  /// same pattern as purchaseEventTicket/createTip.
+  Future<Map<String, dynamic>?> createPrintfulOrder(String serverId,
+      List<Map<String, dynamic>> items, Map<String, dynamic> address, String shippingOptionId) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/printful/orders', data: {
+        'items': items,
+        'address': address,
+        'shipping_option_id': shippingOptionId,
+      });
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('createPrintfulOrder', e); return null; }
   }
 
   // -- Server boosting (Pulse subscriber perk) ---------------------------------

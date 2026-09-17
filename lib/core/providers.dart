@@ -118,6 +118,11 @@ class VoiceSettings {
   final bool highPassFilter;
   final bool typingNoiseDetection;
   final bool voiceIsolation;
+  // Not a WebRTC capture constraint like the above -- gated client-side
+  // by VoiceActivityController, which lowers other participants'
+  // playback volume (Helper.setVolume) while local audioLevel is above
+  // vadThreshold. See voice_activity_controller.dart for the actual tick.
+  final bool autoDucking;
   final bool vadEnabled;
   final double vadThreshold;
   final String? pushToTalkKey;
@@ -135,6 +140,7 @@ class VoiceSettings {
     this.highPassFilter = false,
     this.typingNoiseDetection = true,
     this.voiceIsolation = true,
+    this.autoDucking = false,
     this.vadEnabled = false,
     this.vadThreshold = 0.05,
     this.pushToTalkKey,
@@ -155,6 +161,7 @@ class VoiceSettings {
         highPassFilter:        j['high_pass_filter'] as bool? ?? false,
         typingNoiseDetection:  j['typing_noise_detection'] as bool? ?? true,
         voiceIsolation:        j['voice_isolation'] as bool? ?? true,
+        autoDucking:           j['auto_ducking'] as bool? ?? false,
         vadEnabled:            j['vad_enabled'] as bool? ?? false,
         vadThreshold:          (j['vad_threshold'] as num?)?.toDouble() ?? 0.05,
         pushToTalkKey:         j['push_to_talk_key'] as String?,
@@ -173,6 +180,7 @@ class VoiceSettings {
         'high_pass_filter':       highPassFilter,
         'typing_noise_detection': typingNoiseDetection,
         'voice_isolation':        voiceIsolation,
+        'auto_ducking':           autoDucking,
         'vad_enabled':            vadEnabled,
         'vad_threshold':          vadThreshold,
         'push_to_talk_key':       pushToTalkKey,
@@ -191,6 +199,7 @@ class VoiceSettings {
     bool? highPassFilter,
     bool? typingNoiseDetection,
     bool? voiceIsolation,
+    bool? autoDucking,
     bool? vadEnabled,
     double? vadThreshold,
     String? pushToTalkKey,
@@ -209,6 +218,7 @@ class VoiceSettings {
         highPassFilter:       highPassFilter ?? this.highPassFilter,
         typingNoiseDetection: typingNoiseDetection ?? this.typingNoiseDetection,
         voiceIsolation:       voiceIsolation ?? this.voiceIsolation,
+        autoDucking:          autoDucking ?? this.autoDucking,
         vadEnabled:           vadEnabled ?? this.vadEnabled,
         vadThreshold:         vadThreshold ?? this.vadThreshold,
         pushToTalkKey:        clearPushToTalkKey ? null : (pushToTalkKey ?? this.pushToTalkKey),

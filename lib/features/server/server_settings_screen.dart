@@ -19,6 +19,7 @@ import '../../shared/widgets.dart';
 import '../../shared/channel_edit_dialog.dart';
 import '../../shared/category_edit_dialog.dart';
 import '../../shared/custom_emoji.dart';
+import '../marketplace/printful_merch_screen.dart';
 import 'discord_import_dialog.dart';
 
 class ServerSettingsScreen extends ConsumerStatefulWidget {
@@ -504,10 +505,10 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     if (_loadingPrintful) {
       return const Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        Container(
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.all(20),
+        child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: KodaColors.card,
@@ -564,8 +565,15 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             ],
           ]),
         ),
-      ],
-    );
+      ),
+      if (_printfulConnected)
+        Expanded(
+          child: PrintfulMerchScreen(
+            server: ref.watch(selectedServerProvider),
+            creatorMode: true,
+          ),
+        ),
+    ]);
   }
 
   // -- Emoji ----------------------------------------------------------------

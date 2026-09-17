@@ -19,12 +19,17 @@ import '../../core/time_utils.dart';
 import '../../core/crypto/dm_attachments.dart';
 import '../../core/crypto/dm_session_manager.dart';
 import '../../core/crypto/double_ratchet.dart' show DoubleRatchetDecryptFailure;
+import '../../shared/pronoun_label.dart';
 import '../../shared/tier_badge.dart';
 import '../../shared/widgets.dart';
 import 'safety_number_screen.dart';
 
 class DmScreen extends ConsumerStatefulWidget {
-  const DmScreen({super.key});
+  // Set by push-notification-tap / deep-link routing (see
+  // home_screen.dart's _handlePushTap) to jump straight into a specific
+  // conversation once it's loaded, rather than landing on the bare list.
+  final String? initialConversationId;
+  const DmScreen({super.key, this.initialConversationId});
   @override
   ConsumerState<DmScreen> createState() => _DmScreenState();
 }
@@ -88,6 +93,13 @@ class _DmScreenState extends ConsumerState<DmScreen>
     final convos = await KodaApi.instance.getConversations();
     if (!mounted) return;
     setState(() { _conversations = convos; _loadingConvos = false; });
+
+    final targetId = widget.initialConversationId;
+    if (targetId != null) {
+      final target = convos.cast<Map<String, dynamic>?>().firstWhere(
+          (c) => c?['id'] == targetId, orElse: () => null);
+      if (target != null) _openConversation(target);
+    }
   }
 
   Future<void> _loadUnreadCounts() async {
@@ -573,7 +585,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
         decoration: const BoxDecoration(
             border: Border(bottom: BorderSide(color: KodaColors.border))),
         child: Row(children: [
-          Text(peerName, style: const TextStyle(
+          Text(withPronouns(peerName, peer), style: const TextStyle(
               color: KodaColors.text1, fontWeight: FontWeight.w600, fontSize: 13)),
           const SizedBox(width: 6),
           TierBadge(tier: peerTier, size: 13),
@@ -640,7 +652,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                                 : CrossAxisAlignment.start,
                             children: [
                               if (!isMe)
-                                Text(author,
+                                Text(withPronouns(author, m['author'] as Map<String, dynamic>?),
                                     style: const TextStyle(
                                         color: KodaColors.koda,
                                         fontSize: 12,

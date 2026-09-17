@@ -36,6 +36,32 @@
 	<string>Koda saves images you download to your photo library.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Koda uses the local network to discover and connect to nearby devices for voice and video calls.</string>
+	<!-- remote-notification lets FirebaseMessaging (lib/core/push_notifications.dart)
+	     process a silent/data push while backgrounded, e.g. to refresh unread state
+	     without waking the full UI -- required alongside the aps-environment
+	     entitlement (Runner.entitlements) for push to work at all, not just to show
+	     an alert. voip is NOT included here: Koda's calls are user-initiated joins
+	     via a normal channel tap, not incoming CallKit-style rings. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<!-- koda://invite/<code> custom-scheme deep link, see lib/core/deep_links.dart.
+	     Works standalone with no domain verification -- the https://koda.fyi
+	     Universal Link is the other half, gated on the associated-domains
+	     entitlement (Runner.entitlements) and the AASA file at koda.fyi's web
+	     root, which is a separate deployment from this app. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>fyi.koda.invite</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>koda</string>
+			</array>
+		</dict>
+	</array>
 	<!-- Deliberately NOT setting ITSAppUsesNonExemptEncryption here.
 	     Koda ships its own end-to-end encryption (X3DH + Double Ratchet)
 	     for direct messages on top of standard TLS -- the same category

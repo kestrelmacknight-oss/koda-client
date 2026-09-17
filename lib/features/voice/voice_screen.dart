@@ -13,6 +13,7 @@ import '../../core/theme.dart';
 import '../../core/providers.dart';
 import '../../core/voice_activity_controller.dart';
 import '../../core/voice_session.dart';
+import '../../shared/pronoun_label.dart';
 import '../../shared/widgets.dart';
 import 'varm_widget.dart';
 
@@ -264,7 +265,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
       if (meta != null && meta.isNotEmpty) {
         final decoded = jsonDecode(meta) as Map<String, dynamic>;
         final username = decoded['username'] as String?;
-        if (username != null && username.isNotEmpty) return username;
+        if (username != null && username.isNotEmpty) return withPronouns(username, decoded);
       }
     } catch (_) {}
     return p.identity;

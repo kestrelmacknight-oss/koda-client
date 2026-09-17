@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   desktop_multi_window
   flutter_secure_storage_linux
   flutter_webrtc
+  gtk
   livekit_client
   local_notifier
   screen_retriever_linux

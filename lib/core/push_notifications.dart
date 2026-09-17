@@ -19,6 +19,8 @@
 // when that setup hasn't happened yet, so push staying unconfigured
 // never breaks login or the home screen.
 
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'api.dart';
@@ -30,6 +32,26 @@ class PushNotifications {
   static final PushNotifications instance = PushNotifications._();
 
   bool _initStarted = false;
+
+  final _tapController = StreamController<RemoteMessage>.broadcast();
+
+  /// Fires when the user taps a push notification while the app is
+  /// running (foreground or backgrounded) -- see HomeScreen's
+  /// _subscribePushTaps, which routes on msg.data the same way it
+  /// routes a live in-app notification (_routeToNotification).
+  Stream<RemoteMessage> get onNotificationTap => _tapController.stream;
+
+  RemoteMessage? _pendingTap;
+
+  /// The tap that launched the app cold (app was fully killed) -- unlike
+  /// onNotificationTap, this can't be a stream event, since nothing
+  /// subscribes until well after this already happened. Call once right
+  /// after subscribing to onNotificationTap (see HomeScreen).
+  RemoteMessage? consumePendingTap() {
+    final msg = _pendingTap;
+    _pendingTap = null;
+    return msg;
+  }
 
   /// Call once per app session, after the user is authenticated (see
   /// main.dart's AuthGate and home_screen.dart's initState) -- requests
@@ -58,6 +80,19 @@ class PushNotifications {
       // token expiry) -- keep the server in sync whenever that happens,
       // not just at startup.
       messaging.onTokenRefresh.listen(_registerToken);
+
+      // Tapped while backgrounded (app process alive) -- HomeScreen is
+      // essentially certain to already be subscribed to onNotificationTap
+      // by the time this can fire, since it requires the OS notification
+      // tray, a real user tap, and the app resuming, so no buffering
+      // needed here unlike the cold-start case below.
+      FirebaseMessaging.onMessageOpenedApp.listen(_tapController.add);
+
+      // Tapped while the app was fully killed -- this resolves before
+      // anything downstream has had a chance to subscribe to
+      // onNotificationTap, so it can never go through that stream;
+      // callers must pull it via consumePendingTap() instead.
+      _pendingTap = await messaging.getInitialMessage();
     } catch (e) {
       // Push is a nice-to-have layered on top of everything else in this
       // app, never something that should be allowed to break login or

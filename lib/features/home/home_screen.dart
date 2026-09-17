@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/api.dart';
@@ -17,7 +18,10 @@ import '../../shared/widgets.dart';
 import '../../shared/channel_edit_dialog.dart';
 import '../../shared/toast.dart';
 import '../../shared/custom_emoji.dart';
+import '../../shared/pronoun_label.dart';
 import '../../core/push_notifications.dart';
+import '../../core/deep_links.dart';
+import '../../shared/invite_preview_dialog.dart';
 import '../../shared/category_edit_dialog.dart';
 import '../settings/settings_screen.dart';
 import '../settings/content_filters_screen.dart';
@@ -53,7 +57,7 @@ class HomeScreen extends ConsumerStatefulWidget {
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObserver {
   List<Map<String, dynamic>> _servers = [];
   List<Map<String, dynamic>> _channels = [];
   List<Map<String, dynamic>> _categories = [];
@@ -90,14 +94,134 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final Set<String> _channelsWithMentions = {};
   final Map<String, List<Map<String, dynamic>>> _voiceOccupants = {};
   final Set<String> _voiceTopics = {};
+  StreamSubscription<String>? _deepLinkSub;
+  // Set right before switching to the DM tab in response to a tapped
+  // dm_message push/notification -- see _routeToNotification. Passed as
+  // DmScreen's initialConversationId so it jumps straight to that
+  // conversation once its list loads, instead of landing on the bare list.
+  String? _pendingDmConversationId;
+  StreamSubscription<RemoteMessage>? _pushTapSub;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadServers();
     _loadUnreadCounts();
     _loadContentFilters();
     PushNotifications.instance.init();
+    _subscribeDeepLinks();
+    _subscribePushTaps();
+  }
+
+  // Mobile OS networking gets suspended while backgrounded, and can drop
+  // the live Phoenix socket outright (killed process, a network change
+  // the OS didn't bother waking the app to handle, etc.) -- resuming to a
+  // dead socket would otherwise sit silently stale until the user happens
+  // to tap something that incidentally reconnects it. Desktop rarely
+  // backgrounds this way (and window focus isn't app lifecycle), but the
+  // check is cheap and correct there too.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _onResumed();
+  }
+
+  Future<void> _onResumed() async {
+    if (!KodaSocket.instance.isConnected) {
+      // The socket died while backgrounded -- _channels was cleared by
+      // KodaSocket's own closeStream handler, so every rejoin below
+      // starts clean (no duplicate listeners on a channel object that's
+      // already gone).
+      await _subscribeToUserNotifications();
+      if (_channels.isNotEmpty) _subscribeVoicePresence();
+      final activeChannel = ref.read(selectedChannelProvider);
+      if (activeChannel != null && activeChannel['type'] == 'text') {
+        _selectChannel(activeChannel);
+      }
+    }
+    // Cheap either way, and catches anything that changed server-side
+    // while backgrounded that push didn't cover (e.g. read state from
+    // another device) even when the socket never actually dropped.
+    // Deliberately NOT _loadServers() -- it unconditionally jumps to
+    // servers.first (see its own body), which would yank the user back
+    // to their first server on every resume regardless of what they
+    // were actually looking at.
+    _loadUnreadCounts();
+    ref.read(notificationsProvider.notifier).load();
+  }
+
+  // A tapped OS push notification should land on the same screen a live
+  // in-app notification tap would -- see _routeToNotification. Cold-start
+  // (app was killed) and warm-resume (app was backgrounded) taps arrive
+  // through two different PushNotifications APIs; see its doc comments
+  // for why they can't share one code path.
+  Future<void> _subscribePushTaps() async {
+    _pushTapSub = PushNotifications.instance.onNotificationTap.listen(
+        (msg) => _routeToNotification(msg.data['type'] as String?, msg.data));
+    await PushNotifications.instance.init();
+    final pending = PushNotifications.instance.consumePendingTap();
+    if (pending != null) {
+      _routeToNotification(pending.data['type'] as String?, pending.data);
+    }
+  }
+
+  // Reaching HomeScreen means the user is authenticated (see main.dart's
+  // AuthGate), so this is the one place that both (a) can actually show
+  // the invite preview dialog and (b) needs to pick up a link that arrived
+  // before login and was held by DeepLinks.consumePendingInviteCode().
+  Future<void> _subscribeDeepLinks() async {
+    await DeepLinks.instance.init();
+    _deepLinkSub = DeepLinks.instance.inviteCodes.listen(_handleInviteDeepLink);
+    final pending = DeepLinks.instance.consumePendingInviteCode();
+    if (pending != null) _handleInviteDeepLink(pending);
+  }
+
+  Future<void> _handleInviteDeepLink(String code) async {
+    if (!mounted) return;
+    final joined = await showInvitePreviewDialog(context, code);
+    if (joined && mounted) _loadServers();
+  }
+
+  // Routes a tapped push notification (see push_notifications.dart's
+  // onTap wiring) or a live in-app notification tap to the screen it's
+  // actually about, using the same `data` shape _isCurrentlyViewing
+  // already reads (channel_id/server_id for mention/role_mention,
+  // conversation_id for dm_message). Anything else (payment
+  // confirmations, etc.) has no single screen to jump to, so it's left
+  // as a no-op -- tapping those just opens the app to wherever it was.
+  Future<void> _routeToNotification(String? type, Map<String, dynamic>? data) async {
+    if (data == null || !mounted) return;
+    switch (type) {
+      case 'mention':
+      case 'role_mention':
+        final serverId = data['server_id'] as String?;
+        final channelId = data['channel_id'] as String?;
+        if (serverId == null || channelId == null) return;
+        var server = _servers.cast<Map<String, dynamic>?>().firstWhere(
+            (s) => s?['id'] == serverId, orElse: () => null);
+        if (server == null) {
+          await _loadServers();
+          if (!mounted) return;
+          server = _servers.cast<Map<String, dynamic>?>().firstWhere(
+              (s) => s?['id'] == serverId, orElse: () => null);
+        }
+        if (server == null) return;
+        await _selectServer(server);
+        if (!mounted) return;
+        final channel = _channels.cast<Map<String, dynamic>?>().firstWhere(
+            (c) => c?['id'] == channelId, orElse: () => null);
+        if (channel != null) _selectChannel(channel);
+        break;
+
+      case 'dm_message':
+        final conversationId = data['conversation_id'] as String?;
+        if (conversationId == null) return;
+        setState(() {
+          _showingDms = true;
+          _pendingDmConversationId = conversationId;
+        });
+        break;
+    }
   }
 
   // A standard account's personal hide/warn/show preferences (see
@@ -115,6 +239,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _labelSettingFor(Map<String, dynamic> channel) => effectiveFilterSetting(
       List<String>.from(channel['content_labels'] as List? ?? []), _contentFilters);
 
+  String _announcementTooltip(Map<String, dynamic> channel) {
+    const base = 'Announcement channel -- only staff may post';
+    final roleIds = List<String>.from(channel['announcement_role_ids'] as List? ?? []);
+    if (roleIds.isEmpty) return base;
+    final names = roleIds
+        .map((id) => _roles.cast<Map<String, dynamic>?>().firstWhere(
+              (r) => r?['id'] == id, orElse: () => null)?['name'] as String?)
+        .whereType<String>()
+        .toList();
+    if (names.isEmpty) return base;
+    return '$base. Posting here notifies ${names.map((n) => '@$n').join(', ')}.';
+  }
+
   Future<void> _loadUnreadCounts() async {
     final counts = await KodaApi.instance.getUnreadCounts();
     if (!mounted) return;
@@ -124,12 +261,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     if (_activeChannelId != null) {
       KodaSocket.instance.leave('channel:$_activeChannelId');
     }
     for (final topic in _voiceTopics) {
       KodaSocket.instance.leave(topic);
     }
+    _deepLinkSub?.cancel();
+    _pushTapSub?.cancel();
     _messageController.dispose();
     _scroll.dispose();
     super.dispose();
@@ -922,7 +1062,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             KodaAvatar(username: username, size: 64, avatarUrl: avatarUrl),
             const SizedBox(height: 12),
-            Text(username, style: const TextStyle(color: KodaColors.text1,
+            Text(withPronouns(username, author), style: const TextStyle(color: KodaColors.text1,
                 fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: 16),
             if (isFriend)
@@ -1779,9 +1919,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
           if (selectedChannel['is_read_only'] == true) ...[
             const SizedBox(width: 8),
-            const Tooltip(
-              message: 'Announcement channel -- only staff may post',
-              child: Icon(Icons.campaign_outlined, size: 14, color: KodaColors.gold),
+            Tooltip(
+              message: _announcementTooltip(selectedChannel),
+              child: const Icon(Icons.campaign_outlined, size: 14, color: KodaColors.gold),
             ),
           ],
           const Spacer(),
@@ -1892,7 +2032,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
                       children: [
-                        Text(author,
+                        Text(withPronouns(author, m['author'] as Map<String, dynamic>?),
                             style: const TextStyle(
                                 color: KodaColors.koda,
                                 fontSize: 13,
@@ -2351,7 +2491,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
         // ── Main content ─────────────────────────────────────────────
         if (_showingDms)
-          const Expanded(child: DmScreen())
+          Expanded(child: DmScreen(
+            key: _pendingDmConversationId != null
+                ? ValueKey(_pendingDmConversationId) : null,
+            initialConversationId: _pendingDmConversationId,
+          ))
         else ...[
           // Channel list
           Container(

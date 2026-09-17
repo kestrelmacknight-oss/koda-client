@@ -22,6 +22,7 @@
 
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
 import 'package:livekit_client/livekit_client.dart' as lk;
 import 'providers.dart';
 
@@ -29,6 +30,17 @@ class VoiceActivityController {
   Timer? _timer;
   bool _pttHeld = false;
   bool Function(KeyEvent)? _keyHandler;
+
+  // Auto-ducking: lower other participants' playback volume while the
+  // local participant is talking. Edge-triggered on _isDucking so
+  // Helper.setVolume (a real native call) only fires on an actual
+  // start/stop transition, not every 100ms tick. vadThreshold doubles
+  // as the "am I talking" signal here rather than a second threshold
+  // setting -- deliberate, see voice_activity_controller.dart's header.
+  bool _isDucking = false;
+  DateTime? _lastLoudAt;
+  static const _duckVolume = 0.25;
+  static const _duckReleaseHang = Duration(milliseconds: 500);
 
   void start({
     required lk.Room room,
@@ -62,27 +74,66 @@ class VoiceActivityController {
       _keyHandler = null;
     }
     _pttHeld = false;
+    // No volume-restore call here -- stop() runs as the room is
+    // disconnecting/tearing down, so lingering ducked state on a track
+    // about to be destroyed has no lasting effect. Just reset for the
+    // next start().
+    _isDucking = false;
+    _lastLoudAt = null;
   }
 
   Future<void> _apply(lk.Room room, VoiceSettings settings, bool manuallyMuted) async {
     final track = room.localParticipant?.audioTrackPublications.firstOrNull?.track;
-    if (track == null) return;
+    if (track != null) {
+      final bool shouldTransmit;
+      if (manuallyMuted) {
+        shouldTransmit = false;
+      } else if (settings.pushToTalkKey != null) {
+        shouldTransmit = _pttHeld;
+      } else if (settings.vadEnabled) {
+        shouldTransmit = (room.localParticipant?.audioLevel ?? 0.0) >= settings.vadThreshold;
+      } else {
+        shouldTransmit = true; // neither configured -- always-on, the pre-VOX default
+      }
 
-    final bool shouldTransmit;
-    if (manuallyMuted) {
-      shouldTransmit = false;
-    } else if (settings.pushToTalkKey != null) {
-      shouldTransmit = _pttHeld;
-    } else if (settings.vadEnabled) {
-      shouldTransmit = (room.localParticipant?.audioLevel ?? 0.0) >= settings.vadThreshold;
-    } else {
-      shouldTransmit = true; // neither configured -- always-on, the pre-VOX default
+      if (shouldTransmit && track.muted) {
+        await track.unmute(stopOnMute: false);
+      } else if (!shouldTransmit && !track.muted) {
+        await track.mute(stopOnMute: false);
+      }
     }
 
-    if (shouldTransmit && track.muted) {
-      await track.unmute(stopOnMute: false);
-    } else if (!shouldTransmit && !track.muted) {
-      await track.mute(stopOnMute: false);
+    await _applyDucking(room, settings);
+  }
+
+  Future<void> _applyDucking(lk.Room room, VoiceSettings settings) async {
+    if (!settings.autoDucking) {
+      if (_isDucking) {
+        _isDucking = false;
+        await _setRemoteVolumes(room, 1.0);
+      }
+      return;
+    }
+
+    final level = room.localParticipant?.audioLevel ?? 0.0;
+    final now = DateTime.now();
+    if (level >= settings.vadThreshold) _lastLoudAt = now;
+
+    final shouldDuck = _lastLoudAt != null && now.difference(_lastLoudAt!) < _duckReleaseHang;
+    if (shouldDuck == _isDucking) return; // no transition, no native call needed
+
+    _isDucking = shouldDuck;
+    await _setRemoteVolumes(room, shouldDuck ? _duckVolume : 1.0);
+  }
+
+  Future<void> _setRemoteVolumes(lk.Room room, double volume) async {
+    for (final participant in room.remoteParticipants.values) {
+      for (final pub in participant.audioTrackPublications) {
+        final track = pub.track;
+        if (track != null) {
+          await rtc.Helper.setVolume(volume, track.mediaStreamTrack);
+        }
+      }
     }
   }
 }

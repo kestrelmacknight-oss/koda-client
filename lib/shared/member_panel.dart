@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
 import '../core/providers.dart';
+import 'pronoun_label.dart';
 import 'tier_badge.dart';
 
 class MemberPanel extends ConsumerStatefulWidget {
@@ -261,7 +262,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              username,
+              withPronouns(username, member),
               style: TextStyle(
                 color: isOffline
                     ? KodaColors.text3

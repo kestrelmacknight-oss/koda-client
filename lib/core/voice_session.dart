@@ -5,6 +5,8 @@
 // VoiceBar in home_screen.dart observes this provider to show the
 // persistent bottom bar.
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:livekit_client/livekit_client.dart' as lk;
@@ -80,14 +82,45 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
   final Ref _ref;
   final VoiceActivityController _voiceActivity = VoiceActivityController();
 
+  // Serializes join()/leave() calls. Without this, two rapid join() calls
+  // (e.g. a double-tap on a voice channel) can both read `state == null`
+  // before either finishes connecting, so neither one's leave-guard fires
+  // and both open a Room and connect to LiveKit with the same identity --
+  // producing exactly the DUPLICATE_IDENTITY reconnect churn seen in
+  // production logs. Chaining every call onto this future forces them to
+  // run one at a time, in call order.
+  Future<void> _opLock = Future.value();
+
   Future<bool> join({
     required String url,
     required String token,
     required String channelId,
     required String channelName,
   }) async {
+    final previous = _opLock;
+    final completer = Completer<void>();
+    _opLock = completer.future;
+    await previous;
+    try {
+      return await _doJoin(
+        url: url,
+        token: token,
+        channelId: channelId,
+        channelName: channelName,
+      );
+    } finally {
+      completer.complete();
+    }
+  }
+
+  Future<bool> _doJoin({
+    required String url,
+    required String token,
+    required String channelId,
+    required String channelName,
+  }) async {
     // Leave any existing session first
-    if (state != null) await leave();
+    if (state != null) await _doLeave();
 
     final room = lk.Room();
     try {
@@ -122,6 +155,18 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
   }
 
   Future<void> leave() async {
+    final previous = _opLock;
+    final completer = Completer<void>();
+    _opLock = completer.future;
+    await previous;
+    try {
+      await _doLeave();
+    } finally {
+      completer.complete();
+    }
+  }
+
+  Future<void> _doLeave() async {
     final s = state;
     if (s == null) return;
     _voiceActivity.stop();
