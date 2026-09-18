@@ -9,7 +9,13 @@
 ; Output: installer\KodaSetup-0.34.0.exe
 
 #define AppName "Koda"
-#define AppVersion "0.34.0"
+; CI passes the real version via `ISCC /DAppVersion=x.y.z` (sourced from
+; pubspec.yaml, see build-release.yml) so this never has to be bumped by
+; hand in lockstep with pubspec.yaml -- this fallback only matters when
+; compiling the script directly (e.g. opened in the Inno Setup IDE).
+#ifndef AppVersion
+  #define AppVersion "0.34.0"
+#endif
 #define AppPublisher "Kestrel MacKnight / Koda"
 #define AppURL "https://koda.fyi"
 #define AppExeName "koda.exe"

@@ -9,6 +9,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
 import 'package:livekit_client/livekit_client.dart' as lk;
 import 'providers.dart';
 import 'voice_activity_controller.dart';
@@ -78,9 +79,44 @@ lk.AudioCaptureOptions audioCaptureOptionsFor(VoiceSettings settings) =>
     );
 
 class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
-  VoiceSessionNotifier(this._ref) : super(null);
+  VoiceSessionNotifier(this._ref) : super(null) {
+    // Unlike capture constraints (baked into the track at join() time,
+    // see audioCaptureOptionsFor), EQ gains are just a native-side
+    // state update -- no renegotiation needed -- so it's worth reacting
+    // live rather than making a gain change wait for the next rejoin.
+    // Only pushes a native call when an EQ-relevant field actually
+    // changed, so tweaking an unrelated setting (push-to-talk key, VAD
+    // threshold, etc.) mid-call doesn't spam it.
+    _ref.listen(voiceSettingsProvider, (previous, next) {
+      if (state == null) return;
+      final eqChanged = previous == null ||
+          previous.eqEnabled != next.eqEnabled ||
+          previous.eqBassGain != next.eqBassGain ||
+          previous.eqMidGain != next.eqMidGain ||
+          previous.eqTrebleGain != next.eqTrebleGain;
+      final boostChanged = previous == null ||
+          previous.micBoostEnabled != next.micBoostEnabled ||
+          previous.micBoostGain != next.micBoostGain;
+      if (eqChanged) _applyEqGains(next);
+      if (boostChanged) _applyMicBoost(next);
+    });
+  }
   final Ref _ref;
   final VoiceActivityController _voiceActivity = VoiceActivityController();
+
+  Future<void> _applyEqGains(VoiceSettings settings) {
+    final enabled = settings.eqEnabled;
+    return rtc.Helper.setMicEqGains(
+      bass:   enabled ? settings.eqBassGain   : 0.0,
+      mid:    enabled ? settings.eqMidGain    : 0.0,
+      treble: enabled ? settings.eqTrebleGain : 0.0,
+    );
+  }
+
+  Future<void> _applyMicBoost(VoiceSettings settings) {
+    return rtc.Helper.setMicBoost(
+        settings.micBoostEnabled ? settings.micBoostGain : 0.0);
+  }
 
   // Serializes join()/leave() calls. Without this, two rapid join() calls
   // (e.g. a double-tap on a voice channel) can both read `state == null`
@@ -134,6 +170,8 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
         token:       token,
         url:         url,
       );
+      unawaited(_applyEqGains(_ref.read(voiceSettingsProvider)));
+      unawaited(_applyMicBoost(_ref.read(voiceSettingsProvider)));
 
       // Runs for the whole life of the session -- including while
       // collapsed to the VoiceBar, not just while VoiceScreen's full
@@ -175,6 +213,18 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
     try { await s.room.disconnect(); } catch (_) {}
     s.room.dispose();
   }
+
+  /// Current multiplier for a remote participant, 1.0 = normal --
+  /// see VoiceActivityController.volumeFor. Session-scoped, not
+  /// persisted; resets to 1.0 (i.e. absent) on the next call.
+  double volumeForParticipant(String identity) => _voiceActivity.volumeFor(identity);
+
+  /// Sets a remote participant's playback volume for the rest of this
+  /// call -- [volume] is a multiplier, e.g. 0.0..2.0 for a 0-200%
+  /// slider. Composes with auto-ducking rather than fighting it -- see
+  /// VoiceActivityController.setParticipantVolume.
+  Future<void> setParticipantVolume(String identity, double volume) =>
+      _voiceActivity.setParticipantVolume(identity, volume);
 
   Future<void> toggleMute() async {
     final s = state;

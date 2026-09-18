@@ -30,6 +30,13 @@ jobs:
     name: Build Windows
     runs-on: windows-latest
     needs: version
+    # firebase_cpp_sdk's bundled Windows CMake config declares an old
+    # cmake_minimum_required that recent CMake (as shipped on
+    # windows-latest) refuses to even parse -- this is the one platform
+    # that extracts and builds that SDK's native CMake project directly,
+    # so it's the only job that needs the workaround.
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: '3.5'
     steps:
       - uses: actions/checkout@v4
       - name: Setup Flutter
@@ -38,6 +45,15 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+      # pubspec.yaml overrides flutter_webrtc to a local path (real mic
+      # EQ/boost needs a native hook upstream never wires up -- see
+      # native/flutter_webrtc_eq_patch/) -- that path is gitignored, so
+      # `pub get` has nothing to resolve against without this first.
+      # Needed on every platform's pub get, not just Windows's, even
+      # though the EQ/boost code itself only activates here.
+      - name: Vendor patched flutter_webrtc
+        shell: pwsh
+        run: ./tool/vendor_flutter_webrtc.ps1
       - name: Install dependencies
         run: flutter pub get
       - name: Build Windows release
@@ -49,7 +65,7 @@ jobs:
       - name: Build installer
         shell: powershell
         run: |
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" koda_installer.iss
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DAppVersion="${{ needs.version.outputs.version }}" koda_installer.iss
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
@@ -69,6 +85,11 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+      # See build-windows's identical step -- pubspec.yaml's path
+      # override needs this on every platform's pub get.
+      - name: Vendor patched flutter_webrtc
+        shell: pwsh
+        run: ./tool/vendor_flutter_webrtc.ps1
       - name: Install dependencies
         run: flutter pub get
       - name: Build macOS release
@@ -125,6 +146,11 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+      # See build-windows's identical step -- pubspec.yaml's path
+      # override needs this on every platform's pub get.
+      - name: Vendor patched flutter_webrtc
+        shell: pwsh
+        run: ./tool/vendor_flutter_webrtc.ps1
       - name: Install dependencies
         run: flutter pub get
       - name: Build Linux release
@@ -165,6 +191,11 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+      # See build-windows's identical step -- pubspec.yaml's path
+      # override needs this on every platform's pub get.
+      - name: Vendor patched flutter_webrtc
+        shell: pwsh
+        run: ./tool/vendor_flutter_webrtc.ps1
       - name: Install dependencies
         run: flutter pub get
       # Only present once GOOGLE_SERVICES_JSON_BASE64 is set (see
@@ -219,6 +250,11 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+      # See build-windows's identical step -- pubspec.yaml's path
+      # override needs this on every platform's pub get.
+      - name: Vendor patched flutter_webrtc
+        shell: pwsh
+        run: ./tool/vendor_flutter_webrtc.ps1
       - name: Install dependencies
         run: flutter pub get
       # Only present once GOOGLE_SERVICE_INFO_PLIST_BASE64 is set (see

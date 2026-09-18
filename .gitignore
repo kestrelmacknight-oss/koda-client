@@ -67,3 +67,10 @@ app.*.map.json
 # same as the signing files above (see PUSH_NOTIFICATIONS.md).
 /android/app/google-services.json
 /ios/Runner/GoogleService-Info.plist
+
+# Vendored, patched flutter_webrtc (Windows mic EQ -- see
+# tool/vendor_flutter_webrtc.ps1 and native/flutter_webrtc_eq_patch/).
+# This is a full local copy of the upstream package plus its bundled
+# libwebrtc binaries (~30MB) -- a rebuildable local artifact, not
+# something to commit. The actual patch is tracked separately.
+/third_party/flutter_webrtc/

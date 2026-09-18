@@ -151,6 +151,64 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                   onChanged: (v) => _save(settings.copyWith(voiceIsolation: v)),
                 ),
 
+                // Real frequency-band EQ and preamp boost, applied to your
+                // mic before it's published -- not just a local monitoring
+                // effect. Windows only for now (see package:flutter_webrtc's
+                // Helper.setMicEqGains/setMicBoost, Koda-specific native
+                // patches) -- hidden elsewhere rather than shown non-functional.
+                if (Platform.isWindows) ...[
+                  const SizedBox(height: 24),
+                  _sectionLabel('Mic Boost'),
+                  _toggleTile(
+                    title: 'Enable Boost',
+                    subtitle: 'Preamp gain for a quiet or distant mic -- applied before EQ',
+                    value: settings.micBoostEnabled,
+                    onChanged: (v) => _save(settings.copyWith(micBoostEnabled: v)),
+                  ),
+                  if (settings.micBoostEnabled)
+                    _eqBandSlider(
+                      label: 'Boost',
+                      value: settings.micBoostGain,
+                      min: 0.0,
+                      max: 20.0,
+                      onChanged: (v) => ref.read(voiceSettingsProvider.notifier)
+                          .update((s) => s.copyWith(micBoostGain: v)),
+                      onChangeEnd: (v) => _save(settings.copyWith(micBoostGain: v)),
+                    ),
+
+                  const SizedBox(height: 24),
+                  _sectionLabel('Mic EQ'),
+                  _toggleTile(
+                    title: 'Enable EQ',
+                    subtitle: 'Shape your mic before it reaches other people',
+                    value: settings.eqEnabled,
+                    onChanged: (v) => _save(settings.copyWith(eqEnabled: v)),
+                  ),
+                  if (settings.eqEnabled) ...[
+                    _eqBandSlider(
+                      label: 'Bass',
+                      value: settings.eqBassGain,
+                      onChanged: (v) => ref.read(voiceSettingsProvider.notifier)
+                          .update((s) => s.copyWith(eqBassGain: v)),
+                      onChangeEnd: (v) => _save(settings.copyWith(eqBassGain: v)),
+                    ),
+                    _eqBandSlider(
+                      label: 'Mid',
+                      value: settings.eqMidGain,
+                      onChanged: (v) => ref.read(voiceSettingsProvider.notifier)
+                          .update((s) => s.copyWith(eqMidGain: v)),
+                      onChangeEnd: (v) => _save(settings.copyWith(eqMidGain: v)),
+                    ),
+                    _eqBandSlider(
+                      label: 'Treble',
+                      value: settings.eqTrebleGain,
+                      onChanged: (v) => ref.read(voiceSettingsProvider.notifier)
+                          .update((s) => s.copyWith(eqTrebleGain: v)),
+                      onChangeEnd: (v) => _save(settings.copyWith(eqTrebleGain: v)),
+                    ),
+                  ],
+                ],
+
                 const SizedBox(height: 24),
                 _sectionLabel('Voice Activity Detection (VOX)'),
                 _toggleTile(
@@ -380,5 +438,34 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
           activeThumbColor: KodaColors.koda,
           onChanged: onChanged,
         ),
+      );
+
+  Widget _eqBandSlider({
+    required String label,
+    required double value,
+    required ValueChanged<double> onChanged,
+    required ValueChanged<double> onChangeEnd,
+    double min = -12.0,
+    double max = 12.0,
+  }) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Text(label, style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+            const Spacer(),
+            Text('${value >= 0 ? '+' : ''}${value.toStringAsFixed(1)} dB',
+                style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+          ]),
+          Slider(
+            value: value,
+            min: min,
+            max: max,
+            divisions: ((max - min) * 4).round(),
+            activeColor: KodaColors.koda,
+            inactiveColor: KodaColors.border,
+            onChanged: onChanged,
+            onChangeEnd: onChangeEnd,
+          ),
+        ]),
       );
 }

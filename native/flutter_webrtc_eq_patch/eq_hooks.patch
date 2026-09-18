@@ -1,0 +1,192 @@
+--- a/common/cpp/include/flutter_webrtc_base.h
++++ b/common/cpp/include/flutter_webrtc_base.h
+@@ -23,6 +23,13 @@
+ #include "rtc_peerconnection_factory.h"
+ #include "rtc_video_device.h"
+ 
++// Real mic EQ -- Windows only for now, see audio_eq_processor.h for why
++// this lives there and why it's gated behind _WIN32 in this otherwise
++// cross-desktop-platform shared file.
++#if defined(_WIN32)
++#include "audio_eq_processor.h"
++#endif
++
+ namespace flutter_webrtc_plugin {
+ 
+ using namespace libwebrtc;
+@@ -53,6 +60,12 @@
+     return audio_processing_;
+   }
+ 
++#if defined(_WIN32)
++  virtual AudioEqProcessor* audio_eq_processor() {
++    return audio_eq_processor_.get();
++  }
++#endif
++
+   virtual scoped_refptr<RTCMediaTrack> MediaTrackForId(const std::string& id);
+ 
+   std::string GenerateUUID();
+@@ -114,6 +127,9 @@
+   scoped_refptr<RTCVideoDevice> video_device_;
+   scoped_refptr<RTCDesktopDevice> desktop_device_;
+   scoped_refptr<RTCAudioProcessing> audio_processing_;
++#if defined(_WIN32)
++  std::unique_ptr<AudioEqProcessor> audio_eq_processor_;
++#endif
+   RTCConfiguration configuration_;
+ 
+   std::map<std::string, scoped_refptr<libwebrtc::KeyProvider>> key_providers_;
+--- a/common/cpp/src/flutter_webrtc_base.cc
++++ b/common/cpp/src/flutter_webrtc_base.cc
+@@ -20,6 +20,16 @@
+   video_device_ = factory_->GetVideoDevice();
+   desktop_device_ = factory_->GetDesktopDevice();
+   audio_processing_ = factory_->GetAudioProcessing();
++#if defined(_WIN32)
++  // See audio_eq_processor.h -- SetCapturePostProcessing is a real,
++  // previously-unwired hook that runs before Opus encoding, i.e. before
++  // publish, which is what actually lets a remote listener hear the
++  // shaped audio (not just a local monitoring/visualizer tap).
++  audio_eq_processor_ = std::make_unique<AudioEqProcessor>();
++  if (audio_processing_) {
++    audio_processing_->SetCapturePostProcessing(audio_eq_processor_.get());
++  }
++#endif
+   event_channel_ = EventChannelProxy::Create(messenger_, task_runner_, kEventChannelName);
+ }
+ 
+--- a/common/cpp/src/flutter_webrtc.cc
++++ b/common/cpp/src/flutter_webrtc.cc
+@@ -1287,6 +1287,42 @@
+       RTCLoggingSeverity severity = str2LogSeverity(severityStr);
+       initLoggerCallback(severity);
+     }
++#if defined(_WIN32)
++  } else if (method_call.method_name().compare("setMicEqGains") == 0) {
++    // Real mic EQ -- see audio_eq_processor.h. Windows only for now, so
++    // this whole branch (including the method name check) compiles out
++    // on other desktop platforms, which fall through to NotImplemented()
++    // below exactly as if the method didn't exist.
++    if (!method_call.arguments()) {
++      result->Error("Bad Arguments", "Bad arguments received");
++      return;
++    }
++    const EncodableMap params =
++        GetValue<EncodableMap>(*method_call.arguments());
++    const double bass = findDouble(params, "bass");
++    const double mid = findDouble(params, "mid");
++    const double treble = findDouble(params, "treble");
++    if (auto* eq = audio_eq_processor()) {
++      eq->SetGainsDb(bass, mid, treble);
++    }
++    result->Success(EncodableValue(true));
++  } else if (method_call.method_name().compare("setMicBoost") == 0) {
++    // Broadband preamp gain -- see audio_eq_processor.h's SetBoostDb.
++    // Separate native call from setMicEqGains above (the toggle/slider
++    // is its own settings control, not part of the 3-band EQ) but the
++    // same processor instance, applied before the EQ bands.
++    if (!method_call.arguments()) {
++      result->Error("Bad Arguments", "Bad arguments received");
++      return;
++    }
++    const EncodableMap params =
++        GetValue<EncodableMap>(*method_call.arguments());
++    const double boost = findDouble(params, "boost");
++    if (auto* eq = audio_eq_processor()) {
++      eq->SetBoostDb(boost);
++    }
++    result->Success(EncodableValue(true));
++#endif
+   } else {
+     if (HandleFrameCryptorMethodCall(method_call, std::move(result), &result)) {
+       return;
+--- a/windows/CMakeLists.txt
++++ b/windows/CMakeLists.txt
+@@ -33,6 +33,7 @@
+   "loopback_capturer_factory.cc"
+   "flutter_webrtc_plugin.cc"
+   "task_runner_windows.cc"
++  "audio_eq_processor.cc"
+ )
+ 
+ include_directories(
+--- a/lib/src/helper.dart
++++ b/lib/src/helper.dart
+@@ -158,6 +158,21 @@
+   static Future<void> setMicrophoneMute(bool mute, MediaStreamTrack track) =>
+       NativeAudioManagement.setMicrophoneMute(mute, track);
+ 
++  /// Set the 3-band (bass/mid/treble) EQ applied to the outgoing mic
++  /// signal -- see [NativeAudioManagement.setMicEqGains]. Windows only,
++  /// a no-op elsewhere.
++  static Future<void> setMicEqGains({
++    required double bass,
++    required double mid,
++    required double treble,
++  }) =>
++      NativeAudioManagement.setMicEqGains(bass: bass, mid: mid, treble: treble);
++
++  /// Set the broadband mic preamp/boost gain -- see
++  /// [NativeAudioManagement.setMicBoost]. Windows only, a no-op elsewhere.
++  static Future<void> setMicBoost(double boostDb) =>
++      NativeAudioManagement.setMicBoost(boostDb);
++
+   /// Get how the audio device module mutes microphone input.
+   ///
+   /// iOS/macOS only. On all other platforms this returns
+--- a/lib/src/native/audio_management.dart
++++ b/lib/src/native/audio_management.dart
+@@ -246,4 +246,52 @@
+       throw 'Unable to set isMicrophoneMuted: ${e.message}';
+     }
+   }
++
++  static bool get _supportsMicEqGains => !kIsWeb && WebRTC.platformIsWindows;
++
++  /// Sets the 3-band (bass/mid/treble) EQ applied to the outgoing mic
++  /// signal before it's encoded and published -- see
++  /// windows/audio_eq_processor.h for the actual DSP. Gains are in dB,
++  /// 0.0 for all three is a no-op/flat pass-through.
++  ///
++  /// Windows only -- this is a Koda-specific patch on top of upstream
++  /// flutter_webrtc, not a real upstream feature (see rtc_audio_processing.h's
++  /// CustomProcessing, which upstream never wires to anything). On every
++  /// other platform this is a no-op that completes normally, so it's
++  /// always safe to call from cross-platform code.
++  static Future<void> setMicEqGains({
++    required double bass,
++    required double mid,
++    required double treble,
++  }) async {
++    if (!_supportsMicEqGains) return;
++
++    try {
++      await WebRTC.invokeMethod('setMicEqGains', <String, dynamic>{
++        'bass': bass,
++        'mid': mid,
++        'treble': treble,
++      });
++    } on PlatformException catch (e) {
++      throw 'Unable to set mic EQ gains: ${e.message}';
++    }
++  }
++
++  /// Sets a broadband preamp/boost gain (dB, roughly 0..20) applied to
++  /// the outgoing mic signal before the EQ bands above -- see
++  /// windows/audio_eq_processor.h's SetBoostDb. 0.0 is a no-op.
++  ///
++  /// Windows only -- same Koda-specific patch as [setMicEqGains]. No-op
++  /// elsewhere.
++  static Future<void> setMicBoost(double boostDb) async {
++    if (!_supportsMicEqGains) return;
++
++    try {
++      await WebRTC.invokeMethod('setMicBoost', <String, dynamic>{
++        'boost': boostDb,
++      });
++    } on PlatformException catch (e) {
++      throw 'Unable to set mic boost: ${e.message}';
++    }
++  }
+ }

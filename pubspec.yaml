@@ -50,6 +50,18 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   flutter_launcher_icons: ^0.14.1
 
+# Windows mic EQ (see lib/features/settings/voice_video_settings_screen.dart
+# and third_party/flutter_webrtc/windows/audio_eq_processor.cc) needs a
+# real pre-encode audio processing hook that upstream flutter_webrtc
+# never wires up -- this points at a locally vendored, patched copy
+# instead of the pub.dev release. See tool/vendor_flutter_webrtc.ps1 to
+# reproduce third_party/flutter_webrtc (gitignored, not committed) and
+# native/flutter_webrtc_eq_patch/ for exactly what's patched relative to
+# upstream 1.6.0.
+dependency_overrides:
+  flutter_webrtc:
+    path: third_party/flutter_webrtc
+
 flutter:
   uses-material-design: true
   assets:

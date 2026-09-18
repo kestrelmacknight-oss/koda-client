@@ -123,6 +123,17 @@ class VoiceSettings {
   // playback volume (Helper.setVolume) while local audioLevel is above
   // vadThreshold. See voice_activity_controller.dart for the actual tick.
   final bool autoDucking;
+  // 3-band mic EQ applied before publish -- Windows only for now, see
+  // package:flutter_webrtc's Helper.setMicEqGains (a Koda-specific
+  // native patch, not an upstream feature). Gains in dB, -12..12.
+  final bool eqEnabled;
+  final double eqBassGain;
+  final double eqMidGain;
+  final double eqTrebleGain;
+  // Broadband preamp/boost applied before the EQ bands above -- same
+  // native patch, see Helper.setMicBoost. dB, roughly 0..20.
+  final bool micBoostEnabled;
+  final double micBoostGain;
   final bool vadEnabled;
   final double vadThreshold;
   final String? pushToTalkKey;
@@ -141,6 +152,12 @@ class VoiceSettings {
     this.typingNoiseDetection = true,
     this.voiceIsolation = true,
     this.autoDucking = false,
+    this.eqEnabled = false,
+    this.eqBassGain = 0.0,
+    this.eqMidGain = 0.0,
+    this.eqTrebleGain = 0.0,
+    this.micBoostEnabled = false,
+    this.micBoostGain = 0.0,
     this.vadEnabled = false,
     this.vadThreshold = 0.05,
     this.pushToTalkKey,
@@ -162,6 +179,12 @@ class VoiceSettings {
         typingNoiseDetection:  j['typing_noise_detection'] as bool? ?? true,
         voiceIsolation:        j['voice_isolation'] as bool? ?? true,
         autoDucking:           j['auto_ducking'] as bool? ?? false,
+        eqEnabled:             j['eq_enabled'] as bool? ?? false,
+        eqBassGain:            (j['eq_bass_gain'] as num?)?.toDouble() ?? 0.0,
+        eqMidGain:             (j['eq_mid_gain'] as num?)?.toDouble() ?? 0.0,
+        eqTrebleGain:          (j['eq_treble_gain'] as num?)?.toDouble() ?? 0.0,
+        micBoostEnabled:       j['mic_boost_enabled'] as bool? ?? false,
+        micBoostGain:          (j['mic_boost_gain'] as num?)?.toDouble() ?? 0.0,
         vadEnabled:            j['vad_enabled'] as bool? ?? false,
         vadThreshold:          (j['vad_threshold'] as num?)?.toDouble() ?? 0.05,
         pushToTalkKey:         j['push_to_talk_key'] as String?,
@@ -181,6 +204,12 @@ class VoiceSettings {
         'typing_noise_detection': typingNoiseDetection,
         'voice_isolation':        voiceIsolation,
         'auto_ducking':           autoDucking,
+        'eq_enabled':             eqEnabled,
+        'eq_bass_gain':           eqBassGain,
+        'eq_mid_gain':            eqMidGain,
+        'eq_treble_gain':         eqTrebleGain,
+        'mic_boost_enabled':      micBoostEnabled,
+        'mic_boost_gain':         micBoostGain,
         'vad_enabled':            vadEnabled,
         'vad_threshold':          vadThreshold,
         'push_to_talk_key':       pushToTalkKey,
@@ -200,6 +229,12 @@ class VoiceSettings {
     bool? typingNoiseDetection,
     bool? voiceIsolation,
     bool? autoDucking,
+    bool? eqEnabled,
+    double? eqBassGain,
+    double? eqMidGain,
+    double? eqTrebleGain,
+    bool? micBoostEnabled,
+    double? micBoostGain,
     bool? vadEnabled,
     double? vadThreshold,
     String? pushToTalkKey,
@@ -219,6 +254,12 @@ class VoiceSettings {
         typingNoiseDetection: typingNoiseDetection ?? this.typingNoiseDetection,
         voiceIsolation:       voiceIsolation ?? this.voiceIsolation,
         autoDucking:          autoDucking ?? this.autoDucking,
+        eqEnabled:            eqEnabled ?? this.eqEnabled,
+        eqBassGain:           eqBassGain ?? this.eqBassGain,
+        eqMidGain:            eqMidGain ?? this.eqMidGain,
+        eqTrebleGain:         eqTrebleGain ?? this.eqTrebleGain,
+        micBoostEnabled:      micBoostEnabled ?? this.micBoostEnabled,
+        micBoostGain:         micBoostGain ?? this.micBoostGain,
         vadEnabled:           vadEnabled ?? this.vadEnabled,
         vadThreshold:         vadThreshold ?? this.vadThreshold,
         pushToTalkKey:        clearPushToTalkKey ? null : (pushToTalkKey ?? this.pushToTalkKey),

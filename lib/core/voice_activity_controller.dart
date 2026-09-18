@@ -42,12 +42,25 @@ class VoiceActivityController {
   static const _duckVolume = 0.25;
   static const _duckReleaseHang = Duration(milliseconds: 500);
 
+  // Per-participant manual volume (identity -> multiplier, 1.0 = normal,
+  // absent = never touched = also 1.0). Session-scoped like ducking --
+  // resets on the next call, not persisted. Composes multiplicatively
+  // with ducking below rather than one overwriting the other, so
+  // "everyone gets quieter while I talk" and "I turned Alex down" both
+  // stay true at once.
+  final Map<String, double> _participantVolumes = {};
+  lk.Room? _room;
+  lk.EventsListener<lk.RoomEvent>? _volumeListener;
+
+  double volumeFor(String identity) => _participantVolumes[identity] ?? 1.0;
+
   void start({
     required lk.Room room,
     required VoiceSettings Function() settingsOf,
     required bool Function() isManuallyMuted,
   }) {
     stop();
+    _room = room;
 
     _keyHandler = (event) {
       final key = settingsOf().pushToTalkKey;
@@ -61,6 +74,13 @@ class VoiceActivityController {
     };
     HardwareKeyboard.instance.addHandler(_keyHandler!);
 
+    // A participant who left and rejoined mid-call gets a fresh track --
+    // reapply whatever volume was set for their identity earlier in this
+    // same call, rather than silently dropping back to 100%.
+    _volumeListener = room.createListener()
+      ..on<lk.ParticipantConnectedEvent>((_) => _reapplyAllParticipantVolumes())
+      ..on<lk.TrackSubscribedEvent>((_) => _reapplyAllParticipantVolumes());
+
     _timer = Timer.periodic(const Duration(milliseconds: 100), (_) {
       _apply(room, settingsOf(), isManuallyMuted());
     });
@@ -73,6 +93,10 @@ class VoiceActivityController {
       HardwareKeyboard.instance.removeHandler(_keyHandler!);
       _keyHandler = null;
     }
+    _volumeListener?.dispose();
+    _volumeListener = null;
+    _room = null;
+    _participantVolumes.clear();
     _pttHeld = false;
     // No volume-restore call here -- stop() runs as the room is
     // disconnecting/tearing down, so lingering ducked state on a track
@@ -80,6 +104,39 @@ class VoiceActivityController {
     // next start().
     _isDucking = false;
     _lastLoudAt = null;
+  }
+
+  /// Called from the UI (see VoiceSessionNotifier.setParticipantVolume) --
+  /// [volume] is a multiplier, 1.0 = normal, e.g. 0.0..2.0 for a 0-200%
+  /// slider. Applies immediately, composed with whatever ducking state
+  /// is currently in effect.
+  Future<void> setParticipantVolume(String identity, double volume) async {
+    _participantVolumes[identity] = volume;
+    final room = _room;
+    if (room == null) return;
+    final participant = room.remoteParticipants.values
+        .cast<lk.RemoteParticipant?>()
+        .firstWhere((p) => p?.identity == identity, orElse: () => null);
+    if (participant == null) return;
+    await _setParticipantNativeVolume(participant, volume);
+  }
+
+  void _reapplyAllParticipantVolumes() {
+    final room = _room;
+    if (room == null || _participantVolumes.isEmpty) return;
+    for (final participant in room.remoteParticipants.values) {
+      final saved = _participantVolumes[participant.identity];
+      if (saved != null) _setParticipantNativeVolume(participant, saved);
+    }
+  }
+
+  Future<void> _setParticipantNativeVolume(
+      lk.RemoteParticipant participant, double volume) async {
+    final effective = volume * (_isDucking ? _duckVolume : 1.0);
+    for (final pub in participant.audioTrackPublications) {
+      final track = pub.track;
+      if (track != null) await rtc.Helper.setVolume(effective, track.mediaStreamTrack);
+    }
   }
 
   Future<void> _apply(lk.Room room, VoiceSettings settings, bool manuallyMuted) async {
@@ -110,7 +167,7 @@ class VoiceActivityController {
     if (!settings.autoDucking) {
       if (_isDucking) {
         _isDucking = false;
-        await _setRemoteVolumes(room, 1.0);
+        await _setRemoteVolumes(room);
       }
       return;
     }
@@ -123,17 +180,16 @@ class VoiceActivityController {
     if (shouldDuck == _isDucking) return; // no transition, no native call needed
 
     _isDucking = shouldDuck;
-    await _setRemoteVolumes(room, shouldDuck ? _duckVolume : 1.0);
+    await _setRemoteVolumes(room);
   }
 
-  Future<void> _setRemoteVolumes(lk.Room room, double volume) async {
+  // Applies the current duck multiplier to every remote participant,
+  // each still composed with their own saved manual volume (see
+  // _setParticipantNativeVolume) -- so a duck transition never clobbers
+  // a volume someone was manually turned down (or up) to.
+  Future<void> _setRemoteVolumes(lk.Room room) async {
     for (final participant in room.remoteParticipants.values) {
-      for (final pub in participant.audioTrackPublications) {
-        final track = pub.track;
-        if (track != null) {
-          await rtc.Helper.setVolume(volume, track.mediaStreamTrack);
-        }
-      }
+      await _setParticipantNativeVolume(participant, volumeFor(participant.identity));
     }
   }
 }

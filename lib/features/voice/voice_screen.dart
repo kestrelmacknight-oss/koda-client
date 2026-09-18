@@ -259,6 +259,62 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
     );
   }
 
+  // Right-click a remote participant's tile to adjust how loud they are
+  // *for you*, this call only -- composes with auto-ducking rather than
+  // fighting it (see VoiceActivityController.setParticipantVolume), and
+  // is purely local: it never touches what they publish or what anyone
+  // else hears.
+  void _showVolumeDialog(lk.Participant participant, String name) {
+    final notifier = ref.read(voiceSessionProvider.notifier);
+    var volume = notifier.volumeForParticipant(participant.identity);
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: KodaColors.card,
+          title: Text('$name\'s Volume', style: const TextStyle(color: KodaColors.text1)),
+          content: SizedBox(
+            width: 280,
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Text('${(volume * 100).round()}%',
+                  style: const TextStyle(color: KodaColors.text2, fontSize: 13)),
+              Slider(
+                value: volume,
+                min: 0.0,
+                max: 2.0,
+                divisions: 40,
+                activeColor: KodaColors.koda,
+                inactiveColor: KodaColors.border,
+                onChanged: (v) {
+                  setDialogState(() => volume = v);
+                  notifier.setParticipantVolume(participant.identity, v);
+                },
+              ),
+              const Text(
+                'Only affects what you hear -- this device, this call.',
+                style: TextStyle(color: KodaColors.text3, fontSize: 11),
+                textAlign: TextAlign.center,
+              ),
+            ]),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setDialogState(() => volume = 1.0);
+                notifier.setParticipantVolume(participant.identity, 1.0);
+              },
+              child: const Text('Reset'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Done'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _displayName(lk.Participant p) {
     try {
       final meta = p.metadata;
@@ -419,6 +475,9 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                 return GestureDetector(
                                   onDoubleTap: () => _popOutParticipant(context, name, videoTrack),
                                   onTap: () => _popOutParticipant(context, name, videoTrack),
+                                  onSecondaryTapUp: isLocal
+                                      ? null
+                                      : (d) => _showVolumeDialog(p, name),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       color: KodaColors.card,
