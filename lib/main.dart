@@ -14,6 +14,7 @@ import 'core/providers.dart';
 import 'core/push_notifications.dart';
 import 'core/socket.dart';
 import 'core/theme.dart';
+import 'core/tray_service.dart';
 import 'features/auth/auth_screen.dart';
 import 'features/auth/child_lockout_screen.dart';
 import 'features/home/home_screen.dart';
@@ -51,6 +52,8 @@ void main(List<String> args) async {
       await windowManager.show();
       await windowManager.focus();
     });
+
+    await TrayService.instance.init();
   }
 
   try {

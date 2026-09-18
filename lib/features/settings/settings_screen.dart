@@ -11,7 +11,9 @@ import '../../core/api.dart';
 import '../../core/push_notifications.dart';
 import '../../core/socket.dart';
 import '../../core/theme.dart';
+import '../../core/platform.dart';
 import '../../core/providers.dart';
+import '../../core/tray_service.dart';
 import '../../core/uploader.dart';
 import '../../shared/widgets.dart';
 import 'content_filters_screen.dart';
@@ -45,6 +47,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _status = 'online';
   String? _throneWebhookUrl;
   bool _loadingThroneUrl = false;
+  bool _closeToTray = true;
 
   static const _sections = [
     ('My Account', Icons.person_outline),
@@ -52,6 +55,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     ('Billing',    Icons.payments_outlined),
     ('Family',     Icons.family_restroom_outlined),
     ('Voice & Video', Icons.mic_outlined),
+    ('Desktop',    Icons.desktop_windows_outlined),
     ('About',      Icons.info_outlined),
   ];
 
@@ -78,6 +82,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _bioCtrl         = TextEditingController();
     _pronounsCtrl    = TextEditingController();
     _status = 'online';
+    if (isDesktop) {
+      TrayService.instance.getCloseToTrayEnabled().then((v) {
+        if (mounted) setState(() => _closeToTray = v);
+      });
+    }
   }
 
   @override
@@ -316,6 +325,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       case 4:
         return const VoiceVideoSettingsScreen();
       case 5:
+        return _buildDesktopSection();
+      case 6:
         return _shell('About Koda', Column(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
           Container(
@@ -358,6 +369,38 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       default:
         return const SizedBox();
     }
+  }
+
+  Widget _buildDesktopSection() {
+    if (!isDesktop) {
+      return _shell('Desktop', const Text(
+          'These are desktop-only settings -- there\'s no window or system '
+          'tray on this platform.',
+          style: TextStyle(color: KodaColors.text3, fontSize: 13)));
+    }
+    return _shell('Desktop', Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
+        decoration: BoxDecoration(
+            color: KodaColors.card, borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: KodaColors.border)),
+        child: SwitchListTile(
+          secondary: const Icon(Icons.close_fullscreen_outlined, color: KodaColors.text3, size: 18),
+          title: const Text('Close to system tray',
+              style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+          subtitle: const Text(
+              'Closing the window keeps Koda running in the background so you '
+              'still get notifications -- turn this off to make closing the '
+              'window actually quit.',
+              style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+          activeThumbColor: KodaColors.koda,
+          value: _closeToTray,
+          onChanged: (v) async {
+            setState(() => _closeToTray = v);
+            await TrayService.instance.setCloseToTrayEnabled(v);
+          },
+        ),
+      ),
+    ]));
   }
 
   // -- Profile view (read-only) -----------------------------------------------
