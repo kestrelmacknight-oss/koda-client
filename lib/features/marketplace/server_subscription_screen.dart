@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api.dart';
 import '../../core/checkout.dart';
-import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../core/time_utils.dart';
 import '../../shared/widgets.dart';
@@ -145,9 +144,9 @@ class _ServerSubscriptionScreenState
         // Header
         Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: KodaColors.elevated,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
           ),
           child: Row(children: [
             Container(
@@ -599,6 +598,7 @@ class _ServerSubscriptionScreenState
       return;
     }
 
+    if (!mounted) return;
     final messenger = ScaffoldMessenger.of(context);
     final paymentConfirmed = await launchCheckoutAndWait(context, ref,
         checkoutUrl: checkoutUrl,

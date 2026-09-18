@@ -31,7 +31,7 @@ ThemeData kodaTheme() {
     brightness: Brightness.dark,
     scaffoldBackgroundColor: KodaColors.voidBg,
     fontFamily: 'Segoe UI',
-    colorScheme: ColorScheme.dark(
+    colorScheme: const ColorScheme.dark(
       primary:   KodaColors.koda,
       secondary: KodaColors.mint,
       error:     KodaColors.accent,

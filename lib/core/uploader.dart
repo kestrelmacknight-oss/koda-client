@@ -53,7 +53,7 @@ class KodaUploader {
       );
 
       if (cdnUrl == null) {
-        throw UploadException('Upload failed. Please try again.');
+        throw const UploadException('Upload failed. Please try again.');
       }
 
       return UploadResult(cdnUrl: cdnUrl);
@@ -61,7 +61,7 @@ class KodaUploader {
       rethrow;
     } catch (e) {
       debugPrint('[KodaUploader] Upload error: $e');
-      throw UploadException('Upload failed. Please check your connection.');
+      throw const UploadException('Upload failed. Please check your connection.');
     }
   }
 

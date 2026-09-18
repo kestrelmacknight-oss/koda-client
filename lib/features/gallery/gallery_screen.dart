@@ -15,7 +15,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api.dart';
 import '../../core/uploader.dart';
 import '../../core/theme.dart';
-import '../../core/providers.dart';
 import '../../shared/widgets.dart';
 
 class GalleryScreen extends ConsumerStatefulWidget {

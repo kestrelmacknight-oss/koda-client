@@ -8,7 +8,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:livekit_client/livekit_client.dart' as lk;
 import '../../../core/theme.dart';
 import '../../../core/voice_session.dart';
 import 'voice_screen.dart';

@@ -346,12 +346,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white))),
               ),
               const SizedBox(width: 16),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text(KodaConfig.appName, style: TextStyle(
+              const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(KodaConfig.appName, style: TextStyle(
                     color: KodaColors.text1, fontWeight: FontWeight.w700)),
                 Text('${KodaConfig.buildLabel} v${KodaConfig.appVersion}',
-                    style: const TextStyle(color: KodaColors.gold, fontSize: 12)),
-                const Text(KodaConfig.company,
+                    style: TextStyle(color: KodaColors.gold, fontSize: 12)),
+                Text(KodaConfig.company,
                     style: TextStyle(color: KodaColors.text3, fontSize: 11)),
               ]),
             ]),

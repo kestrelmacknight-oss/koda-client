@@ -160,7 +160,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
     try {
       await lp.setMetadata(jsonEncode(meta));
     } catch (e) {
-      debugPrint('[VARM] metadata sync failed: ' + e.toString());
+      debugPrint('[VARM] metadata sync failed: $e');
     }
   }
 
@@ -207,7 +207,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
         await Future.delayed(const Duration(milliseconds: 500));
         if (mounted) setState(() { _cameraOn = true; _localVideoTrack = track; });
       } catch (e) {
-        debugPrint('[Camera] error: ' + e.toString());
+        debugPrint('[Camera] error: $e');
       }
     }
   }
@@ -229,9 +229,11 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
         await _room.localParticipant?.publishVideoTrack(track);
         if (mounted) setState(() { _screenShareOn = true; _screenShareTrack = track; });
       } catch (e) {
-        debugPrint('[ScreenShare] error: ' + e.toString());
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Screen share failed: ' + e.toString())));
+        debugPrint('[ScreenShare] error: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Screen share failed: $e')));
+        }
       }
     }
   }

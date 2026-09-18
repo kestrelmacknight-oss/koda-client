@@ -499,8 +499,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 const SizedBox(height: 12),
 
                 // Start time
-                Text('Start (${DateTime.now().timeZoneName})', 
-                  style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                Text('Start (${DateTime.now().timeZoneName})',
+                  style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
                 GestureDetector(
                   onTap: () async {
@@ -511,6 +511,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
                     );
                     if (date == null) return;
+                    if (!ctx.mounted) return;
                     final time = await showTimePicker(
                         context: ctx, initialTime: TimeOfDay.fromDateTime(startAt));
                     if (time == null) return;
@@ -530,8 +531,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 const SizedBox(height: 10),
 
                 // End time
-                Text('End — optional (${DateTime.now().timeZoneName})', 
-                  style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                Text('End — optional (${DateTime.now().timeZoneName})',
+                  style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
                 GestureDetector(
                   onTap: () async {
@@ -542,6 +543,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
                     );
                     if (date == null) return;
+                    if (!ctx.mounted) return;
                     final time = await showTimePicker(
                         context: ctx,
                         initialTime: TimeOfDay.fromDateTime(

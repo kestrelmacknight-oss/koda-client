@@ -123,8 +123,10 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   // ── Subscriptions tab ─────────────────────────────────────────────────────
 
   Widget _buildSubscriptionsTab() {
-    if (_loadingSub) return const Center(
-        child: CircularProgressIndicator(color: KodaColors.koda));
+    if (_loadingSub) {
+      return const Center(
+          child: CircularProgressIndicator(color: KodaColors.koda));
+    }
 
     final tier = _subscriptionInfo?['tier'] as String? ?? 'free';
     final sub = _subscriptionInfo?['subscription'] as Map<String, dynamic>?;
@@ -319,7 +321,6 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
 
   Future<void> _showSubscribeDialog(String tier, int price, bool isGift) async {
     final recipientCtrl = TextEditingController();
-    final messageCtrl = TextEditingController();
     final server = ref.read(selectedServerProvider);
 
     final confirmed = await showDialog<bool>(
@@ -403,6 +404,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
       return;
     }
 
+    if (!mounted) return;
     final messenger = ScaffoldMessenger.of(context);
     final paymentConfirmed = await launchCheckoutAndWait(context, ref,
         checkoutUrl: checkoutUrl,
@@ -421,8 +423,10 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   // ── Creator tab ───────────────────────────────────────────────────────────
 
   Widget _buildCreatorTab() {
-    if (_loadingConnect) return const Center(
-        child: CircularProgressIndicator(color: KodaColors.koda));
+    if (_loadingConnect) {
+      return const Center(
+          child: CircularProgressIndicator(color: KodaColors.koda));
+    }
 
     final connected = _connectAccount != null;
     final onboarded = _connectAccount?['onboarding_complete'] == true;
@@ -621,7 +625,6 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   }
 
   Widget _buildDigitalGoodsTab() {
-    final user = ref.watch(authProvider).user;
     final server = ref.watch(selectedServerProvider);
     return DigitalGoodsScreen(
       server: server,
@@ -735,8 +738,10 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Center(
-        child: CircularProgressIndicator(color: KodaColors.koda));
+    if (_loading) {
+      return const Center(
+          child: CircularProgressIndicator(color: KodaColors.koda));
+    }
 
     final balance = _bank?['balance'] as int? ?? 0;
     final balanceUsd = _bank?['balance_usd'] as double? ?? 0.0;
@@ -845,12 +850,12 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: KodaColors.border),
           ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('Coming soon — Server upgrades',
+          child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Coming soon — Server upgrades',
                 style: TextStyle(color: KodaColors.text1,
                     fontWeight: FontWeight.w600, fontSize: 14)),
-            const SizedBox(height: 8),
-            const Text('Spend server bank points on:\n• Custom server domain\n• Increased member limit\n• Priority support\n• Exclusive server badge',
+            SizedBox(height: 8),
+            Text('Spend server bank points on:\n• Custom server domain\n• Increased member limit\n• Priority support\n• Exclusive server badge',
                 style: TextStyle(color: KodaColors.text3, fontSize: 13, height: 1.6)),
           ]),
         ),
@@ -955,8 +960,10 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Center(
-        child: CircularProgressIndicator(color: KodaColors.koda));
+    if (_loading) {
+      return const Center(
+          child: CircularProgressIndicator(color: KodaColors.koda));
+    }
 
     if (!_authorized) {
       return const Center(

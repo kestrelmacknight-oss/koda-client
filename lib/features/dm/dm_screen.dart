@@ -615,7 +615,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
           color: KodaColors.accent.withValues(alpha: 0.15),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
-            "${peerName}'s safety number changed -- verify it before sending. "
+            "$peerName's safety number changed -- verify it before sending. "
             "This can mean they reinstalled the app, or (rarely) something is wrong.",
             style: const TextStyle(color: KodaColors.accent, fontSize: 11),
           ),

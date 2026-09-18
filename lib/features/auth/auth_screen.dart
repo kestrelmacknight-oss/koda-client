@@ -190,8 +190,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       fontSize: 24,
                       fontWeight: FontWeight.w800,
                       color: KodaColors.text1)),
-              Text('${KodaConfig.buildLabel} v${KodaConfig.appVersion}',
-                  style: const TextStyle(fontSize: 12, color: KodaColors.gold)),
+              const Text('${KodaConfig.buildLabel} v${KodaConfig.appVersion}',
+                  style: TextStyle(fontSize: 12, color: KodaColors.gold)),
               const SizedBox(height: 28),
 
               Container(

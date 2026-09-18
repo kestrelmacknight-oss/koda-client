@@ -90,6 +90,7 @@ class _TipDialogState extends ConsumerState<TipDialog> {
     final rootContext = Navigator.of(context, rootNavigator: true).context;
     final messenger = ScaffoldMessenger.of(context);
     Navigator.pop(context);
+    if (!rootContext.mounted) return;
 
     final confirmed = await launchCheckoutAndWait(rootContext, ref,
         checkoutUrl: checkoutUrl,

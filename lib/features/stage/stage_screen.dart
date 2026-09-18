@@ -137,10 +137,12 @@ class _StageScreenState extends ConsumerState<StageScreen> {
 
       _room.addListener(_onRoomChange);
 
-      if (mounted) setState(() {
-        _connecting = false;
-        _isSpeaker  = isSpeaker;
-      });
+      if (mounted) {
+        setState(() {
+          _connecting = false;
+          _isSpeaker  = isSpeaker;
+        });
+      }
     } catch (e) {
       if (mounted) setState(() { _connecting = false; _error = e.toString(); });
     }

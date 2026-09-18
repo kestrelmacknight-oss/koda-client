@@ -242,14 +242,13 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
       await s.room.localParticipant?.setCameraEnabled(false);
       state = s.copyWith(cameraOn: false, clearVideo: true);
     } else {
-      final settings = s.room.localParticipant;
       await s.room.localParticipant?.setCameraEnabled(true);
       await Future.delayed(const Duration(milliseconds: 2000));
       final pub = s.room.localParticipant?.videoTrackPublications
           .where((t) => !t.isScreenShare).firstOrNull;
       state = s.copyWith(
         cameraOn: true,
-        localVideoTrack: pub?.track as lk.LocalVideoTrack?,
+        localVideoTrack: pub?.track,
       );
     }
   }

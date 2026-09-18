@@ -130,6 +130,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
           'Finish connecting in your browser, then come back and refresh.')));
     }
@@ -783,8 +784,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       ),
       if (!cosmeticsUnlocked || !iconBorderUnlocked) ...[
         const SizedBox(height: 16),
-        Text('Boost this server from the Server Bank in Marketplace to raise its level.',
-            style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+        const Text('Boost this server from the Server Bank in Marketplace to raise its level.',
+            style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       ],
     ]);
   }
@@ -888,8 +889,10 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             const SnackBar(content: Text('Server icon updated!')));
       }
     } on UploadException catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message)));
+      }
     }
   }
 
@@ -1002,9 +1005,13 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         icon: const Icon(Icons.more_vert, size: 16, color: KodaColors.text3),
         color: KodaColors.card,
         onSelected: (v) {
-          if (v == 'edit') _showChannelDialog(existing: ch);
-          else if (v == 'edit_rules') _showRulesContentDialog(ch);
-          else _deleteChannel(ch);
+          if (v == 'edit') {
+            _showChannelDialog(existing: ch);
+          } else if (v == 'edit_rules') {
+            _showRulesContentDialog(ch);
+          } else {
+            _deleteChannel(ch);
+          }
         },
         itemBuilder: (_) => [
           const PopupMenuItem(value: 'edit', child: Text('Edit')),
@@ -1058,6 +1065,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     if (saved != true) return;
     await KodaApi.instance.updateRules(
         server['id'] as String, contentController.text.trim());
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Rules updated!')));
     _loadAll();
@@ -1614,7 +1622,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                     ),
                   ]),
                 );
-              }).toList(),
+              }),
           ],
         );
       },

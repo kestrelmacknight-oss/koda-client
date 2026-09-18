@@ -23,7 +23,7 @@ class RoleSelectScreen extends StatefulWidget {
 
 class _RoleSelectScreenState extends State<RoleSelectScreen> {
   List<Map<String, dynamic>> _roles = [];
-  Set<String> _assigned = {};
+  final Set<String> _assigned = {};
   bool _loading = true;
 
   @override
@@ -142,7 +142,7 @@ class _RoleSelectScreenState extends State<RoleSelectScreen> {
                           onTap: () => _toggle(role),
                         ),
                       );
-                    }).toList(),
+                    }),
                   ],
                 ),
     );

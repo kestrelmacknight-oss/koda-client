@@ -324,6 +324,7 @@ class _PurchaseDialogState extends State<_PurchaseDialog> {
     final rootContext = Navigator.of(context, rootNavigator: true).context;
     final messenger = ScaffoldMessenger.of(context);
     Navigator.pop(context);
+    if (!rootContext.mounted) return;
 
     final confirmed = await launchCheckoutAndWait(rootContext, widget.ref,
         checkoutUrl: checkoutUrl,

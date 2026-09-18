@@ -27,7 +27,6 @@ import '../../shared/category_edit_dialog.dart';
 import '../settings/settings_screen.dart';
 import '../settings/content_filters_screen.dart';
 import '../server/server_settings_screen.dart';
-import '../voice/voice_screen.dart';
 import '../voice/voice_bar.dart';
 import '../../core/voice_session.dart';
 import '../dm/dm_screen.dart';
@@ -75,8 +74,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   String? _activeChannelId;
   final _messageController = TextEditingController();
   final _scroll = ScrollController();
-  final Map<String, DateTime> _typingUsers = {};
-  Timer? _typingCleanupTimer;
   Map<String, dynamic>? _replyingTo;
   Map<String, String>? _pendingAttachment; // {url, contentType, fileName}
   bool _uploadingAttachment = false;
@@ -991,8 +988,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               final result = await KodaApi.instance.redeemInvite(code);
               if (!mounted) return;
               if (result != null && result['ok'] == true) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Joined \!')));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Joined!')));
                 _loadServers();
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -1053,7 +1050,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
 
     // Check friendship status
     final status = await KodaApi.instance.getFriendStatus(userId);
-    if (!mounted) return;
+    if (!context.mounted) return;
     final isFriend = status?['friends'] == true;
     final canDm = status?['can_dm'] == true;
 
@@ -1085,13 +1082,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   onPressed: () async {
                     Navigator.pop(context);
                     final ok = await KodaApi.instance.sendFriendRequest(userId);
-                    if (ok && mounted) {
+                    if (ok && context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Friend request sent to $username!')));
                     }
                   },
                 ),
-              if (isFriend) ...[
+              if (canDm) ...[
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: KodaColors.elevated,
@@ -1102,9 +1099,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   onPressed: () async {
                     Navigator.pop(context);
                     final convo = await KodaApi.instance.getOrCreateConversation(userId);
-                    if (convo != null && mounted) {
+                    if (convo != null && context.mounted) {
                       Navigator.push(context, MaterialPageRoute(
-                          builder: (_) => const DmScreen()));
+                          builder: (_) => DmScreen(initialConversationId: convo['id'] as String)));
                     }
                   },
                 ),
@@ -1872,10 +1869,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: const BoxDecoration(
               border: Border(bottom: BorderSide(color: KodaColors.border))),
-          child: Row(children: [
-            const Icon(Icons.storefront_outlined, size: 16, color: KodaColors.text3),
-            const SizedBox(width: 6),
-            const Text('Marketplace',
+          child: const Row(children: [
+            Icon(Icons.storefront_outlined, size: 16, color: KodaColors.text3),
+            SizedBox(width: 6),
+            Text('Marketplace',
                 style: TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w600)),
           ]),
         ),
@@ -1967,13 +1964,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 (m['sender_id'] as String?)?.substring(0, 6) ??
                 'Unknown';
             final time = _formatTime(m['inserted_at']);
-            final canDelete = true; // server enforces permission
+            const canDelete = true; // server enforces permission
             final isMine = m['sender_id'] == ref.read(authProvider).user?.id;
             final isPinned = m['pinned_at'] != null;
             final isEdited = m['edited_at'] != null;
             return GestureDetector(
               onSecondaryTapUp: (d) async {
-                final channelId = m['channel_id'] as String? ?? selectedChannel!['id'] as String;
+                final channelId = m['channel_id'] as String? ?? selectedChannel['id'] as String;
                 final action = await showMenu<String>(
                   context: context,
                   position: RelativeRect.fromLTRB(d.globalPosition.dx,
@@ -2502,7 +2499,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     color: KodaColors.koda),
                 tooltip: 'Admin Panel',
                 onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => AdminScreen())),
+                    MaterialPageRoute(builder: (_) => const AdminScreen())),
               ),
             const SizedBox(height: 10),
           ]),

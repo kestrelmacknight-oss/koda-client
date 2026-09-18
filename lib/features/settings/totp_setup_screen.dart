@@ -13,7 +13,6 @@ class TotpSetupScreen extends StatefulWidget {
 
 class _TotpSetupScreenState extends State<TotpSetupScreen> {
   String? _secret;
-  String? _uri;
   bool _loading = true;
   bool _enabled = false;
   final _code = TextEditingController();
@@ -30,7 +29,6 @@ class _TotpSetupScreenState extends State<TotpSetupScreen> {
     if (!mounted) return;
     setState(() {
       _secret = result?['secret'];
-      _uri = result?['uri'];
       _loading = false;
     });
   }

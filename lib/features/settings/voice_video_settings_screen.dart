@@ -348,8 +348,10 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
           : current.copyWith(varmTalkingUrl: uploaded.cdnUrl);
       await _save(updated);
     } on UploadException catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message)));
+      }
     }
   }
 

@@ -8,9 +8,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:livekit_client/livekit_client.dart' as lk;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme.dart';
-import '../../core/providers.dart';
 import '../../shared/widgets.dart';
 
 class PopOutVideoWindow extends StatefulWidget {
