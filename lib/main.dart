@@ -18,6 +18,7 @@ import 'features/auth/auth_screen.dart';
 import 'features/auth/child_lockout_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/voice/pop_out_video_window.dart';
+import 'shared/update_nudge.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -96,6 +97,15 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   void initState() {
     super.initState();
     _checkSession();
+
+    // Public, no-auth endpoint -- runs regardless of login state, so an
+    // old build gets nudged whether or not the person's signed in yet.
+    // Post-frame so the Navigator this needs is definitely ready (this
+    // widget IS MaterialApp's `home`, so there's no Navigator above it
+    // to rely on any earlier than that).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) maybeShowUpdateNudge(context);
+    });
 
     // Fires when any request comes back 403 outside_allowed_hours --
     // covers the case where a child's account gets locked out mid-use

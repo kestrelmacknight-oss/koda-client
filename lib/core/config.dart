@@ -2,10 +2,11 @@
 //
 // Production configuration for Koda Alpha v0.34.
 // Every URL and email address Koda needs lives here, and only here.
-// Nothing from Fly.io belongs in this file or anywhere in this app —
-// secrets (database URLs, Guardian keys, LiveKit keys) live exclusively
-// in Phoenix's server-side environment variables. The client only ever
-// needs to know these public addresses.
+// No hosting-provider details (Railway service variables, Neon
+// connection strings, etc.) belong in this file or anywhere in this
+// app — secrets (database URLs, Guardian keys, LiveKit keys) live
+// exclusively in Phoenix's server-side environment variables. The
+// client only ever needs to know these public addresses.
 
 class KodaConfig {
   KodaConfig._();

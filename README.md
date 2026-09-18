@@ -1,17 +1,18 @@
 # Koda Client -- Alpha v0.34
 
 A fresh Flutter desktop client, pre-configured for production. Every URL in
-this app points at koda.fyi already -- there is nothing to fill in, and
-nothing from Fly.io belongs in this project. The client only ever talks to
-three public addresses, all already baked into `lib/core/config.dart`:
+this app points at koda.fyi already -- there is nothing to fill in, and no
+hosting-provider details belong in this project. The client only ever talks
+to three public addresses, all already baked into `lib/core/config.dart`:
 
     https://api.koda.fyi/api/v1   -- REST API
     wss://api.koda.fyi/socket     -- real-time channels (future wiring point)
     wss://voice.koda.fyi          -- LiveKit voice/video
 
 Secrets like DATABASE_URL, GUARDIAN_SECRET_KEY, RESEND_API_KEY, and the
-LiveKit API key/secret all live server-side as Fly.io secrets on
-koda-server and koda-livekit. None of them are needed here, and none of
+LiveKit API key/secret all live server-side as Railway service variables on
+koda-server and koda-livekit (Postgres itself is Neon, connected to
+koda-server via DATABASE_URL). None of them are needed here, and none of
 them should ever be put in this project.
 
 ## What's included
@@ -118,4 +119,4 @@ None of these gaps affect the parts already in this build -- registration,
 login, email verification, password reset, the forced password change
 flow for admin accounts, server/channel creation, sending messages, and
 all legal/contact links pointing at koda.fyi are complete and functional
-against your live Fly.io backend today.
+against your live Railway backend today.
