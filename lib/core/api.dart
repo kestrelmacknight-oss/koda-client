@@ -775,6 +775,116 @@ class KodaApi {
     } catch (e) { _log('getMyChannelDeliveries', e); return []; }
   }
 
+  // ── Threshold moderator decryption (Tier 3) ─────────────────────────────
+  // See lib/core/crypto/threshold_moderation_manager.dart for how these
+  // are used together, and koda-server's Koda.ThresholdModeration for
+  // the server side. Same envelope-delivery shape as channel group
+  // encryption above, just carrying Shamir shares instead of the real
+  // epoch key -- see lib/core/crypto/shamir.dart.
+
+  /// Null if Tier 3 has never been configured for this server. Readable
+  /// by any member -- it names the moderator group, not any secret.
+  Future<Map<String, dynamic>?> getThresholdModerationConfig(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/threshold_moderation');
+      return res.data['config'] as Map<String, dynamic>?;
+    } catch (e) { _log('getThresholdModerationConfig', e); return null; }
+  }
+
+  /// Server owner only. Only takes effect for epochs generated after
+  /// this call -- see Koda.ThresholdModeration.set_config's doc comment.
+  Future<Map<String, dynamic>?> setThresholdModerationConfig(
+      String serverId, List<String> moderatorIds, int threshold, {bool enabled = true}) async {
+    try {
+      final res = await _dio.put('/servers/$serverId/threshold_moderation', data: {
+        'moderator_ids': moderatorIds,
+        'threshold': threshold,
+        'enabled': enabled,
+      });
+      return res.data['config'] as Map<String, dynamic>?;
+    } catch (e) { _log('setThresholdModerationConfig', e); return null; }
+  }
+
+  Future<List<String>> getPendingThresholdShareRecipients(String channelId, int epoch) async {
+    try {
+      final res = await _dio.get('/channels/$channelId/epoch/$epoch/threshold_shares/pending');
+      return List<String>.from(res.data['moderator_ids'] ?? []);
+    } catch (e) { _log('getPendingThresholdShareRecipients', e); return []; }
+  }
+
+  /// Each entry is `{moderator_id, share_index, content, ratchet_key,
+  /// msg_number, prev_chain, nonce, x3dh_header?}`.
+  Future<bool> deliverThresholdShares(
+      String channelId, int epoch, List<Map<String, dynamic>> shares) async {
+    try {
+      await _dio.post('/channels/$channelId/epoch/threshold_shares',
+          data: {'epoch': epoch, 'shares': shares});
+      return true;
+    } catch (e) { _log('deliverThresholdShares', e); return false; }
+  }
+
+  Future<List<Map<String, dynamic>>> getMyThresholdShares(String channelId) async {
+    try {
+      final res = await _dio.get('/channels/$channelId/epoch/my_threshold_shares');
+      return List<Map<String, dynamic>>.from(res.data['shares'] ?? []);
+    } catch (e) { _log('getMyThresholdShares', e); return []; }
+  }
+
+  /// Requests a threshold decrypt of one channel epoch -- designated
+  /// moderators only. The requester's own initiation counts as their
+  /// first approval.
+  Future<Map<String, dynamic>?> createThresholdDecryptRequest(
+      String channelId, int epoch, String reason) async {
+    try {
+      final res = await _dio.post(
+          '/channels/$channelId/epoch/$epoch/threshold_decrypt_requests',
+          data: {'reason': reason});
+      return res.data['request'] as Map<String, dynamic>?;
+    } catch (e) { _log('createThresholdDecryptRequest', e); return null; }
+  }
+
+  /// Pending/approved requests for a server -- designated moderators only.
+  Future<List<Map<String, dynamic>>> getThresholdDecryptRequests(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/threshold_decrypt_requests');
+      return List<Map<String, dynamic>>.from(res.data['requests'] ?? []);
+    } catch (e) { _log('getThresholdDecryptRequests', e); return []; }
+  }
+
+  Future<Map<String, dynamic>?> approveThresholdDecryptRequest(String requestId) async {
+    try {
+      final res = await _dio.post('/threshold_decrypt_requests/$requestId/approve');
+      return res.data['request'] as Map<String, dynamic>?;
+    } catch (e) { _log('approveThresholdDecryptRequest', e); return null; }
+  }
+
+  /// Bookkeeping only -- call once this device has actually reconstructed
+  /// the epoch key locally.
+  Future<bool> completeThresholdDecryptRequest(String requestId) async {
+    try {
+      await _dio.post('/threshold_decrypt_requests/$requestId/complete');
+      return true;
+    } catch (e) { _log('completeThresholdDecryptRequest', e); return false; }
+  }
+
+  /// An approving moderator relays their decrypted-then-re-encrypted
+  /// share to the requester -- same envelope shape as everything else
+  /// in this section.
+  Future<bool> relayThresholdShare(String requestId, Map<String, dynamic> envelope) async {
+    try {
+      await _dio.post('/threshold_decrypt_requests/$requestId/share_relays', data: envelope);
+      return true;
+    } catch (e) { _log('relayThresholdShare', e); return false; }
+  }
+
+  /// The requester polls this for shares relayed to them so far.
+  Future<List<Map<String, dynamic>>> getThresholdShareRelays(String requestId) async {
+    try {
+      final res = await _dio.get('/threshold_decrypt_requests/$requestId/share_relays');
+      return List<Map<String, dynamic>>.from(res.data['relays'] ?? []);
+    } catch (e) { _log('getThresholdShareRelays', e); return []; }
+  }
+
   // ── Stage channels ────────────────────────────────────────────────────────
 
   /// errorCode is "ticket_required" when this stage has a currently-live

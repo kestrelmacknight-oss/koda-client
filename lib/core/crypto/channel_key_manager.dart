@@ -22,6 +22,7 @@ import '../secure_storage.dart';
 import 'channel_epoch.dart';
 import 'dm_session_manager.dart';
 import 'kcp_primitives.dart';
+import 'threshold_moderation_manager.dart';
 
 class ChannelEncryptResult {
   final int epoch;
@@ -85,7 +86,8 @@ class ChannelKeyManager {
   /// Returns the current epoch number, or null if the channel still
   /// isn't usable yet (network failure, or I'm still waiting on someone
   /// else's delivery to reach me).
-  Future<int?> ensureReady(String channelId, {required String myUserId}) async {
+  Future<int?> ensureReady(String channelId,
+      {required String myUserId, String? serverId}) async {
     await syncDeliveries(channelId, myUserId: myUserId);
 
     final currentEpoch = await KodaApi.instance.getChannelEpoch(channelId);
@@ -113,6 +115,12 @@ class ChannelKeyManager {
     if (key == null) return null; // waiting on a delivery -- caller should retry later
 
     await _distributePendingIfAny(channelId, epoch, key, myUserId: myUserId);
+    if (serverId != null) {
+      await ThresholdModerationManager.instance.distributeSharesIfEnabled(
+        serverId: serverId, channelId: channelId, epoch: epoch,
+        epochKey: key, myUserId: myUserId,
+      );
+    }
     secureZero(key);
     return epoch;
   }
@@ -123,12 +131,17 @@ class ChannelKeyManager {
   /// among them, can't read anything sent afterward. Best-effort: meant
   /// to be called by whichever client actually processes the departure,
   /// which already has the up-to-date member list.
-  Future<void> rotateAfterDeparture(String channelId, {required String myUserId}) async {
+  Future<void> rotateAfterDeparture(String channelId,
+      {required String myUserId, required String serverId}) async {
     final started = await KodaApi.instance.startChannelEpoch(channelId);
     if (started == null || !started.created) return; // someone else is already handling it
     final key = await generateChannelEpochKey();
     await SecureStorage.saveChannelEpochKey(channelId, started.epoch, key);
     await _distributePendingIfAny(channelId, started.epoch, key, myUserId: myUserId);
+    await ThresholdModerationManager.instance.distributeSharesIfEnabled(
+      serverId: serverId, channelId: channelId, epoch: started.epoch,
+      epochKey: key, myUserId: myUserId,
+    );
     secureZero(key);
   }
 

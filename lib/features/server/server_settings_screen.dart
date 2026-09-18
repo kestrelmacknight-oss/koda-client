@@ -21,6 +21,7 @@ import '../../shared/category_edit_dialog.dart';
 import '../../shared/custom_emoji.dart';
 import '../marketplace/printful_merch_screen.dart';
 import 'discord_import_dialog.dart';
+import 'threshold_moderation_tab.dart';
 
 class ServerSettingsScreen extends ConsumerStatefulWidget {
   const ServerSettingsScreen({super.key});
@@ -79,7 +80,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 9, vsync: this);
+    _tabController = TabController(length: 10, vsync: this);
     _loadAll();
     _loadPrintfulStatus();
     _loadEmoji();
@@ -491,6 +492,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             Tab(text: 'Customize'),
             Tab(text: 'Audit Log'),
             Tab(text: 'Reports'),
+            Tab(text: 'Threshold Mod'),
           ],
         ),
       ),
@@ -500,7 +502,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
               controller: _tabController,
               children: [_buildChannelsTab(), _buildRolesTab(), _buildMembersTab(),
                   _buildInvitesTab(), _buildMerchTab(), _buildEmojiTab(),
-                  _buildCustomizeTab(), _buildAuditLogTab(), _buildReportsTab()],
+                  _buildCustomizeTab(), _buildAuditLogTab(), _buildReportsTab(),
+                  ThresholdModerationTab(serverId: _serverId, members: _members, channels: _channels)],
             ),
     );
   }
@@ -1261,8 +1264,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       if (myUserId != null) {
         for (final channel in _channels) {
           if (channel['type'] == 'text') {
-            ChannelKeyManager.instance
-                .rotateAfterDeparture(channel['id'] as String, myUserId: myUserId);
+            ChannelKeyManager.instance.rotateAfterDeparture(
+                channel['id'] as String, myUserId: myUserId, serverId: _serverId);
           }
         }
       }

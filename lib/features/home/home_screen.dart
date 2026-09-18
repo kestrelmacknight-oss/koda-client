@@ -651,7 +651,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       // or someone who was offline the first time around) -- without
       // this, a channel only onboards new members the next time someone
       // happens to send a message rather than the moment anyone opens it.
-      unawaited(ChannelKeyManager.instance.ensureReady(channelId, myUserId: myUserId));
+      // serverId (when known) also drives Tier 3 threshold-share
+      // distribution -- see ChannelKeyManager.ensureReady.
+      unawaited(ChannelKeyManager.instance.ensureReady(channelId,
+          myUserId: myUserId, serverId: ref.read(selectedServerProvider)?['id'] as String?));
 
       final decrypted = await _decryptMessages(messages.reversed.toList(),
           channelId: channelId, myUserId: myUserId);
