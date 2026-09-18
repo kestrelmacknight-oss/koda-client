@@ -528,6 +528,65 @@ class KodaApi {
     } catch (e) { _log('redeemBackerCode', e); return null; }
   }
 
+  // ── Reports (Tier 2 -- see koda-server's Koda.Reports) ─────────────────────
+  //
+  // disclosedContent is always the caller's own already-decrypted copy of
+  // the message (it's on screen already, that's what's being reported) --
+  // never re-fetched or re-decrypted here. The server can't decrypt it
+  // either; this call is what discloses it.
+
+  Future<Map<String, dynamic>?> reportChannelMessage(String channelId, String messageId,
+      {required String reason, String? note, required String disclosedContent}) async {
+    try {
+      final res = await _dio.post('/channels/$channelId/messages/$messageId/report', data: {
+        'reason': reason,
+        if (note != null) 'note': note,
+        'disclosed_content': disclosedContent,
+      });
+      return res.data['report'] as Map<String, dynamic>;
+    } catch (e) { _log('reportChannelMessage', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> reportDmMessage(String messageId,
+      {required String reason, String? note, required String disclosedContent}) async {
+    try {
+      final res = await _dio.post('/dm_messages/$messageId/report', data: {
+        'reason': reason,
+        if (note != null) 'note': note,
+        'disclosed_content': disclosedContent,
+      });
+      return res.data['report'] as Map<String, dynamic>;
+    } catch (e) { _log('reportDmMessage', e); return null; }
+  }
+
+  Future<List<Map<String, dynamic>>> getServerReports(String serverId, {String? status}) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/reports',
+          queryParameters: status != null ? {'status': status} : null);
+      return List<Map<String, dynamic>>.from(res.data['reports'] ?? []);
+    } catch (e) { _log('getServerReports', e); return []; }
+  }
+
+  /// Platform-admin-only -- DM reports have no server to have moderators
+  /// of, see koda-server's Koda.Reports.list_dm_reports/1.
+  Future<List<Map<String, dynamic>>> getDmReports({String? status}) async {
+    try {
+      final res = await _dio.get('/admin/dm_reports',
+          queryParameters: status != null ? {'status': status} : null);
+      return List<Map<String, dynamic>>.from(res.data['reports'] ?? []);
+    } catch (e) { _log('getDmReports', e); return []; }
+  }
+
+  Future<bool> resolveReport(String reportId, String status, {String? moderationAction}) async {
+    try {
+      await _dio.post('/reports/$reportId/resolve', data: {
+        'status': status,
+        if (moderationAction != null) 'moderation_action': moderationAction,
+      });
+      return true;
+    } catch (e) { _log('resolveReport', e); return false; }
+  }
+
   // ── Moderation ────────────────────────────────────────────────────────────
 
   Future<bool> deleteMessage(String channelId, String messageId,

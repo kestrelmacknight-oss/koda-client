@@ -22,6 +22,7 @@ import '../../shared/pronoun_label.dart';
 import '../../core/push_notifications.dart';
 import '../../core/deep_links.dart';
 import '../../shared/invite_preview_dialog.dart';
+import '../../shared/report_dialog.dart';
 import '../../shared/category_edit_dialog.dart';
 import '../settings/settings_screen.dart';
 import '../settings/content_filters_screen.dart';
@@ -1984,6 +1985,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                         child: Text(isPinned ? 'Unpin Message' : 'Pin Message')),
                     if (canDelete) const PopupMenuItem(
                         value: 'delete', child: Text('Delete Message')),
+                    if (!isMine)
+                      const PopupMenuItem(value: 'report',
+                          child: Text('Report Message', style: TextStyle(color: KodaColors.accent))),
                   ],
                 );
                 if (action == 'reply' && mounted) {
@@ -2008,6 +2012,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     m['id'] as String? ?? '',
                   );
                   if (ok) setState(() => _messages.remove(m));
+                }
+                if (action == 'report' && mounted) {
+                  final submitted = await showReportChannelMessageDialog(
+                    context,
+                    channelId: channelId,
+                    messageId: m['id'] as String? ?? '',
+                    disclosedContent: m['content'] as String? ?? '',
+                  );
+                  if (submitted && mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Report submitted.')));
+                  }
                 }
               },
               child: Padding(

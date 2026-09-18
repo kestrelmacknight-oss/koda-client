@@ -26,7 +26,7 @@ class _AdminScreenState extends State<AdminScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 2, vsync: this);
+    _tabs = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -56,6 +56,7 @@ class _AdminScreenState extends State<AdminScreen>
           tabs: const [
             Tab(text: 'Backer Codes'),
             Tab(text: 'Users'),
+            Tab(text: 'DM Reports'),
           ],
         ),
       ),
@@ -64,6 +65,7 @@ class _AdminScreenState extends State<AdminScreen>
         children: [
           _BackerCodesTab(),
           _UsersTab(),
+          _DmReportsTab(),
         ],
       ),
     );
@@ -392,5 +394,121 @@ class _UsersTabState extends State<_UsersTab> {
                   ),
       ),
     ]);
+  }
+}
+
+// ── DM Reports Tab ───────────────────────────────────────────────────────────
+//
+// DM reports (Tier 2 -- see koda-server's Koda.Reports) have no server_id --
+// there's no per-server moderation team for a private 1:1 conversation --
+// so unlike channel reports (reviewed by that server's own moderators, see
+// server_settings_screen.dart's Reports tab) these are a platform-level
+// trust & safety queue, admin-only.
+
+class _DmReportsTab extends StatefulWidget {
+  @override
+  State<_DmReportsTab> createState() => _DmReportsTabState();
+}
+
+class _DmReportsTabState extends State<_DmReportsTab> {
+  List<Map<String, dynamic>> _reports = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    final reports = await KodaApi.instance.getDmReports();
+    if (!mounted) return;
+    setState(() { _reports = reports; _loading = false; });
+  }
+
+  Future<void> _resolve(String id, String status) async {
+    final ok = await KodaApi.instance.resolveReport(id, status);
+    if (ok && mounted) _load();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final pending = _reports.where((r) => r['status'] == 'pending').toList();
+    final resolved = _reports.where((r) => r['status'] != 'pending').toList();
+
+    return _loading
+        ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+        : ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              if (pending.isEmpty && resolved.isEmpty)
+                const Center(child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: Text('No DM reports.', style: TextStyle(color: KodaColors.text3)),
+                )),
+              ...pending.map((r) => _reportCard(r)),
+              if (resolved.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                const Text('RESOLVED', style: TextStyle(
+                    color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
+                const SizedBox(height: 8),
+                ...resolved.map((r) => _reportCard(r)),
+              ],
+            ],
+          );
+  }
+
+  Widget _reportCard(Map<String, dynamic> r) {
+    final status = r['status'] as String? ?? 'pending';
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: KodaColors.card,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: KodaColors.border),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(r['reason'] as String? ?? 'other',
+            style: const TextStyle(color: KodaColors.koda, fontSize: 11, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 6),
+        Text('Reporter: ${r['reporter_id']}\nRevealed sender: ${r['target_user_id']}',
+            style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+        const SizedBox(height: 6),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+              color: KodaColors.elevated, borderRadius: BorderRadius.circular(6)),
+          child: Text(r['disclosed_content'] as String? ?? '',
+              style: const TextStyle(color: KodaColors.text1, fontSize: 12)),
+        ),
+        if ((r['note'] as String?)?.isNotEmpty ?? false) ...[
+          const SizedBox(height: 6),
+          Text('Note: ${r['note']}',
+              style: const TextStyle(color: KodaColors.text3, fontSize: 11, fontStyle: FontStyle.italic)),
+        ],
+        if (status == 'pending') ...[
+          const SizedBox(height: 8),
+          Row(children: [
+            TextButton(
+              onPressed: () => _resolve(r['id'] as String, 'dismissed'),
+              child: const Text('Dismiss'),
+            ),
+            const SizedBox(width: 4),
+            TextButton(
+              onPressed: () => _resolve(r['id'] as String, 'actioned'),
+              child: const Text('Mark Actioned', style: TextStyle(color: KodaColors.accent)),
+            ),
+          ]),
+        ] else
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(status == 'actioned' ? 'Actioned' : 'Dismissed',
+                style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+          ),
+      ]),
+    );
   }
 }

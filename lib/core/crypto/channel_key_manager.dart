@@ -100,8 +100,9 @@ class ChannelKeyManager {
       if (started.created) {
         // I won the race to bootstrap -- I'm the one who has to
         // actually generate the key, nobody else can.
-        final key = await generateChannelEpochKey();
-        await SecureStorage.saveChannelEpochKey(channelId, epoch, key);
+        final newKey = await generateChannelEpochKey();
+        await SecureStorage.saveChannelEpochKey(channelId, epoch, newKey);
+        secureZero(newKey);
       }
       // If I lost the race, fall through: I don't have the key yet and
       // must not generate my own -- distributePendingIfAny below will
@@ -112,6 +113,7 @@ class ChannelKeyManager {
     if (key == null) return null; // waiting on a delivery -- caller should retry later
 
     await _distributePendingIfAny(channelId, epoch, key, myUserId: myUserId);
+    secureZero(key);
     return epoch;
   }
 
@@ -127,6 +129,7 @@ class ChannelKeyManager {
     final key = await generateChannelEpochKey();
     await SecureStorage.saveChannelEpochKey(channelId, started.epoch, key);
     await _distributePendingIfAny(channelId, started.epoch, key, myUserId: myUserId);
+    secureZero(key);
   }
 
   Future<void> _distributePendingIfAny(
@@ -179,6 +182,7 @@ class ChannelKeyManager {
 
     final enc = await encryptChannelMessage(
       epochKey: key, channelId: channelId, epoch: epoch, plaintext: plaintext);
+    secureZero(key);
     return ChannelEncryptResult(epoch: epoch, content: enc.content, nonce: enc.nonce);
   }
 
@@ -194,6 +198,7 @@ class ChannelKeyManager {
 
     final enc = await encryptChannelMessage(
       epochKey: key, channelId: channelId, epoch: epoch, plaintext: plaintext);
+    secureZero(key);
     return ChannelEncryptResult(epoch: epoch, content: enc.content, nonce: enc.nonce);
   }
 
@@ -216,6 +221,8 @@ class ChannelKeyManager {
         epochKey: key, channelId: channelId, epoch: epoch, content: content, nonce: nonce);
     } catch (_) {
       return null;
+    } finally {
+      secureZero(key);
     }
   }
 }

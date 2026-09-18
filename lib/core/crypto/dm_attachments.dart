@@ -66,15 +66,27 @@ Future<DmAttachmentMeta?> encryptAndUploadDmAttachment({
     uploadType: 'attachment',
     contentType: 'application/octet-stream',
   );
-  if (url == null) return null;
+  if (url == null) {
+    secureZero(key);
+    return null;
+  }
 
-  return DmAttachmentMeta(
+  // Base64-encode before zeroing -- the returned DmAttachmentMeta.key
+  // string is an immutable Dart String that can never be wiped the way
+  // this raw buffer can, so it's the one copy of this key that just has
+  // to be trusted to the GC eventually. Zeroing the buffer afterward is
+  // still real: it's the copy that would otherwise sit at whatever
+  // address SecretKeyData.random allocated it at for the rest of this
+  // isolate's life.
+  final result = DmAttachmentMeta(
     url: url,
     key: bytesToB64(key),
     nonce: bytesToB64(nonce),
     contentType: contentType,
     fileName: fileName,
   );
+  secureZero(key);
+  return result;
 }
 
 /// Inverse of the upload half: fetches ciphertext from [meta.url] and
@@ -87,11 +99,16 @@ Future<Uint8List> downloadAndDecryptDmAttachment(DmAttachmentMeta meta) async {
   if (response == null) {
     throw StateError('Could not download attachment.');
   }
-  return aesGcmDecrypt(
-    key: b64ToBytes(meta.key),
-    nonce: b64ToBytes(meta.nonce),
-    payload: Uint8List.fromList(response),
-  );
+  final key = b64ToBytes(meta.key);
+  try {
+    return await aesGcmDecrypt(
+      key: key,
+      nonce: b64ToBytes(meta.nonce),
+      payload: Uint8List.fromList(response),
+    );
+  } finally {
+    secureZero(key);
+  }
 }
 
 // ── DM message envelope ──────────────────────────────────────────────────

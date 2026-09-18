@@ -37,6 +37,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   List<Map<String, dynamic>> _members = [];
   List<Map<String, dynamic>> _bans = [];
   List<Map<String, dynamic>> _auditActions = [];
+  List<Map<String, dynamic>> _reports = [];
   bool _loading = true;
   bool _showBans = false;
   bool _printfulConnected = false;
@@ -78,7 +79,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 8, vsync: this);
+    _tabController = TabController(length: 9, vsync: this);
     _loadAll();
     _loadPrintfulStatus();
     _loadEmoji();
@@ -178,6 +179,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       KodaApi.instance.getMembers(serverId),
       KodaApi.instance.listBans(serverId),
       KodaApi.instance.getAuditLog(serverId),
+      KodaApi.instance.getServerReports(serverId),
     ]);
     if (!mounted) return;
     final roles = results[2]
@@ -189,6 +191,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       _members       = results[3];
       _bans          = results[4];
       _auditActions  = results[5];
+      _reports       = results[6];
       _loading       = false;
     });
   }
@@ -487,6 +490,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             Tab(text: 'Emoji'),
             Tab(text: 'Customize'),
             Tab(text: 'Audit Log'),
+            Tab(text: 'Reports'),
           ],
         ),
       ),
@@ -496,7 +500,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
               controller: _tabController,
               children: [_buildChannelsTab(), _buildRolesTab(), _buildMembersTab(),
                   _buildInvitesTab(), _buildMerchTab(), _buildEmojiTab(),
-                  _buildCustomizeTab(), _buildAuditLogTab()],
+                  _buildCustomizeTab(), _buildAuditLogTab(), _buildReportsTab()],
             ),
     );
   }
@@ -1416,6 +1420,107 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           }),
       ],
     );
+  }
+
+  // Tier 2 -- see koda-server's Koda.Reports. Only channel reports show
+  // here (a server's own moderators); DM reports have no server to
+  // belong to and go to a separate platform-admin queue instead (see
+  // Koda.Reports.list_dm_reports's doc comment).
+  Widget _buildReportsTab() {
+    final pending = _reports.where((r) => r['status'] == 'pending').toList();
+    final resolved = _reports.where((r) => r['status'] != 'pending').toList();
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        const Text(
+          'Messages reported by members of this server -- the reporter\'s own '
+          'already-decrypted copy, disclosed by reporting.',
+          style: TextStyle(color: KodaColors.text3, fontSize: 12),
+        ),
+        const SizedBox(height: 16),
+        if (pending.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Text('No pending reports.',
+                style: TextStyle(color: KodaColors.text3, fontSize: 13)),
+          )
+        else
+          ...pending.map(_buildReportCard),
+        if (resolved.isNotEmpty) ...[
+          const SizedBox(height: 20),
+          const Text('RESOLVED', style: TextStyle(
+              color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
+          const SizedBox(height: 8),
+          ...resolved.map(_buildReportCard),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildReportCard(Map<String, dynamic> r) {
+    final reporter = _usernameFor(r['reporter_id'] as String?) ?? 'Unknown';
+    final target = _usernameFor(r['target_user_id'] as String?) ?? 'Unknown';
+    final status = r['status'] as String? ?? 'pending';
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: KodaColors.card,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: KodaColors.border),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Text(r['reason'] as String? ?? 'other',
+              style: const TextStyle(color: KodaColors.koda, fontSize: 11, fontWeight: FontWeight.w700)),
+          const Spacer(),
+          Text(_formatAuditTime(r['inserted_at'] as String?),
+              style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+        ]),
+        const SizedBox(height: 6),
+        Text('Reported by $reporter -- sent by $target',
+            style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+        const SizedBox(height: 6),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+              color: KodaColors.elevated, borderRadius: BorderRadius.circular(6)),
+          child: Text(r['disclosed_content'] as String? ?? '',
+              style: const TextStyle(color: KodaColors.text1, fontSize: 12)),
+        ),
+        if ((r['note'] as String?)?.isNotEmpty ?? false) ...[
+          const SizedBox(height: 6),
+          Text('Note: ${r['note']}',
+              style: const TextStyle(color: KodaColors.text3, fontSize: 11, fontStyle: FontStyle.italic)),
+        ],
+        if (status == 'pending') ...[
+          const SizedBox(height: 8),
+          Row(children: [
+            TextButton(
+              onPressed: () => _resolveReport(r['id'] as String, 'dismissed'),
+              child: const Text('Dismiss'),
+            ),
+            const SizedBox(width: 4),
+            TextButton(
+              onPressed: () => _resolveReport(r['id'] as String, 'actioned'),
+              child: const Text('Mark Actioned', style: TextStyle(color: KodaColors.accent)),
+            ),
+          ]),
+        ] else
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(status == 'actioned' ? 'Actioned' : 'Dismissed',
+                style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+          ),
+      ]),
+    );
+  }
+
+  Future<void> _resolveReport(String reportId, String status) async {
+    final ok = await KodaApi.instance.resolveReport(reportId, status);
+    if (ok && mounted) _loadAll();
   }
 
   String _formatAuditTime(String? iso) {

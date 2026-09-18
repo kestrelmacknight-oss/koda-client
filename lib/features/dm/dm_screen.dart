@@ -20,6 +20,7 @@ import '../../core/crypto/dm_attachments.dart';
 import '../../core/crypto/dm_session_manager.dart';
 import '../../core/crypto/double_ratchet.dart' show DoubleRatchetDecryptFailure;
 import '../../shared/pronoun_label.dart';
+import '../../shared/report_dialog.dart';
 import '../../shared/tier_badge.dart';
 import '../../shared/widgets.dart';
 import 'safety_number_screen.dart';
@@ -634,7 +635,32 @@ class _DmScreenState extends ConsumerState<DmScreen>
                   final isMe = m['sender_id'] == me?.id;
                   final author = (m['author'] as Map<String, dynamic>?)?
                       ['username'] as String? ?? 'Unknown';
-                  return Padding(
+                  final canReport = !isMe && m['_undecryptable'] == null;
+                  return GestureDetector(
+                    onSecondaryTapUp: !canReport ? null : (d) async {
+                      final action = await showMenu<String>(
+                        context: context,
+                        position: RelativeRect.fromLTRB(d.globalPosition.dx,
+                            d.globalPosition.dy, d.globalPosition.dx, d.globalPosition.dy),
+                        color: KodaColors.card,
+                        items: const [
+                          PopupMenuItem(value: 'report',
+                              child: Text('Report Message', style: TextStyle(color: KodaColors.accent))),
+                        ],
+                      );
+                      if (action == 'report' && mounted) {
+                        final submitted = await showReportDmMessageDialog(
+                          context,
+                          messageId: m['id'] as String? ?? '',
+                          disclosedContent: m['content'] as String? ?? '',
+                        );
+                        if (submitted && mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Report submitted.')));
+                        }
+                      }
+                    },
+                    child: Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -718,7 +744,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                         if (isMe) const SizedBox(width: 8),
                       ],
                     ),
-                  );
+                  ));
                 },
               ),
       ),
