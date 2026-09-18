@@ -6,7 +6,7 @@
 ; 1. Run: flutter build windows --release
 ; 2. Open this file in Inno Setup Compiler
 ; 3. Click Build -> Compile
-; Output: installer\KodaSetup-0.34.0.exe
+; Output: installer\KodaSetup-0.5.0.exe
 
 #define AppName "Koda"
 ; CI passes the real version via `ISCC /DAppVersion=x.y.z` (sourced from
@@ -14,7 +14,7 @@
 ; hand in lockstep with pubspec.yaml -- this fallback only matters when
 ; compiling the script directly (e.g. opened in the Inno Setup IDE).
 #ifndef AppVersion
-  #define AppVersion "0.34.0"
+  #define AppVersion "0.5.0"
 #endif
 #define AppPublisher "Kestrel MacKnight / Koda"
 #define AppURL "https://koda.fyi"

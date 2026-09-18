@@ -68,7 +68,7 @@ that same directory, replacing what `flutter create` generated.
 
 ### 4. Build the Windows release
 
-    flutter build windows --release --build-name=0.34.0 --build-number=1
+    flutter build windows --release --build-name=0.5.0 --build-number=2
 
 Output lands in `build\windows\x64\runner\Release\` -- confirm `koda.exe`
 and a handful of `.dll` files are there before moving on.

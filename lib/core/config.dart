@@ -29,7 +29,7 @@ class KodaConfig {
 
   // ── App identity ───────────────────────────────────────────────────────
   static const String appName     = 'Koda';
-  static const String appVersion  = '0.34.0';
+  static const String appVersion  = '0.5.0';
   static const String buildLabel  = 'Alpha';
   static const String fullVersion = '$appName $buildLabel v$appVersion';
   static const String company     = 'GryphonHeart LLC';
