@@ -1838,6 +1838,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     return tile;
   }
 
+  /// Slim, read-only progress banner for a server's connected Tiltify
+  /// campaign (see server_settings_screen.dart's Charity tab for the
+  /// owner-facing connect/select-campaign flow). Purely displays the
+  /// snapshot already embedded in the server object -- refreshed
+  /// server-side every 5 minutes by Koda.Tiltify.CampaignSweeper, so no
+  /// extra request happens just from this rendering.
+  Widget _buildTiltifyBanner(Map<String, dynamic> tiltify) {
+    final title = tiltify['campaign_title'] as String? ?? 'Charity campaign';
+    final raised = double.tryParse('${tiltify['raised_amount'] ?? 0}') ?? 0;
+    final goal = double.tryParse('${tiltify['goal_amount'] ?? 0}') ?? 0;
+    final currency = tiltify['currency'] as String? ?? 'USD';
+    final progress = goal > 0 ? (raised / goal).clamp(0.0, 1.0) : 0.0;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: KodaColors.border))),
+      child: Row(children: [
+        const Icon(Icons.favorite, size: 16, color: KodaColors.accent),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title, style: const TextStyle(
+                color: KodaColors.text1, fontSize: 12, fontWeight: FontWeight.w600),
+                overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 4),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: progress, minHeight: 5,
+                backgroundColor: KodaColors.elevated,
+                valueColor: const AlwaysStoppedAnimation(KodaColors.mint),
+              ),
+            ),
+          ]),
+        ),
+        const SizedBox(width: 10),
+        Text('$currency ${raised.toStringAsFixed(0)} / ${goal.toStringAsFixed(0)}',
+            style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+      ]),
+    );
+  }
+
   /// Boost-level-4 perk (Koda.Boosts.cosmetics_unlocked?/1) -- a custom
   /// image behind the channel content for everyone currently viewing
   /// this server, replacing the flat KodaColors.voidBg there. A dark
@@ -2612,6 +2655,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           // Content area + optional member panel
           Expanded(child: Row(children: [
             Expanded(child: Column(children: [
+              if (selectedServer?['tiltify']?['connected'] == true)
+                _buildTiltifyBanner(selectedServer!['tiltify'] as Map<String, dynamic>),
               Expanded(child: _buildBackgroundedContent(selectedServer, selectedChannel)),
               const VoiceBar(),
             ])),

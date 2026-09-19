@@ -1791,6 +1791,125 @@ class KodaApi {
     } catch (e) { _log('createPrintfulOrder', e); return null; }
   }
 
+  // -- Twitch (per-user account connection, EventSub live detection) -----------
+
+  /// Returns the URL to open in a browser to start connecting your Twitch
+  /// account -- the OAuth handshake itself happens server-side (see
+  /// koda-server's TwitchController.callback/2). Per-user, not per-server
+  /// -- your connected account follows you across every server you're in.
+  Future<String?> connectTwitch() async {
+    try {
+      final res = await _dio.post('/users/me/twitch/connect');
+      return res.data['authorize_url'] as String?;
+    } catch (e) { _log('connectTwitch', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> getTwitchStatus() async {
+    try {
+      final res = await _dio.get('/users/me/twitch/status');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getTwitchStatus', e); return null; }
+  }
+
+  Future<bool> disconnectTwitch() async {
+    try {
+      await _dio.delete('/users/me/twitch');
+      return true;
+    } catch (e) { _log('disconnectTwitch', e); return false; }
+  }
+
+  /// Per-user opt-out -- lets someone stop their stream being announced
+  /// without needing a role change from a server admin.
+  Future<bool> setTwitchAnnounceEnabled(bool enabled) async {
+    try {
+      await _dio.patch('/users/me/twitch', data: {'announce_enabled': enabled});
+      return true;
+    } catch (e) { _log('setTwitchAnnounceEnabled', e); return false; }
+  }
+
+  // -- YouTube (per-user account connection, polled live + upload detection) --
+
+  /// Returns the URL to open in a browser to start connecting your
+  /// YouTube account -- the OAuth handshake itself happens server-side
+  /// (see koda-server's YoutubeController.callback/2).
+  Future<String?> connectYoutube() async {
+    try {
+      final res = await _dio.post('/users/me/youtube/connect');
+      return res.data['authorize_url'] as String?;
+    } catch (e) { _log('connectYoutube', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> getYoutubeStatus() async {
+    try {
+      final res = await _dio.get('/users/me/youtube/status');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getYoutubeStatus', e); return null; }
+  }
+
+  Future<bool> disconnectYoutube() async {
+    try {
+      await _dio.delete('/users/me/youtube');
+      return true;
+    } catch (e) { _log('disconnectYoutube', e); return false; }
+  }
+
+  /// Per-user opt-out -- covers both live-stream and new-upload
+  /// announcements, same single toggle as Twitch's.
+  Future<bool> setYoutubeAnnounceEnabled(bool enabled) async {
+    try {
+      await _dio.patch('/users/me/youtube', data: {'announce_enabled': enabled});
+      return true;
+    } catch (e) { _log('setYoutubeAnnounceEnabled', e); return false; }
+  }
+
+  // -- Tiltify (per-server charity campaign display) ---------------------------
+
+  /// Returns the URL to open in a browser to start connecting this
+  /// server's Tiltify campaign -- the OAuth handshake itself happens
+  /// server-side (see koda-server's TiltifyController.callback/2).
+  Future<String?> connectTiltify(String serverId) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/tiltify/connect');
+      return res.data['authorize_url'] as String?;
+    } catch (e) { _log('connectTiltify', e); return null; }
+  }
+
+  /// Full owner-facing status -- connected flag plus the cached campaign
+  /// snapshot (title/raised/goal/currency), same fields every member
+  /// already gets for free via the server's own `tiltify` JSON key, but
+  /// fetched fresh on demand for the management screen.
+  Future<Map<String, dynamic>?> getTiltifyStatus(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/tiltify/status');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getTiltifyStatus', e); return null; }
+  }
+
+  /// Every campaign visible to the connected Tiltify account -- shown
+  /// once, right after connect, so the owner can pick which one this
+  /// server displays.
+  Future<List<Map<String, dynamic>>?> getTiltifyCampaigns(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/tiltify/campaigns');
+      return List<Map<String, dynamic>>.from(res.data['campaigns'] ?? []);
+    } catch (e) { _log('getTiltifyCampaigns', e); return null; }
+  }
+
+  Future<bool> selectTiltifyCampaign(String serverId, String campaignId) async {
+    try {
+      await _dio.put('/servers/$serverId/tiltify/campaign',
+          data: {'campaign_id': campaignId});
+      return true;
+    } catch (e) { _log('selectTiltifyCampaign', e); return false; }
+  }
+
+  Future<bool> disconnectTiltify(String serverId) async {
+    try {
+      await _dio.delete('/servers/$serverId/tiltify');
+      return true;
+    } catch (e) { _log('disconnectTiltify', e); return false; }
+  }
+
   // -- Server boosting (Pulse subscriber perk) ---------------------------------
 
   Future<List<Map<String, dynamic>>> getMyBoostTokens() async {

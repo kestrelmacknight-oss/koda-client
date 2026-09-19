@@ -44,6 +44,11 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   bool _printfulConnected = false;
   bool _loadingPrintful = true;
   bool _connectingPrintful = false;
+  Map<String, dynamic>? _tiltifyStatus;
+  bool _loadingTiltify = true;
+  bool _connectingTiltify = false;
+  List<Map<String, dynamic>>? _tiltifyCampaigns;
+  bool _loadingTiltifyCampaigns = false;
   List<Map<String, dynamic>> _emoji = [];
   bool _loadingEmoji = true;
   Map<String, dynamic>? _boostStatus;
@@ -55,6 +60,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     'view_channels', 'send_messages', 'connect_voice', 'manage_server',
     'manage_channels', 'manage_roles', 'manage_messages',
     'kick_members', 'ban_members', 'mute_members', 'mention_everyone', 'manage_marketplace',
+    'announce_live',
   ];
 
   static const Map<String, String> _permissionLabels = {
@@ -70,6 +76,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     'mute_members':     'Mute Members',
     'mention_everyone': 'Mention @everyone',
     'manage_marketplace': 'Manage Marketplace',
+    'announce_live':    'Announce When Live',
   };
 
   static const List<String> _colorSwatches = [
@@ -80,9 +87,10 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 10, vsync: this);
+    _tabController = TabController(length: 11, vsync: this);
     _loadAll();
     _loadPrintfulStatus();
+    _loadTiltifyStatus();
     _loadEmoji();
     _loadBoostStatus();
   }
@@ -157,6 +165,74 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     if (confirmed != true) return;
     final ok = await KodaApi.instance.disconnectPrintful(_serverId);
     if (ok && mounted) setState(() => _printfulConnected = false);
+  }
+
+  Future<void> _loadTiltifyStatus() async {
+    final serverId = _serverId;
+    if (serverId.isEmpty) {
+      if (mounted) setState(() => _loadingTiltify = false);
+      return;
+    }
+    final status = await KodaApi.instance.getTiltifyStatus(serverId);
+    if (!mounted) return;
+    setState(() { _tiltifyStatus = status; _loadingTiltify = false; });
+    if (status?['connected'] == true && status?['campaign_id'] == null) {
+      _loadTiltifyCampaigns();
+    }
+  }
+
+  Future<void> _connectTiltify() async {
+    setState(() => _connectingTiltify = true);
+    final url = await KodaApi.instance.connectTiltify(_serverId);
+    if (!mounted) return;
+    setState(() => _connectingTiltify = false);
+    if (url == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not start Tiltify connection.')));
+      return;
+    }
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
+          'Finish connecting in your browser, then come back and refresh.')));
+    }
+  }
+
+  Future<void> _loadTiltifyCampaigns() async {
+    setState(() => _loadingTiltifyCampaigns = true);
+    final campaigns = await KodaApi.instance.getTiltifyCampaigns(_serverId);
+    if (!mounted) return;
+    setState(() { _tiltifyCampaigns = campaigns; _loadingTiltifyCampaigns = false; });
+  }
+
+  Future<void> _selectTiltifyCampaign(String campaignId) async {
+    final ok = await KodaApi.instance.selectTiltifyCampaign(_serverId, campaignId);
+    if (ok && mounted) _loadTiltifyStatus();
+  }
+
+  Future<void> _disconnectTiltify() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Text('Disconnect Tiltify?', style: TextStyle(color: KodaColors.text1)),
+        content: const Text(
+            'This server will stop showing its charity campaign\'s progress until reconnected.',
+            style: TextStyle(color: KodaColors.text2)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Disconnect', style: TextStyle(color: KodaColors.accent)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final ok = await KodaApi.instance.disconnectTiltify(_serverId);
+    if (ok && mounted) setState(() { _tiltifyStatus = null; _tiltifyCampaigns = null; });
   }
 
   @override
@@ -494,6 +570,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             Tab(text: 'Audit Log'),
             Tab(text: 'Reports'),
             Tab(text: 'Threshold Mod'),
+            Tab(text: 'Charity'),
           ],
         ),
       ),
@@ -504,7 +581,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
               children: [_buildChannelsTab(), _buildRolesTab(), _buildMembersTab(),
                   _buildInvitesTab(), _buildMerchTab(), _buildEmojiTab(),
                   _buildCustomizeTab(), _buildAuditLogTab(), _buildReportsTab(),
-                  ThresholdModerationTab(serverId: _serverId, members: _members, channels: _channels)],
+                  ThresholdModerationTab(serverId: _serverId, members: _members, channels: _channels),
+                  _buildCharityTab()],
             ),
     );
   }
@@ -582,6 +660,170 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           ),
         ),
     ]);
+  }
+
+  // -- Charity (Tiltify campaign display) ------------------------------------
+
+  Widget _buildCharityTab() {
+    if (_loadingTiltify) {
+      return const Center(child: CircularProgressIndicator(color: KodaColors.koda));
+    }
+    final connected = _tiltifyStatus?['connected'] == true;
+    final campaignId = _tiltifyStatus?['campaign_id'] as String?;
+
+    return ListView(padding: const EdgeInsets.all(20), children: [
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: KodaColors.card,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: KodaColors.border),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Icon(connected ? Icons.check_circle : Icons.favorite_outline,
+                color: connected ? KodaColors.mint : KodaColors.text3, size: 22),
+            const SizedBox(width: 10),
+            Text(connected ? 'Tiltify Connected' : 'Tiltify Not Connected',
+                style: const TextStyle(color: KodaColors.text1,
+                    fontSize: 15, fontWeight: FontWeight.w600)),
+          ]),
+          const SizedBox(height: 8),
+          const Text(
+            'Connect this server\'s Tiltify account to show a charity '
+            'campaign\'s live progress to every member. Read-only -- Koda '
+            'never posts or changes anything on Tiltify\'s side.',
+            style: TextStyle(color: KodaColors.text3, fontSize: 12, height: 1.5),
+          ),
+          const SizedBox(height: 14),
+          if (connected)
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: KodaColors.accent,
+                side: const BorderSide(color: KodaColors.accent),
+                minimumSize: const Size(double.infinity, 40),
+              ),
+              onPressed: _disconnectTiltify,
+              child: const Text('Disconnect'),
+            )
+          else
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: KodaColors.koda,
+                foregroundColor: Colors.black,
+                minimumSize: const Size(double.infinity, 40),
+              ),
+              icon: _connectingTiltify
+                  ? const SizedBox(width: 14, height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                  : const Icon(Icons.link, size: 16),
+              label: Text(_connectingTiltify ? 'Connecting...' : 'Connect Tiltify'),
+              onPressed: _connectingTiltify ? null : _connectTiltify,
+            ),
+          if (!connected) ...[
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: _loadTiltifyStatus,
+              child: const Text('Already connected in your browser? Refresh status',
+                  style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+            ),
+          ],
+        ]),
+      ),
+      if (connected && campaignId == null) ...[
+        const SizedBox(height: 16),
+        _buildTiltifyCampaignPicker(),
+      ],
+      if (connected && campaignId != null) ...[
+        const SizedBox(height: 16),
+        _buildTiltifyCampaignCard(),
+      ],
+    ]);
+  }
+
+  Widget _buildTiltifyCampaignPicker() {
+    if (_loadingTiltifyCampaigns) {
+      return const Center(child: CircularProgressIndicator(color: KodaColors.koda));
+    }
+    final campaigns = _tiltifyCampaigns ?? [];
+    if (campaigns.isEmpty) {
+      return Column(children: [
+        const Text('No campaigns found on this Tiltify account.',
+            style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+        const SizedBox(height: 8),
+        TextButton(onPressed: _loadTiltifyCampaigns, child: const Text('Retry')),
+      ]);
+    }
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: KodaColors.card,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: KodaColors.border),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('Pick which campaign to display',
+            style: TextStyle(color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 8),
+        ...campaigns.map((c) => ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(c['title'] as String? ?? 'Untitled campaign',
+                  style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+              trailing: const Icon(Icons.chevron_right, color: KodaColors.text3, size: 18),
+              onTap: () => _selectTiltifyCampaign(c['id'] as String),
+            )),
+      ]),
+    );
+  }
+
+  Widget _buildTiltifyCampaignCard() {
+    final title = _tiltifyStatus?['campaign_title'] as String? ?? 'Untitled campaign';
+    final url = _tiltifyStatus?['campaign_url'] as String?;
+    final raised = double.tryParse('${_tiltifyStatus?['raised_amount'] ?? 0}') ?? 0;
+    final goal = double.tryParse('${_tiltifyStatus?['goal_amount'] ?? 0}') ?? 0;
+    final currency = _tiltifyStatus?['currency'] as String? ?? 'USD';
+    final progress = goal > 0 ? (raised / goal).clamp(0.0, 1.0) : 0.0;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: KodaColors.card,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: KodaColors.border),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(title, style: const TextStyle(color: KodaColors.text1,
+            fontSize: 15, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 10),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: LinearProgressIndicator(
+            value: progress, minHeight: 8,
+            backgroundColor: KodaColors.elevated,
+            valueColor: const AlwaysStoppedAnimation(KodaColors.mint),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text('$currency ${raised.toStringAsFixed(2)} raised of ${goal.toStringAsFixed(2)} goal',
+            style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+        const SizedBox(height: 12),
+        Row(children: [
+          if (url != null)
+            TextButton(
+              onPressed: () async {
+                final uri = Uri.parse(url);
+                if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
+              },
+              child: const Text('View campaign'),
+            ),
+          const Spacer(),
+          TextButton(
+            onPressed: _loadTiltifyStatus,
+            child: const Text('Refresh', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+          ),
+        ]),
+      ]),
+    );
   }
 
   // -- Emoji ----------------------------------------------------------------

@@ -48,6 +48,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String? _throneWebhookUrl;
   bool _loadingThroneUrl = false;
   bool _closeToTray = true;
+  final Map<String, Map<String, dynamic>?> _streamingStatus = {'twitch': null, 'youtube': null};
+  final Map<String, bool> _loadingStreaming = {'twitch': true, 'youtube': true};
+  final Map<String, bool> _connectingStreaming = {'twitch': false, 'youtube': false};
 
   static const _sections = [
     ('My Account', Icons.person_outline),
@@ -87,6 +90,60 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         if (mounted) setState(() => _closeToTray = v);
       });
     }
+    _loadStreamingStatus('twitch');
+    _loadStreamingStatus('youtube');
+  }
+
+  String _platformLabel(String platform) => platform == 'twitch' ? 'Twitch' : 'YouTube';
+
+  Future<void> _loadStreamingStatus(String platform) async {
+    final status = platform == 'twitch'
+        ? await KodaApi.instance.getTwitchStatus()
+        : await KodaApi.instance.getYoutubeStatus();
+    if (mounted) {
+      setState(() {
+        _streamingStatus[platform] = status;
+        _loadingStreaming[platform] = false;
+      });
+    }
+  }
+
+  Future<void> _connectStreaming(String platform) async {
+    setState(() => _connectingStreaming[platform] = true);
+    final url = platform == 'twitch'
+        ? await KodaApi.instance.connectTwitch()
+        : await KodaApi.instance.connectYoutube();
+    if (!mounted) return;
+    setState(() => _connectingStreaming[platform] = false);
+    if (url == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not start ${_platformLabel(platform)} connection.')));
+      return;
+    }
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
+          'Finish connecting in your browser, then come back and refresh.')));
+    }
+  }
+
+  Future<void> _disconnectStreaming(String platform) async {
+    final ok = platform == 'twitch'
+        ? await KodaApi.instance.disconnectTwitch()
+        : await KodaApi.instance.disconnectYoutube();
+    if (ok && mounted) setState(() => _streamingStatus[platform] = null);
+  }
+
+  Future<void> _setStreamingAnnounceEnabled(String platform, bool enabled) async {
+    final previous = _streamingStatus[platform];
+    setState(() => _streamingStatus[platform] =
+        {...?_streamingStatus[platform], 'announce_enabled': enabled});
+    final ok = platform == 'twitch'
+        ? await KodaApi.instance.setTwitchAnnounceEnabled(enabled)
+        : await KodaApi.instance.setYoutubeAnnounceEnabled(enabled);
+    if (!ok && mounted) setState(() => _streamingStatus[platform] = previous);
   }
 
   @override
@@ -475,6 +532,91 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
       const SizedBox(height: 16),
       _buildThroneCard(),
+      const SizedBox(height: 16),
+      _buildStreamingCard(),
+    ]);
+  }
+
+  Widget _buildStreamingCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+          color: KodaColors.card, borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: KodaColors.border)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Row(children: [
+          Icon(Icons.live_tv_outlined, size: 16, color: KodaColors.accent),
+          SizedBox(width: 8),
+          Text('Streaming Accounts',
+              style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w600)),
+        ]),
+        const SizedBox(height: 6),
+        const Text(
+            'Connect Twitch/YouTube so servers where you have the "Announce When '
+            'Live" permission can automatically post when you go live or post a '
+            'new video.',
+            style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+        const SizedBox(height: 12),
+        _buildStreamingRow('twitch'),
+        const Divider(color: KodaColors.border, height: 24),
+        _buildStreamingRow('youtube'),
+      ]),
+    );
+  }
+
+  Widget _buildStreamingRow(String platform) {
+    if (_loadingStreaming[platform] == true) {
+      return const Center(child: SizedBox(width: 18, height: 18,
+          child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda)));
+    }
+    final status = _streamingStatus[platform];
+    final connected = status?['connected'] == true;
+    final connecting = _connectingStreaming[platform] == true;
+    final label = _platformLabel(platform);
+    final liveOrNew = platform == 'twitch' ? 'live now' : 'a new upload';
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(children: [
+        Icon(connected ? Icons.check_circle : Icons.circle_outlined,
+            size: 16, color: connected ? KodaColors.mint : KodaColors.text3),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+              connected
+                  ? '$label connected as ${status?['external_username'] ?? ''}'
+                      '${status?['is_live'] == true ? ' -- $liveOrNew' : ''}'
+                  : '$label not connected',
+              style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+        ),
+        if (connected)
+          TextButton(onPressed: () => _disconnectStreaming(platform), child: const Text('Disconnect'))
+        else
+          TextButton.icon(
+            icon: connecting
+                ? const SizedBox(width: 12, height: 12,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
+                : const Icon(Icons.link, size: 14),
+            label: Text(connecting ? 'Connecting...' : 'Connect'),
+            onPressed: connecting ? null : () => _connectStreaming(platform),
+          ),
+      ]),
+      if (connected)
+        CheckboxListTile(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          controlAffinity: ListTileControlAffinity.leading,
+          title: Text(platform == 'twitch' ? 'Announce when I go live' : 'Announce live streams and new uploads',
+              style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+          value: status?['announce_enabled'] == true,
+          activeColor: KodaColors.koda,
+          onChanged: (v) => _setStreamingAnnounceEnabled(platform, v ?? true),
+        )
+      else
+        TextButton(
+          onPressed: () => _loadStreamingStatus(platform),
+          child: const Text('Already connected in your browser? Refresh status',
+              style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+        ),
     ]);
   }
 

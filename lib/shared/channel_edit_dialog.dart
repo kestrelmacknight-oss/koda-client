@@ -26,6 +26,7 @@ Future<void> showChannelEditDialog(
   String type = existing?['type'] ?? 'text';
   String? selectedCategoryId = existing?['category_id'] ?? categoryId;
   bool isReadOnly = existing?['is_read_only'] == true;
+  bool liveAnnouncements = existing?['live_announcements'] == true;
   final allowedRoleIds = List<String>.from(existing?['allowed_role_ids'] ?? []);
   final selectedRoleIds = List<String>.from(allowedRoleIds);
   final announcementRoleIds = List<String>.from(existing?['announcement_role_ids'] ?? []);
@@ -73,6 +74,21 @@ Future<void> showChannelEditDialog(
                   activeColor: KodaColors.koda,
                   onChanged: (v) => setDialogState(() => isReadOnly = v ?? false),
                 ),
+                if (isReadOnly)
+                  CheckboxListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: const Text('Post live-stream & upload announcements here',
+                        style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+                    subtitle: const Text(
+                        'Auto-posts when a member with the "Announce when live" '
+                        'permission goes live on Twitch, or posts a new YouTube video',
+                        style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+                    value: liveAnnouncements,
+                    activeColor: KodaColors.koda,
+                    onChanged: (v) => setDialogState(() => liveAnnouncements = v ?? false),
+                  ),
                 if (isReadOnly && roles.isNotEmpty) ...[
                   const Text('Notify these roles when posted (optional)',
                       style: TextStyle(color: KodaColors.text3, fontSize: 12)),
@@ -193,6 +209,7 @@ Future<void> showChannelEditDialog(
       'name': name, 'type': type, 'category_id': selectedCategoryId,
       'is_read_only': isReadOnly, 'content_labels': selectedLabels,
       'announcement_role_ids': announcementRoleIds,
+      'live_announcements': liveAnnouncements,
     });
     await KodaApi.instance.setChannelAllowedRoles(existing['id'] as String, selectedRoleIds);
   }
