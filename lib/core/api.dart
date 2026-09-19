@@ -1557,6 +1557,40 @@ class KodaApi {
     } catch (e) { _log('createEvent', e); return null; }
   }
 
+  /// Preview-only -- generates an event plan from [prompt] but creates
+  /// nothing. Bundles the device's current local time + timezone offset
+  /// automatically so Visp can resolve "next Friday"/"tomorrow" against
+  /// the same "now" the user is actually looking at (see koda-server's
+  /// Koda.Visp.Events for why this can't just be left to the model).
+  /// Returns `{'plan': {...}}` on success or `{'error': '...'}` on failure.
+  Future<Map<String, dynamic>?> planVispEvent({required String channelId, required String prompt}) async {
+    try {
+      final now = DateTime.now();
+      final res = await _dio.post('/channels/$channelId/visp/event_plan', data: {
+        'prompt': prompt,
+        'client_now': now.toIso8601String(),
+        'client_tz_offset_minutes': now.timeZoneOffset.inMinutes,
+      });
+      return res.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      _log('planVispEvent', e);
+      return {'error': _errorCodeOf(e) ?? 'Visp is unavailable right now.'};
+    }
+  }
+
+  /// Applies a previously-previewed event [plan] (the exact map returned
+  /// under `plan` by [planVispEvent]). Returns `{'ok': true, 'event_id': '...'}`
+  /// on success or `{'error': '...'}` on failure.
+  Future<Map<String, dynamic>?> applyVispEventPlan({required String channelId, required Map<String, dynamic> plan}) async {
+    try {
+      final res = await _dio.post('/channels/$channelId/visp/event_apply', data: {'plan': plan});
+      return res.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      _log('applyVispEventPlan', e);
+      return {'error': _errorCodeOf(e) ?? 'Could not apply that plan.'};
+    }
+  }
+
   Future<bool> updateEvent(String eventId, Map<String, dynamic> data) async {
     try {
       await _dio.patch('/events/$eventId', data: data);
@@ -2254,6 +2288,44 @@ class KodaApi {
           data: {'code': code, 'replace': replace});
       return true;
     } catch (e) { _log('applyDiscordTemplate', e); return false; }
+  }
+
+  // -- Visp (natural-language server setup, self-hosted -- see koda-server's
+  // Koda.Visp / VispController) ------------------------------------------------
+
+  /// Preview-only -- generates a plan from [prompt] but creates nothing.
+  /// [serverId] absent means "propose a brand-new server"; present means
+  /// "propose additions to that existing server". Returns `{'plan': {...}}`
+  /// on success or `{'error': '...'}` on failure so the dialog can show a
+  /// specific message (rate-limited, malformed plan, etc.) rather than a
+  /// generic one.
+  Future<Map<String, dynamic>?> planWithVisp({String? serverId, required String prompt}) async {
+    try {
+      final res = await _dio.post('/visp/plan', data: {
+        'prompt': prompt,
+        if (serverId != null) 'server_id': serverId,
+      });
+      return res.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      _log('planWithVisp', e);
+      return {'error': _errorCodeOf(e) ?? 'Visp is unavailable right now.'};
+    }
+  }
+
+  /// Applies a previously-previewed [plan] (the exact map returned under
+  /// `plan` by [planWithVisp]). Returns `{'ok': true, 'server_id': '...'}`
+  /// on success or `{'error': '...'}` on failure.
+  Future<Map<String, dynamic>?> applyVispPlan({String? serverId, required Map<String, dynamic> plan}) async {
+    try {
+      final res = await _dio.post('/visp/apply', data: {
+        'plan': plan,
+        if (serverId != null) 'server_id': serverId,
+      });
+      return res.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      _log('applyVispPlan', e);
+      return {'error': _errorCodeOf(e) ?? 'Could not apply that plan.'};
+    }
   }
 
 }

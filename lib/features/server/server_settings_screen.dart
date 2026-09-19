@@ -22,6 +22,7 @@ import '../../shared/custom_emoji.dart';
 import '../marketplace/printful_merch_screen.dart';
 import 'discord_import_dialog.dart';
 import 'threshold_moderation_tab.dart';
+import '../visp/visp_setup_dialog.dart';
 
 class ServerSettingsScreen extends ConsumerStatefulWidget {
   const ServerSettingsScreen({super.key});
@@ -1166,6 +1167,21 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
               icon: const Icon(Icons.download_outlined, size: 16, color: KodaColors.text3),
               label: const Text('Import from Discord',
                   style: TextStyle(color: KodaColors.text3)),
+            ),
+            TextButton.icon(
+              onPressed: () {
+                showVispSetupDialog(
+                  context,
+                  serverId: _serverId,
+                  onApplied: (_) {
+                    _loadAll();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Visp\'s plan is live!')));
+                  },
+                );
+              },
+              icon: const Icon(Icons.auto_awesome, size: 16, color: KodaColors.koda),
+              label: const Text('Ask Visp', style: TextStyle(color: KodaColors.koda)),
             ),
             TextButton.icon(
               onPressed: () => _showCategoryDialog(),

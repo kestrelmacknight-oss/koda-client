@@ -50,6 +50,7 @@ import '../../core/notifications_provider.dart';
 import '../admin/admin_screen.dart';
 import 'message_search_dialog.dart';
 import 'gif_picker_dialog.dart';
+import '../visp/visp_setup_dialog.dart';
 
 const _kQuickReactions = ['👍', '❤️', '😂', '😮', '😢', '😡'];
 class HomeScreen extends ConsumerStatefulWidget {
@@ -1219,8 +1220,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         backgroundColor: KodaColors.card,
         title: const Text('Create a server',
             style: TextStyle(color: KodaColors.text1)),
-        content:
-            KodaTextField(controller: nameController, hintText: 'Server name'),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          KodaTextField(controller: nameController, hintText: 'Server name'),
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              style: TextButton.styleFrom(padding: EdgeInsets.zero),
+              onPressed: () {
+                Navigator.pop(context);
+                showVispSetupDialog(context, onApplied: (_) => _loadServers());
+              },
+              icon: const Icon(Icons.auto_awesome, size: 14, color: KodaColors.koda),
+              label: const Text('Describe it to Visp instead',
+                  style: TextStyle(color: KodaColors.koda, fontSize: 12)),
+            ),
+          ),
+        ]),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),

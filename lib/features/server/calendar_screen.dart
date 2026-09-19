@@ -13,6 +13,7 @@ import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../core/time_utils.dart';
 import '../../shared/widgets.dart';
+import '../visp/visp_event_dialog.dart';
 
 class CalendarScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> channel;
@@ -107,6 +108,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               style: const TextStyle(
                   color: KodaColors.text1, fontWeight: FontWeight.w600)),
           const Spacer(),
+          IconButton(
+            icon: const Icon(Icons.auto_awesome, color: KodaColors.koda, size: 20),
+            tooltip: 'Ask Visp',
+            onPressed: () => showVispEventDialog(
+              context,
+              channelId: widget.channel['id'] as String,
+              onApplied: (_) => _loadEvents(),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.add, color: KodaColors.koda, size: 20),
             tooltip: 'Create Event',
