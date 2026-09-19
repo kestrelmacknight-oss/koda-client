@@ -1557,17 +1557,27 @@ class KodaApi {
     } catch (e) { _log('createEvent', e); return null; }
   }
 
-  /// Preview-only -- generates an event plan from [prompt] but creates
-  /// nothing. Bundles the device's current local time + timezone offset
-  /// automatically so Visp can resolve "next Friday"/"tomorrow" against
-  /// the same "now" the user is actually looking at (see koda-server's
-  /// Koda.Visp.Events for why this can't just be left to the model).
-  /// Returns `{'plan': {...}}` on success or `{'error': '...'}` on failure.
-  Future<Map<String, dynamic>?> planVispEvent({required String channelId, required String prompt}) async {
+  /// Advances an event-creation walkthrough by one turn -- [messages] is
+  /// the full conversation so far (`[{'role': 'user'|'assistant',
+  /// 'content': '...'}, ...]`, growing with each call); this endpoint
+  /// itself is stateless. Bundles the device's current local time +
+  /// timezone offset automatically so Visp can resolve "next Friday"/
+  /// "tomorrow" against the same "now" the user is actually looking at
+  /// (see koda-server's Koda.Visp.Events for why this can't just be
+  /// left to the model). [forcePlan] is the "skip and generate now"
+  /// escape hatch. Returns `{'action': 'ask', 'question':, 'options':,
+  /// 'question_number':, 'max_questions':}`, `{'action': 'plan', 'plan':
+  /// {...}}`, or `{'error': '...'}` on failure.
+  Future<Map<String, dynamic>?> planVispEvent({
+    required String channelId,
+    required List<Map<String, String>> messages,
+    bool forcePlan = false,
+  }) async {
     try {
       final now = DateTime.now();
       final res = await _dio.post('/channels/$channelId/visp/event_plan', data: {
-        'prompt': prompt,
+        'messages': messages,
+        'force_plan': forcePlan,
         'client_now': now.toIso8601String(),
         'client_tz_offset_minutes': now.timeZoneOffset.inMinutes,
       });
@@ -1735,6 +1745,28 @@ class KodaApi {
           });
       return res.data as Map<String, dynamic>;
     } catch (e) { _log('getRevenueTransactions', e); return null; }
+  }
+
+  /// Boost ROI advisor -- a read-only Visp narrative over this server's
+  /// real revenue/boost/subscriber numbers (see koda-server's
+  /// Koda.Visp.BoostAdvisor). [messages] is the full conversation so far,
+  /// same shape/statelessness as [planWithVisp], but every turn here
+  /// returns a narrative answer directly -- no 'action'/'plan' branching,
+  /// and no companion "apply" call since there's nothing to create.
+  /// Returns `{'headline':, 'narrative':, 'recommendations': [...],
+  /// 'sources': [...]}` or `{'error': '...'}` on failure.
+  Future<Map<String, dynamic>?> askVispBoostAdvice({
+    required String serverId,
+    required List<Map<String, String>> messages,
+  }) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/visp/boost_advice',
+          data: {'messages': messages});
+      return res.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      _log('askVispBoostAdvice', e);
+      return {'error': _errorCodeOf(e) ?? 'Visp is unavailable right now.'};
+    }
   }
 
   // -- Printful (per-server merch fulfillment) ---------------------------------
@@ -2293,16 +2325,25 @@ class KodaApi {
   // -- Visp (natural-language server setup, self-hosted -- see koda-server's
   // Koda.Visp / VispController) ------------------------------------------------
 
-  /// Preview-only -- generates a plan from [prompt] but creates nothing.
-  /// [serverId] absent means "propose a brand-new server"; present means
-  /// "propose additions to that existing server". Returns `{'plan': {...}}`
-  /// on success or `{'error': '...'}` on failure so the dialog can show a
-  /// specific message (rate-limited, malformed plan, etc.) rather than a
-  /// generic one.
-  Future<Map<String, dynamic>?> planWithVisp({String? serverId, required String prompt}) async {
+  /// Advances a server-setup walkthrough by one turn -- [messages] is
+  /// the full conversation so far (`[{'role': 'user'|'assistant',
+  /// 'content': '...'}, ...]`, growing with each call); this endpoint
+  /// itself is stateless. [serverId] absent means "propose a brand-new
+  /// server"; present means "propose additions to that existing
+  /// server". [forcePlan] is the "skip and generate now" escape hatch.
+  /// Returns `{'action': 'ask', 'question':, 'options':,
+  /// 'question_number':, 'max_questions':}`, `{'action': 'plan', 'plan':
+  /// {...}}`, or `{'error': '...'}` on failure so the dialog can show a
+  /// specific message (rate-limited, malformed plan, etc.).
+  Future<Map<String, dynamic>?> planWithVisp({
+    String? serverId,
+    required List<Map<String, String>> messages,
+    bool forcePlan = false,
+  }) async {
     try {
       final res = await _dio.post('/visp/plan', data: {
-        'prompt': prompt,
+        'messages': messages,
+        'force_plan': forcePlan,
         if (serverId != null) 'server_id': serverId,
       });
       return res.data as Map<String, dynamic>;
@@ -2326,6 +2367,48 @@ class KodaApi {
       _log('applyVispPlan', e);
       return {'error': _errorCodeOf(e) ?? 'Could not apply that plan.'};
     }
+  }
+
+  // -- Wiki (Visp's retrieval-grounding corpus + koda.fyi doc source --
+  // see koda-server's Koda.Wiki / WikiController) -- admin-only. -------------
+
+  Future<List<Map<String, dynamic>>> listWikiArticles() async {
+    try {
+      final res = await _dio.get('/admin/wiki');
+      return List<Map<String, dynamic>>.from(res.data['articles'] ?? []);
+    } catch (e) { _log('listWikiArticles', e); return []; }
+  }
+
+  Future<Map<String, dynamic>?> createWikiArticle({
+    required String title,
+    required String content,
+    required String category,
+    String? slug,
+  }) async {
+    try {
+      final res = await _dio.post('/admin/wiki', data: {
+        'title': title,
+        'content': content,
+        'category': category,
+        if (slug != null) 'slug': slug,
+      });
+      return res.data['article'] as Map<String, dynamic>;
+    } catch (e) { _log('createWikiArticle', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> updateWikiArticle(
+      String id, Map<String, dynamic> data) async {
+    try {
+      final res = await _dio.patch('/admin/wiki/$id', data: data);
+      return res.data['article'] as Map<String, dynamic>;
+    } catch (e) { _log('updateWikiArticle', e); return null; }
+  }
+
+  Future<bool> deleteWikiArticle(String id) async {
+    try {
+      await _dio.delete('/admin/wiki/$id');
+      return true;
+    } catch (e) { _log('deleteWikiArticle', e); return false; }
   }
 
 }

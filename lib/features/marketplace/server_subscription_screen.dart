@@ -6,11 +6,19 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api.dart';
 import '../../core/checkout.dart';
 import '../../core/theme.dart';
 import '../../core/time_utils.dart';
 import '../../shared/widgets.dart';
+
+// Per-device display preference, off by default -- not every owner wants
+// subscriber counts in their face constantly (small/new servers, or just
+// personal taste), so it's opt-in rather than always shown. Not synced
+// server-side, same "local window-chrome-style choice" convention as
+// TrayService's close-to-tray setting.
+const _kShowSubscriberCountsKey = 'koda_show_subscriber_counts';
 
 class ServerSubscriptionScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> server;
@@ -31,11 +39,25 @@ class _ServerSubscriptionScreenState
   List<Map<String, dynamic>> _roles = [];
   Map<String, dynamic>? _mySubscription;
   bool _loading = true;
+  bool _showSubscriberCounts = false;
 
   @override
   void initState() {
     super.initState();
     _load();
+    _loadShowSubscriberCounts();
+  }
+
+  Future<void> _loadShowSubscriberCounts() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() => _showSubscriberCounts = prefs.getBool(_kShowSubscriberCountsKey) ?? false);
+  }
+
+  Future<void> _setShowSubscriberCounts(bool value) async {
+    setState(() => _showSubscriberCounts = value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_kShowSubscriberCountsKey, value);
   }
 
   Future<void> _load() async {
@@ -123,8 +145,26 @@ class _ServerSubscriptionScreenState
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: _tiers.length,
-      itemBuilder: (_, i) => _buildOwnerTierCard(_tiers[i]),
+      itemCount: _tiers.length + 1,
+      itemBuilder: (_, i) {
+        if (i == 0) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(children: [
+              const Expanded(
+                child: Text('Show subscriber counts',
+                    style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+              ),
+              Switch(
+                value: _showSubscriberCounts,
+                activeThumbColor: KodaColors.koda,
+                onChanged: _setShowSubscriberCounts,
+              ),
+            ]),
+          );
+        }
+        return _buildOwnerTierCard(_tiers[i - 1]);
+      },
     );
   }
 
@@ -132,6 +172,7 @@ class _ServerSubscriptionScreenState
     final price = (tier['price_cents'] as int? ?? 0) / 100.0;
     final discount = tier['marketplace_discount_percent'] as int? ?? 0;
     final position = tier['position'] as int? ?? 1;
+    final subscriberCount = tier['subscriber_count'] as int? ?? 0;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -179,6 +220,15 @@ class _ServerSubscriptionScreenState
                 (tier['description'] as String).isNotEmpty) ...[
               Text(tier['description'] as String,
                   style: const TextStyle(color: KodaColors.text2, fontSize: 13)),
+              const SizedBox(height: 8),
+            ],
+            if (_showSubscriberCounts) ...[
+              Row(children: [
+                const Icon(Icons.people_outline, size: 14, color: KodaColors.text3),
+                const SizedBox(width: 4),
+                Text('$subscriberCount active subscriber${subscriberCount == 1 ? '' : 's'}',
+                    style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+              ]),
               const SizedBox(height: 8),
             ],
             Row(children: [

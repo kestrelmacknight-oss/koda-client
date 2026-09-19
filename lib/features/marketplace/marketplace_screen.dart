@@ -13,6 +13,7 @@ import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../core/time_utils.dart';
 import '../../shared/tier_badge.dart';
+import '../visp/visp_boost_advisor_panel.dart';
 import '../../shared/widgets.dart';
 import 'digital_goods_screen.dart';
 import 'printful_merch_screen.dart';
@@ -931,6 +932,7 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
       case 'server_subscription': return 'Server Subscriptions';
       case 'digital_product': return 'Digital Goods';
       case 'stage_ticket': return 'Stage Tickets';
+      case 'printful_order': return 'Merch Orders';
       default: return type;
     }
   }
@@ -942,6 +944,7 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
       case 'server_subscription': return Icons.card_membership_outlined;
       case 'digital_product': return Icons.inventory_2_outlined;
       case 'stage_ticket': return Icons.confirmation_num_outlined;
+      case 'printful_order': return Icons.local_shipping_outlined;
       default: return Icons.circle_outlined;
     }
   }
@@ -1080,6 +1083,9 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
               ]),
             );
           }),
+
+        const SizedBox(height: 20),
+        VispBoostAdvisorPanel(serverId: widget.server['id'] as String),
       ],
     );
   }

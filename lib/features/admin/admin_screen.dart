@@ -26,7 +26,7 @@ class _AdminScreenState extends State<AdminScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 3, vsync: this);
+    _tabs = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -57,6 +57,7 @@ class _AdminScreenState extends State<AdminScreen>
             Tab(text: 'Backer Codes'),
             Tab(text: 'Users'),
             Tab(text: 'DM Reports'),
+            Tab(text: 'Wiki'),
           ],
         ),
       ),
@@ -66,6 +67,7 @@ class _AdminScreenState extends State<AdminScreen>
           _BackerCodesTab(),
           _UsersTab(),
           _DmReportsTab(),
+          _WikiTab(),
         ],
       ),
     );
@@ -510,5 +512,194 @@ class _DmReportsTabState extends State<_DmReportsTab> {
           ),
       ]),
     );
+  }
+}
+
+// ── Wiki Tab ──────────────────────────────────────────────────────────────────
+//
+// Koda's knowledge base (see koda-server's Koda.Wiki) -- Visp's
+// retrieval-grounding corpus and the source content for koda.fyi's
+// public docs. Every create/update re-embeds server-side (see
+// Koda.Wiki.create_article/1, update_article/2), so there's nothing
+// embedding-related to manage here, just plain content CRUD.
+
+const _wikiCategories = [
+  'getting-started', 'messaging', 'voice-video', 'server-management',
+  'moderation', 'marketplace', 'events', 'parental-controls',
+  'integrations', 'visp',
+];
+
+class _WikiTab extends StatefulWidget {
+  @override
+  State<_WikiTab> createState() => _WikiTabState();
+}
+
+class _WikiTabState extends State<_WikiTab> {
+  List<Map<String, dynamic>> _articles = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    final articles = await KodaApi.instance.listWikiArticles();
+    if (!mounted) return;
+    setState(() { _articles = articles; _loading = false; });
+  }
+
+  Future<void> _delete(Map<String, dynamic> article) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: const Text('Delete article?', style: TextStyle(color: KodaColors.text1)),
+        content: Text('"${article['title']}" will be removed from Visp\'s knowledge base.',
+            style: const TextStyle(color: KodaColors.text3)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete', style: TextStyle(color: KodaColors.accent)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      final ok = await KodaApi.instance.deleteWikiArticle(article['id'] as String);
+      if (ok && mounted) _load();
+    }
+  }
+
+  Future<void> _showEditor({Map<String, dynamic>? article}) async {
+    final titleCtrl = TextEditingController(text: article?['title'] as String? ?? '');
+    final contentCtrl = TextEditingController(text: article?['content'] as String? ?? '');
+    String category = article?['category'] as String? ?? _wikiCategories.first;
+
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: KodaColors.card,
+          title: Text(article == null ? 'New Article' : 'Edit Article',
+              style: const TextStyle(color: KodaColors.text1)),
+          content: SizedBox(
+            width: 480,
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              KodaTextField(controller: titleCtrl, hintText: 'Title'),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                initialValue: category,
+                dropdownColor: KodaColors.card,
+                style: const TextStyle(color: KodaColors.text1, fontSize: 14),
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                ),
+                items: _wikiCategories
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                    .toList(),
+                onChanged: (v) => setDialogState(() => category = v ?? category),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: contentCtrl,
+                maxLines: 10,
+                minLines: 6,
+                style: const TextStyle(color: KodaColors.text1, fontSize: 13),
+                decoration: const InputDecoration(
+                  hintText: 'Article content (markdown)',
+                  contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                ),
+              ),
+            ]),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(article == null ? 'Create' : 'Save'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (saved != true) return;
+    final title = titleCtrl.text.trim();
+    final content = contentCtrl.text.trim();
+    if (title.isEmpty || content.isEmpty) return;
+
+    final result = article == null
+        ? await KodaApi.instance.createWikiArticle(title: title, content: content, category: category)
+        : await KodaApi.instance.updateWikiArticle(article['id'] as String,
+            {'title': title, 'content': content, 'category': category});
+
+    if (result != null && mounted) _load();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(children: [
+          const Text('Wiki Articles',
+              style: TextStyle(color: KodaColors.text1, fontSize: 15, fontWeight: FontWeight.w700)),
+          const Spacer(),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(backgroundColor: KodaColors.koda),
+            icon: const Icon(Icons.add, size: 16, color: Colors.white),
+            label: const Text('New Article', style: TextStyle(color: Colors.white)),
+            onPressed: () => _showEditor(),
+          ),
+        ]),
+      ),
+      const Divider(color: KodaColors.border, height: 1),
+      Expanded(
+        child: _loading
+            ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+            : _articles.isEmpty
+                ? const Center(child: Text('No articles yet', style: TextStyle(color: KodaColors.text3)))
+                : ListView.builder(
+                    padding: const EdgeInsets.all(12),
+                    itemCount: _articles.length,
+                    itemBuilder: (_, i) {
+                      final a = _articles[i];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: KodaColors.card,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: KodaColors.border),
+                        ),
+                        child: Row(children: [
+                          Expanded(child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                            Text(a['title'] as String? ?? '',
+                                style: const TextStyle(color: KodaColors.text1,
+                                    fontSize: 14, fontWeight: FontWeight.w600)),
+                            const SizedBox(height: 2),
+                            Text(a['category'] as String? ?? '',
+                                style: const TextStyle(color: KodaColors.koda, fontSize: 11)),
+                          ])),
+                          IconButton(
+                            icon: const Icon(Icons.edit_outlined, size: 18, color: KodaColors.text3),
+                            onPressed: () => _showEditor(article: a),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline, size: 18, color: KodaColors.text3),
+                            onPressed: () => _delete(a),
+                          ),
+                        ]),
+                      );
+                    },
+                  ),
+      ),
+    ]);
   }
 }

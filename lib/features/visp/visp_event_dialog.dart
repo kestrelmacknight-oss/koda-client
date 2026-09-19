@@ -1,19 +1,23 @@
 // lib/features/visp/visp_event_dialog.dart
 //
-// Visp: event creation from natural language. Same input -> preview ->
-// confirm shape as visp_setup_dialog.dart. The one thing this preview
-// has to get right that server-setup's doesn't: the resolved date/time
-// is reformatted into the user's own *local* time before display --
-// Visp resolves "next Friday"/"tomorrow" against the device's local
-// clock (see koda-server's Koda.Visp.Events), but small local models
-// can still get date/time reasoning wrong, so seeing it spelled out in
-// plain local terms before confirming is the actual safety net here,
-// not decoration.
+// Visp: event creation from natural language, with smart walkthrough
+// branching -- same conversational shape as visp_setup_dialog.dart
+// (describe -> Visp asks up to 4 clarifying questions or proposes a
+// final event, "Skip and generate now" always available). The one
+// thing this preview has to get right that server-setup's doesn't: the
+// resolved date/time is reformatted into the user's own *local* time
+// before display -- Visp resolves "next Friday"/"tomorrow" against the
+// device's local clock (see koda-server's Koda.Visp.Events), but small
+// local models can still get date/time reasoning wrong, so seeing it
+// spelled out in plain local terms before confirming is the actual
+// safety net here, not decoration.
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import 'visp_question_step.dart';
 
 Future<void> showVispEventDialog(
   BuildContext context, {
@@ -39,8 +43,14 @@ class VispEventDialog extends StatefulWidget {
 class _VispEventDialogState extends State<VispEventDialog> {
   final _promptCtrl = TextEditingController();
   bool _loading = false;
-  Map<String, dynamic>? _plan;
   String? _error;
+
+  final List<Map<String, String>> _messages = [];
+  String? _currentQuestion;
+  List<String> _currentOptions = [];
+  int _questionNumber = 0;
+  int _maxQuestions = 4;
+  Map<String, dynamic>? _plan;
 
   static const _recurrenceLabels = {
     'none': 'One-time',
@@ -55,25 +65,63 @@ class _VispEventDialogState extends State<VispEventDialog> {
     super.dispose();
   }
 
-  Future<void> _generatePlan() async {
+  Future<void> _startWalkthrough() async {
     final prompt = _promptCtrl.text.trim();
     if (prompt.isEmpty) return;
-    setState(() { _loading = true; _error = null; _plan = null; });
+    _messages.add({'role': 'user', 'content': prompt});
+    await _takeTurn();
+  }
+
+  Future<void> _answerQuestion(String answer) async {
+    _messages.add({'role': 'user', 'content': answer});
+    await _takeTurn();
+  }
+
+  Future<void> _skipToPlan() => _takeTurn(forcePlan: true);
+
+  Future<void> _takeTurn({bool forcePlan = false}) async {
+    setState(() { _loading = true; _error = null; });
 
     final result = await KodaApi.instance.planVispEvent(
       channelId: widget.channelId,
-      prompt: prompt,
+      messages: _messages,
+      forcePlan: forcePlan,
     );
     if (!mounted) return;
 
-    final plan = result?['plan'] as Map<String, dynamic>?;
-    if (plan != null) {
-      setState(() { _plan = plan; _loading = false; });
-    } else {
-      setState(() {
-        _error = result?['error'] as String? ?? 'Visp could not generate an event.';
-        _loading = false;
-      });
+    switch (result?['action']) {
+      case 'ask':
+        final question = result?['question'] as String?;
+        if (question == null) {
+          setState(() { _error = 'Visp could not generate an event.'; _loading = false; });
+          return;
+        }
+        _messages.add({'role': 'assistant', 'content': jsonEncode({
+          'action': 'ask', 'question': question, 'options': result?['options'] ?? [],
+        })});
+        setState(() {
+          _currentQuestion = question;
+          _currentOptions = List<String>.from(result?['options'] ?? []);
+          _questionNumber = result?['question_number'] as int? ?? _questionNumber + 1;
+          _maxQuestions = result?['max_questions'] as int? ?? _maxQuestions;
+          _loading = false;
+        });
+        break;
+
+      case 'plan':
+        final plan = result?['plan'] as Map<String, dynamic>?;
+        if (plan == null) {
+          setState(() { _error = 'Visp could not generate an event.'; _loading = false; });
+          return;
+        }
+        setState(() { _plan = plan; _currentQuestion = null; _loading = false; });
+        break;
+
+      default:
+        setState(() {
+          _error = result?['error'] as String? ?? 'Visp could not generate an event.';
+          _loading = false;
+        });
     }
   }
 
@@ -100,7 +148,15 @@ class _VispEventDialogState extends State<VispEventDialog> {
     }
   }
 
-  void _regenerate() => setState(() { _plan = null; _error = null; });
+  void _startOver() => setState(() {
+    _messages.clear();
+    _currentQuestion = null;
+    _currentOptions = [];
+    _questionNumber = 0;
+    _plan = null;
+    _error = null;
+    _promptCtrl.clear();
+  });
 
   DateTime? _tryParseLocal(String? iso) {
     if (iso == null) return null;
@@ -114,6 +170,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
   @override
   Widget build(BuildContext context) {
     final plan = _plan;
+    final question = _currentQuestion;
 
     return Dialog(
       backgroundColor: KodaColors.card,
@@ -145,7 +202,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
               ),
               const SizedBox(height: 16),
 
-              if (plan == null) ...[
+              if (plan == null && question == null) ...[
                 TextField(
                   controller: _promptCtrl,
                   maxLines: 3,
@@ -161,6 +218,18 @@ class _VispEventDialogState extends State<VispEventDialog> {
                   'Your description is sent to Visp (a self-hosted assistant -- '
                   'nothing leaves Koda\'s servers) to generate this plan.',
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
+                ),
+              ],
+
+              if (question != null && plan == null) ...[
+                VispQuestionStep(
+                  question: question,
+                  options: _currentOptions,
+                  questionNumber: _questionNumber,
+                  maxQuestions: _maxQuestions,
+                  loading: _loading,
+                  onAnswer: _answerQuestion,
+                  onSkip: _skipToPlan,
                 ),
               ],
 
@@ -190,8 +259,8 @@ class _VispEventDialogState extends State<VispEventDialog> {
                         side: const BorderSide(color: KodaColors.border),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      onPressed: _loading ? null : _regenerate,
-                      child: const Text('Try Again'),
+                      onPressed: _loading ? null : _startOver,
+                      child: const Text('Start Over'),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -211,7 +280,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
                     ),
                   ),
                 ]),
-              ] else ...[
+              ] else if (question == null) ...[
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -221,7 +290,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                    onPressed: _loading ? null : _generatePlan,
+                    onPressed: _loading ? null : _startWalkthrough,
                     icon: _loading
                         ? const SizedBox(width: 16, height: 16,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
@@ -243,6 +312,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
     final endLocal = _tryParseLocal(plan['end_at'] as String?);
     final recurrence = plan['recurrence'] as String? ?? 'none';
     final priceCents = plan['price_cents'] as int? ?? 0;
+    final sources = List<String>.from(plan['sources'] ?? []);
     final dateFmt = DateFormat('EEEE, MMM d, yyyy \'at\' h:mm a');
 
     return Container(
@@ -272,6 +342,10 @@ class _VispEventDialogState extends State<VispEventDialog> {
         if (priceCents > 0)
           _previewRow(Icons.confirmation_number_outlined,
               '\$${(priceCents / 100).toStringAsFixed(2)} per ticket'),
+        if (sources.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          _sourcesRow(sources),
+        ],
       ]),
     );
   }
@@ -284,4 +358,22 @@ class _VispEventDialogState extends State<VispEventDialog> {
       Expanded(child: Text(text, style: const TextStyle(color: KodaColors.text2, fontSize: 12))),
     ]),
   );
+
+  // Which wiki articles (see koda-server's Koda.Wiki) Visp actually
+  // grounded this plan in, if any -- lets the user check the source
+  // rather than just trusting the model's claim.
+  Widget _sourcesRow(List<String> sources) {
+    return Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
+      const Icon(Icons.menu_book_outlined, size: 12, color: KodaColors.text3),
+      const Text('Based on:', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+      ...sources.map((title) => Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: KodaColors.koda.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(title, style: const TextStyle(color: KodaColors.koda, fontSize: 11)),
+          )),
+    ]);
+  }
 }
