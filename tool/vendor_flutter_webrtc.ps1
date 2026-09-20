@@ -83,8 +83,36 @@ Write-Host "Adding audio_eq_processor.h/.cc ..."
 Copy-Item -Force (Join-Path $PatchDir "audio_eq_processor.h") (Join-Path $VendorDir "windows\audio_eq_processor.h")
 Copy-Item -Force (Join-Path $PatchDir "audio_eq_processor.cc") (Join-Path $VendorDir "windows\audio_eq_processor.cc")
 
-Write-Host "Applying eq_hooks.patch ..."
 $patchFile = Join-Path $PatchDir "eq_hooks.patch"
+
+# eq_hooks.patch is authored with LF hunks (see .gitattributes -- *.patch
+# -text keeps it that way on every checkout), but upstream ships at
+# least one of the files it touches (windows/CMakeLists.txt) with real,
+# permanent CRLF line endings baked into the published pub.dev package
+# itself -- confirmed against a genuinely fresh `dart pub cache add`
+# fetch, not a checkout artifact. git apply on Windows happens to
+# tolerate that mismatch (core.autocrlf's usual default there), but a
+# strict Linux/macOS `git apply` does an exact byte match and fails on
+# that one hunk. Line endings carry no meaning to CMake/C++/Dart parsers,
+# so normalizing just the files this patch is about to touch to LF
+# (parsed straight from the patch's own "+++ b/..." headers, rather than
+# a hardcoded list that could drift from the patch) is a safe, permanent
+# fix rather than relying on whichever platform's git happens to be lenient.
+Write-Host "Normalizing line endings of patched files to LF ..."
+$patchedRelPaths = Select-String -Path $patchFile -Pattern '^\+\+\+ b/(.+)$' |
+    ForEach-Object { $_.Matches[0].Groups[1].Value.Trim() }
+foreach ($relPath in $patchedRelPaths) {
+    $fullPath = Join-Path $VendorDir $relPath
+    if (Test-Path $fullPath) {
+        $text = [System.IO.File]::ReadAllText($fullPath)
+        $normalized = $text -replace "`r`n", "`n"
+        if ($normalized -ne $text) {
+            [System.IO.File]::WriteAllText($fullPath, $normalized, (New-Object System.Text.UTF8Encoding($false)))
+        }
+    }
+}
+
+Write-Host "Applying eq_hooks.patch ..."
 Push-Location $VendorDir
 try {
     git apply --verbose $patchFile
