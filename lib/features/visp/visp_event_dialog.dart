@@ -10,13 +10,16 @@
 // device's local clock (see koda-server's Koda.Visp.Events), but small
 // local models can still get date/time reasoning wrong, so seeing it
 // spelled out in plain local terms before confirming is the actual
-// safety net here, not decoration.
+// safety net here, not decoration. Visp's avatar/kaomoji face follow the
+// same mood-mapped pattern as visp_setup_dialog.dart -- see
+// visp_avatar.dart.
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import 'visp_avatar.dart';
 import 'visp_question_step.dart';
 
 Future<void> showVispEventDialog(
@@ -51,6 +54,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
   int _questionNumber = 0;
   int _maxQuestions = 4;
   Map<String, dynamic>? _plan;
+  bool _showAvatar = true;
 
   static const _recurrenceLabels = {
     'none': 'One-time',
@@ -58,6 +62,22 @@ class _VispEventDialogState extends State<VispEventDialog> {
     'weekly': 'Repeats weekly',
     'monthly': 'Repeats monthly',
   };
+
+  VispMood get _mood {
+    if (_error != null) return VispMood.error;
+    if (_loading) return VispMood.thinking;
+    if (_plan != null) return VispMood.planReady;
+    if (_currentQuestion != null) return VispMood.asking;
+    return VispMood.idle;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    VispAvatarPrefs.isEnabled().then((v) {
+      if (mounted) setState(() => _showAvatar = v);
+    });
+  }
 
   @override
   void dispose() {
@@ -183,13 +203,16 @@ class _VispEventDialogState extends State<VispEventDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(children: [
-                const Icon(Icons.auto_awesome, color: KodaColors.koda, size: 20),
+              Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                _showAvatar
+                    ? VispAvatar(size: 44, mood: _mood)
+                    : const Icon(Icons.auto_awesome, color: KodaColors.koda, size: 20),
                 const SizedBox(width: 10),
-                const Text('Ask Visp to create an event',
-                    style: TextStyle(color: KodaColors.text1, fontSize: 16,
-                        fontWeight: FontWeight.w700)),
-                const Spacer(),
+                const Expanded(
+                  child: Text('Ask Visp to create an event',
+                      style: TextStyle(color: KodaColors.text1, fontSize: 16,
+                          fontWeight: FontWeight.w700)),
+                ),
                 IconButton(
                   icon: const Icon(Icons.close, size: 18, color: KodaColors.text3),
                   onPressed: () => Navigator.pop(context),

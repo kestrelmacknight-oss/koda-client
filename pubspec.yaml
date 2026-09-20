@@ -72,6 +72,7 @@ flutter:
     - assets/badges/
     - assets/frames/
     - assets/tray/
+    - assets/visp/
 
 # Regenerate with: dart run flutter_launcher_icons
 # Source is the same brand mark already shipping in the macOS/Windows

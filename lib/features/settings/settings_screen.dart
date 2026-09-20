@@ -23,6 +23,7 @@ import 'voice_video_settings_screen.dart';
 import '../auth/auth_screen.dart';
 import '../marketplace/marketplace_screen.dart';
 import '../parental/parental_dashboard_screen.dart';
+import '../visp/visp_avatar.dart';
 import '../../shared/tier_badge.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -48,6 +49,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String? _throneWebhookUrl;
   bool _loadingThroneUrl = false;
   bool _closeToTray = true;
+  bool _showVispAvatar = true;
   final Map<String, Map<String, dynamic>?> _streamingStatus = {'twitch': null, 'youtube': null};
   final Map<String, bool> _loadingStreaming = {'twitch': true, 'youtube': true};
   final Map<String, bool> _connectingStreaming = {'twitch': false, 'youtube': false};
@@ -90,6 +92,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         if (mounted) setState(() => _closeToTray = v);
       });
     }
+    VispAvatarPrefs.isEnabled().then((v) {
+      if (mounted) setState(() => _showVispAvatar = v);
+    });
     _loadStreamingStatus('twitch');
     _loadStreamingStatus('youtube');
   }
@@ -366,6 +371,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         const SnackBar(content: Text('Could not update DM privacy.')));
                   }
                 }
+              },
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(bottom: 6),
+            decoration: BoxDecoration(
+                color: KodaColors.card, borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: KodaColors.border)),
+            child: SwitchListTile(
+              secondary: const Icon(Icons.auto_awesome, color: KodaColors.text3, size: 18),
+              title: const Text('Show Visp\'s avatar',
+                  style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+              subtitle: const Text('Shows Visp\'s face and mood in its setup/event/advisor dialogs',
+                  style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+              activeThumbColor: KodaColors.koda,
+              value: _showVispAvatar,
+              onChanged: (v) async {
+                setState(() => _showVispAvatar = v);
+                await VispAvatarPrefs.setEnabled(v);
               },
             ),
           ),

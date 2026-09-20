@@ -9,11 +9,13 @@
 // optionally citing wiki articles the same "Based on: ..." way the other
 // two Visp surfaces do. A default question fires automatically on first
 // load; a free-text field lets the owner ask follow-ups in the same
-// conversation.
+// conversation. Avatar/kaomoji face follow the same mood-mapped pattern
+// as the other two Visp surfaces -- see visp_avatar.dart.
 
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import 'visp_avatar.dart';
 
 const _kDefaultQuestion = 'How is my boosting and marketplace revenue doing?';
 
@@ -31,10 +33,21 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
   bool _loading = false;
   String? _error;
   Map<String, dynamic>? _lastAdvice;
+  bool _showAvatar = true;
+
+  VispMood get _mood {
+    if (_error != null) return VispMood.error;
+    if (_loading) return VispMood.thinking;
+    if (_lastAdvice != null) return VispMood.planReady;
+    return VispMood.idle;
+  }
 
   @override
   void initState() {
     super.initState();
+    VispAvatarPrefs.isEnabled().then((v) {
+      if (mounted) setState(() => _showAvatar = v);
+    });
     _ask(_kDefaultQuestion);
   }
 
@@ -92,10 +105,12 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
         border: Border.all(color: KodaColors.border),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Row(children: [
-          Icon(Icons.auto_awesome, size: 16, color: KodaColors.koda),
-          SizedBox(width: 8),
-          Text('Ask Visp: Boost ROI Advisor',
+        Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          _showAvatar
+              ? VispAvatar(size: 40, mood: _mood)
+              : const Icon(Icons.auto_awesome, size: 16, color: KodaColors.koda),
+          const SizedBox(width: 8),
+          const Text('Ask Visp: Boost ROI Advisor',
               style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w700)),
         ]),
         const SizedBox(height: 12),

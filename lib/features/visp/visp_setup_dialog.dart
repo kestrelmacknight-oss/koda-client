@@ -11,13 +11,17 @@
 // Koda.Visp.take_turn/3. The conversation itself is just a plain
 // {role, content} list resent in full each turn; this dialog is the
 // only place that state lives, the server is stateless throughout.
-// No character art yet -- Icons.auto_awesome stands in for Visp until
-// real animation work happens (a separate, later item).
+// Visp's avatar (VispAvatar) and its kaomoji "face" (vispKaomoji,
+// mood-mapped to this dialog's own loading/asking/plan/error state)
+// show by default -- see visp_avatar.dart -- and fall back to the
+// plain Icons.auto_awesome sparkle if the user's turned the avatar off
+// in Settings > My Account (VispAvatarPrefs).
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import 'visp_avatar.dart';
 import 'visp_question_step.dart';
 
 Future<void> showVispSetupDialog(
@@ -52,8 +56,25 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
   int _questionNumber = 0;
   int _maxQuestions = 4;
   Map<String, dynamic>? _plan;
+  bool _showAvatar = true;
 
   bool get _isNewServer => widget.serverId == null;
+
+  VispMood get _mood {
+    if (_error != null) return VispMood.error;
+    if (_loading) return VispMood.thinking;
+    if (_plan != null) return VispMood.planReady;
+    if (_currentQuestion != null) return VispMood.asking;
+    return VispMood.idle;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    VispAvatarPrefs.isEnabled().then((v) {
+      if (mounted) setState(() => _showAvatar = v);
+    });
+  }
 
   @override
   void dispose() {
@@ -172,13 +193,16 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(children: [
-                const Icon(Icons.auto_awesome, color: KodaColors.koda, size: 20),
+              Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                _showAvatar
+                    ? VispAvatar(size: 44, mood: _mood)
+                    : const Icon(Icons.auto_awesome, color: KodaColors.koda, size: 20),
                 const SizedBox(width: 10),
-                Text(_isNewServer ? 'Describe your server to Visp' : 'Ask Visp to add to this server',
-                    style: const TextStyle(color: KodaColors.text1, fontSize: 16,
-                        fontWeight: FontWeight.w700)),
-                const Spacer(),
+                Expanded(
+                  child: Text(_isNewServer ? 'Describe your server to Visp' : 'Ask Visp to add to this server',
+                      style: const TextStyle(color: KodaColors.text1, fontSize: 16,
+                          fontWeight: FontWeight.w700)),
+                ),
                 IconButton(
                   icon: const Icon(Icons.close, size: 18, color: KodaColors.text3),
                   onPressed: () => Navigator.pop(context),
