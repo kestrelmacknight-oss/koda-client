@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <!-- Required on API 33+ for any notification to display at all --
+    <!-- Required on API 33+ for any notification to display at all:
          FirebaseMessaging.requestPermission() (lib/core/push_notifications.dart)
          can only trigger the runtime prompt when this is declared; without it,
          push silently never shows on Android 13+ even though the FCM token
@@ -50,7 +50,7 @@
             <!-- https://koda.fyi/invite/<code> App Link. autoVerify requires
                  assetlinks.json published at koda.fyi's web root (a separate
                  deployment from this app) with this app's signing cert
-                 fingerprint -- see the handoff content alongside this change.
+                 fingerprint; see the handoff content alongside this change.
                  Until that's live, Android falls back to showing a disambiguation
                  sheet instead of opening Koda directly, same as any unverified
                  App Link. -->
