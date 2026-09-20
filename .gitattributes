@@ -1,0 +1,11 @@
+# Unified diff files must never have their line endings touched by git's
+# autocrlf/eol normalization. git apply does an exact byte match against
+# upstream source (LF), so a CRLF-converted copy fails every hunk that
+# spans more than one context line -- exactly what broke
+# tool/vendor_flutter_webrtc.ps1's `git apply` step against
+# native/flutter_webrtc_eq_patch/eq_hooks.patch on any machine/runner
+# with core.autocrlf=true (the common Windows default, including
+# windows-latest GitHub-hosted runners). -text disables line-ending
+# conversion entirely -- the safest option for a file whose line endings
+# are themselves diff content, not formatting.
+*.patch -text
