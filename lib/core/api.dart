@@ -587,6 +587,26 @@ class KodaApi {
     } catch (e) { _log('resolveReport', e); return false; }
   }
 
+  /// Platform-admin-only, system-generated spam flags (dm_fanout +
+  /// channel_flood in one queue) -- see koda-server's
+  /// Koda.Moderation.list_spam_flags/1.
+  Future<List<Map<String, dynamic>>> getSpamFlags({String? status}) async {
+    try {
+      final res = await _dio.get('/admin/spam_flags',
+          queryParameters: status != null ? {'status': status} : null);
+      return List<Map<String, dynamic>>.from(res.data['flags'] ?? []);
+    } catch (e) { _log('getSpamFlags', e); return []; }
+  }
+
+  /// `status` is 'actioned' (applies the harder restriction -- see
+  /// koda-server's Koda.Moderation.resolve_spam_flag/3) or 'dismissed'.
+  Future<bool> resolveSpamFlag(String flagId, String status) async {
+    try {
+      await _dio.post('/spam_flags/$flagId/resolve', data: {'status': status});
+      return true;
+    } catch (e) { _log('resolveSpamFlag', e); return false; }
+  }
+
   // ── Moderation ────────────────────────────────────────────────────────────
 
   Future<bool> deleteMessage(String channelId, String messageId,

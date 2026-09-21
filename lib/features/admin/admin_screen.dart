@@ -26,7 +26,7 @@ class _AdminScreenState extends State<AdminScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 4, vsync: this);
+    _tabs = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -57,6 +57,7 @@ class _AdminScreenState extends State<AdminScreen>
             Tab(text: 'Backer Codes'),
             Tab(text: 'Users'),
             Tab(text: 'DM Reports'),
+            Tab(text: 'Spam Flags'),
             Tab(text: 'Wiki'),
           ],
         ),
@@ -67,6 +68,7 @@ class _AdminScreenState extends State<AdminScreen>
           _BackerCodesTab(),
           _UsersTab(),
           _DmReportsTab(),
+          _SpamFlagsTab(),
           _WikiTab(),
         ],
       ),
@@ -502,6 +504,158 @@ class _DmReportsTabState extends State<_DmReportsTab> {
             TextButton(
               onPressed: () => _resolve(r['id'] as String, 'actioned'),
               child: const Text('Mark Actioned', style: TextStyle(color: KodaColors.accent)),
+            ),
+          ]),
+        ] else
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(status == 'actioned' ? 'Actioned' : 'Dismissed',
+                style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+          ),
+      ]),
+    );
+  }
+}
+
+// ── Spam Flags Tab ────────────────────────────────────────────────────────────
+//
+// System-generated metadata-pattern flags (Tier 1 -- see koda-server's
+// Koda.Moderation.RateLimiter: check_dm_fanout/1 for mass-DM cold
+// outreach, the tiered record_violation/2 for channel flooding). No
+// human reporter and no single message behind these (unlike DM Reports
+// above), so they're a distinct queue -- both flag types share it since
+// a dm_fanout flag has no server to scope to either way. "Confirm &
+// Restrict" applies the same harder restriction the automatic
+// repeat-trip escalation already can (dm_restricted_until for
+// dm_fanout, a full mute for channel_flood).
+
+class _SpamFlagsTab extends StatefulWidget {
+  @override
+  State<_SpamFlagsTab> createState() => _SpamFlagsTabState();
+}
+
+class _SpamFlagsTabState extends State<_SpamFlagsTab> {
+  List<Map<String, dynamic>> _flags = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    final flags = await KodaApi.instance.getSpamFlags();
+    if (!mounted) return;
+    setState(() { _flags = flags; _loading = false; });
+  }
+
+  Future<void> _resolve(String id, String status) async {
+    final ok = await KodaApi.instance.resolveSpamFlag(id, status);
+    if (ok && mounted) _load();
+  }
+
+  String _flagLabel(String type) {
+    switch (type) {
+      case 'dm_fanout': return 'Mass-DM spam';
+      case 'raid_lockdown': return 'Raid lockdown';
+      case 'bot_behavior': return 'Bot-like behavior';
+      default: return 'Channel flooding';
+    }
+  }
+
+  IconData _flagIcon(String type) {
+    switch (type) {
+      case 'dm_fanout': return Icons.forward_to_inbox_outlined;
+      case 'raid_lockdown': return Icons.shield_outlined;
+      case 'bot_behavior': return Icons.smart_toy_outlined;
+      default: return Icons.water_drop_outlined;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final pending = _flags.where((f) => f['status'] == 'pending').toList();
+    final resolved = _flags.where((f) => f['status'] != 'pending').toList();
+
+    return _loading
+        ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+        : ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              if (pending.isEmpty && resolved.isEmpty)
+                const Center(child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: Text('No spam flags.', style: TextStyle(color: KodaColors.text3)),
+                )),
+              ...pending.map((f) => _flagCard(f)),
+              if (resolved.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                const Text('RESOLVED', style: TextStyle(
+                    color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
+                const SizedBox(height: 8),
+                ...resolved.map((f) => _flagCard(f)),
+              ],
+            ],
+          );
+  }
+
+  Widget _flagCard(Map<String, dynamic> f) {
+    final status = f['status'] as String? ?? 'pending';
+    final type = f['flag_type'] as String? ?? 'dm_fanout';
+    final details = Map<String, dynamic>.from(f['details'] ?? {});
+    final autoEscalated = details['auto_escalated'] == true;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: KodaColors.card,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: KodaColors.border),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(_flagIcon(type), size: 14, color: KodaColors.koda),
+          const SizedBox(width: 6),
+          Text(_flagLabel(type),
+              style: const TextStyle(color: KodaColors.koda, fontSize: 11, fontWeight: FontWeight.w700)),
+          if (autoEscalated) ...[
+            const SizedBox(width: 6),
+            const Text('AUTO-ESCALATED',
+                style: TextStyle(color: KodaColors.accent, fontSize: 10, fontWeight: FontWeight.w700)),
+          ],
+        ]),
+        const SizedBox(height: 6),
+        Text([
+          if (f['user_id'] != null) 'User: ${f['user_id']}',
+          if (f['server_id'] != null) 'Server: ${f['server_id']}',
+        ].join('\n'), style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+        if (details.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+                color: KodaColors.elevated, borderRadius: BorderRadius.circular(6)),
+            child: Text(details.entries.map((e) => '${e.key}: ${e.value}').join(', '),
+                style: const TextStyle(color: KodaColors.text1, fontSize: 12)),
+          ),
+        ],
+        if (status == 'pending') ...[
+          const SizedBox(height: 8),
+          Row(children: [
+            TextButton(
+              onPressed: () => _resolve(f['id'] as String, 'dismissed'),
+              child: const Text('Dismiss'),
+            ),
+            const SizedBox(width: 4),
+            TextButton(
+              onPressed: () => _resolve(f['id'] as String, 'actioned'),
+              child: Text(
+                  (type == 'raid_lockdown' || type == 'bot_behavior') ? 'Acknowledge' : 'Confirm & Restrict',
+                  style: const TextStyle(color: KodaColors.accent)),
             ),
           ]),
         ] else
