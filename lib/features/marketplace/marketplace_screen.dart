@@ -22,12 +22,18 @@ class MarketplaceScreen extends ConsumerStatefulWidget {
   /// When true, renders just the tab bar + tab content (no Scaffold/AppBar
   /// of its own) so it can sit inline inside another screen's layout --
   /// see home_screen.dart, where this is shown in the main content area
-  /// as a server-scoped pseudo-channel rather than a pushed full-screen
-  /// route. Pushed full-screen (the default), it's reached from Settings
-  /// for account-level billing (Subscriptions/Creator), which isn't tied
-  /// to any one server.
+  /// as a server-scoped pseudo-channel.
   final bool embedded;
-  const MarketplaceScreen({super.key, this.embedded = false});
+  /// Settings > Billing's mode: only Subscriptions/Creator, the two tabs
+  /// that are genuinely account-level. Server Bank/Digital Goods/Merch/
+  /// Revenue all read ref.watch(selectedServerProvider) as their primary
+  /// data source -- meaningful when this screen is embedded inside a
+  /// specific server's own view (home_screen.dart, selectedServerProvider
+  /// correctly reflects that server), but not from account Settings,
+  /// where there's no server the user deliberately chose to be looking
+  /// at -- just whatever server happened to be selected last.
+  final bool accountOnly;
+  const MarketplaceScreen({super.key, this.embedded = false, this.accountOnly = false});
   @override
   ConsumerState<MarketplaceScreen> createState() => _MarketplaceScreenState();
 }
@@ -44,7 +50,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 6, vsync: this);
+    _tabs = TabController(length: widget.accountOnly ? 2 : 6, vsync: this);
     _loadData();
   }
 
@@ -75,25 +81,29 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
       indicatorColor: KodaColors.koda,
       labelColor: KodaColors.text1,
       unselectedLabelColor: KodaColors.text3,
-      tabs: const [
-        Tab(text: 'Subscriptions'),
-        Tab(text: 'Creator'),
-        Tab(text: 'Server Bank'),
-        Tab(text: 'Digital Goods'),
-        Tab(text: 'Merch'),
-        Tab(text: 'Revenue'),
-      ],
+      tabs: widget.accountOnly
+          ? const [Tab(text: 'Subscriptions'), Tab(text: 'Creator')]
+          : const [
+              Tab(text: 'Subscriptions'),
+              Tab(text: 'Creator'),
+              Tab(text: 'Server Bank'),
+              Tab(text: 'Digital Goods'),
+              Tab(text: 'Merch'),
+              Tab(text: 'Revenue'),
+            ],
     );
     final tabViews = TabBarView(
       controller: _tabs,
-      children: [
-        _buildSubscriptionsTab(),
-        _buildCreatorTab(),
-        _buildServerBankTab(),
-        _buildDigitalGoodsTab(),
-        _buildMerchTab(),
-        _buildRevenueTab(),
-      ],
+      children: widget.accountOnly
+          ? [_buildSubscriptionsTab(), _buildCreatorTab()]
+          : [
+              _buildSubscriptionsTab(),
+              _buildCreatorTab(),
+              _buildServerBankTab(),
+              _buildDigitalGoodsTab(),
+              _buildMerchTab(),
+              _buildRevenueTab(),
+            ],
     );
 
     if (widget.embedded) {

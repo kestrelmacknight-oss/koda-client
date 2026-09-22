@@ -395,7 +395,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ]));
       case 2:
-        return const MarketplaceScreen(embedded: true);
+        // Account-level only -- Server Bank/Digital Goods/Merch/Revenue
+        // are all server-scoped (see MarketplaceScreen.accountOnly's doc
+        // comment) and belong on the relevant server instead, not here.
+        return const MarketplaceScreen(embedded: true, accountOnly: true);
       case 3:
         if (user?.isChild == true) {
           return _shell('Family', const Text(
