@@ -601,11 +601,40 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
           );
   }
 
+  String _restrictionLabel(String type, Map<String, dynamic> restriction) {
+    if (type == 'raid_lockdown') {
+      final mutedCount = restriction['muted_count'] as int? ?? 0;
+      final totalJoiners = restriction['total_joiners'] as int? ?? 0;
+      return mutedCount > 0
+          ? '$mutedCount of $totalJoiners joiners still muted'
+          : 'No joiners currently muted';
+    }
+    final until = restriction['until'] as String?;
+    if (restriction['active'] == true && until != null) {
+      final local = DateTime.parse(until).toLocal().toString().split('.').first;
+      return 'Currently restricted until $local';
+    }
+    return 'Not currently restricted';
+  }
+
+  Color _confidenceColor(String? label) {
+    switch (label) {
+      case 'High': return KodaColors.mint;
+      case 'Medium': return KodaColors.gold;
+      default: return KodaColors.accent;
+    }
+  }
+
   Widget _flagCard(Map<String, dynamic> f) {
     final status = f['status'] as String? ?? 'pending';
     final type = f['flag_type'] as String? ?? 'dm_fanout';
     final details = Map<String, dynamic>.from(f['details'] ?? {});
-    final autoEscalated = details['auto_escalated'] == true;
+    final restriction = Map<String, dynamic>.from(f['restriction'] ?? {});
+    final confidence = Map<String, dynamic>.from(f['confidence'] ?? {});
+    // details['escalated'] is channel_flood's key (see
+    // Koda.Moderation.mark_flag_escalated/3); details['auto_escalated']
+    // is dm_fanout's -- same badge either way.
+    final autoEscalated = details['auto_escalated'] == true || details['escalated'] == true;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -626,6 +655,12 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
             const Text('AUTO-ESCALATED',
                 style: TextStyle(color: KodaColors.accent, fontSize: 10, fontWeight: FontWeight.w700)),
           ],
+          const Spacer(),
+          if (confidence['score'] != null)
+            Text('Confidence: ${confidence['score']}% (${confidence['label']})',
+                style: TextStyle(
+                    color: _confidenceColor(confidence['label'] as String?),
+                    fontSize: 10, fontWeight: FontWeight.w600)),
         ]),
         const SizedBox(height: 6),
         Text([
@@ -643,19 +678,22 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
                 style: const TextStyle(color: KodaColors.text1, fontSize: 12)),
           ),
         ],
+        const SizedBox(height: 6),
+        Text(_restrictionLabel(type, restriction),
+            style: TextStyle(
+                color: restriction['active'] == true ? KodaColors.accent : KodaColors.text3,
+                fontSize: 11, fontStyle: FontStyle.italic)),
         if (status == 'pending') ...[
           const SizedBox(height: 8),
           Row(children: [
             TextButton(
               onPressed: () => _resolve(f['id'] as String, 'dismissed'),
-              child: const Text('Dismiss'),
+              child: const Text('Dismiss & Undo'),
             ),
             const SizedBox(width: 4),
             TextButton(
               onPressed: () => _resolve(f['id'] as String, 'actioned'),
-              child: Text(
-                  (type == 'raid_lockdown' || type == 'bot_behavior') ? 'Acknowledge' : 'Confirm & Restrict',
-                  style: const TextStyle(color: KodaColors.accent)),
+              child: const Text('Confirm & Restrict', style: TextStyle(color: KodaColors.accent)),
             ),
           ]),
         ] else
