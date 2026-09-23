@@ -42,6 +42,19 @@ class VoiceActivityController {
   static const _duckVolume = 0.25;
   static const _duckReleaseHang = Duration(milliseconds: 500);
 
+  // VOX release hang: without this, _apply below gated transmission on
+  // a raw instantaneous audioLevel >= threshold check every 100ms tick --
+  // any brief dip below threshold (the ~100-250ms natural gaps between
+  // words in ordinary speech, not just pauses between sentences) closed
+  // the mic immediately, chopping words off until the next syllable
+  // happened to cross the threshold again. 300ms comfortably bridges
+  // those inter-word gaps without holding the mic open noticeably after
+  // someone actually stops talking -- shorter than ducking's 500ms
+  // since VOX gates what's actually transmitted (should track speech
+  // closely) while ducking is a coarser "someone has the floor" signal.
+  DateTime? _lastVoxLoudAt;
+  static const _voxReleaseHang = Duration(milliseconds: 300);
+
   // Per-participant manual volume (identity -> multiplier, 1.0 = normal,
   // absent = never touched = also 1.0). Session-scoped like ducking --
   // resets on the next call, not persisted. Composes multiplicatively
@@ -104,6 +117,7 @@ class VoiceActivityController {
     // next start().
     _isDucking = false;
     _lastLoudAt = null;
+    _lastVoxLoudAt = null;
   }
 
   /// Called from the UI (see VoiceSessionNotifier.setParticipantVolume) --
@@ -148,7 +162,12 @@ class VoiceActivityController {
       } else if (settings.pushToTalkKey != null) {
         shouldTransmit = _pttHeld;
       } else if (settings.vadEnabled) {
-        shouldTransmit = (room.localParticipant?.audioLevel ?? 0.0) >= settings.vadThreshold;
+        final now = DateTime.now();
+        if ((room.localParticipant?.audioLevel ?? 0.0) >= settings.vadThreshold) {
+          _lastVoxLoudAt = now;
+        }
+        shouldTransmit =
+            _lastVoxLoudAt != null && now.difference(_lastVoxLoudAt!) < _voxReleaseHang;
       } else {
         shouldTransmit = true; // neither configured -- always-on, the pre-VOX default
       }
