@@ -1452,7 +1452,7 @@ class KodaApi {
   Future<Map<String, dynamic>?> getOrCreateConversation(String userId) async {
     try {
       final res = await _dio.post('/dms/conversations', data: {'user_id': userId});
-      return res.data as Map<String, dynamic>;
+      return res.data['conversation'] as Map<String, dynamic>?;
     } catch (e) { _log('getOrCreateConversation', e); return null; }
   }
 
