@@ -145,12 +145,12 @@ class VoiceSettings {
   final double varmThreshold;
 
   const VoiceSettings({
-    this.noiseSuppression = true,
+    this.noiseSuppression = false,
     this.echoCancellation = true,
     this.autoGainControl = true,
     this.highPassFilter = false,
     this.typingNoiseDetection = true,
-    this.voiceIsolation = true,
+    this.voiceIsolation = false,
     this.autoDucking = false,
     this.eqEnabled = false,
     this.eqBassGain = 0.0,
@@ -172,12 +172,12 @@ class VoiceSettings {
   bool get varmEnabled => varmSilentUrl != null && varmTalkingUrl != null;
 
   factory VoiceSettings.fromJson(Map<String, dynamic> j) => VoiceSettings(
-        noiseSuppression:      j['noise_suppression'] as bool? ?? true,
+        noiseSuppression:      j['noise_suppression'] as bool? ?? false,
         echoCancellation:      j['echo_cancellation'] as bool? ?? true,
         autoGainControl:       j['auto_gain_control'] as bool? ?? true,
         highPassFilter:        j['high_pass_filter'] as bool? ?? false,
         typingNoiseDetection:  j['typing_noise_detection'] as bool? ?? true,
-        voiceIsolation:        j['voice_isolation'] as bool? ?? true,
+        voiceIsolation:        j['voice_isolation'] as bool? ?? false,
         autoDucking:           j['auto_ducking'] as bool? ?? false,
         eqEnabled:             j['eq_enabled'] as bool? ?? false,
         eqBassGain:            (j['eq_bass_gain'] as num?)?.toDouble() ?? 0.0,
