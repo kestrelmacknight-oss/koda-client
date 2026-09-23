@@ -10,6 +10,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/api.dart';
+import '../../core/last_channel_prefs.dart';
 import '../../core/platform.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
@@ -410,9 +411,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       _channels = results[0];
       _categories = results[1];
     });
-    final firstText = _channels.firstWhere(
-        (c) => c['type'] == 'text', orElse: () => {});
-    if (firstText.isNotEmpty) _selectChannel(firstText);
+    // _channels only ever contains channels this user can currently
+    // view (server-side filtered, see ChannelController.index/2) --
+    // the remembered id is looked up against that already-scoped list,
+    // so a channel access lost since last visiting simply won't match
+    // and this falls back to the old first-text-channel behavior.
+    final lastChannelId = await LastChannelPrefs.get(server['id'] as String);
+    final remembered = lastChannelId == null
+        ? <String, dynamic>{}
+        : _channels.firstWhere((c) => c['id'] == lastChannelId, orElse: () => {});
+    final target = remembered.isNotEmpty
+        ? remembered
+        : _channels.firstWhere((c) => c['type'] == 'text', orElse: () => {});
+    if (target.isNotEmpty) _selectChannel(target);
     _subscribeVoicePresence();
     _loadMyPermissions(server);
   }
@@ -664,6 +675,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         _channelsWithMentions.remove(channelId);
       });
       KodaApi.instance.markChannelRead(channelId);
+      final currentServerId = ref.read(selectedServerProvider)?['id'] as String?;
+      if (currentServerId != null) {
+        unawaited(LastChannelPrefs.set(currentServerId, channelId));
+      }
 
       // Subscribe to real-time messages for this channel
       final ch = await KodaSocket.instance.channelAsync('channel:$channelId');
