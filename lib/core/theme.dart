@@ -25,12 +25,18 @@ class KodaColors {
   static const Color text3 = Color(0xFF575F80);
 }
 
-ThemeData kodaTheme() {
+ThemeData kodaTheme({bool dyslexiaFont = false, VisualDensity? visualDensity}) {
   return ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
     scaffoldBackgroundColor: KodaColors.voidBg,
-    fontFamily: 'Segoe UI',
+    // Overriding this one place covers all body text app-wide -- no
+    // individual TextStyle sets its own fontFamily except the handful
+    // that intentionally pin 'monospace'/'Consolas' for security codes
+    // (TOTP secrets, safety numbers, license keys), which correctly
+    // stay fixed-width regardless of this setting.
+    fontFamily: dyslexiaFont ? 'OpenDyslexic' : 'Segoe UI',
+    visualDensity: visualDensity ?? VisualDensity.standard,
     colorScheme: const ColorScheme.dark(
       primary:   KodaColors.koda,
       secondary: KodaColors.mint,

@@ -7,6 +7,7 @@ import 'package:audio_session/audio_session.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'core/accessibility_prefs.dart';
 import 'core/api.dart';
 import 'core/crypto/dm_session_manager.dart';
 import 'core/platform.dart';
@@ -72,16 +73,34 @@ void main(List<String> args) async {
   runApp(const ProviderScope(child: KodaApp()));
 }
 
-class KodaApp extends StatelessWidget {
+class KodaApp extends ConsumerWidget {
   const KodaApp({super.key});
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final a11y = ref.watch(accessibilityPrefsProvider);
     return MaterialApp(
       title: 'Koda',
       debugShowCheckedModeBanner: false,
-      theme: kodaTheme(),
+      theme: kodaTheme(
+        dyslexiaFont: a11y.dyslexiaFont,
+        visualDensity: _visualDensity(a11y.density),
+      ),
+      // Text auto-respects the ambient textScaler app-wide -- this is
+      // the one override point, no per-widget fontSize changes needed.
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(a11y.textScale)),
+        child: child!,
+      ),
       home: const AuthGate(),
     );
+  }
+
+  VisualDensity _visualDensity(String density) {
+    switch (density) {
+      case 'compact':     return VisualDensity.compact;
+      case 'comfortable': return VisualDensity.comfortable;
+      default:            return VisualDensity.standard;
+    }
   }
 }
 
@@ -185,6 +204,20 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     if (_lockedOut) {
       return ChildLockoutScreen(onLogout: _handleLockoutLogout);
     }
+    // Single choke point for loading/resetting accessibility prefs --
+    // covers every current and future login path (session restore,
+    // fresh login, forced password change) via one transition check,
+    // rather than hooking each authProvider.setUser call site
+    // individually.
+    ref.listen(authProvider, (prev, next) {
+      final hadUser = prev?.user != null;
+      final hasUser = next.user != null;
+      if (!hadUser && hasUser) {
+        ref.read(accessibilityPrefsProvider.notifier).load();
+      } else if (hadUser && !hasUser) {
+        ref.read(accessibilityPrefsProvider.notifier).reset();
+      }
+    });
     final auth = ref.watch(authProvider);
     if (auth.loading) {
       return const Scaffold(

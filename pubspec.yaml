@@ -73,6 +73,20 @@ flutter:
     - assets/frames/
     - assets/tray/
     - assets/visp/
+  # OpenDyslexic (SIL Open Font License, see assets/fonts/OFL.txt) --
+  # the dyslexia-friendly font option in Settings > Accessibility, see
+  # lib/core/theme.dart's kodaTheme(dyslexiaFont: true).
+  fonts:
+    - family: OpenDyslexic
+      fonts:
+        - asset: assets/fonts/OpenDyslexic-Regular.otf
+        - asset: assets/fonts/OpenDyslexic-Bold.otf
+          weight: 700
+        - asset: assets/fonts/OpenDyslexic-Italic.otf
+          style: italic
+        - asset: assets/fonts/OpenDyslexic-Bold-Italic.otf
+          weight: 700
+          style: italic
 
 # Regenerate with: dart run flutter_launcher_icons
 # Source is the same brand mark already shipping in the macOS/Windows

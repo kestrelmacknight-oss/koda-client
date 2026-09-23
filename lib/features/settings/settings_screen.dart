@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../core/accessibility_prefs.dart';
 import '../../core/config.dart';
 import '../../core/api.dart';
 import '../../core/push_notifications.dart';
@@ -57,6 +58,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   static const _sections = [
     ('My Account', Icons.person_outline),
     ('Security',   Icons.security_outlined),
+    ('Accessibility', Icons.accessibility_new_outlined),
     ('Billing',    Icons.payments_outlined),
     ('Family',     Icons.family_restroom_outlined),
     ('Voice & Video', Icons.mic_outlined),
@@ -395,22 +397,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ]));
       case 2:
+        return _buildAccessibilitySection();
+      case 3:
         // Account-level only -- Server Bank/Digital Goods/Merch/Revenue
         // are all server-scoped (see MarketplaceScreen.accountOnly's doc
         // comment) and belong on the relevant server instead, not here.
         return const MarketplaceScreen(embedded: true, accountOnly: true);
-      case 3:
+      case 4:
         if (user?.isChild == true) {
           return _shell('Family', const Text(
               'Parental controls aren\'t available on a supervised account.',
               style: TextStyle(color: KodaColors.text3, fontSize: 13)));
         }
         return const ParentalDashboardScreen(embedded: true);
-      case 4:
-        return const VoiceVideoSettingsScreen();
       case 5:
-        return _buildDesktopSection();
+        return const VoiceVideoSettingsScreen();
       case 6:
+        return _buildDesktopSection();
+      case 7:
         return _shell('About Koda', Column(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
           Container(
@@ -483,6 +487,88 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             await TrayService.instance.setCloseToTrayEnabled(v);
           },
         ),
+      ),
+    ]));
+  }
+
+  Widget _buildAccessibilitySection() {
+    final a11y = ref.watch(accessibilityPrefsProvider);
+    final notifier = ref.read(accessibilityPrefsProvider.notifier);
+
+    return _shell('Accessibility', Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
+        margin: const EdgeInsets.only(bottom: 6),
+        decoration: BoxDecoration(
+            color: KodaColors.card, borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: KodaColors.border)),
+        child: SwitchListTile(
+          secondary: const Icon(Icons.font_download_outlined, color: KodaColors.text3, size: 18),
+          title: const Text('Dyslexia-friendly font',
+              style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+          subtitle: const Text('Switches body text to OpenDyslexic app-wide',
+              style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+          activeThumbColor: KodaColors.koda,
+          value: a11y.dyslexiaFont,
+          onChanged: notifier.setDyslexiaFont,
+        ),
+      ),
+      Container(
+        margin: const EdgeInsets.only(bottom: 6),
+        padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
+        decoration: BoxDecoration(
+            color: KodaColors.card, borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: KodaColors.border)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Row(children: [
+            Icon(Icons.text_fields, color: KodaColors.text3, size: 18),
+            SizedBox(width: 10),
+            Text('Font size', style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+          ]),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text('The quick brown fox jumps over the lazy dog',
+                style: TextStyle(color: KodaColors.text2, fontSize: 14 * a11y.textScale)),
+          ),
+          Slider(
+            value: a11y.textScale,
+            min: 0.85,
+            max: 1.6,
+            divisions: 15,
+            activeColor: KodaColors.koda,
+            label: '${(a11y.textScale * 100).round()}%',
+            onChanged: notifier.setTextScale,
+          ),
+        ]),
+      ),
+      Container(
+        margin: const EdgeInsets.only(bottom: 6),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+            color: KodaColors.card, borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: KodaColors.border)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Row(children: [
+            Icon(Icons.density_medium, color: KodaColors.text3, size: 18),
+            SizedBox(width: 10),
+            Text('Density', style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+          ]),
+          const SizedBox(height: 4),
+          const Text(
+              'Affects spacing on standard controls -- buttons, toggles, '
+              'dialogs -- not every custom layout.',
+              style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+          const SizedBox(height: 12),
+          SegmentedButton<String>(
+            segments: const [
+              ButtonSegment(value: 'compact', label: Text('Compact')),
+              ButtonSegment(value: 'standard', label: Text('Standard')),
+              ButtonSegment(value: 'comfortable', label: Text('Comfortable')),
+            ],
+            selected: {a11y.density},
+            onSelectionChanged: (s) => notifier.setDensity(s.first),
+          ),
+          const SizedBox(height: 4),
+        ]),
       ),
     ]));
   }
