@@ -2,8 +2,27 @@
 #include <flutter/flutter_view_controller.h>
 #include <windows.h>
 
+#include <desktop_multi_window/desktop_multi_window_plugin.h>
+
+#include "flutter/generated_plugin_registrant.h"
 #include "flutter_window.h"
 #include "utils.h"
+
+// desktop_multi_window creates each pop-out window's own FlutterEngine
+// internally (see multi_window_manager.cc) and deliberately does NOT
+// register any plugins for it automatically -- it calls back into the
+// host app to do so, via this callback. Without it, a pop-out window's
+// engine has zero plugins registered at all (not just one), which
+// surfaces as a MissingPluginException on whichever plugin method
+// happens to get called first (e.g. connectivity_plus, used internally
+// by livekit_client for reconnect handling) the moment that window
+// tries to do anything plugin-dependent -- same RegisterPlugins call
+// FlutterWindow::OnCreate already makes for the main window.
+void RegisterPluginsForNewWindow(void* controller) {
+  auto* flutter_controller =
+      reinterpret_cast<flutter::FlutterViewController*>(controller);
+  RegisterPlugins(flutter_controller->engine());
+}
 
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
@@ -16,6 +35,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   // Initialize COM, so that it is available for use in the library and/or
   // plugins.
   ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+
+  // Must be set before any pop-out window can possibly be created.
+  DesktopMultiWindowSetWindowCreatedCallback(RegisterPluginsForNewWindow);
 
   flutter::DartProject project(L"data");
 
