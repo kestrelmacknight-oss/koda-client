@@ -57,14 +57,14 @@ class _TotpSetupScreenState extends State<TotpSetupScreen> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 420),
                 child: _enabled
-                    ? const Column(mainAxisSize: MainAxisSize.min, children: [
+                    ? Column(mainAxisSize: MainAxisSize.min, children: [
                         Icon(Icons.check_circle, color: KodaColors.mint, size: 40),
                         SizedBox(height: 12),
                         Text('Two-factor authentication is enabled.',
                             style: TextStyle(color: KodaColors.text1, fontSize: 15)),
                       ])
                     : Column(mainAxisSize: MainAxisSize.min, children: [
-                        const Text(
+                        Text(
                           'Scan this secret into your authenticator app '
                           '(Google Authenticator, 1Password, Authy):',
                           style: TextStyle(color: KodaColors.text2, fontSize: 13)),
@@ -78,7 +78,7 @@ class _TotpSetupScreenState extends State<TotpSetupScreen> {
                             border: Border.all(color: KodaColors.border),
                           ),
                           child: SelectableText(_secret ?? '',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: KodaColors.mint, fontFamily: 'Consolas', fontSize: 13)),
                         ),
                         const SizedBox(height: 20),

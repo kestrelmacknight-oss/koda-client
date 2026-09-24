@@ -48,7 +48,7 @@ class _ParentalDashboardScreenState extends State<ParentalDashboardScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('Create Child Account', style: TextStyle(color: KodaColors.text1)),
+        title: Text('Create Child Account', style: TextStyle(color: KodaColors.text1)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
           KodaTextField(controller: usernameCtrl, hintText: 'Username'),
           const SizedBox(height: 10),
@@ -56,7 +56,7 @@ class _ParentalDashboardScreenState extends State<ParentalDashboardScreen> {
           const SizedBox(height: 10),
           KodaTextField(controller: passwordCtrl, hintText: 'Password', obscureText: true),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'This creates a fully supervised account: labeled channels are '
             'blocked, and you\'ll be able to set allowed hours and see (but '
             'not read) their friends and servers.',
@@ -95,7 +95,7 @@ class _ParentalDashboardScreenState extends State<ParentalDashboardScreen> {
 
   Widget _buildBody() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator(color: KodaColors.koda));
+      return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -115,7 +115,7 @@ class _ParentalDashboardScreenState extends State<ParentalDashboardScreen> {
         ),
         const SizedBox(height: 16),
         if (_children.isEmpty)
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 24),
             child: Text('No linked accounts yet.',
                 textAlign: TextAlign.center,
@@ -134,10 +134,10 @@ class _ParentalDashboardScreenState extends State<ParentalDashboardScreen> {
                       username: child['username'] as String? ?? '?',
                       avatarUrl: child['avatar_url'] as String?, size: 36),
                   title: Text(child['username'] as String? ?? 'Unknown',
-                      style: const TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w500)),
-                  subtitle: const Text('Supervised account',
+                      style: TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w500)),
+                  subtitle: Text('Supervised account',
                       style: TextStyle(color: KodaColors.text3, fontSize: 11)),
-                  trailing: const Icon(Icons.chevron_right, color: KodaColors.text3),
+                  trailing: Icon(Icons.chevron_right, color: KodaColors.text3),
                   onTap: () => Navigator.push(context, MaterialPageRoute(
                       builder: (_) => ChildDetailScreen(child: child))),
                 ),
@@ -153,7 +153,7 @@ class _ParentalDashboardScreenState extends State<ParentalDashboardScreen> {
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: const Text('Family',
+        title: Text('Family',
             style: TextStyle(color: KodaColors.text1, fontSize: 16, fontWeight: FontWeight.w700)),
       ),
       body: _buildBody(),

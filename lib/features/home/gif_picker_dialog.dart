@@ -78,14 +78,14 @@ class _GifPickerDialogState extends State<GifPickerDialog> {
               onSubmitted: (_) => _load(),
             ),
           ),
-          const Divider(color: KodaColors.border, height: 1),
+          Divider(color: KodaColors.border, height: 1),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+                ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
                 : _gifs.isEmpty
                     ? Center(child: Text(_error ?? 'No GIFs found',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: KodaColors.text3, fontSize: 12)))
+                        style: TextStyle(color: KodaColors.text3, fontSize: 12)))
                     : GridView.builder(
                         padding: const EdgeInsets.all(12),
                         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -107,7 +107,7 @@ class _GifPickerDialogState extends State<GifPickerDialog> {
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, __, ___) => Container(
                                     color: KodaColors.elevated,
-                                    child: const Icon(Icons.broken_image_outlined,
+                                    child: Icon(Icons.broken_image_outlined,
                                         color: KodaColors.text3)),
                               ),
                             ),

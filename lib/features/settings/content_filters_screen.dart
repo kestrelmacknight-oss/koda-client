@@ -87,15 +87,15 @@ class _ContentFiltersScreenState extends State<ContentFiltersScreen> {
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: const Text('Content Filters',
+        title: Text('Content Filters',
             style: TextStyle(color: KodaColors.text1, fontSize: 16, fontWeight: FontWeight.w700)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+          ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                const Text(
+                Text(
                   'Servers can flag channels with content labels. Choose how you want '
                   'labeled channels to behave -- this is your own preference and never '
                   'affects what anyone else sees.',
@@ -120,10 +120,10 @@ class _ContentFiltersScreenState extends State<ContentFiltersScreen> {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(_labelNames[label] ?? label,
-            style: const TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w600)),
+            style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w600)),
         const SizedBox(height: 2),
         Text(_labelDescriptions[label] ?? '',
-            style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+            style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         const SizedBox(height: 10),
         SegmentedButton<String>(
           segments: const [

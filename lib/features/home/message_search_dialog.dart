@@ -124,20 +124,20 @@ class _MessageSearchDialogState extends State<MessageSearchDialog> {
               ),
               const SizedBox(width: 8),
               IconButton(
-                icon: const Icon(Icons.search, color: KodaColors.koda),
+                icon: Icon(Icons.search, color: KodaColors.koda),
                 onPressed: _searching ? null : _search,
               ),
             ]),
           ),
-          const Divider(color: KodaColors.border, height: 1),
+          Divider(color: KodaColors.border, height: 1),
           Expanded(
             child: !_hasSearched
-                ? const Center(child: Text('Searches messages already loaded on this device -- '
+                ? Center(child: Text('Searches messages already loaded on this device -- '
                     'older history gets fetched (and decrypted locally) as you scan further back.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)))
                 : _results.isEmpty && !_searching
-                    ? const Center(child: Text('No matches',
+                    ? Center(child: Text('No matches',
                         style: TextStyle(color: KodaColors.text3)))
                     : ListView.builder(
                         padding: const EdgeInsets.all(12),
@@ -145,14 +145,14 @@ class _MessageSearchDialogState extends State<MessageSearchDialog> {
                         itemBuilder: (_, i) {
                           if (i == _results.length) {
                             if (_searching) {
-                              return const Padding(
+                              return Padding(
                                 padding: EdgeInsets.all(16),
                                 child: Center(child: CircularProgressIndicator(
                                     strokeWidth: 2, color: KodaColors.koda)),
                               );
                             }
                             if (_reachedStart) {
-                              return const Padding(
+                              return Padding(
                                 padding: EdgeInsets.all(16),
                                 child: Center(child: Text('Start of channel history',
                                     style: TextStyle(color: KodaColors.text3, fontSize: 11))),
@@ -171,10 +171,10 @@ class _MessageSearchDialogState extends State<MessageSearchDialog> {
                               as String? ?? 'Unknown';
                           return ListTile(
                             dense: true,
-                            title: Text(author, style: const TextStyle(
+                            title: Text(author, style: TextStyle(
                                 color: KodaColors.koda, fontSize: 12, fontWeight: FontWeight.w600)),
                             subtitle: Text(m['content'] as String? ?? '',
-                                style: const TextStyle(color: KodaColors.text1, fontSize: 13),
+                                style: TextStyle(color: KodaColors.text1, fontSize: 13),
                                 maxLines: 2, overflow: TextOverflow.ellipsis),
                             onTap: () => Navigator.pop(
                               context,

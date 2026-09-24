@@ -67,9 +67,9 @@ class _CheckoutWaitDialog extends ConsumerWidget {
       canPop: false,
       child: AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('Waiting for payment',
+        title: Text('Waiting for payment',
             style: TextStyle(color: KodaColors.text1, fontSize: 15)),
-        content: const Column(mainAxisSize: MainAxisSize.min, children: [
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
           CircularProgressIndicator(color: KodaColors.koda),
           SizedBox(height: 16),
           Text(

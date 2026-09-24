@@ -38,7 +38,7 @@ Future<void> showChannelEditDialog(
       builder: (ctx, setDialogState) => AlertDialog(
         backgroundColor: KodaColors.card,
         title: Text(existing == null ? 'New Channel' : 'Edit Channel',
-            style: const TextStyle(color: KodaColors.text1)),
+            style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 340,
           height: 400,
@@ -66,9 +66,9 @@ Future<void> showChannelEditDialog(
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                   controlAffinity: ListTileControlAffinity.leading,
-                  title: const Text('Announcement channel',
+                  title: Text('Announcement channel',
                       style: TextStyle(color: KodaColors.text1, fontSize: 13)),
-                  subtitle: const Text('Only members who can manage messages may post',
+                  subtitle: Text('Only members who can manage messages may post',
                       style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                   value: isReadOnly,
                   activeColor: KodaColors.koda,
@@ -79,9 +79,9 @@ Future<void> showChannelEditDialog(
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                     controlAffinity: ListTileControlAffinity.leading,
-                    title: const Text('Post live-stream & upload announcements here',
+                    title: Text('Post live-stream & upload announcements here',
                         style: TextStyle(color: KodaColors.text1, fontSize: 13)),
-                    subtitle: const Text(
+                    subtitle: Text(
                         'Auto-posts when a member with the "Announce when live" '
                         'permission goes live on Twitch, or posts a new YouTube video',
                         style: TextStyle(color: KodaColors.text3, fontSize: 11)),
@@ -90,7 +90,7 @@ Future<void> showChannelEditDialog(
                     onChanged: (v) => setDialogState(() => liveAnnouncements = v ?? false),
                   ),
                 if (isReadOnly && roles.isNotEmpty) ...[
-                  const Text('Notify these roles when posted (optional)',
+                  Text('Notify these roles when posted (optional)',
                       style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                   const SizedBox(height: 4),
                   ...roles.where((r) => r['is_default'] != true).map((role) {
@@ -101,7 +101,7 @@ Future<void> showChannelEditDialog(
                       contentPadding: EdgeInsets.zero,
                       controlAffinity: ListTileControlAffinity.leading,
                       title: Text(role['name'] as String? ?? '',
-                          style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+                          style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                       value: isSelected,
                       activeColor: KodaColors.koda,
                       onChanged: (v) => setDialogState(() {
@@ -129,7 +129,7 @@ Future<void> showChannelEditDialog(
               ),
               if (roles.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                const Text('Role Access (leave empty for all)',
+                Text('Role Access (leave empty for all)',
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 6),
                 ...roles.where((r) => r['is_default'] != true).map((role) {
@@ -139,7 +139,7 @@ Future<void> showChannelEditDialog(
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                     title: Text(role['name'] as String? ?? '',
-                        style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+                        style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                     value: isSelected,
                     activeColor: KodaColors.koda,
                     onChanged: (v) => setDialogState(() {
@@ -154,12 +154,12 @@ Future<void> showChannelEditDialog(
               ],
               if (existing != null) ...[
                 const SizedBox(height: 12),
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text('Content Labels',
                       style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 ),
-                const Text(
+                Text(
                   'Flags this channel for members\' content filters; hard-blocked for supervised accounts',
                   style: TextStyle(color: KodaColors.text3, fontSize: 10),
                 ),
@@ -171,7 +171,7 @@ Future<void> showChannelEditDialog(
                     contentPadding: EdgeInsets.zero,
                     controlAffinity: ListTileControlAffinity.leading,
                     title: Text(kContentLabelNames[label] ?? label,
-                        style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+                        style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                     value: isSelected,
                     activeColor: KodaColors.koda,
                     onChanged: (v) => setDialogState(() {

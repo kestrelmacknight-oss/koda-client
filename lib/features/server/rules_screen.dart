@@ -87,9 +87,9 @@ class _RulesScreenState extends State<RulesScreen> {
         automaticallyImplyLeading: false,
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(widget.serverName,
-              style: const TextStyle(color: KodaColors.text1,
+              style: TextStyle(color: KodaColors.text1,
                   fontSize: 15, fontWeight: FontWeight.w700)),
-          const Text('Server Rules',
+          Text('Server Rules',
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         ]),
       ),
@@ -111,7 +111,7 @@ class _RulesScreenState extends State<RulesScreen> {
                   ),
                   child: Text(
                     widget.rulesContent,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: KodaColors.text1,
                         fontSize: 14,
                         height: 1.6),
@@ -119,7 +119,7 @@ class _RulesScreenState extends State<RulesScreen> {
                 ),
                 if (!_scrolledToBottom) ...[
                   const SizedBox(height: 12),
-                  const Center(
+                  Center(
                     child: Text('Scroll down to read all rules',
                         style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                   ),
@@ -132,10 +132,10 @@ class _RulesScreenState extends State<RulesScreen> {
         // Accept bar
         Container(
           padding: const EdgeInsets.all(20),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
               border: Border(top: BorderSide(color: KodaColors.border))),
           child: Column(children: [
-            const Text(
+            Text(
               'By clicking Accept, you agree to follow these rules.\nViolations may result in removal from the server.',
               textAlign: TextAlign.center,
               style: TextStyle(color: KodaColors.text3, fontSize: 11),

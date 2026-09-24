@@ -51,7 +51,7 @@ class _ChildDetailScreenState extends State<ChildDetailScreen>
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
         title: Text(widget.child['username'] as String? ?? 'Child account',
-            style: const TextStyle(color: KodaColors.text1, fontSize: 16, fontWeight: FontWeight.w700)),
+            style: TextStyle(color: KodaColors.text1, fontSize: 16, fontWeight: FontWeight.w700)),
         bottom: TabBar(
           controller: _tabs,
           indicatorColor: KodaColors.koda,
@@ -108,9 +108,9 @@ class _ChildFriendsTabState extends State<_ChildFriendsTab> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Center(child: CircularProgressIndicator(color: KodaColors.koda));
+    if (_loading) return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     if (_friends.isEmpty) {
-      return const Center(child: Text('No friends.', style: TextStyle(color: KodaColors.text3)));
+      return Center(child: Text('No friends.', style: TextStyle(color: KodaColors.text3)));
     }
     return ListView.builder(
       padding: const EdgeInsets.all(16),
@@ -121,9 +121,9 @@ class _ChildFriendsTabState extends State<_ChildFriendsTab> {
           leading: KodaAvatar(username: f['username'] as String? ?? '?',
               avatarUrl: f['avatar_url'] as String?, size: 32),
           title: Text(f['username'] as String? ?? 'Unknown',
-              style: const TextStyle(color: KodaColors.text1)),
+              style: TextStyle(color: KodaColors.text1)),
           trailing: IconButton(
-            icon: const Icon(Icons.person_remove_outlined, color: KodaColors.accent, size: 18),
+            icon: Icon(Icons.person_remove_outlined, color: KodaColors.accent, size: 18),
             tooltip: 'Remove friend',
             onPressed: () => _remove(f),
           ),
@@ -166,9 +166,9 @@ class _ChildServersTabState extends State<_ChildServersTab> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Center(child: CircularProgressIndicator(color: KodaColors.koda));
+    if (_loading) return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     if (_servers.isEmpty) {
-      return const Center(child: Text('Not in any servers.', style: TextStyle(color: KodaColors.text3)));
+      return Center(child: Text('Not in any servers.', style: TextStyle(color: KodaColors.text3)));
     }
     return ListView.builder(
       padding: const EdgeInsets.all(16),
@@ -182,15 +182,15 @@ class _ChildServersTabState extends State<_ChildServersTab> {
                 ? NetworkImage(s['icon_url'] as String) : null,
             child: (s['icon_url'] as String?)?.isNotEmpty != true
                 ? Text(((s['name'] as String? ?? '?').isNotEmpty ? (s['name'] as String)[0] : '?').toUpperCase(),
-                    style: const TextStyle(color: KodaColors.text1))
+                    style: TextStyle(color: KodaColors.text1))
                 : null,
           ),
           title: Text(s['name'] as String? ?? 'Unknown',
-              style: const TextStyle(color: KodaColors.text1)),
+              style: TextStyle(color: KodaColors.text1)),
           subtitle: Text('${s['member_count'] ?? 0} members',
-              style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+              style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           trailing: IconButton(
-            icon: const Icon(Icons.exit_to_app, color: KodaColors.accent, size: 18),
+            icon: Icon(Icons.exit_to_app, color: KodaColors.accent, size: 18),
             tooltip: 'Remove from server',
             onPressed: () => _remove(s),
           ),
@@ -284,7 +284,7 @@ class _ChildScheduleTabState extends State<_ChildScheduleTab> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Center(child: CircularProgressIndicator(color: KodaColors.koda));
+    if (_loading) return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -297,9 +297,9 @@ class _ChildScheduleTabState extends State<_ChildScheduleTab> {
           ),
           child: SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Restrict access to set hours',
+            title: Text('Restrict access to set hours',
                 style: TextStyle(color: KodaColors.text1, fontSize: 13)),
-            subtitle: const Text('Off means unrestricted access at any time',
+            subtitle: Text('Off means unrestricted access at any time',
                 style: TextStyle(color: KodaColors.text3, fontSize: 11)),
             activeThumbColor: KodaColors.koda,
             value: _restricted,
@@ -311,7 +311,7 @@ class _ChildScheduleTabState extends State<_ChildScheduleTab> {
           DropdownButtonFormField<String>(
             initialValue: _timezones.contains(_timezone) ? _timezone : 'UTC',
             dropdownColor: KodaColors.card,
-            style: const TextStyle(color: KodaColors.text1),
+            style: TextStyle(color: KodaColors.text1),
             decoration: const InputDecoration(labelText: 'Timezone'),
             items: _timezones
                 .map((tz) => DropdownMenuItem(value: tz, child: Text(tz)))
@@ -347,21 +347,21 @@ class _ChildScheduleTabState extends State<_ChildScheduleTab> {
       ),
       child: Row(children: [
         SizedBox(width: 90, child: Text(label,
-            style: const TextStyle(color: KodaColors.text1, fontSize: 13))),
+            style: TextStyle(color: KodaColors.text1, fontSize: 13))),
         Expanded(
           child: window == null
-              ? const Text('No access', style: TextStyle(color: KodaColors.text3, fontSize: 12))
+              ? Text('No access', style: TextStyle(color: KodaColors.text3, fontSize: 12))
               : Row(children: [
                   TextButton(
                     onPressed: () => _pickTime(key, true),
                     child: Text(window.start.format(context),
-                        style: const TextStyle(color: KodaColors.koda, fontSize: 12)),
+                        style: TextStyle(color: KodaColors.koda, fontSize: 12)),
                   ),
-                  const Text('to', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                  Text('to', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                   TextButton(
                     onPressed: () => _pickTime(key, false),
                     child: Text(window.end.format(context),
-                        style: const TextStyle(color: KodaColors.koda, fontSize: 12)),
+                        style: TextStyle(color: KodaColors.koda, fontSize: 12)),
                   ),
                 ]),
         ),
@@ -425,7 +425,7 @@ class _ChildOverrideTabState extends State<_ChildOverrideTab> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text(
+        Text(
           'Grant temporary access outside the normal schedule -- useful for '
           'a one-off exception without changing the weekly schedule.',
           style: TextStyle(color: KodaColors.text3, fontSize: 12, height: 1.5),
@@ -444,7 +444,7 @@ class _ChildOverrideTabState extends State<_ChildOverrideTab> {
         OutlinedButton(
           style: OutlinedButton.styleFrom(
             foregroundColor: KodaColors.accent,
-            side: const BorderSide(color: KodaColors.accent),
+            side: BorderSide(color: KodaColors.accent),
             minimumSize: const Size(double.infinity, 40),
           ),
           onPressed: _busy ? null : _revoke,

@@ -59,7 +59,7 @@ class _VispQuestionStepState extends State<VispQuestionStep> {
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('Question ${widget.questionNumber} of ${widget.maxQuestions}',
-          style: const TextStyle(color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w600)),
+          style: TextStyle(color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w600)),
       const SizedBox(height: 8),
       Container(
         padding: const EdgeInsets.all(14),
@@ -69,11 +69,11 @@ class _VispQuestionStepState extends State<VispQuestionStep> {
           border: Border.all(color: KodaColors.border),
         ),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Icon(Icons.auto_awesome, size: 16, color: KodaColors.koda),
+          Icon(Icons.auto_awesome, size: 16, color: KodaColors.koda),
           const SizedBox(width: 10),
           Expanded(
             child: Text(widget.question,
-                style: const TextStyle(color: KodaColors.text1, fontSize: 14, height: 1.4)),
+                style: TextStyle(color: KodaColors.text1, fontSize: 14, height: 1.4)),
           ),
         ]),
       ),
@@ -83,7 +83,7 @@ class _VispQuestionStepState extends State<VispQuestionStep> {
           return OutlinedButton(
             style: OutlinedButton.styleFrom(
               foregroundColor: KodaColors.text1,
-              side: const BorderSide(color: KodaColors.border),
+              side: BorderSide(color: KodaColors.border),
             ),
             onPressed: widget.loading ? null : () => widget.onAnswer(option),
             child: Text(option),
@@ -96,7 +96,7 @@ class _VispQuestionStepState extends State<VispQuestionStep> {
           child: TextField(
             controller: _answerCtrl,
             enabled: !widget.loading,
-            style: const TextStyle(color: KodaColors.text1, fontSize: 14),
+            style: TextStyle(color: KodaColors.text1, fontSize: 14),
             decoration: const InputDecoration(
               hintText: 'Or type your own answer...',
               contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -107,9 +107,9 @@ class _VispQuestionStepState extends State<VispQuestionStep> {
         const SizedBox(width: 8),
         IconButton(
           icon: widget.loading
-              ? const SizedBox(width: 16, height: 16,
+              ? SizedBox(width: 16, height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
-              : const Icon(Icons.send, size: 18, color: KodaColors.koda),
+              : Icon(Icons.send, size: 18, color: KodaColors.koda),
           onPressed: widget.loading ? null : _submitFreeText,
         ),
       ]),
@@ -119,7 +119,7 @@ class _VispQuestionStepState extends State<VispQuestionStep> {
         child: TextButton(
           style: TextButton.styleFrom(padding: EdgeInsets.zero),
           onPressed: widget.loading ? null : widget.onSkip,
-          child: const Text('Skip and generate now',
+          child: Text('Skip and generate now',
               style: TextStyle(color: KodaColors.text3, fontSize: 12)),
         ),
       ),

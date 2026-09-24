@@ -70,7 +70,7 @@ class VoiceBar extends ConsumerWidget {
               children: [
                 Text(
                   session.channelName,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: KodaColors.text1,
                       fontSize: 13,
                       fontWeight: FontWeight.w600),
@@ -78,7 +78,7 @@ class VoiceBar extends ConsumerWidget {
                 ),
                 Text(
                   '$participantCount connected · tap to expand',
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: KodaColors.text3, fontSize: 10),
                 ),
               ],
@@ -110,7 +110,7 @@ class VoiceBar extends ConsumerWidget {
           // Leave
           IconButton(
             iconSize: 18,
-            icon: const Icon(Icons.call_end, color: KodaColors.accent),
+            icon: Icon(Icons.call_end, color: KodaColors.accent),
             onPressed: () => ref.read(voiceSessionProvider.notifier).leave(),
             tooltip: 'Leave Voice',
           ),

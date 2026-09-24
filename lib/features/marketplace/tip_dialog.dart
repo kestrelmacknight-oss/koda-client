@@ -107,16 +107,16 @@ class _TipDialogState extends ConsumerState<TipDialog> {
     return AlertDialog(
       backgroundColor: KodaColors.card,
       title: Row(children: [
-        const Icon(Icons.volunteer_activism, color: KodaColors.koda, size: 20),
+        Icon(Icons.volunteer_activism, color: KodaColors.koda, size: 20),
         const SizedBox(width: 8),
         Text('Tip $username',
-            style: const TextStyle(color: KodaColors.text1, fontSize: 16)),
+            style: TextStyle(color: KodaColors.text1, fontSize: 16)),
       ]),
       content: SizedBox(
         width: 340,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           // Amount selector
-          const Text('Select amount',
+          Text('Select amount',
               style: TextStyle(color: KodaColors.text3, fontSize: 12)),
           const SizedBox(height: 8),
           Row(children: _amounts.map((a) {
@@ -164,7 +164,7 @@ class _TipDialogState extends ConsumerState<TipDialog> {
 
           // Preview
           if (_loadingPreview)
-            const Center(child: CircularProgressIndicator(
+            Center(child: CircularProgressIndicator(
                 color: KodaColors.koda, strokeWidth: 2))
           else if (_preview != null)
             Container(

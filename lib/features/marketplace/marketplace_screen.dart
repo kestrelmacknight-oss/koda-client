@@ -122,7 +122,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: const Text('Marketplace',
+        title: Text('Marketplace',
             style: TextStyle(color: KodaColors.text1,
                 fontSize: 16, fontWeight: FontWeight.w700)),
         bottom: tabBar,
@@ -135,7 +135,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
 
   Widget _buildSubscriptionsTab() {
     if (_loadingSub) {
-      return const Center(
+      return Center(
           child: CircularProgressIndicator(color: KodaColors.koda));
     }
 
@@ -157,7 +157,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
           ),
           child: Row(children: [
             tier == 'free'
-                ? const Icon(Icons.person_outline, color: KodaColors.text3, size: 28)
+                ? Icon(Icons.person_outline, color: KodaColors.text3, size: 28)
                 : TierBadge(tier: tier, size: 32),
             const SizedBox(width: 12),
             Expanded(child: Column(
@@ -165,14 +165,14 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
               Text(
                 tier == 'free' ? 'Free' :
                 tier == 'spark' ? 'Spark' : 'Pulse',
-                style: const TextStyle(color: KodaColors.text1,
+                style: TextStyle(color: KodaColors.text1,
                     fontSize: 18, fontWeight: FontWeight.w700),
               ),
               if (sub != null)
                 Text('Expires ${_formatDate(sub['expires_at'])}',
-                    style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+                    style: TextStyle(color: KodaColors.text3, fontSize: 12)),
               if (tier == 'free')
-                const Text('Upgrade for exclusive perks',
+                Text('Upgrade for exclusive perks',
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
             ])),
           ]),
@@ -188,14 +188,14 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
               border: Border.all(color: KodaColors.border),
             ),
             child: Row(children: [
-              const Icon(Icons.rocket_launch_outlined, color: KodaColors.koda, size: 24),
+              Icon(Icons.rocket_launch_outlined, color: KodaColors.koda, size: 24),
               const SizedBox(width: 12),
               Expanded(child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('${_boostTokens.length} boost token${_boostTokens.length == 1 ? '' : 's'} available',
-                    style: const TextStyle(color: KodaColors.text1,
+                    style: TextStyle(color: KodaColors.text1,
                         fontSize: 14, fontWeight: FontWeight.w600)),
-                const Text('Gift a token to any server you\'re in from its Server Bank tab',
+                Text('Gift a token to any server you\'re in from its Server Bank tab',
                     style: TextStyle(color: KodaColors.text3, fontSize: 11)),
               ])),
             ]),
@@ -269,7 +269,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
                 fontSize: 18, fontWeight: FontWeight.w700)),
             const Spacer(),
             Text('\$${(price / 100).toStringAsFixed(2)}/mo',
-                style: const TextStyle(color: KodaColors.text1,
+                style: TextStyle(color: KodaColors.text1,
                     fontSize: 16, fontWeight: FontWeight.w600)),
           ]),
         ),
@@ -283,7 +283,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
               child: Row(children: [
                 Icon(Icons.check_circle_outline, size: 14, color: color),
                 const SizedBox(width: 8),
-                Text(p, style: const TextStyle(
+                Text(p, style: TextStyle(
                     color: KodaColors.text2, fontSize: 13)),
               ]),
             )),
@@ -339,10 +339,10 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
         title: Text(isGift ? 'Gift ${tier.toUpperCase()}' : 'Subscribe to ${tier.toUpperCase()}',
-            style: const TextStyle(color: KodaColors.text1)),
+            style: TextStyle(color: KodaColors.text1)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
           if (isGift) ...[
-            const Text('Gift username:', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+            Text('Gift username:', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
             const SizedBox(height: 4),
             KodaTextField(controller: recipientCtrl, hintText: 'Username'),
             const SizedBox(height: 10),
@@ -355,22 +355,22 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
             ),
             child: Column(children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                const Text('Subscription', style: TextStyle(color: KodaColors.text2)),
+                Text('Subscription', style: TextStyle(color: KodaColors.text2)),
                 Text('\$${(price / 100).toStringAsFixed(2)}',
-                    style: const TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w600)),
+                    style: TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w600)),
               ]),
-              const Divider(color: KodaColors.border),
+              Divider(color: KodaColors.border),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                const Text('Total', style: TextStyle(
+                Text('Total', style: TextStyle(
                     color: KodaColors.text1, fontWeight: FontWeight.w600)),
                 Text('\$${(price / 100).toStringAsFixed(2)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: KodaColors.koda, fontWeight: FontWeight.w700)),
               ]),
             ]),
           ),
           const SizedBox(height: 8),
-          const Text('Payment processed securely by Stripe',
+          Text('Payment processed securely by Stripe',
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         ]),
         actions: [
@@ -435,7 +435,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
 
   Widget _buildCreatorTab() {
     if (_loadingConnect) {
-      return const Center(
+      return Center(
           child: CircularProgressIndicator(color: KodaColors.koda));
     }
 
@@ -461,11 +461,11 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
                   color: KodaColors.koda.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.payments_outlined,
+                child: Icon(Icons.payments_outlined,
                     color: KodaColors.koda, size: 24),
               ),
               const SizedBox(width: 12),
-              const Expanded(child: Column(
+              Expanded(child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('Creator Payouts',
                     style: TextStyle(color: KodaColors.text1,
@@ -512,7 +512,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
                 OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     foregroundColor: KodaColors.text2,
-                    side: const BorderSide(color: KodaColors.border),
+                    side: BorderSide(color: KodaColors.border),
                     minimumSize: const Size(double.infinity, 44),
                   ),
                   icon: const Icon(Icons.refresh, size: 18),
@@ -528,7 +528,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: KodaColors.koda.withValues(alpha: 0.3)),
                 ),
-                child: const Row(children: [
+                child: Row(children: [
                   Icon(Icons.check_circle, color: KodaColors.koda, size: 18),
                   SizedBox(width: 8),
                   Text('You\'re ready to receive tips!',
@@ -550,7 +550,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
             border: Border.all(color: KodaColors.border),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('How it works',
+            Text('How it works',
                 style: TextStyle(color: KodaColors.text1,
                     fontWeight: FontWeight.w600, fontSize: 14)),
             const SizedBox(height: 12),
@@ -558,7 +558,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
             _buildHowItWorksRow('2', 'Complete identity verification'),
             _buildHowItWorksRow('3', 'Receive tips directly to your bank'),
             const SizedBox(height: 8),
-            const Text('Koda charges a 5% processing fee. The fee goes to your server\'s bank as points.',
+            Text('Koda charges a 5% processing fee. The fee goes to your server\'s bank as points.',
                 style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           ]),
         ),
@@ -591,11 +591,11 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
             shape: BoxShape.circle,
           ),
           child: Center(child: Text(step,
-              style: const TextStyle(color: KodaColors.koda,
+              style: TextStyle(color: KodaColors.koda,
                   fontSize: 11, fontWeight: FontWeight.w700))),
         ),
         const SizedBox(width: 10),
-        Text(text, style: const TextStyle(color: KodaColors.text2, fontSize: 13)),
+        Text(text, style: TextStyle(color: KodaColors.text2, fontSize: 13)),
       ]),
     );
   }
@@ -629,7 +629,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   Widget _buildServerBankTab() {
     final server = ref.watch(selectedServerProvider);
     if (server == null) {
-      return const Center(child: Text('Select a server to view its bank',
+      return Center(child: Text('Select a server to view its bank',
           style: TextStyle(color: KodaColors.text3)));
     }
     return _ServerBankView(server: server);
@@ -664,7 +664,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   Widget _buildRevenueTab() {
     final server = ref.watch(selectedServerProvider);
     if (server == null) {
-      return const Center(child: Text('Select a server to view its revenue',
+      return Center(child: Text('Select a server to view its revenue',
           style: TextStyle(color: KodaColors.text3)));
     }
     return _RevenueDashboardView(server: server);
@@ -750,7 +750,7 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Center(
+      return Center(
           child: CircularProgressIndicator(color: KodaColors.koda));
     }
 
@@ -776,20 +776,20 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              const Icon(Icons.account_balance_outlined,
+              Icon(Icons.account_balance_outlined,
                   color: KodaColors.koda, size: 20),
               const SizedBox(width: 8),
               Text(widget.server['name'] as String? ?? 'Server',
-                  style: const TextStyle(color: KodaColors.text2, fontSize: 13)),
+                  style: TextStyle(color: KodaColors.text2, fontSize: 13)),
             ]),
             const SizedBox(height: 16),
             Text('$balance pts',
-                style: const TextStyle(color: KodaColors.text1,
+                style: TextStyle(color: KodaColors.text1,
                     fontSize: 36, fontWeight: FontWeight.w800)),
             Text('\$${balanceUsd.toStringAsFixed(2)} in activity',
-                style: const TextStyle(color: KodaColors.text3, fontSize: 13)),
+                style: TextStyle(color: KodaColors.text3, fontSize: 13)),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Points are earned from the 5% processing fee on tips and subscriptions in this server. Use points to unlock server upgrades.',
               style: TextStyle(color: KodaColors.text3, fontSize: 11),
             ),
@@ -808,31 +808,31 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              const Icon(Icons.rocket_launch_outlined, color: KodaColors.koda, size: 20),
+              Icon(Icons.rocket_launch_outlined, color: KodaColors.koda, size: 20),
               const SizedBox(width: 8),
-              const Text('Server Boosts',
+              Text('Server Boosts',
                   style: TextStyle(color: KodaColors.text1,
                       fontWeight: FontWeight.w600, fontSize: 14)),
               const Spacer(),
               Text('Level ${_boostStatus?['level'] ?? 0}',
-                  style: const TextStyle(color: KodaColors.koda,
+                  style: TextStyle(color: KodaColors.koda,
                       fontWeight: FontWeight.w700, fontSize: 13)),
             ]),
             const SizedBox(height: 4),
             Text('${_boostStatus?['count'] ?? 0} active boost${(_boostStatus?['count'] ?? 0) == 1 ? '' : 's'}'
                 ' -- $_emojiSlotText',
-                style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+                style: TextStyle(color: KodaColors.text3, fontSize: 12)),
             if (_nextLevelHint != null) ...[
               const SizedBox(height: 4),
               Text(_nextLevelHint!,
-                  style: const TextStyle(color: KodaColors.koda, fontSize: 11)),
+                  style: TextStyle(color: KodaColors.koda, fontSize: 11)),
             ],
             const SizedBox(height: 12),
             Text(
               _myTokenCount > 0
                   ? 'You have $_myTokenCount boost token${_myTokenCount == 1 ? '' : 's'} available.'
                   : 'Boost tokens come from a Pulse subscription (1/month). Subscribe on the Subscriptions tab to earn one.',
-              style: const TextStyle(color: KodaColors.text3, fontSize: 11),
+              style: TextStyle(color: KodaColors.text3, fontSize: 11),
             ),
             const SizedBox(height: 12),
             ElevatedButton.icon(
@@ -861,7 +861,7 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: KodaColors.border),
           ),
-          child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('Coming soon — Server upgrades',
                 style: TextStyle(color: KodaColors.text1,
                     fontWeight: FontWeight.w600, fontSize: 14)),
@@ -974,12 +974,12 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Center(
+      return Center(
           child: CircularProgressIndicator(color: KodaColors.koda));
     }
 
     if (!_authorized) {
-      return const Center(
+      return Center(
         child: Padding(
           padding: EdgeInsets.all(24),
           child: Text(
@@ -1006,19 +1006,19 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
         ]),
 
         const SizedBox(height: 16),
-        const Text('Last 30 Days',
+        Text('Last 30 Days',
             style: TextStyle(color: KodaColors.text1,
                 fontWeight: FontWeight.w600, fontSize: 14)),
         const SizedBox(height: 10),
         _RevenueBarChart(points: _points),
 
         const SizedBox(height: 20),
-        const Text('Revenue by Source',
+        Text('Revenue by Source',
             style: TextStyle(color: KodaColors.text1,
                 fontWeight: FontWeight.w600, fontSize: 14)),
         const SizedBox(height: 10),
         if (breakdown.isEmpty)
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
             child: Text('No revenue yet.',
                 style: TextStyle(color: KodaColors.text3, fontSize: 13)),
@@ -1043,30 +1043,30 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(_sourceLabel(type),
-                        style: const TextStyle(color: KodaColors.text1,
+                        style: TextStyle(color: KodaColors.text1,
                             fontSize: 13, fontWeight: FontWeight.w600)),
                     Text('$count transaction${count == 1 ? '' : 's'}',
-                        style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+                        style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                   ]),
                 ),
                 Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                   Text('\$${(total / 100).toStringAsFixed(2)}',
-                      style: const TextStyle(color: KodaColors.text1,
+                      style: TextStyle(color: KodaColors.text1,
                           fontSize: 13, fontWeight: FontWeight.w700)),
                   Text('${pct.toStringAsFixed(0)}%',
-                      style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+                      style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                 ]),
               ]),
             );
           }),
 
         const SizedBox(height: 20),
-        const Text('Recent Transactions',
+        Text('Recent Transactions',
             style: TextStyle(color: KodaColors.text1,
                 fontWeight: FontWeight.w600, fontSize: 14)),
         const SizedBox(height: 10),
         if (_transactions.isEmpty)
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
             child: Text('No transactions yet.',
                 style: TextStyle(color: KodaColors.text3, fontSize: 13)),
@@ -1082,14 +1082,14 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(_sourceLabel(type),
-                      style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+                      style: TextStyle(color: KodaColors.text2, fontSize: 12)),
                 ),
                 Text('+\$${(amount / 100).toStringAsFixed(2)}',
-                    style: const TextStyle(color: KodaColors.mint,
+                    style: TextStyle(color: KodaColors.mint,
                         fontSize: 12, fontWeight: FontWeight.w600)),
                 const SizedBox(width: 10),
                 Text(_relativeDate(t['inserted_at'] as String? ?? ''),
-                    style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+                    style: TextStyle(color: KodaColors.text3, fontSize: 11)),
               ]),
             );
           }),
@@ -1109,7 +1109,7 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
         border: Border.all(color: KodaColors.border),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label, style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+        Text(label, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
         const SizedBox(height: 6),
         Text('\$${(cents / 100).toStringAsFixed(2)}',
             style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.w800)),
@@ -1129,7 +1129,7 @@ class _RevenueBarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (points.isEmpty) {
-      return const SizedBox(
+      return SizedBox(
         height: 120,
         child: Center(child: Text('No activity yet',
             style: TextStyle(color: KodaColors.text3, fontSize: 12))),
@@ -1176,7 +1176,7 @@ class _RevenueBarChart extends StatelessWidget {
                       width: 16,
                       child: Text(day,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: KodaColors.text3, fontSize: 8)),
+                          style: TextStyle(color: KodaColors.text3, fontSize: 8)),
                     ),
                   ],
                 ),

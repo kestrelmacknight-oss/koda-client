@@ -108,7 +108,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
       return Container(
         width: 240,
         color: KodaColors.bg2,
-        child: const Center(
+        child: Center(
             child: CircularProgressIndicator(color: KodaColors.koda)),
       );
     }
@@ -123,14 +123,14 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
         // Header
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: KodaColors.border))),
           child: Row(children: [
-            const Icon(Icons.people_outlined,
+            Icon(Icons.people_outlined,
                 color: KodaColors.text3, size: 15),
             const SizedBox(width: 6),
             Text('Members — $totalOnline online',
-                style: const TextStyle(
+                style: TextStyle(
                     color: KodaColors.text3,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -138,7 +138,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
             const Spacer(),
             GestureDetector(
               onTap: _load,
-              child: const Icon(Icons.refresh_outlined,
+              child: Icon(Icons.refresh_outlined,
                   color: KodaColors.text3, size: 14),
             ),
           ]),
@@ -234,7 +234,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
                     : null,
                 child: avatarUrl == null
                     ? Text(username[0].toUpperCase(),
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: KodaColors.text1,
                             fontSize: 12,
                             fontWeight: FontWeight.w700))
@@ -293,7 +293,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
         if (widget.canKick)
           const PopupMenuItem(value: 'kick', child: Text('Kick')),
         if (widget.canBan)
-          const PopupMenuItem(value: 'ban',
+          PopupMenuItem(value: 'ban',
               child: Text('Ban', style: TextStyle(color: KodaColors.accent))),
       ],
     );
@@ -310,13 +310,13 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
             action == 'ban'
                 ? 'Ban $username from ${widget.server['name']}? They will not be able to rejoin without being unbanned.'
                 : 'Kick $username from ${widget.server['name']}? They can rejoin with an invite.',
-            style: const TextStyle(color: KodaColors.text1)),
+            style: TextStyle(color: KodaColors.text1)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
           TextButton(
               onPressed: () => Navigator.pop(ctx, true),
               child: Text(action == 'ban' ? 'Ban' : 'Kick',
-                  style: const TextStyle(color: KodaColors.accent))),
+                  style: TextStyle(color: KodaColors.accent))),
         ],
       ),
     );

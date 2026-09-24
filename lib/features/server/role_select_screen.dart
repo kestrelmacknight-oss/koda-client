@@ -78,22 +78,22 @@ class _RoleSelectScreenState extends State<RoleSelectScreen> {
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
         title: Row(children: [
-          const Icon(Icons.badge_outlined, color: KodaColors.koda, size: 18),
+          Icon(Icons.badge_outlined, color: KodaColors.koda, size: 18),
           const SizedBox(width: 8),
           Text(widget.channelName,
-              style: const TextStyle(color: KodaColors.text1, fontSize: 15)),
+              style: TextStyle(color: KodaColors.text1, fontSize: 15)),
         ]),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+          ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
           : _roles.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text('No self-assignable roles available.',
                       style: TextStyle(color: KodaColors.text3)))
               : ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
-                    const Text(
+                    Text(
                       'Select the roles you want. Tap a role to add or remove it.',
                       style: TextStyle(color: KodaColors.text3, fontSize: 13),
                     ),

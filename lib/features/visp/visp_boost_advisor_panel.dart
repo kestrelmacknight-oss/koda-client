@@ -108,15 +108,15 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
         Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
           _showAvatar
               ? VispAvatar(size: 40, mood: _mood)
-              : const Icon(Icons.auto_awesome, size: 16, color: KodaColors.koda),
+              : Icon(Icons.auto_awesome, size: 16, color: KodaColors.koda),
           const SizedBox(width: 8),
-          const Text('Ask Visp: Boost ROI Advisor',
+          Text('Ask Visp: Boost ROI Advisor',
               style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w700)),
         ]),
         const SizedBox(height: 12),
 
         if (_loading && advice == null)
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
             child: Center(child: CircularProgressIndicator(color: KodaColors.koda, strokeWidth: 2)),
           ),
@@ -129,29 +129,29 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: KodaColors.accent.withValues(alpha: 0.3)),
             ),
-            child: Text(_error!, style: const TextStyle(color: KodaColors.accent, fontSize: 12)),
+            child: Text(_error!, style: TextStyle(color: KodaColors.accent, fontSize: 12)),
           ),
           const SizedBox(height: 8),
         ],
 
         if (advice != null) ...[
           Text(advice['headline'] as String? ?? '',
-              style: const TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w700)),
+              style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w700)),
           const SizedBox(height: 6),
           Text(advice['narrative'] as String? ?? '',
-              style: const TextStyle(color: KodaColors.text2, fontSize: 13, height: 1.4)),
+              style: TextStyle(color: KodaColors.text2, fontSize: 13, height: 1.4)),
 
           if (recommendations.isNotEmpty) ...[
             const SizedBox(height: 12),
             ...recommendations.map((r) => Padding(
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(top: 2),
                       child: Icon(Icons.arrow_right, size: 16, color: KodaColors.koda),
                     ),
                     Expanded(
-                      child: Text(r, style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+                      child: Text(r, style: TextStyle(color: KodaColors.text2, fontSize: 12)),
                     ),
                   ]),
                 )),
@@ -169,7 +169,7 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
             child: TextField(
               controller: _followUpCtrl,
               enabled: !_loading,
-              style: const TextStyle(color: KodaColors.text1, fontSize: 13),
+              style: TextStyle(color: KodaColors.text1, fontSize: 13),
               decoration: const InputDecoration(
                 hintText: 'Ask a follow-up...',
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -180,9 +180,9 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
           const SizedBox(width: 8),
           IconButton(
             icon: _loading
-                ? const SizedBox(width: 16, height: 16,
+                ? SizedBox(width: 16, height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
-                : const Icon(Icons.send, size: 18, color: KodaColors.koda),
+                : Icon(Icons.send, size: 18, color: KodaColors.koda),
             onPressed: _loading ? null : _submitFollowUp,
           ),
         ]),
@@ -194,15 +194,15 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
   // visp_event_dialog.dart's citation rows.
   Widget _sourcesRow(List<String> sources) {
     return Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
-      const Icon(Icons.menu_book_outlined, size: 12, color: KodaColors.text3),
-      const Text('Based on:', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+      Icon(Icons.menu_book_outlined, size: 12, color: KodaColors.text3),
+      Text('Based on:', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       ...sources.map((title) => Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
               color: KodaColors.koda.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Text(title, style: const TextStyle(color: KodaColors.koda, fontSize: 11)),
+            child: Text(title, style: TextStyle(color: KodaColors.koda, fontSize: 11)),
           )),
     ]);
   }

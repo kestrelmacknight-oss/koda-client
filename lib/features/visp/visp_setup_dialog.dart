@@ -196,15 +196,15 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
               Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                 _showAvatar
                     ? VispAvatar(size: 44, mood: _mood)
-                    : const Icon(Icons.auto_awesome, color: KodaColors.koda, size: 20),
+                    : Icon(Icons.auto_awesome, color: KodaColors.koda, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(_isNewServer ? 'Describe your server to Visp' : 'Ask Visp to add to this server',
-                      style: const TextStyle(color: KodaColors.text1, fontSize: 16,
+                      style: TextStyle(color: KodaColors.text1, fontSize: 16,
                           fontWeight: FontWeight.w700)),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 18, color: KodaColors.text3),
+                  icon: Icon(Icons.close, size: 18, color: KodaColors.text3),
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),
@@ -213,7 +213,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
                 _isNewServer
                     ? 'Describe the server you want -- Visp will propose a name and a set of roles, categories, and channels.'
                     : 'Describe what you\'d like to add -- Visp will propose roles, categories, and channels to create.',
-                style: const TextStyle(color: KodaColors.text3, fontSize: 12),
+                style: TextStyle(color: KodaColors.text3, fontSize: 12),
               ),
               const SizedBox(height: 16),
 
@@ -222,7 +222,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
                   controller: _promptCtrl,
                   maxLines: 3,
                   minLines: 3,
-                  style: const TextStyle(color: KodaColors.text1, fontSize: 14),
+                  style: TextStyle(color: KodaColors.text1, fontSize: 14),
                   decoration: InputDecoration(
                     hintText: _isNewServer
                         ? 'e.g. "A cozy server for my D&D group with voice channels for two tables"'
@@ -231,7 +231,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
+                Text(
                   'Your description is sent to Visp (a self-hosted assistant -- '
                   'nothing leaves Koda\'s servers) to generate this plan.',
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
@@ -260,7 +260,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
                     border: Border.all(color: KodaColors.accent.withValues(alpha: 0.3)),
                   ),
                   child: Text(_error!,
-                      style: const TextStyle(color: KodaColors.accent, fontSize: 12)),
+                      style: TextStyle(color: KodaColors.accent, fontSize: 12)),
                 ),
               ],
 
@@ -273,7 +273,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: KodaColors.text2,
-                        side: const BorderSide(color: KodaColors.border),
+                        side: BorderSide(color: KodaColors.border),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: _loading ? null : _startOver,
@@ -340,7 +340,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(plan['summary'] as String? ?? '',
-            style: const TextStyle(color: KodaColors.text1, fontSize: 13, height: 1.4)),
+            style: TextStyle(color: KodaColors.text1, fontSize: 13, height: 1.4)),
         if (server != null) ...[
           const SizedBox(height: 10),
           _previewSection(Icons.dns_outlined, 'New server', [server['name'] as String? ?? '']),
@@ -374,15 +374,15 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
   // rather than just trusting the model's claim.
   Widget _sourcesRow(List<String> sources) {
     return Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
-      const Icon(Icons.menu_book_outlined, size: 12, color: KodaColors.text3),
-      const Text('Based on:', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+      Icon(Icons.menu_book_outlined, size: 12, color: KodaColors.text3),
+      Text('Based on:', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       ...sources.map((title) => Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
               color: KodaColors.koda.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Text(title, style: const TextStyle(color: KodaColors.koda, fontSize: 11)),
+            child: Text(title, style: TextStyle(color: KodaColors.koda, fontSize: 11)),
           )),
     ]);
   }
@@ -392,14 +392,14 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
       Row(children: [
         Icon(icon, size: 14, color: KodaColors.text3),
         const SizedBox(width: 6),
-        Text(title, style: const TextStyle(color: KodaColors.text2, fontSize: 12,
+        Text(title, style: TextStyle(color: KodaColors.text2, fontSize: 12,
             fontWeight: FontWeight.w600)),
       ]),
       const SizedBox(height: 4),
       Padding(
         padding: const EdgeInsets.only(left: 20),
         child: Text(items.join(', '),
-            style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+            style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       ),
     ]);
   }

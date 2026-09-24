@@ -162,14 +162,14 @@ class _StageScreenState extends ConsumerState<StageScreen> {
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.confirmation_number_outlined, size: 48, color: KodaColors.koda),
+            Icon(Icons.confirmation_number_outlined, size: 48, color: KodaColors.koda),
             const SizedBox(height: 16),
             Text(event['title'] as String? ?? 'This stage',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: KodaColors.text1,
+                style: TextStyle(color: KodaColors.text1,
                     fontSize: 17, fontWeight: FontWeight.w700)),
             const SizedBox(height: 6),
-            const Text('requires a ticket to join',
+            Text('requires a ticket to join',
                 style: TextStyle(color: KodaColors.text3, fontSize: 13)),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -186,7 +186,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
             const SizedBox(height: 10),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Not now', style: TextStyle(color: KodaColors.text3)),
+              child: Text('Not now', style: TextStyle(color: KodaColors.text3)),
             ),
           ]),
         ),
@@ -326,10 +326,10 @@ class _StageScreenState extends ConsumerState<StageScreen> {
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
         title: Row(children: [
-          const Icon(Icons.campaign_outlined, size: 18, color: KodaColors.koda),
+          Icon(Icons.campaign_outlined, size: 18, color: KodaColors.koda),
           const SizedBox(width: 8),
           Text(_channelName,
-              style: const TextStyle(color: KodaColors.text1, fontSize: 16)),
+              style: TextStyle(color: KodaColors.text1, fontSize: 16)),
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -345,12 +345,12 @@ class _StageScreenState extends ConsumerState<StageScreen> {
         ]),
       ),
       body: _connecting
-          ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+          ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
           : _ticketRequiredEvent != null
               ? _buildTicketRequired()
               : _error != null
               ? Center(child: Text('Could not join: $_error',
-                  style: const TextStyle(color: KodaColors.accent)))
+                  style: TextStyle(color: KodaColors.accent)))
               : Column(children: [
                   Expanded(
                     child: SingleChildScrollView(
@@ -359,7 +359,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                         // ── Speakers ──────────────────────────────────
-                        const Text('SPEAKERS',
+                        Text('SPEAKERS',
                             style: TextStyle(color: KodaColors.text3,
                                 fontSize: 11, fontWeight: FontWeight.w700,
                                 letterSpacing: 1)),
@@ -396,7 +396,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
 
                         // ── Hand raises (admin only) ──────────────────
                         if (_isAdmin && _handRaises.isNotEmpty) ...[
-                          const Text('RAISED HANDS',
+                          Text('RAISED HANDS',
                               style: TextStyle(color: KodaColors.gold,
                                   fontSize: 11, fontWeight: FontWeight.w700,
                                   letterSpacing: 1)),
@@ -412,15 +412,15 @@ class _StageScreenState extends ConsumerState<StageScreen> {
                                   color: KodaColors.gold.withValues(alpha: 0.4)),
                             ),
                             child: Row(children: [
-                              const Icon(Icons.back_hand_outlined,
+                              Icon(Icons.back_hand_outlined,
                                   color: KodaColors.gold, size: 16),
                               const SizedBox(width: 8),
                               Expanded(child: Text(e.value,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: KodaColors.text1, fontSize: 13))),
                               TextButton(
                                 onPressed: () => _grantSpeaker(e.key),
-                                child: const Text('Allow',
+                                child: Text('Allow',
                                     style: TextStyle(color: KodaColors.mint)),
                               ),
                               TextButton(
@@ -428,7 +428,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
                                   _handRaises.remove(e.key);
                                   setState(() {});
                                 },
-                                child: const Text('Ignore',
+                                child: Text('Ignore',
                                     style: TextStyle(color: KodaColors.text3)),
                               ),
                             ]),
@@ -438,7 +438,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
 
                         // ── Listeners ─────────────────────────────────
                         if (listeners.isNotEmpty || !_isSpeaker) ...[
-                          const Text('LISTENERS',
+                          Text('LISTENERS',
                               style: TextStyle(color: KodaColors.text3,
                                   fontSize: 11, fontWeight: FontWeight.w700,
                                   letterSpacing: 1)),
@@ -465,7 +465,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 16),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                         border: Border(top: BorderSide(color: KodaColors.border))),
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -499,7 +499,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
                       ],
                       IconButton(
                         iconSize: 28,
-                        icon: const Icon(Icons.logout,
+                        icon: Icon(Icons.logout,
                             color: KodaColors.accent),
                         onPressed: _leave,
                         tooltip: 'Leave Stage',
@@ -546,20 +546,20 @@ class _SpeakerTile extends StatelessWidget {
         if (muted)
           Container(
             padding: const EdgeInsets.all(3),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
                 color: KodaColors.card, shape: BoxShape.circle),
-            child: const Icon(Icons.mic_off, size: 12, color: KodaColors.accent),
+            child: Icon(Icons.mic_off, size: 12, color: KodaColors.accent),
           ),
       ]),
       const SizedBox(height: 6),
       Text(isYou ? '$name (you)' : name,
-          style: const TextStyle(color: KodaColors.text1, fontSize: 12)),
+          style: TextStyle(color: KodaColors.text1, fontSize: 12)),
       if (isAdmin && onRevoke != null)
         TextButton(
           onPressed: onRevoke,
           style: TextButton.styleFrom(
               minimumSize: Size.zero, padding: EdgeInsets.zero),
-          child: const Text('Move to listeners',
+          child: Text('Move to listeners',
               style: TextStyle(color: KodaColors.text3, fontSize: 10)),
         ),
     ]);
@@ -591,7 +591,7 @@ class _ListenerChip extends StatelessWidget {
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         if (handRaised) ...[
-          const Icon(Icons.back_hand, size: 12, color: KodaColors.gold),
+          Icon(Icons.back_hand, size: 12, color: KodaColors.gold),
           const SizedBox(width: 4),
         ],
         Text(isYou ? '$name (you)' : name,

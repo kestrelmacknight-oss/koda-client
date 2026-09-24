@@ -26,14 +26,14 @@ class ChildLockoutScreen extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              const Icon(Icons.schedule_outlined, size: 56, color: KodaColors.text3),
+              Icon(Icons.schedule_outlined, size: 56, color: KodaColors.text3),
               const SizedBox(height: 20),
-              const Text("It's outside your allowed hours",
+              Text("It's outside your allowed hours",
                   textAlign: TextAlign.center,
                   style: TextStyle(color: KodaColors.text1,
                       fontSize: 18, fontWeight: FontWeight.w700)),
               const SizedBox(height: 10),
-              const Text(
+              Text(
                 'A parent or guardian has set times this account can use Koda. '
                 'Ask them for more time, or check back during your next allowed window.',
                 textAlign: TextAlign.center,
@@ -44,7 +44,7 @@ class ChildLockoutScreen extends StatelessWidget {
                 onPressed: onLogout,
                 style: OutlinedButton.styleFrom(
                   foregroundColor: KodaColors.text2,
-                  side: const BorderSide(color: KodaColors.border),
+                  side: BorderSide(color: KodaColors.border),
                   minimumSize: const Size(double.infinity, 44),
                 ),
                 child: const Text('Log Out'),

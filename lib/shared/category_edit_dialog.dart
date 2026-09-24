@@ -25,7 +25,7 @@ Future<void> showCategoryEditDialog(
       builder: (ctx, setDialogState) => AlertDialog(
         backgroundColor: KodaColors.card,
         title: Text(existing == null ? 'New Category' : 'Edit Category',
-            style: const TextStyle(color: KodaColors.text1)),
+            style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 340,
           height: 360,
@@ -34,7 +34,7 @@ Future<void> showCategoryEditDialog(
               KodaTextField(controller: controller, hintText: 'Category name'),
               if (roles.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                const Text('Role Access (leave empty for all)',
+                Text('Role Access (leave empty for all)',
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 6),
                 ...roles.where((r) => r['is_default'] != true).map((role) {
@@ -44,7 +44,7 @@ Future<void> showCategoryEditDialog(
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                     title: Text(role['name'] as String? ?? '',
-                        style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+                        style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                     value: isSelected,
                     activeColor: KodaColors.koda,
                     onChanged: (v) => setDialogState(() {

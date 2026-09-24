@@ -76,7 +76,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 14),
                   child: Text(_info!,
-                      style: const TextStyle(color: KodaColors.mint, fontSize: 12)),
+                      style: TextStyle(color: KodaColors.mint, fontSize: 12)),
                 ),
               KodaTextField(controller: _email, hintText: 'Email address',
                   keyboardType: TextInputType.emailAddress),

@@ -99,17 +99,17 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       Container(
         height: 52,
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: KodaColors.border))),
         child: Row(children: [
-          const Icon(Icons.calendar_month_outlined, size: 16, color: KodaColors.text3),
+          Icon(Icons.calendar_month_outlined, size: 16, color: KodaColors.text3),
           const SizedBox(width: 6),
           Text(widget.channel['name'] as String? ?? 'Calendar',
-              style: const TextStyle(
+              style: TextStyle(
                   color: KodaColors.text1, fontWeight: FontWeight.w600)),
           const Spacer(),
           IconButton(
-            icon: const Icon(Icons.auto_awesome, color: KodaColors.koda, size: 20),
+            icon: Icon(Icons.auto_awesome, color: KodaColors.koda, size: 20),
             tooltip: 'Ask Visp',
             onPressed: () => showVispEventDialog(
               context,
@@ -118,7 +118,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.add, color: KodaColors.koda, size: 20),
+            icon: Icon(Icons.add, color: KodaColors.koda, size: 20),
             tooltip: 'Create Event',
             onPressed: () => _showEventDialog(),
           ),
@@ -127,7 +127,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
       Expanded(
         child: _loading
-            ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+            ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
             : Row(children: [
                 // Calendar
                 Expanded(
@@ -142,7 +142,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 // Event list for selected day
                 Container(
                   width: 280,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     border: Border(left: BorderSide(color: KodaColors.border))),
                   child: _buildEventPanel(),
                 ),
@@ -156,19 +156,19 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(children: [
         IconButton(
-          icon: const Icon(Icons.chevron_left, color: KodaColors.text2),
+          icon: Icon(Icons.chevron_left, color: KodaColors.text2),
           onPressed: () => _changeMonth(-1),
         ),
         Expanded(
           child: Text(
             DateFormat('MMMM yyyy').format(_focusedMonth),
             textAlign: TextAlign.center,
-            style: const TextStyle(color: KodaColors.text1,
+            style: TextStyle(color: KodaColors.text1,
                 fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.chevron_right, color: KodaColors.text2),
+          icon: Icon(Icons.chevron_right, color: KodaColors.text2),
           onPressed: () => _changeMonth(1),
         ),
         TextButton(
@@ -179,7 +179,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             });
             _loadEvents();
           },
-          child: const Text('Today', style: TextStyle(color: KodaColors.koda)),
+          child: Text('Today', style: TextStyle(color: KodaColors.koda)),
         ),
       ]),
     );
@@ -193,7 +193,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         children: days.map((d) => Expanded(
           child: Center(
             child: Text(d,
-                style: const TextStyle(color: KodaColors.text3,
+                style: TextStyle(color: KodaColors.text3,
                     fontSize: 11, fontWeight: FontWeight.w600)),
           ),
         )).toList(),
@@ -287,12 +287,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       Padding(
         padding: const EdgeInsets.all(12),
         child: Text(label,
-            style: const TextStyle(color: KodaColors.text1,
+            style: TextStyle(color: KodaColors.text1,
                 fontWeight: FontWeight.w600, fontSize: 13)),
       ),
-      const Divider(color: KodaColors.border, height: 1),
+      Divider(color: KodaColors.border, height: 1),
       if (events.isEmpty)
-        const Expanded(
+        Expanded(
           child: Center(child: Text('No events',
               style: TextStyle(color: KodaColors.text3, fontSize: 13))),
         )
@@ -338,7 +338,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           Row(children: [
             Expanded(
               child: Text(event['title'] as String? ?? '',
-                  style: const TextStyle(color: KodaColors.text1,
+                  style: TextStyle(color: KodaColors.text1,
                       fontWeight: FontWeight.w600, fontSize: 13)),
             ),
             IconButton(
@@ -362,7 +362,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             if (canManage) ...[
               const SizedBox(width: 6),
               IconButton(
-                icon: const Icon(Icons.edit_outlined, color: KodaColors.text3, size: 16),
+                icon: Icon(Icons.edit_outlined, color: KodaColors.text3, size: 16),
                 tooltip: 'Edit',
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -370,7 +370,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               ),
               const SizedBox(width: 6),
               IconButton(
-                icon: const Icon(Icons.delete_outline, color: KodaColors.text3, size: 16),
+                icon: Icon(Icons.delete_outline, color: KodaColors.text3, size: 16),
                 tooltip: 'Delete',
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -380,28 +380,28 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           ]),
           const SizedBox(height: 4),
           Row(children: [
-            const Icon(Icons.access_time, size: 12, color: KodaColors.text3),
+            Icon(Icons.access_time, size: 12, color: KodaColors.text3),
             const SizedBox(width: 4),
             Text(
               end != null
                   ? '${DateFormat('h:mm a').format(start)} – ${DateFormat('h:mm a').format(end)}'
                   : DateFormat('h:mm a').format(start),
-              style: const TextStyle(color: KodaColors.text3, fontSize: 11),
+              style: TextStyle(color: KodaColors.text3, fontSize: 11),
             ),
           ]),
           if (event['location'] != null && (event['location'] as String).isNotEmpty) ...[
             const SizedBox(height: 2),
             Row(children: [
-              const Icon(Icons.location_on_outlined, size: 12, color: KodaColors.text3),
+              Icon(Icons.location_on_outlined, size: 12, color: KodaColors.text3),
               const SizedBox(width: 4),
               Text(event['location'] as String,
-                  style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+                  style: TextStyle(color: KodaColors.text3, fontSize: 11)),
             ]),
           ],
           if (event['description'] != null && (event['description'] as String).isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(event['description'] as String,
-                style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+                style: TextStyle(color: KodaColors.text2, fontSize: 12)),
           ],
           if ((event['recurrence'] != null && event['recurrence'] != 'none') ||
               priceCents > 0) ...[
@@ -416,7 +416,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   ),
                   child: Text(
                     'Repeats ${event['recurrence']}',
-                    style: const TextStyle(color: KodaColors.text3, fontSize: 10),
+                    style: TextStyle(color: KodaColors.text3, fontSize: 10),
                   ),
                 ),
               if (priceCents > 0)
@@ -434,7 +434,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       hasTicket
                           ? 'Ticket owned'
                           : '\$${(priceCents / 100).toStringAsFixed(2)} ticket',
-                      style: const TextStyle(color: KodaColors.koda,
+                      style: TextStyle(color: KodaColors.koda,
                           fontSize: 10, fontWeight: FontWeight.w600),
                     ),
                   ]),
@@ -451,15 +451,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('Delete Event', style: TextStyle(color: KodaColors.text1)),
+        title: Text('Delete Event', style: TextStyle(color: KodaColors.text1)),
         content: Text('Delete "${event['title']}"? This cannot be undone.',
-            style: const TextStyle(color: KodaColors.text2)),
+            style: TextStyle(color: KodaColors.text2)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false),
               child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete', style: TextStyle(color: KodaColors.accent)),
+            child: Text('Delete', style: TextStyle(color: KodaColors.accent)),
           ),
         ],
       ),
@@ -495,7 +495,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
           title: Text(isEdit ? 'Edit Event' : 'Create Event',
-              style: const TextStyle(color: KodaColors.text1)),
+              style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 400,
             child: SingleChildScrollView(
@@ -510,7 +510,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
                 // Start time
                 Text('Start (${DateTime.now().timeZoneName})',
-                  style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+                  style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
                 GestureDetector(
                   onTap: () async {
@@ -535,14 +535,14 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(DateFormat('MMM d, yyyy h:mm a').format(startAt),
-                        style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+                        style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                   ),
                 ),
                 const SizedBox(height: 10),
 
                 // End time
                 Text('End — optional (${DateTime.now().timeZoneName})',
-                  style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+                  style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
                 GestureDetector(
                   onTap: () async {
@@ -581,12 +581,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 const SizedBox(height: 12),
 
                 // Recurrence
-                const Text('Recurrence', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                Text('Recurrence', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
                 DropdownButton<String>(
                   value: recurrence,
                   dropdownColor: KodaColors.card,
-                  style: const TextStyle(color: KodaColors.text1, fontSize: 13),
+                  style: TextStyle(color: KodaColors.text1, fontSize: 13),
                   onChanged: (v) => setDialogState(() => recurrence = v!),
                   items: const [
                     DropdownMenuItem(value: 'none', child: Text('Does not repeat')),
@@ -598,7 +598,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 const SizedBox(height: 12),
 
                 // Color
-                const Text('Color', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                Text('Color', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 6),
                 Wrap(spacing: 8, children: [
                   '#2DD4A0', '#7F77DD', '#E05C5C', '#F59E0B',
@@ -625,7 +625,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 // ticket, same gate as digital goods / Printful.
                 if (_canManageMarketplace) ...[
                   const SizedBox(height: 12),
-                  const Text('Ticket price — optional',
+                  Text('Ticket price — optional',
                       style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                   const SizedBox(height: 4),
                   KodaTextField(
@@ -635,14 +635,14 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   ),
                   if (_stageChannels.isNotEmpty) ...[
                     const SizedBox(height: 10),
-                    const Text('Link to stage channel — optional',
+                    Text('Link to stage channel — optional',
                         style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                     const SizedBox(height: 4),
                     DropdownButton<String?>(
                       value: stageChannelId,
                       dropdownColor: KodaColors.card,
                       isExpanded: true,
-                      style: const TextStyle(color: KodaColors.text1, fontSize: 13),
+                      style: TextStyle(color: KodaColors.text1, fontSize: 13),
                       onChanged: (v) => setDialogState(() => stageChannelId = v),
                       items: [
                         const DropdownMenuItem<String?>(

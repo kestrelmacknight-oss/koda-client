@@ -275,16 +275,16 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: const Text('Test Devices', style: TextStyle(color: KodaColors.text1, fontSize: 16)),
+        title: Text('Test Devices', style: TextStyle(color: KodaColors.text1, fontSize: 16)),
       ),
       body: _connecting
-          ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+          ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
           : _error != null
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
                     child: Text('Could not connect: $_error',
-                        style: const TextStyle(color: KodaColors.accent), textAlign: TextAlign.center),
+                        style: TextStyle(color: KodaColors.accent), textAlign: TextAlign.center),
                   ),
                 )
               : ListView(
@@ -303,7 +303,7 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
 
                     _sectionLabel('Hear Yourself (Delayed)'),
                     Text('Talk, then hear a ${_selfListenDelay.toStringAsFixed(1)}s clip play back',
-                        style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+                        style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                     Slider(
                       value: _selfListenDelay,
                       min: 0.5,
@@ -318,7 +318,7 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
                     OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 40)),
                       icon: _selfListenBusy
-                          ? const SizedBox(width: 14, height: 14,
+                          ? SizedBox(width: 14, height: 14,
                               child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
                           : const Icon(Icons.hearing, size: 16),
                       label: Text(_selfListenLabel),
@@ -356,7 +356,7 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
                                 borderRadius: BorderRadius.circular(10),
                                 child: lk.VideoTrackRenderer(_videoTrack!),
                               )
-                            : const Center(
+                            : Center(
                                 child: Text('Camera preview off',
                                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                               ),
@@ -376,7 +376,7 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
   Widget _sectionLabel(String text) => Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: Text(text.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
                 color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
       );
 
@@ -398,11 +398,11 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
           isExpanded: true,
           dropdownColor: KodaColors.card,
           value: selected?.deviceId,
-          hint: Text(placeholder, style: const TextStyle(color: KodaColors.text3, fontSize: 13)),
+          hint: Text(placeholder, style: TextStyle(color: KodaColors.text3, fontSize: 13)),
           items: devices.map((d) => DropdownMenuItem(
                 value: d.deviceId,
                 child: Text(d.label.isNotEmpty ? d.label : d.deviceId,
-                    style: const TextStyle(color: KodaColors.text1, fontSize: 13),
+                    style: TextStyle(color: KodaColors.text1, fontSize: 13),
                     overflow: TextOverflow.ellipsis),
               )).toList(),
           onChanged: (id) {
@@ -424,7 +424,7 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
       barColor = KodaColors.gold;
     }
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('Input level', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+      Text('Input level', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       const SizedBox(height: 4),
       ClipRRect(
         borderRadius: BorderRadius.circular(4),

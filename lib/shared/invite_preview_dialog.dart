@@ -70,18 +70,18 @@ class _InvitePreviewDialogState extends State<_InvitePreviewDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: KodaColors.card,
-      title: const Text('Server Invite', style: TextStyle(color: KodaColors.text1)),
+      title: Text('Server Invite', style: TextStyle(color: KodaColors.text1)),
       content: SizedBox(
         width: 320,
         child: _loading
-            ? const Padding(
+            ? Padding(
                 padding: EdgeInsets.symmetric(vertical: 24),
                 child: Center(child: CircularProgressIndicator(color: KodaColors.koda)),
               )
             : _server != null
                 ? _buildPreview(_server!)
                 : Text(_error ?? 'Invalid or expired invite.',
-                    style: const TextStyle(color: KodaColors.text2)),
+                    style: TextStyle(color: KodaColors.text2)),
       ),
       actions: [
         TextButton(
@@ -92,7 +92,7 @@ class _InvitePreviewDialogState extends State<_InvitePreviewDialog> {
           TextButton(
             onPressed: _joining ? null : _join,
             child: _joining
-                ? const SizedBox(
+                ? SizedBox(
                     width: 16, height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
                 : const Text('Join'),
@@ -114,29 +114,29 @@ class _InvitePreviewDialogState extends State<_InvitePreviewDialog> {
         backgroundImage: iconUrl != null ? NetworkImage(iconUrl) : null,
         child: iconUrl == null
             ? Text(name.isNotEmpty ? name[0].toUpperCase() : '?',
-                style: const TextStyle(
+                style: TextStyle(
                     color: KodaColors.text1, fontSize: 24, fontWeight: FontWeight.w700))
             : null,
       ),
       const SizedBox(height: 12),
       Text(name,
-          style: const TextStyle(
+          style: TextStyle(
               color: KodaColors.text1, fontSize: 16, fontWeight: FontWeight.w700),
           textAlign: TextAlign.center),
       if (description != null && description.isNotEmpty) ...[
         const SizedBox(height: 6),
         Text(description,
-            style: const TextStyle(color: KodaColors.text3, fontSize: 12),
+            style: TextStyle(color: KodaColors.text3, fontSize: 12),
             textAlign: TextAlign.center,
             maxLines: 3,
             overflow: TextOverflow.ellipsis),
       ],
       const SizedBox(height: 10),
       Text('$memberCount ${memberCount == 1 ? 'member' : 'members'}',
-          style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+          style: TextStyle(color: KodaColors.text3, fontSize: 12)),
       if (_error != null) ...[
         const SizedBox(height: 10),
-        Text(_error!, style: const TextStyle(color: KodaColors.accent, fontSize: 12)),
+        Text(_error!, style: TextStyle(color: KodaColors.accent, fontSize: 12)),
       ],
     ]);
   }

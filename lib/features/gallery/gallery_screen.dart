@@ -89,7 +89,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDlg) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: const Text('New Post', style: TextStyle(color: KodaColors.text1)),
+          title: Text('New Post', style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 400,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -115,7 +115,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
                 label: Text(pickedFileName ?? 'Choose File'),
               ),
               const SizedBox(height: 8),
-              const Row(children: [
+              Row(children: [
                 Expanded(child: Divider()),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8),
@@ -222,7 +222,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('New Collection', style: TextStyle(color: KodaColors.text1)),
+        title: Text('New Collection', style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 360,
           child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -257,12 +257,12 @@ Future<void> _showCreatePost({String? collectionId}) async {
       builder: (ctx) => AlertDialog(
         backgroundColor: KodaColors.card,
         content: Text('Delete "${col['name']}"? Posts inside will become uncollected.',
-            style: const TextStyle(color: KodaColors.text1)),
+            style: TextStyle(color: KodaColors.text1)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false),
               child: const Text('Cancel')),
           TextButton(onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Delete', style: TextStyle(color: KodaColors.accent))),
+              child: Text('Delete', style: TextStyle(color: KodaColors.accent))),
         ],
       ),
     );
@@ -310,18 +310,18 @@ Future<void> _showCreatePost({String? collectionId}) async {
           Container(
             height: 52,
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
                 border: Border(bottom: BorderSide(color: KodaColors.border))),
             child: Row(children: [
-              const Icon(Icons.image_outlined, size: 16, color: KodaColors.text3),
+              Icon(Icons.image_outlined, size: 16, color: KodaColors.text3),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(widget.channel['name'] as String? ?? '',
-                    style: const TextStyle(color: KodaColors.text1,
+                    style: TextStyle(color: KodaColors.text1,
                         fontSize: 14, fontWeight: FontWeight.w600)),
               ),
               IconButton(
-                icon: const Icon(Icons.add_photo_alternate_outlined,
+                icon: Icon(Icons.add_photo_alternate_outlined,
                     size: 18, color: KodaColors.text3),
                 tooltip: 'New Post',
                 onPressed: () => _showCreatePost(
@@ -351,10 +351,10 @@ Future<void> _showCreatePost({String? collectionId}) async {
 
   Widget _buildFeed() {
     if (_loadingFeed) {
-      return const Center(child: CircularProgressIndicator(color: KodaColors.koda));
+      return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
     if (_feedPosts.isEmpty) {
-      return const Center(
+      return Center(
           child: Text('No posts yet', style: TextStyle(color: KodaColors.text3)));
     }
     return GridView.builder(
@@ -375,13 +375,13 @@ Future<void> _showCreatePost({String? collectionId}) async {
 
   Widget _buildCollections() {
     if (_loadingCollections) {
-      return const Center(child: CircularProgressIndicator(color: KodaColors.koda));
+      return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
     return Row(children: [
       // Collection list sidebar
       Container(
         width: 200,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
             border: Border(right: BorderSide(color: KodaColors.border))),
         child: Column(children: [
           if (_canManage())
@@ -392,7 +392,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
             ),
           Expanded(
             child: _collections.isEmpty
-                ? const Center(
+                ? Center(
                     child: Text('No collections yet',
                         style: TextStyle(color: KodaColors.text3, fontSize: 12),
                         textAlign: TextAlign.center))
@@ -406,7 +406,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
                         dense: true,
                         selected: active,
                         selectedTileColor: KodaColors.koda.withValues(alpha: 0.1),
-                        leading: const Icon(Icons.photo_album_outlined,
+                        leading: Icon(Icons.photo_album_outlined,
                             size: 16, color: KodaColors.text3),
                         title: Text(col['name'] as String? ?? '',
                             style: TextStyle(
@@ -415,7 +415,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
                             overflow: TextOverflow.ellipsis),
                         trailing: _canManage()
                             ? PopupMenuButton<String>(
-                                icon: const Icon(Icons.more_vert,
+                                icon: Icon(Icons.more_vert,
                                     size: 14, color: KodaColors.text3),
                                 color: KodaColors.card,
                                 onSelected: (v) {
@@ -438,16 +438,16 @@ Future<void> _showCreatePost({String? collectionId}) async {
       // Collection post grid
       Expanded(
         child: _activeCollection == null
-            ? const Center(
+            ? Center(
                 child: Text('Select a collection',
                     style: TextStyle(color: KodaColors.text3)))
             : _loadingCollectionPosts
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(color: KodaColors.koda))
                 : _collectionPosts.isEmpty
                     ? Center(
                         child: Column(mainAxisSize: MainAxisSize.min, children: [
-                          const Text('No posts in this collection',
+                          Text('No posts in this collection',
                               style: TextStyle(color: KodaColors.text3)),
                           const SizedBox(height: 12),
                           OutlinedButton.icon(
@@ -535,7 +535,7 @@ class _PostTileState extends State<_PostTile> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis),
                   Text(username,
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: KodaColors.koda, fontSize: 10,
                           fontWeight: FontWeight.w600)),
                 ]),
@@ -566,7 +566,7 @@ class _PostTileState extends State<_PostTile> {
 
   Widget _placeholder() => Container(
         color: KodaColors.elevated,
-        child: const Center(
+        child: Center(
             child: Icon(Icons.image_outlined, color: KodaColors.text3, size: 32)),
       );
 
@@ -607,18 +607,18 @@ class _PostTileState extends State<_PostTile> {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                     Text(username,
-                        style: const TextStyle(color: KodaColors.koda,
+                        style: TextStyle(color: KodaColors.koda,
                             fontSize: 13, fontWeight: FontWeight.w600)),
                     if (caption != null && caption.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(caption,
-                          style: const TextStyle(color: KodaColors.text1,
+                          style: TextStyle(color: KodaColors.text1,
                               fontSize: 13)),
                     ],
                   ]),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: KodaColors.text3, size: 18),
+                  icon: Icon(Icons.close, color: KodaColors.text3, size: 18),
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),

@@ -18,30 +18,40 @@ class AccessibilityPrefs {
   final double textScale;
   final bool dyslexiaFont;
   final String density; // 'standard' | 'comfortable' | 'compact'
+  final bool highContrast;
 
   const AccessibilityPrefs({
     this.textScale = 1.0,
     this.dyslexiaFont = false,
     this.density = 'standard',
+    this.highContrast = false,
   });
 
   factory AccessibilityPrefs.fromJson(Map<String, dynamic> j) => AccessibilityPrefs(
         textScale: (j['text_scale'] as num?)?.toDouble() ?? 1.0,
         dyslexiaFont: j['dyslexia_font'] as bool? ?? false,
         density: j['density'] as String? ?? 'standard',
+        highContrast: j['high_contrast'] as bool? ?? false,
       );
 
   Map<String, dynamic> toJson() => {
         'text_scale': textScale,
         'dyslexia_font': dyslexiaFont,
         'density': density,
+        'high_contrast': highContrast,
       };
 
-  AccessibilityPrefs copyWith({double? textScale, bool? dyslexiaFont, String? density}) =>
+  AccessibilityPrefs copyWith({
+    double? textScale,
+    bool? dyslexiaFont,
+    String? density,
+    bool? highContrast,
+  }) =>
       AccessibilityPrefs(
         textScale: textScale ?? this.textScale,
         dyslexiaFont: dyslexiaFont ?? this.dyslexiaFont,
         density: density ?? this.density,
+        highContrast: highContrast ?? this.highContrast,
       );
 }
 
@@ -73,6 +83,7 @@ class AccessibilityPrefsNotifier extends StateNotifier<AccessibilityPrefs> {
   Future<void> setTextScale(double value) => _update(state.copyWith(textScale: value));
   Future<void> setDyslexiaFont(bool value) => _update(state.copyWith(dyslexiaFont: value));
   Future<void> setDensity(String value) => _update(state.copyWith(density: value));
+  Future<void> setHighContrast(bool value) => _update(state.copyWith(highContrast: value));
 
   Future<void> _update(AccessibilityPrefs next) async {
     state = next;

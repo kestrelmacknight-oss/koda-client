@@ -41,7 +41,7 @@ class _AdminScreenState extends State<AdminScreen>
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: const Row(children: [
+        title: Row(children: [
           Icon(Icons.admin_panel_settings_outlined,
               size: 18, color: KodaColors.koda),
           SizedBox(width: 8),
@@ -110,7 +110,7 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('Create Backer Code',
+        title: Text('Create Backer Code',
             style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 400,
@@ -164,22 +164,22 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
                   context: context,
                   builder: (_) => AlertDialog(
                     backgroundColor: KodaColors.card,
-                    title: const Text('Code Created',
+                    title: Text('Code Created',
                         style: TextStyle(color: KodaColors.text1)),
                     content: Column(mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                      const Text('Code:',
+                      Text('Code:',
                           style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                       const SizedBox(height: 4),
                       Row(children: [
                         Expanded(child: SelectableText(code,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: KodaColors.koda,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700))),
                         IconButton(
-                          icon: const Icon(Icons.copy, size: 16,
+                          icon: Icon(Icons.copy, size: 16,
                               color: KodaColors.text3),
                           onPressed: () =>
                               Clipboard.setData(ClipboardData(text: code)),
@@ -187,7 +187,7 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
                       ]),
                       const SizedBox(height: 8),
                       Text('Flags: ${result['flags']}',
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: KodaColors.text3, fontSize: 12)),
                     ]),
                     actions: [
@@ -227,7 +227,7 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
       Padding(
         padding: const EdgeInsets.all(16),
         child: Row(children: [
-          const Text('Backer & Reward Codes',
+          Text('Backer & Reward Codes',
               style: TextStyle(color: KodaColors.text1,
                   fontSize: 15, fontWeight: FontWeight.w700)),
           const Spacer(),
@@ -240,13 +240,13 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
           ),
         ]),
       ),
-      const Divider(color: KodaColors.border, height: 1),
+      Divider(color: KodaColors.border, height: 1),
       Expanded(
         child: _loading
-            ? const Center(child: CircularProgressIndicator(
+            ? Center(child: CircularProgressIndicator(
                 color: KodaColors.koda))
             : _codes.isEmpty
-                ? const Center(child: Text('No codes yet',
+                ? Center(child: Text('No codes yet',
                     style: TextStyle(color: KodaColors.text3)))
                 : ListView.builder(
                     padding: const EdgeInsets.all(12),
@@ -273,7 +273,7 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
                             Row(children: [
                               SelectableText(
                                 c['code'] as String? ?? '',
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: KodaColors.koda,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
@@ -283,7 +283,7 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
                               IconButton(
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(),
-                                icon: const Icon(Icons.copy, size: 14,
+                                icon: Icon(Icons.copy, size: 14,
                                     color: KodaColors.text3),
                                 onPressed: () => Clipboard.setData(
                                     ClipboardData(text: c['code'] as String)),
@@ -291,14 +291,14 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
                             ]),
                             if (c['note'] != null)
                               Text(c['note'] as String,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: KodaColors.text2, fontSize: 12)),
                             const SizedBox(height: 4),
                             Text('Flags: ${c['flags']}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: KodaColors.text3, fontSize: 11)),
                             Text(usesStr,
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: KodaColors.text3, fontSize: 11)),
                           ])),
                         ]),
@@ -348,13 +348,13 @@ class _UsersTabState extends State<_UsersTab> {
           onSubmitted: _search,
         ),
       ),
-      const Divider(color: KodaColors.border, height: 1),
+      Divider(color: KodaColors.border, height: 1),
       Expanded(
         child: _loading
-            ? const Center(child: CircularProgressIndicator(
+            ? Center(child: CircularProgressIndicator(
                 color: KodaColors.koda))
             : _members.isEmpty
-                ? const Center(child: Text('Search for a user above',
+                ? Center(child: Text('Search for a user above',
                     style: TextStyle(color: KodaColors.text3)))
                 : ListView.builder(
                     padding: const EdgeInsets.all(12),
@@ -380,16 +380,16 @@ class _UsersTabState extends State<_UsersTab> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                             Text(m['username'] as String? ?? '',
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: KodaColors.text1,
                                     fontWeight: FontWeight.w600)),
                             Text(m['email'] as String? ?? '',
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: KodaColors.text3, fontSize: 12)),
                             if (m['flags'] != null &&
                                 (m['flags'] as Map).isNotEmpty)
                               Text('Flags: ${m['flags']}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: KodaColors.gold, fontSize: 11)),
                           ])),
                         ]),
@@ -442,19 +442,19 @@ class _DmReportsTabState extends State<_DmReportsTab> {
     final resolved = _reports.where((r) => r['status'] != 'pending').toList();
 
     return _loading
-        ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+        ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
         : ListView(
             padding: const EdgeInsets.all(16),
             children: [
               if (pending.isEmpty && resolved.isEmpty)
-                const Center(child: Padding(
+                Center(child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 24),
                   child: Text('No DM reports.', style: TextStyle(color: KodaColors.text3)),
                 )),
               ...pending.map((r) => _reportCard(r)),
               if (resolved.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                const Text('RESOLVED', style: TextStyle(
+                Text('RESOLVED', style: TextStyle(
                     color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
                 const SizedBox(height: 8),
                 ...resolved.map((r) => _reportCard(r)),
@@ -475,10 +475,10 @@ class _DmReportsTabState extends State<_DmReportsTab> {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(r['reason'] as String? ?? 'other',
-            style: const TextStyle(color: KodaColors.koda, fontSize: 11, fontWeight: FontWeight.w700)),
+            style: TextStyle(color: KodaColors.koda, fontSize: 11, fontWeight: FontWeight.w700)),
         const SizedBox(height: 6),
         Text('Reporter: ${r['reporter_id']}\nRevealed sender: ${r['target_user_id']}',
-            style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+            style: TextStyle(color: KodaColors.text2, fontSize: 12)),
         const SizedBox(height: 6),
         Container(
           width: double.infinity,
@@ -486,12 +486,12 @@ class _DmReportsTabState extends State<_DmReportsTab> {
           decoration: BoxDecoration(
               color: KodaColors.elevated, borderRadius: BorderRadius.circular(6)),
           child: Text(r['disclosed_content'] as String? ?? '',
-              style: const TextStyle(color: KodaColors.text1, fontSize: 12)),
+              style: TextStyle(color: KodaColors.text1, fontSize: 12)),
         ),
         if ((r['note'] as String?)?.isNotEmpty ?? false) ...[
           const SizedBox(height: 6),
           Text('Note: ${r['note']}',
-              style: const TextStyle(color: KodaColors.text3, fontSize: 11, fontStyle: FontStyle.italic)),
+              style: TextStyle(color: KodaColors.text3, fontSize: 11, fontStyle: FontStyle.italic)),
         ],
         if (status == 'pending') ...[
           const SizedBox(height: 8),
@@ -503,14 +503,14 @@ class _DmReportsTabState extends State<_DmReportsTab> {
             const SizedBox(width: 4),
             TextButton(
               onPressed: () => _resolve(r['id'] as String, 'actioned'),
-              child: const Text('Mark Actioned', style: TextStyle(color: KodaColors.accent)),
+              child: Text('Mark Actioned', style: TextStyle(color: KodaColors.accent)),
             ),
           ]),
         ] else
           Padding(
             padding: const EdgeInsets.only(top: 6),
             child: Text(status == 'actioned' ? 'Actioned' : 'Dismissed',
-                style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+                style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           ),
       ]),
     );
@@ -580,19 +580,19 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
     final resolved = _flags.where((f) => f['status'] != 'pending').toList();
 
     return _loading
-        ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+        ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
         : ListView(
             padding: const EdgeInsets.all(16),
             children: [
               if (pending.isEmpty && resolved.isEmpty)
-                const Center(child: Padding(
+                Center(child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 24),
                   child: Text('No spam flags.', style: TextStyle(color: KodaColors.text3)),
                 )),
               ...pending.map((f) => _flagCard(f)),
               if (resolved.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                const Text('RESOLVED', style: TextStyle(
+                Text('RESOLVED', style: TextStyle(
                     color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
                 const SizedBox(height: 8),
                 ...resolved.map((f) => _flagCard(f)),
@@ -649,10 +649,10 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
           Icon(_flagIcon(type), size: 14, color: KodaColors.koda),
           const SizedBox(width: 6),
           Text(_flagLabel(type),
-              style: const TextStyle(color: KodaColors.koda, fontSize: 11, fontWeight: FontWeight.w700)),
+              style: TextStyle(color: KodaColors.koda, fontSize: 11, fontWeight: FontWeight.w700)),
           if (autoEscalated) ...[
             const SizedBox(width: 6),
-            const Text('AUTO-ESCALATED',
+            Text('AUTO-ESCALATED',
                 style: TextStyle(color: KodaColors.accent, fontSize: 10, fontWeight: FontWeight.w700)),
           ],
           const Spacer(),
@@ -666,7 +666,7 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
         Text([
           if (f['user_id'] != null) 'User: ${f['user_id']}',
           if (f['server_id'] != null) 'Server: ${f['server_id']}',
-        ].join('\n'), style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+        ].join('\n'), style: TextStyle(color: KodaColors.text2, fontSize: 12)),
         if (details.isNotEmpty) ...[
           const SizedBox(height: 6),
           Container(
@@ -675,7 +675,7 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
             decoration: BoxDecoration(
                 color: KodaColors.elevated, borderRadius: BorderRadius.circular(6)),
             child: Text(details.entries.map((e) => '${e.key}: ${e.value}').join(', '),
-                style: const TextStyle(color: KodaColors.text1, fontSize: 12)),
+                style: TextStyle(color: KodaColors.text1, fontSize: 12)),
           ),
         ],
         const SizedBox(height: 6),
@@ -693,14 +693,14 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
             const SizedBox(width: 4),
             TextButton(
               onPressed: () => _resolve(f['id'] as String, 'actioned'),
-              child: const Text('Confirm & Restrict', style: TextStyle(color: KodaColors.accent)),
+              child: Text('Confirm & Restrict', style: TextStyle(color: KodaColors.accent)),
             ),
           ]),
         ] else
           Padding(
             padding: const EdgeInsets.only(top: 6),
             child: Text(status == 'actioned' ? 'Actioned' : 'Dismissed',
-                style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+                style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           ),
       ]),
     );
@@ -748,14 +748,14 @@ class _WikiTabState extends State<_WikiTab> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('Delete article?', style: TextStyle(color: KodaColors.text1)),
+        title: Text('Delete article?', style: TextStyle(color: KodaColors.text1)),
         content: Text('"${article['title']}" will be removed from Visp\'s knowledge base.',
-            style: const TextStyle(color: KodaColors.text3)),
+            style: TextStyle(color: KodaColors.text3)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: KodaColors.accent)),
+            child: Text('Delete', style: TextStyle(color: KodaColors.accent)),
           ),
         ],
       ),
@@ -777,7 +777,7 @@ class _WikiTabState extends State<_WikiTab> {
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
           title: Text(article == null ? 'New Article' : 'Edit Article',
-              style: const TextStyle(color: KodaColors.text1)),
+              style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 480,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -786,7 +786,7 @@ class _WikiTabState extends State<_WikiTab> {
               DropdownButtonFormField<String>(
                 initialValue: category,
                 dropdownColor: KodaColors.card,
-                style: const TextStyle(color: KodaColors.text1, fontSize: 14),
+                style: TextStyle(color: KodaColors.text1, fontSize: 14),
                 decoration: const InputDecoration(
                   contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 ),
@@ -800,7 +800,7 @@ class _WikiTabState extends State<_WikiTab> {
                 controller: contentCtrl,
                 maxLines: 10,
                 minLines: 6,
-                style: const TextStyle(color: KodaColors.text1, fontSize: 13),
+                style: TextStyle(color: KodaColors.text1, fontSize: 13),
                 decoration: const InputDecoration(
                   hintText: 'Article content (markdown)',
                   contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -838,7 +838,7 @@ class _WikiTabState extends State<_WikiTab> {
       Padding(
         padding: const EdgeInsets.all(16),
         child: Row(children: [
-          const Text('Wiki Articles',
+          Text('Wiki Articles',
               style: TextStyle(color: KodaColors.text1, fontSize: 15, fontWeight: FontWeight.w700)),
           const Spacer(),
           ElevatedButton.icon(
@@ -849,12 +849,12 @@ class _WikiTabState extends State<_WikiTab> {
           ),
         ]),
       ),
-      const Divider(color: KodaColors.border, height: 1),
+      Divider(color: KodaColors.border, height: 1),
       Expanded(
         child: _loading
-            ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+            ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
             : _articles.isEmpty
-                ? const Center(child: Text('No articles yet', style: TextStyle(color: KodaColors.text3)))
+                ? Center(child: Text('No articles yet', style: TextStyle(color: KodaColors.text3)))
                 : ListView.builder(
                     padding: const EdgeInsets.all(12),
                     itemCount: _articles.length,
@@ -873,18 +873,18 @@ class _WikiTabState extends State<_WikiTab> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                             Text(a['title'] as String? ?? '',
-                                style: const TextStyle(color: KodaColors.text1,
+                                style: TextStyle(color: KodaColors.text1,
                                     fontSize: 14, fontWeight: FontWeight.w600)),
                             const SizedBox(height: 2),
                             Text(a['category'] as String? ?? '',
-                                style: const TextStyle(color: KodaColors.koda, fontSize: 11)),
+                                style: TextStyle(color: KodaColors.koda, fontSize: 11)),
                           ])),
                           IconButton(
-                            icon: const Icon(Icons.edit_outlined, size: 18, color: KodaColors.text3),
+                            icon: Icon(Icons.edit_outlined, size: 18, color: KodaColors.text3),
                             onPressed: () => _showEditor(article: a),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.delete_outline, size: 18, color: KodaColors.text3),
+                            icon: Icon(Icons.delete_outline, size: 18, color: KodaColors.text3),
                             onPressed: () => _delete(a),
                           ),
                         ]),

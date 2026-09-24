@@ -69,11 +69,11 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: const Text('Configure Threshold Moderation', style: TextStyle(color: KodaColors.text1)),
+          title: Text('Configure Threshold Moderation', style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 360,
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text(
+              Text(
                 'Pick trusted moderators and how many of them must agree before any '
                 'of them can decrypt one epoch of a channel\'s history. Not even you '
                 'get a unilateral key -- you\'re only exempt if you\'re also in this list.',
@@ -91,7 +91,7 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
                       value: checked,
                       activeColor: KodaColors.koda,
                       title: Text(m['username'] as String? ?? id,
-                          style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+                          style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                       onChanged: (v) => setDialogState(() {
                         if (v == true) {
                           selected.add(id);
@@ -105,20 +105,20 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
               ),
               const SizedBox(height: 8),
               Row(children: [
-                const Text('Threshold:', style: TextStyle(color: KodaColors.text2, fontSize: 13)),
+                Text('Threshold:', style: TextStyle(color: KodaColors.text2, fontSize: 13)),
                 const SizedBox(width: 12),
                 IconButton(
-                  icon: const Icon(Icons.remove_circle_outline, size: 20, color: KodaColors.text3),
+                  icon: Icon(Icons.remove_circle_outline, size: 20, color: KodaColors.text3),
                   onPressed: threshold > 2 ? () => setDialogState(() => threshold--) : null,
                 ),
-                Text('$threshold', style: const TextStyle(color: KodaColors.text1, fontSize: 15, fontWeight: FontWeight.w700)),
+                Text('$threshold', style: TextStyle(color: KodaColors.text1, fontSize: 15, fontWeight: FontWeight.w700)),
                 IconButton(
-                  icon: const Icon(Icons.add_circle_outline, size: 20, color: KodaColors.text3),
+                  icon: Icon(Icons.add_circle_outline, size: 20, color: KodaColors.text3),
                   onPressed: threshold < selected.length ? () => setDialogState(() => threshold++) : null,
                 ),
                 const Spacer(),
                 Text('of ${selected.length} moderators',
-                    style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+                    style: TextStyle(color: KodaColors.text3, fontSize: 12)),
               ]),
             ]),
           ),
@@ -155,25 +155,25 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: const Text('Request Threshold Decrypt', style: TextStyle(color: KodaColors.text1)),
+          title: Text('Request Threshold Decrypt', style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 320,
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('Channel', style: TextStyle(color: KodaColors.text2, fontSize: 12)),
+              Text('Channel', style: TextStyle(color: KodaColors.text2, fontSize: 12)),
               DropdownButton<Map<String, dynamic>>(
                 value: selectedChannel,
                 isExpanded: true,
                 dropdownColor: KodaColors.card,
                 items: textChannels.map((c) => DropdownMenuItem(
                     value: c,
-                    child: Text('#${c['name']}', style: const TextStyle(color: KodaColors.text1)))).toList(),
+                    child: Text('#${c['name']}', style: TextStyle(color: KodaColors.text1)))).toList(),
                 onChanged: (v) => setDialogState(() => selectedChannel = v),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: reasonCtrl,
                 maxLines: 2,
-                style: const TextStyle(color: KodaColors.text1, fontSize: 13),
+                style: TextStyle(color: KodaColors.text1, fontSize: 13),
                 decoration: const InputDecoration(hintText: 'Reason -- shown to every designated moderator'),
               ),
             ]),
@@ -260,21 +260,21 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
         title: Text('Epoch $epoch -- ${decrypted.length} messages',
-            style: const TextStyle(color: KodaColors.text1)),
+            style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 360,
           height: 400,
           child: decrypted.isEmpty
-              ? const Center(child: Text('No decryptable messages in this epoch.',
+              ? Center(child: Text('No decryptable messages in this epoch.',
                   style: TextStyle(color: KodaColors.text3)))
               : ListView.builder(
                   itemCount: decrypted.length,
                   itemBuilder: (_, i) => Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: RichText(
-                      text: TextSpan(style: const TextStyle(fontSize: 12.5, color: KodaColors.text2), children: [
+                      text: TextSpan(style: TextStyle(fontSize: 12.5, color: KodaColors.text2), children: [
                         TextSpan(text: '${decrypted[i]['author']}: ',
-                            style: const TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w600)),
+                            style: TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w600)),
                         TextSpan(text: decrypted[i]['text']),
                       ]),
                     ),
@@ -289,7 +289,7 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator(color: KodaColors.koda));
+      return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
 
     final enabled = _config?['enabled'] == true;
@@ -297,7 +297,7 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text(
+        Text(
           'Real decryption of a channel\'s history, gated on multiple designated '
           'moderators actively agreeing -- never one person alone, not even the '
           'server owner. Only ever unlocks one whole epoch (everything sent since '
@@ -312,7 +312,7 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
                 enabled
                     ? 'Enabled -- ${(_config!['moderator_ids'] as List).length} moderators, threshold ${_config!['threshold']}'
                     : 'Not configured',
-                style: const TextStyle(color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600),
+                style: TextStyle(color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600),
               ),
             ),
             OutlinedButton(onPressed: _showConfigDialog, child: Text(enabled ? 'Reconfigure' : 'Enable')),
@@ -320,14 +320,14 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
           const SizedBox(height: 20),
         ],
         if (!enabled && !_isOwner)
-          const Text('Threshold moderation is not enabled for this server.',
+          Text('Threshold moderation is not enabled for this server.',
               style: TextStyle(color: KodaColors.text3, fontSize: 13)),
         if (enabled && !_isDesignatedModerator)
-          const Text('Enabled for this server. You are not one of the designated moderators.',
+          Text('Enabled for this server. You are not one of the designated moderators.',
               style: TextStyle(color: KodaColors.text3, fontSize: 13)),
         if (_isDesignatedModerator) ...[
           Row(children: [
-            const Text('Requests', style: TextStyle(
+            Text('Requests', style: TextStyle(
                 color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
             const Spacer(),
             TextButton.icon(
@@ -337,7 +337,7 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
             ),
           ]),
           if (_requests.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
               child: Text('No active requests.', style: TextStyle(color: KodaColors.text3, fontSize: 13)),
             )
@@ -357,9 +357,9 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('#${channel?['name'] ?? '?'} -- epoch ${r['epoch']} -- $status',
-                      style: const TextStyle(color: KodaColors.koda, fontSize: 12, fontWeight: FontWeight.w700)),
+                      style: TextStyle(color: KodaColors.koda, fontSize: 12, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 4),
-                  Text(r['reason'] as String? ?? '', style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+                  Text(r['reason'] as String? ?? '', style: TextStyle(color: KodaColors.text2, fontSize: 12)),
                   const SizedBox(height: 8),
                   Wrap(spacing: 8, children: [
                     if (status == 'pending')

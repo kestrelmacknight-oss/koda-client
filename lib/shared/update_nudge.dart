@@ -60,7 +60,7 @@ class _UpdateDialog extends StatelessWidget {
             color: dismissible ? KodaColors.koda : KodaColors.accent, size: 20),
         const SizedBox(width: 8),
         Text(dismissible ? 'Update Available' : 'Update Required',
-            style: const TextStyle(color: KodaColors.text1)),
+            style: TextStyle(color: KodaColors.text1)),
       ]),
       content: SizedBox(
         width: 320,
@@ -69,11 +69,11 @@ class _UpdateDialog extends StatelessWidget {
             dismissible
                 ? 'Koda ${result.latestVersion} is available -- you\'re on an older build.'
                 : 'This build is no longer supported. Update to Koda ${result.latestVersion} to keep using Koda.',
-            style: const TextStyle(color: KodaColors.text2, fontSize: 13),
+            style: TextStyle(color: KodaColors.text2, fontSize: 13),
           ),
           if (result.releaseNotes.isNotEmpty) ...[
             const SizedBox(height: 8),
-            Text(result.releaseNotes, style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+            Text(result.releaseNotes, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
           ],
         ]),
       ),

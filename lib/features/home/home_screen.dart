@@ -538,20 +538,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Row(children: [
+        title: Row(children: [
           Icon(Icons.warning_amber_rounded, color: KodaColors.gold, size: 20),
           SizedBox(width: 8),
           Text('Content Warning', style: TextStyle(color: KodaColors.text1)),
         ]),
         content: Text(
           'This channel is flagged for: $names.\n\nChange this in Settings > Security > Content Filters.',
-          style: const TextStyle(color: KodaColors.text2, fontSize: 13),
+          style: TextStyle(color: KodaColors.text2, fontSize: 13),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('View Anyway', style: TextStyle(color: KodaColors.koda)),
+            child: Text('View Anyway', style: TextStyle(color: KodaColors.koda)),
           ),
         ],
       ),
@@ -983,9 +983,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('Join Server', style: TextStyle(color: KodaColors.text1)),
+        title: Text('Join Server', style: TextStyle(color: KodaColors.text1)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Text('Enter an invite code or URL:',
+          Text('Enter an invite code or URL:',
               style: TextStyle(color: KodaColors.text3, fontSize: 12)),
           const SizedBox(height: 10),
           KodaTextField(controller: ctrl, hintText: 'e.g. XK9MP2'),
@@ -1025,9 +1025,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('Redeem Code', style: TextStyle(color: KodaColors.text1)),
+        title: Text('Redeem Code', style: TextStyle(color: KodaColors.text1)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Text('Enter your backer or reward code:',
+          Text('Enter your backer or reward code:',
               style: TextStyle(color: KodaColors.text3, fontSize: 12)),
           const SizedBox(height: 10),
           KodaTextField(controller: ctrl, hintText: 'Reward code'),
@@ -1079,11 +1079,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             KodaAvatar(username: username, size: 64, avatarUrl: avatarUrl),
             const SizedBox(height: 12),
-            Text(withPronouns(username, author), style: const TextStyle(color: KodaColors.text1,
+            Text(withPronouns(username, author), style: TextStyle(color: KodaColors.text1,
                 fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: 16),
             if (isFriend)
-              const Text('You are friends',
+              Text('You are friends',
                   style: TextStyle(color: KodaColors.koda, fontSize: 12)),
             const SizedBox(height: 12),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -1127,7 +1127,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
                 foregroundColor: KodaColors.koda,
-                side: const BorderSide(color: KodaColors.koda),
+                side: BorderSide(color: KodaColors.koda),
               ),
               icon: const Icon(Icons.volunteer_activism, size: 16),
               label: const Text('Send Tip'),
@@ -1177,7 +1177,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         if (canModerate)
           const PopupMenuItem(value: 'settings',
               child: Text('Server Settings')),
-        const PopupMenuItem(value: 'leave',
+        PopupMenuItem(value: 'leave',
             child: Text('Leave Server',
                 style: TextStyle(color: KodaColors.accent))),
       ],
@@ -1201,12 +1201,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           builder: (_) => AlertDialog(
             backgroundColor: KodaColors.card,
             content: Text('Leave ${server['name']}? You can rejoin with an invite.',
-                style: const TextStyle(color: KodaColors.text1)),
+                style: TextStyle(color: KodaColors.text1)),
             actions: [
               TextButton(onPressed: () => Navigator.pop(context, false),
                   child: const Text('Cancel')),
               TextButton(onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Leave',
+                  child: Text('Leave',
                       style: TextStyle(color: KodaColors.accent))),
             ],
           ),
@@ -1233,7 +1233,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('Create a server',
+        title: Text('Create a server',
             style: TextStyle(color: KodaColors.text1)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
           KodaTextField(controller: nameController, hintText: 'Server name'),
@@ -1246,8 +1246,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 Navigator.pop(context);
                 showVispSetupDialog(context, onApplied: (_) => _loadServers());
               },
-              icon: const Icon(Icons.auto_awesome, size: 14, color: KodaColors.koda),
-              label: const Text('Describe it to Visp instead',
+              icon: Icon(Icons.auto_awesome, size: 14, color: KodaColors.koda),
+              label: Text('Describe it to Visp instead',
                   style: TextStyle(color: KodaColors.koda, fontSize: 12)),
             ),
           ),
@@ -1305,7 +1305,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           const PopupMenuItem(value: 'mark_read', child: Text('Mark as Read')),
         if (canManage) ...[
           const PopupMenuItem(value: 'edit', child: Text('Edit Channel')),
-          const PopupMenuItem(value: 'delete',
+          PopupMenuItem(value: 'delete',
               child: Text('Delete Channel', style: TextStyle(color: KodaColors.accent))),
         ],
       ],
@@ -1342,14 +1342,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           builder: (ctx) => AlertDialog(
             backgroundColor: KodaColors.card,
             content: Text('Delete #${channel['name']}? This cannot be undone.',
-                style: const TextStyle(color: KodaColors.text1)),
+                style: TextStyle(color: KodaColors.text1)),
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
                   child: const Text('Cancel')),
               TextButton(
                   onPressed: () => Navigator.pop(ctx, true),
-                  child: const Text('Delete',
+                  child: Text('Delete',
                       style: TextStyle(color: KodaColors.accent))),
             ],
           ),
@@ -1370,7 +1370,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       position: RelativeRect.fromLTRB(
           position.dx, position.dy, position.dx, position.dy),
       color: KodaColors.card,
-      items: const [
+      items: [
         PopupMenuItem(value: 'create_channel', child: Text('Create Channel Here')),
         PopupMenuItem(value: 'edit', child: Text('Edit Category')),
         PopupMenuItem(value: 'delete',
@@ -1414,12 +1414,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             backgroundColor: KodaColors.card,
             content: Text(
                 'Delete "${category['name']}"? Channels inside will become uncategorized.',
-                style: const TextStyle(color: KodaColors.text1)),
+                style: TextStyle(color: KodaColors.text1)),
             actions: [
               TextButton(onPressed: () => Navigator.pop(ctx, false),
                   child: const Text('Cancel')),
               TextButton(onPressed: () => Navigator.pop(ctx, true),
-                  child: const Text('Delete', style: TextStyle(color: KodaColors.accent))),
+                  child: Text('Delete', style: TextStyle(color: KodaColors.accent))),
             ],
           ),
         );
@@ -1506,7 +1506,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('Add Reaction',
+        title: Text('Add Reaction',
             style: TextStyle(color: KodaColors.text1, fontSize: 14)),
         content: SingleChildScrollView(
           child: Wrap(
@@ -1604,11 +1604,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       decoration: BoxDecoration(
         color: KodaColors.elevated,
         borderRadius: BorderRadius.circular(6),
-        border: const Border(left: BorderSide(color: KodaColors.koda, width: 2)),
+        border: Border(left: BorderSide(color: KodaColors.koda, width: 2)),
       ),
       child: Text(
         '$author: $content',
-        style: const TextStyle(
+        style: TextStyle(
             color: KodaColors.text3,
             fontSize: 11,
             fontStyle: FontStyle.italic),
@@ -1649,11 +1649,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           border: Border.all(color: KodaColors.border),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.insert_drive_file_outlined, size: 16, color: KodaColors.text3),
+          Icon(Icons.insert_drive_file_outlined, size: 16, color: KodaColors.text3),
           const SizedBox(width: 8),
           Flexible(
             child: Text(fileName,
-                style: const TextStyle(color: KodaColors.koda, fontSize: 12),
+                style: TextStyle(color: KodaColors.koda, fontSize: 12),
                 overflow: TextOverflow.ellipsis),
           ),
         ]),
@@ -1676,7 +1676,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         decoration: BoxDecoration(
           color: KodaColors.elevated,
           borderRadius: BorderRadius.circular(8),
-          border: const Border(left: BorderSide(color: KodaColors.koda, width: 3)),
+          border: Border(left: BorderSide(color: KodaColors.koda, width: 3)),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           if (imageUrl != null)
@@ -1689,12 +1689,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             padding: const EdgeInsets.all(10),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(title,
-                  style: const TextStyle(color: KodaColors.koda, fontSize: 13, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: KodaColors.koda, fontSize: 13, fontWeight: FontWeight.w600),
                   maxLines: 2, overflow: TextOverflow.ellipsis),
               if (description != null) ...[
                 const SizedBox(height: 2),
                 Text(description,
-                    style: const TextStyle(color: KodaColors.text3, fontSize: 11),
+                    style: TextStyle(color: KodaColors.text3, fontSize: 11),
                     maxLines: 2, overflow: TextOverflow.ellipsis),
               ],
             ]),
@@ -1752,7 +1752,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 ? Icons.expand_less : Icons.expand_more,
             size: 14, color: KodaColors.text3),
           title: Text('${cThreads.length} thread${cThreads.length == 1 ? '' : 's'}',
-              style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+              style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           onTap: () => setState(() {
             if (_expandedThreads.contains(c['id'])) {
               _expandedThreads.remove(c['id']);
@@ -1776,7 +1776,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 2),
           child: Text(
             (cat['name'] as String? ?? '').toUpperCase(),
-            style: const TextStyle(color: KodaColors.text3, fontSize: 10,
+            style: TextStyle(color: KodaColors.text3, fontSize: 10,
                 fontWeight: FontWeight.w700, letterSpacing: 1),
           ),
         ),
@@ -1827,7 +1827,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           ),
           if (labelSetting == 'warn') ...[
             const SizedBox(width: 4),
-            const Tooltip(
+            Tooltip(
               message: 'Content warning',
               child: Icon(Icons.warning_amber_rounded, size: 12, color: KodaColors.gold),
             ),
@@ -1835,7 +1835,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         ]),
         subtitle: occupants.isEmpty ? null : Text(
             occupants.map((p) => p['username'] as String? ?? '?').join(', '),
-            style: const TextStyle(color: KodaColors.text3, fontSize: 11),
+            style: TextStyle(color: KodaColors.text3, fontSize: 11),
             maxLines: 1, overflow: TextOverflow.ellipsis),
         trailing: unread > 0
             ? Tooltip(
@@ -1884,14 +1884,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
           border: Border(bottom: BorderSide(color: KodaColors.border))),
       child: Row(children: [
-        const Icon(Icons.favorite, size: 16, color: KodaColors.accent),
+        Icon(Icons.favorite, size: 16, color: KodaColors.accent),
         const SizedBox(width: 10),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: const TextStyle(
+            Text(title, style: TextStyle(
                 color: KodaColors.text1, fontSize: 12, fontWeight: FontWeight.w600),
                 overflow: TextOverflow.ellipsis),
             const SizedBox(height: 4),
@@ -1900,14 +1900,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               child: LinearProgressIndicator(
                 value: progress, minHeight: 5,
                 backgroundColor: KodaColors.elevated,
-                valueColor: const AlwaysStoppedAnimation(KodaColors.mint),
+                valueColor: AlwaysStoppedAnimation(KodaColors.mint),
               ),
             ),
           ]),
         ),
         const SizedBox(width: 10),
         Text('$currency ${raised.toStringAsFixed(0)} / ${goal.toStringAsFixed(0)}',
-            style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+            style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       ]),
     );
   }
@@ -1941,9 +1941,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         Container(
           height: 52,
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
               border: Border(bottom: BorderSide(color: KodaColors.border))),
-          child: const Row(children: [
+          child: Row(children: [
             Icon(Icons.storefront_outlined, size: 16, color: KodaColors.text3),
             SizedBox(width: 6),
             Text('Marketplace',
@@ -1955,7 +1955,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     }
 
     if (selectedChannel == null) {
-      return const Center(
+      return Center(
           child: Text('Select a channel',
               style: TextStyle(color: KodaColors.text3)));
     }
@@ -1978,7 +1978,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       Container(
         height: 52,
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: KodaColors.border))),
         child: Row(children: [
           Icon(
@@ -1988,7 +1988,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           ),
           const SizedBox(width: 6),
           Text(selectedChannel['name'] as String? ?? '',
-              style: const TextStyle(
+              style: TextStyle(
                   color: KodaColors.text1, fontWeight: FontWeight.w600)),
           const SizedBox(width: 8),
 
@@ -1996,17 +1996,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             const SizedBox(width: 8),
             Tooltip(
               message: _announcementTooltip(selectedChannel),
-              child: const Icon(Icons.campaign_outlined, size: 14, color: KodaColors.gold),
+              child: Icon(Icons.campaign_outlined, size: 14, color: KodaColors.gold),
             ),
           ],
           const Spacer(),
           IconButton(
-            icon: const Icon(Icons.search, color: KodaColors.text3, size: 18),
+            icon: Icon(Icons.search, color: KodaColors.text3, size: 18),
             tooltip: 'Search',
             onPressed: () => _searchChannel(selectedChannel['id'] as String),
           ),
           IconButton(
-            icon: const Icon(Icons.push_pin_outlined, color: KodaColors.text3, size: 18),
+            icon: Icon(Icons.push_pin_outlined, color: KodaColors.text3, size: 18),
             tooltip: 'Pinned Messages',
             onPressed: () => _showPinnedMessages(selectedChannel['id'] as String),
           ),
@@ -2060,7 +2060,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     if (canDelete) const PopupMenuItem(
                         value: 'delete', child: Text('Delete Message')),
                     if (!isMine)
-                      const PopupMenuItem(value: 'report',
+                      PopupMenuItem(value: 'report',
                           child: Text('Report Message', style: TextStyle(color: KodaColors.accent))),
                   ],
                 );
@@ -2123,24 +2123,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                       textBaseline: TextBaseline.alphabetic,
                       children: [
                         Text(withPronouns(author, m['author'] as Map<String, dynamic>?),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: KodaColors.koda,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600)),
                         if (time.isNotEmpty) ...[
                           const SizedBox(width: 6),
                           Text(time,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: KodaColors.text3, fontSize: 11)),
                         ],
                         if (isEdited) ...[
                           const SizedBox(width: 4),
-                          const Text('(edited)',
+                          Text('(edited)',
                               style: TextStyle(color: KodaColors.text3, fontSize: 10)),
                         ],
                         if (isPinned) ...[
                           const SizedBox(width: 6),
-                          const Icon(Icons.push_pin, size: 11, color: KodaColors.gold),
+                          Icon(Icons.push_pin, size: 11, color: KodaColors.gold),
                         ],
                       ],
                     ),
@@ -2149,17 +2149,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     if (m['reply_to'] != null)
                       _buildReplyPreview(m['reply_to'] as Map<String, dynamic>),
                     if (m['_decryptPending'] == true)
-                      const Text('Waiting for the encryption key to arrive...',
+                      Text('Waiting for the encryption key to arrive...',
                           style: TextStyle(color: KodaColors.text3,
                               fontSize: 13, fontStyle: FontStyle.italic))
                     else if (m['_decryptFailed'] == true)
-                      const Text('Unable to decrypt this message.',
+                      Text('Unable to decrypt this message.',
                           style: TextStyle(color: KodaColors.accent,
                               fontSize: 13, fontStyle: FontStyle.italic))
                     else if ((m['content'] as String? ?? '').isNotEmpty)
                       Text.rich(TextSpan(children: renderMessageWithEmoji(
                           m['content'] as String, _currentServerEmoji(),
-                          const TextStyle(color: KodaColors.text1, fontSize: 14)))),
+                          TextStyle(color: KodaColors.text1, fontSize: 14)))),
                     if (m['attachment_url'] != null) ...[
                       const SizedBox(height: 4),
                       _buildAttachment(m),
@@ -2182,17 +2182,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           color: KodaColors.elevated,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           child: Row(children: [
-            const Icon(Icons.reply, size: 14, color: KodaColors.koda),
+            Icon(Icons.reply, size: 14, color: KodaColors.koda),
             const SizedBox(width: 6),
             Expanded(
               child: Text(
                 'Replying to ${(_replyingTo!['author'] as Map<String, dynamic>?)?['username'] ?? 'Unknown'}',
-                style: const TextStyle(color: KodaColors.text3, fontSize: 12),
+                style: TextStyle(color: KodaColors.text3, fontSize: 12),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.close, size: 14, color: KodaColors.text3),
+              icon: Icon(Icons.close, size: 14, color: KodaColors.text3),
               onPressed: () => setState(() => _replyingTo = null),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
@@ -2204,15 +2204,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           color: KodaColors.elevated,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           child: Row(children: [
-            const Icon(Icons.attach_file, size: 14, color: KodaColors.koda),
+            Icon(Icons.attach_file, size: 14, color: KodaColors.koda),
             const SizedBox(width: 6),
             Expanded(
               child: Text(_pendingAttachment!['fileName'] ?? 'Attachment',
-                  style: const TextStyle(color: KodaColors.text3, fontSize: 12),
+                  style: TextStyle(color: KodaColors.text3, fontSize: 12),
                   overflow: TextOverflow.ellipsis),
             ),
             IconButton(
-              icon: const Icon(Icons.close, size: 14, color: KodaColors.text3),
+              icon: Icon(Icons.close, size: 14, color: KodaColors.text3),
               onPressed: () => setState(() => _pendingAttachment = null),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
@@ -2241,7 +2241,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                       serverEmoji: _shortcodeMatches, size: 18),
                   const SizedBox(width: 6),
                   Text(':${e['name']}:',
-                      style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+                      style: TextStyle(color: KodaColors.text2, fontSize: 12)),
                 ]),
               ),
             )).toList(),
@@ -2252,14 +2252,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         child: Row(children: [
           IconButton(
             icon: _uploadingAttachment
-                ? const SizedBox(width: 18, height: 18,
+                ? SizedBox(width: 18, height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
-                : const Icon(Icons.attach_file, color: KodaColors.text2),
+                : Icon(Icons.attach_file, color: KodaColors.text2),
             tooltip: 'Attach file',
             onPressed: _uploadingAttachment ? null : _pickAttachment,
           ),
           IconButton(
-            icon: const Icon(Icons.gif_box_outlined, color: KodaColors.text2),
+            icon: Icon(Icons.gif_box_outlined, color: KodaColors.text2),
             tooltip: 'GIF',
             onPressed: _pickGif,
           ),
@@ -2284,7 +2284,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           ),
           const SizedBox(width: 10),
           IconButton(
-            icon: const Icon(Icons.send, color: KodaColors.koda),
+            icon: Icon(Icons.send, color: KodaColors.koda),
             onPressed: _sendMessage,
           ),
         ]),
@@ -2298,7 +2298,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('Edit Message', style: TextStyle(color: KodaColors.text1)),
+        title: Text('Edit Message', style: TextStyle(color: KodaColors.text1)),
         content: KodaTextField(controller: ctrl, hintText: 'Message'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context),
@@ -2374,28 +2374,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('Pinned Messages', style: TextStyle(color: KodaColors.text1)),
+        title: Text('Pinned Messages', style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 360,
           height: 400,
           child: pins.isEmpty
-              ? const Center(child: Text('No pinned messages',
+              ? Center(child: Text('No pinned messages',
                   style: TextStyle(color: KodaColors.text3)))
               : ListView.separated(
                   itemCount: pins.length,
-                  separatorBuilder: (_, __) => const Divider(color: KodaColors.border),
+                  separatorBuilder: (_, __) => Divider(color: KodaColors.border),
                   itemBuilder: (_, i) {
                     final p = pins[i];
                     final author = (p['author'] as Map<String, dynamic>?)?['username']
                         as String? ?? 'Unknown';
                     return ListTile(
                       dense: true,
-                      title: Text(author, style: const TextStyle(
+                      title: Text(author, style: TextStyle(
                           color: KodaColors.koda, fontSize: 12, fontWeight: FontWeight.w600)),
                       subtitle: Text(p['content'] as String? ?? '',
-                          style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+                          style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                       trailing: IconButton(
-                        icon: const Icon(Icons.push_pin, size: 16, color: KodaColors.gold),
+                        icon: Icon(Icons.push_pin, size: 16, color: KodaColors.gold),
                         tooltip: 'Unpin',
                         onPressed: () async {
                           final ok = await KodaApi.instance.unpinMessage(
@@ -2428,7 +2428,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('Create Thread',
+        title: Text('Create Thread',
             style: TextStyle(color: KodaColors.text1)),
         content: KodaTextField(controller: ctrl, hintText: 'Thread name'),
         actions: [
@@ -2563,13 +2563,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     ),
             ),
             IconButton(
-              icon: const Icon(Icons.add, color: KodaColors.text2),
+              icon: Icon(Icons.add, color: KodaColors.text2),
               tooltip: 'Create or Join',
               onPressed: () => _showAddServerMenu(),
             ),
             if (ref.watch(authProvider).user?.isAdmin == true)
               IconButton(
-                icon: const Icon(Icons.admin_panel_settings_outlined,
+                icon: Icon(Icons.admin_panel_settings_outlined,
                     color: KodaColors.koda),
                 tooltip: 'Admin Panel',
                 onPressed: () => Navigator.push(context,
@@ -2595,20 +2595,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               Container(
                 height: 52,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                     border:
                         Border(bottom: BorderSide(color: KodaColors.border))),
                 child: Row(children: [
                   Expanded(
                     child: Text(selectedServer?['name'] ?? 'Koda',
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: KodaColors.text1,
                             fontWeight: FontWeight.w700),
                         overflow: TextOverflow.ellipsis),
                   ),
                   if (selectedServer != null)
                     IconButton(
-                      icon: const Icon(Icons.settings_outlined,
+                      icon: Icon(Icons.settings_outlined,
                           size: 16, color: KodaColors.text3),
                       tooltip: 'Server Settings',
                       onPressed: () => Navigator.push(
@@ -2657,19 +2657,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 padding: const EdgeInsets.all(10),
 
 
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                     border: Border(top: BorderSide(color: KodaColors.border))),
                 child: Row(children: [
                   KodaAvatar(username: user?.username ?? '?', size: 30, avatarUrl: user?.avatarUrl),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(user?.username ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: KodaColors.text1, fontSize: 13),
                         overflow: TextOverflow.ellipsis),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.settings_outlined,
+                    icon: Icon(Icons.settings_outlined,
                         size: 16, color: KodaColors.text3),
                     onPressed: () => Navigator.push(
                         context,

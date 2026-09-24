@@ -62,7 +62,7 @@ class _MoodCyclerState extends State<_MoodCycler> {
           ),
           const SizedBox(height: 24),
           Text(mood.name,
-              style: const TextStyle(color: KodaColors.text3, fontSize: 13)),
+              style: TextStyle(color: KodaColors.text3, fontSize: 13)),
           const SizedBox(height: 24),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: KodaColors.koda),

@@ -31,7 +31,7 @@ class KodaTextField extends StatelessWidget {
       onChanged: onChanged,
       onSubmitted: onSubmitted,
       textInputAction: onSubmitted != null ? TextInputAction.send : TextInputAction.newline,
-      style: const TextStyle(color: KodaColors.text1, fontSize: 14),
+      style: TextStyle(color: KodaColors.text1, fontSize: 14),
       decoration: InputDecoration(
         hintText: hintText,
         contentPadding:
@@ -78,7 +78,7 @@ class KodaAvatar extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [KodaColors.koda, KodaColors.mint],
           begin: Alignment.topLeft,
@@ -148,11 +148,11 @@ class KodaErrorBanner extends StatelessWidget {
           border: Border.all(color: KodaColors.accent.withValues(alpha: 0.3)),
         ),
         child: Row(children: [
-          const Icon(Icons.error_outline, color: KodaColors.accent, size: 16),
+          Icon(Icons.error_outline, color: KodaColors.accent, size: 16),
           const SizedBox(width: 8),
           Expanded(
               child: Text(message,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: KodaColors.accent, fontSize: 12))),
         ]),
       );

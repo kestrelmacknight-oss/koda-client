@@ -96,7 +96,7 @@ class _ShippingAddressFormState extends State<ShippingAddressForm> {
         Expanded(child: KodaTextField(controller: _phone, hintText: 'Phone (optional)')),
       ]),
       const SizedBox(height: 4),
-      const Text(
+      Text(
         'Used only to ship this order -- see Printful\'s own privacy policy for how they handle it once the order is placed.',
         style: TextStyle(color: KodaColors.text3, fontSize: 11),
       ),

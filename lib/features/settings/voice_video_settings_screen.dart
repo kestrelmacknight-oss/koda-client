@@ -62,8 +62,8 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
         },
         child: AlertDialog(
           backgroundColor: KodaColors.card,
-          title: const Text('Push to Talk', style: TextStyle(color: KodaColors.text1)),
-          content: const Text('Press any key to bind it...',
+          title: Text('Push to Talk', style: TextStyle(color: KodaColors.text1)),
+          content: Text('Press any key to bind it...',
               style: TextStyle(color: KodaColors.text2)),
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
@@ -91,11 +91,11 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: const Text('Voice & Video',
+        title: Text('Voice & Video',
             style: TextStyle(color: KodaColors.text1, fontSize: 16)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+          ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
           : ListView(
               padding: const EdgeInsets.all(20),
               children: [
@@ -221,7 +221,7 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      const Text('Sensitivity',
+                      Text('Sensitivity',
                           style: TextStyle(color: KodaColors.text2, fontSize: 12)),
                       Slider(
                         value: settings.vadThreshold,
@@ -233,7 +233,7 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                             .update((s) => s.copyWith(vadThreshold: v)),
                         onChangeEnd: (v) => _save(settings.copyWith(vadThreshold: v)),
                       ),
-                      const Text(
+                      Text(
                         'Lower = picks up quieter sounds. Higher = only louder speech triggers transmission.',
                         style: TextStyle(color: KodaColors.text3, fontSize: 11),
                       ),
@@ -252,19 +252,19 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                   child: Row(children: [
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        const Text('Bound key',
+                        Text('Bound key',
                             style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                         const SizedBox(height: 4),
                         Text(
                           settings.pushToTalkKey ?? 'Not set — mic stays live whenever unmuted',
-                          style: const TextStyle(color: KodaColors.text3, fontSize: 12),
+                          style: TextStyle(color: KodaColors.text3, fontSize: 12),
                         ),
                       ]),
                     ),
                     if (settings.pushToTalkKey != null)
                       TextButton(
                         onPressed: _clearKeybind,
-                        child: const Text('Clear', style: TextStyle(color: KodaColors.accent)),
+                        child: Text('Clear', style: TextStyle(color: KodaColors.accent)),
                       ),
                     TextButton(
                       onPressed: _captureKeybind,
@@ -273,14 +273,14 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                   ]),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'When a key is bound, your mic transmits only while you hold that key down. '
                   'This takes priority over VOX while you\'re in a voice channel.',
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
                 ),
                 const SizedBox(height: 24),
                 _sectionLabel('VARM - Virtual Avatar Reactive Model'),
-                const Text(
+                Text(
                   'Upload two images that swap when you speak. Visible only to you.',
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
                 ),
@@ -300,7 +300,7 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                 ]),
                 if (settings.varmEnabled) ...[
                   const SizedBox(height: 10),
-                  const Text('Speaking threshold',
+                  Text('Speaking threshold',
                       style: TextStyle(color: KodaColors.text2, fontSize: 12)),
                   Slider(
                     value: settings.varmThreshold,
@@ -311,12 +311,12 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                         .update((s) => s.copyWith(varmThreshold: v)),
                     onChangeEnd: (v) => _save(settings.copyWith(varmThreshold: v)),
                   ),
-                  const Text('Lower = switches to talking image more easily.',
+                  Text('Lower = switches to talking image more easily.',
                       style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                   OutlinedButton.icon(
                     onPressed: () => _save(settings.copyWith(clearVarm: true)),
-                    icon: const Icon(Icons.delete_outline, size: 14, color: KodaColors.accent),
-                    label: const Text('Remove VARM', style: TextStyle(color: KodaColors.accent)),
+                    icon: Icon(Icons.delete_outline, size: 14, color: KodaColors.accent),
+                    label: Text('Remove VARM', style: TextStyle(color: KodaColors.accent)),
                   ),
                 ],
               ],
@@ -374,7 +374,7 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                 borderRadius: BorderRadius.circular(10),
                 child: Image.network(url,
                     width: double.infinity, height: 120, fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const Center(
+                    errorBuilder: (_, __, ___) => Center(
                         child: Icon(Icons.broken_image_outlined, color: KodaColors.text3))),
               ),
               Positioned(top: 4, right: 4,
@@ -403,10 +403,10 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
               onTap: onPick,
               borderRadius: BorderRadius.circular(10),
               child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                const Icon(Icons.add_photo_alternate_outlined,
+                Icon(Icons.add_photo_alternate_outlined,
                     color: KodaColors.text3, size: 28),
                 const SizedBox(height: 6),
-                Text(label, style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+                Text(label, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
               ]),
             ),
     );
@@ -415,7 +415,7 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
   Widget _sectionLabel(String text) => Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: Text(text.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
                 color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
       );
 
@@ -434,8 +434,8 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
         ),
         child: SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: Text(title, style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
-          subtitle: Text(subtitle, style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+          title: Text(title, style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+          subtitle: Text(subtitle, style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           value: value,
           activeThumbColor: KodaColors.koda,
           onChanged: onChanged,
@@ -453,10 +453,10 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Text(label, style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+            Text(label, style: TextStyle(color: KodaColors.text2, fontSize: 12)),
             const Spacer(),
             Text('${value >= 0 ? '+' : ''}${value.toStringAsFixed(1)} dB',
-                style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+                style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           ]),
           Slider(
             value: value,

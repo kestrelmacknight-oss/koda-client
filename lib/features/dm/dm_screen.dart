@@ -465,7 +465,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: const Text('Messages',
+        title: Text('Messages',
             style: TextStyle(color: KodaColors.text1, fontSize: 16,
                 fontWeight: FontWeight.w700)),
         bottom: TabBar(
@@ -515,10 +515,10 @@ class _DmScreenState extends ConsumerState<DmScreen>
           ),
           Expanded(
             child: _loadingConvos
-                ? const Center(child: CircularProgressIndicator(
+                ? Center(child: CircularProgressIndicator(
                     color: KodaColors.koda))
                 : _conversations.isEmpty
-                    ? const Center(child: Text('No conversations yet',
+                    ? Center(child: Text('No conversations yet',
                         style: TextStyle(color: KodaColors.text3,
                             fontSize: 13)))
                     : ListView.builder(
@@ -566,7 +566,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
       // Chat area
       Expanded(
         child: _activeConversation == null
-            ? const Center(child: Text('Select a conversation',
+            ? Center(child: Text('Select a conversation',
                 style: TextStyle(color: KodaColors.text3)))
             : _buildChatArea(),
       ),
@@ -583,22 +583,22 @@ class _DmScreenState extends ConsumerState<DmScreen>
       Container(
         height: 48,
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: KodaColors.border))),
         child: Row(children: [
-          Text(withPronouns(peerName, peer), style: const TextStyle(
+          Text(withPronouns(peerName, peer), style: TextStyle(
               color: KodaColors.text1, fontWeight: FontWeight.w600, fontSize: 13)),
           const SizedBox(width: 6),
           TierBadge(tier: peerTier, size: 13),
           const SizedBox(width: 8),
-          const Tooltip(
+          Tooltip(
             message: 'End-to-end encrypted',
             child: Icon(Icons.lock_outline, size: 13, color: KodaColors.mint),
           ),
           const Spacer(),
           if (peerId != null)
             IconButton(
-              icon: const Icon(Icons.verified_user_outlined, size: 18, color: KodaColors.text3),
+              icon: Icon(Icons.verified_user_outlined, size: 18, color: KodaColors.text3),
               tooltip: 'Verify Safety Number',
               onPressed: () async {
                 final confirmed = await Navigator.push<bool>(context, MaterialPageRoute(
@@ -617,13 +617,13 @@ class _DmScreenState extends ConsumerState<DmScreen>
           child: Text(
             "$peerName's safety number changed -- verify it before sending. "
             "This can mean they reinstalled the app, or (rarely) something is wrong.",
-            style: const TextStyle(color: KodaColors.accent, fontSize: 11),
+            style: TextStyle(color: KodaColors.accent, fontSize: 11),
           ),
         ),
       // Messages
       Expanded(
         child: _loadingMessages
-            ? const Center(child: CircularProgressIndicator(
+            ? Center(child: CircularProgressIndicator(
                 color: KodaColors.koda))
             : ListView.builder(
                 controller: _scroll,
@@ -643,7 +643,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                         position: RelativeRect.fromLTRB(d.globalPosition.dx,
                             d.globalPosition.dy, d.globalPosition.dx, d.globalPosition.dy),
                         color: KodaColors.card,
-                        items: const [
+                        items: [
                           PopupMenuItem(value: 'report',
                               child: Text('Report Message', style: TextStyle(color: KodaColors.accent))),
                         ],
@@ -679,7 +679,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                             children: [
                               if (!isMe)
                                 Text(withPronouns(author, m['author'] as Map<String, dynamic>?),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         color: KodaColors.koda,
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600)),
@@ -694,14 +694,14 @@ class _DmScreenState extends ConsumerState<DmScreen>
                                 ),
                                 child: m['_undecryptable'] != null
                                     ? Row(mainAxisSize: MainAxisSize.min, children: [
-                                        const Icon(Icons.lock_outline,
+                                        Icon(Icons.lock_outline,
                                             size: 13, color: KodaColors.accent),
                                         const SizedBox(width: 6),
                                         Text(
                                           m['_undecryptable'] == 'safety_number_changed'
                                               ? 'Unable to decrypt -- safety number changed'
                                               : 'Unable to decrypt this message',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                               color: KodaColors.accent,
                                               fontSize: 12,
                                               fontStyle: FontStyle.italic),
@@ -720,7 +720,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                                           if ((m['content'] as String? ?? '').isNotEmpty)
                                             Text(
                                               m['content'] as String,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                   color: KodaColors.text1,
                                                   fontSize: 13),
                                             ),
@@ -730,10 +730,10 @@ class _DmScreenState extends ConsumerState<DmScreen>
                               Padding(
                                 padding: const EdgeInsets.only(top: 2, left: 2, right: 2),
                                 child: Text(_formatTime(m['inserted_at']),
-                                    style: const TextStyle(color: KodaColors.text3, fontSize: 10)),
+                                    style: TextStyle(color: KodaColors.text3, fontSize: 10)),
                               ),
                               if (isMe && i == _messages.length - 1 && _seenByPeer(m))
-                                const Padding(
+                                Padding(
                                   padding: EdgeInsets.only(top: 2, right: 2),
                                   child: Text('Seen',
                                       style: TextStyle(color: KodaColors.text3, fontSize: 10)),
@@ -757,15 +757,15 @@ class _DmScreenState extends ConsumerState<DmScreen>
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
-                const Icon(Icons.lock_outline, size: 12, color: KodaColors.mint),
+                Icon(Icons.lock_outline, size: 12, color: KodaColors.mint),
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(_pendingAttachment!.fileName,
-                      style: const TextStyle(color: KodaColors.text2, fontSize: 12),
+                      style: TextStyle(color: KodaColors.text2, fontSize: 12),
                       overflow: TextOverflow.ellipsis),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 14, color: KodaColors.text3),
+                  icon: Icon(Icons.close, size: 14, color: KodaColors.text3),
                   onPressed: () => setState(() => _pendingAttachment = null),
                   constraints: const BoxConstraints(),
                   padding: const EdgeInsets.only(left: 6),
@@ -776,10 +776,10 @@ class _DmScreenState extends ConsumerState<DmScreen>
           Row(children: [
             IconButton(
               icon: _uploadingAttachment
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 16, height: 16,
                       child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
-                  : const Icon(Icons.attach_file, color: KodaColors.text3),
+                  : Icon(Icons.attach_file, color: KodaColors.text3),
               onPressed: _uploadingAttachment ? null : _pickAndEncryptAttachment,
             ),
             Expanded(
@@ -791,7 +791,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
             ),
             const SizedBox(width: 10),
             IconButton(
-              icon: const Icon(Icons.send, color: KodaColors.koda),
+              icon: Icon(Icons.send, color: KodaColors.koda),
               onPressed: _sendMessage,
             ),
           ]),
@@ -804,11 +804,11 @@ class _DmScreenState extends ConsumerState<DmScreen>
 
   Widget _buildFriendsTab() {
     if (_loadingFriends) {
-      return const Center(child: CircularProgressIndicator(
+      return Center(child: CircularProgressIndicator(
           color: KodaColors.koda));
     }
     if (_friends.isEmpty) {
-      return const Center(child: Text('No friends yet.\nSend a friend request to get started.',
+      return Center(child: Text('No friends yet.\nSend a friend request to get started.',
           textAlign: TextAlign.center,
           style: TextStyle(color: KodaColors.text3, fontSize: 13)));
     }
@@ -831,7 +831,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                 tier: f['koda_tier'] as String?),
             title: Row(mainAxisSize: MainAxisSize.min, children: [
               Flexible(child: Text(name,
-                  style: const TextStyle(color: KodaColors.text1,
+                  style: TextStyle(color: KodaColors.text1,
                       fontWeight: FontWeight.w500),
                   overflow: TextOverflow.ellipsis)),
               const SizedBox(width: 4),
@@ -839,13 +839,13 @@ class _DmScreenState extends ConsumerState<DmScreen>
             ]),
             trailing: Row(mainAxisSize: MainAxisSize.min, children: [
               IconButton(
-                icon: const Icon(Icons.message_outlined,
+                icon: Icon(Icons.message_outlined,
                     color: KodaColors.koda, size: 18),
                 tooltip: 'Send message',
                 onPressed: () => _startDm(f),
               ),
               IconButton(
-                icon: const Icon(Icons.person_remove_outlined,
+                icon: Icon(Icons.person_remove_outlined,
                     color: KodaColors.text3, size: 18),
                 tooltip: 'Unfriend',
                 onPressed: () async {
@@ -865,18 +865,18 @@ class _DmScreenState extends ConsumerState<DmScreen>
 
   Widget _buildRequestsTab() {
     if (_loadingRequests) {
-      return const Center(child: CircularProgressIndicator(
+      return Center(child: CircularProgressIndicator(
           color: KodaColors.koda));
     }
     if (_receivedRequests.isEmpty && _sentRequests.isEmpty) {
-      return const Center(child: Text('No pending friend requests.',
+      return Center(child: Text('No pending friend requests.',
           style: TextStyle(color: KodaColors.text3, fontSize: 13)));
     }
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         if (_receivedRequests.isNotEmpty) ...[
-          const Text('INCOMING', style: TextStyle(color: KodaColors.text3,
+          Text('INCOMING', style: TextStyle(color: KodaColors.text3,
               fontSize: 11, fontWeight: FontWeight.w700,
               letterSpacing: 0.8)),
           const SizedBox(height: 8),
@@ -899,20 +899,20 @@ class _DmScreenState extends ConsumerState<DmScreen>
                 Expanded(child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                  Text(name, style: const TextStyle(
+                  Text(name, style: TextStyle(
                       color: KodaColors.text1, fontWeight: FontWeight.w500)),
                   if (msg != null && msg.isNotEmpty)
-                    Text(msg, style: const TextStyle(
+                    Text(msg, style: TextStyle(
                         color: KodaColors.text3, fontSize: 12)),
                 ])),
                 IconButton(
-                  icon: const Icon(Icons.check_circle_outline,
+                  icon: Icon(Icons.check_circle_outline,
                       color: KodaColors.koda, size: 22),
                   tooltip: 'Accept',
                   onPressed: () => _acceptRequest(req),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.cancel_outlined,
+                  icon: Icon(Icons.cancel_outlined,
                       color: KodaColors.accent, size: 22),
                   tooltip: 'Decline',
                   onPressed: () => _declineRequest(req),
@@ -923,7 +923,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
           const SizedBox(height: 16),
         ],
         if (_sentRequests.isNotEmpty) ...[
-          const Text('SENT', style: TextStyle(color: KodaColors.text3,
+          Text('SENT', style: TextStyle(color: KodaColors.text3,
               fontSize: 11, fontWeight: FontWeight.w700,
               letterSpacing: 0.8)),
           const SizedBox(height: 8),
@@ -943,9 +943,9 @@ class _DmScreenState extends ConsumerState<DmScreen>
                 KodaAvatar(username: name, size: 36,
                     avatarUrl: user?['avatar_url'] as String?),
                 const SizedBox(width: 10),
-                Expanded(child: Text(name, style: const TextStyle(
+                Expanded(child: Text(name, style: TextStyle(
                     color: KodaColors.text1, fontWeight: FontWeight.w500))),
-                const Text('Pending', style: TextStyle(
+                Text('Pending', style: TextStyle(
                     color: KodaColors.text3, fontSize: 12)),
               ]),
             );
@@ -963,7 +963,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('New Message',
+        title: Text('New Message',
             style: TextStyle(color: KodaColors.text1)),
         content: KodaTextField(controller: ctrl,
             hintText: 'Enter username'),
@@ -1052,7 +1052,7 @@ class _EncryptedAttachmentState extends State<_EncryptedAttachment> {
   }
 
   Widget _attachmentChip(IconData icon, String fileName,
-      {Color color = KodaColors.text3, VoidCallback? onTap}) {
+      {Color? color, VoidCallback? onTap}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
@@ -1065,11 +1065,11 @@ class _EncryptedAttachmentState extends State<_EncryptedAttachment> {
           border: Border.all(color: KodaColors.border),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(icon, size: 16, color: color),
+          Icon(icon, size: 16, color: color ?? KodaColors.text3),
           const SizedBox(width: 8),
           Flexible(
             child: Text(fileName,
-                style: const TextStyle(color: KodaColors.koda, fontSize: 12),
+                style: TextStyle(color: KodaColors.koda, fontSize: 12),
                 overflow: TextOverflow.ellipsis),
           ),
         ]),

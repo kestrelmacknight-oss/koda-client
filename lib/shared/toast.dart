@@ -24,7 +24,7 @@ void showKodaToast(
         const SizedBox(width: 10),
         Expanded(
           child: Text(title,
-              style: const TextStyle(color: KodaColors.text1, fontSize: 13),
+              style: TextStyle(color: KodaColors.text1, fontSize: 13),
               overflow: TextOverflow.ellipsis),
         ),
       ]),
@@ -33,7 +33,7 @@ void showKodaToast(
       duration: const Duration(seconds: 4),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: const BorderSide(color: KodaColors.border),
+        side: BorderSide(color: KodaColors.border),
       ),
       margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
     ),

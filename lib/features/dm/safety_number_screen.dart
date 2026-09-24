@@ -98,7 +98,7 @@ class _SafetyNumberScreenState extends State<SafetyNumberScreen> {
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
         title: Text('Safety Number with ${widget.peerName}',
-            style: const TextStyle(color: KodaColors.text1, fontSize: 15)),
+            style: TextStyle(color: KodaColors.text1, fontSize: 15)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),
@@ -107,13 +107,13 @@ class _SafetyNumberScreenState extends State<SafetyNumberScreen> {
               'Compare this number with ${widget.peerName} through another channel -- in '
               'person, a phone call, anywhere other than this chat. If it matches on both '
               "sides, you're talking to who you think you're talking to.",
-              style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+              style: TextStyle(color: KodaColors.text3, fontSize: 12)),
           if (_deviceIds.length > 1) ...[
             const SizedBox(height: 16),
             Text(
                 '${widget.peerName} has ${_deviceIds.length} devices, each with its own safety '
                 "number -- verifying one doesn't cover the others.",
-                style: const TextStyle(color: KodaColors.text3, fontSize: 11, fontStyle: FontStyle.italic)),
+                style: TextStyle(color: KodaColors.text3, fontSize: 11, fontStyle: FontStyle.italic)),
             const SizedBox(height: 8),
             Wrap(spacing: 8, runSpacing: 8, children: _deviceIds.asMap().entries.map((e) {
               final selected = e.value == _selectedDeviceId;
@@ -131,9 +131,9 @@ class _SafetyNumberScreenState extends State<SafetyNumberScreen> {
           ],
           const SizedBox(height: 24),
           if (_error != null)
-            Text(_error!, style: const TextStyle(color: KodaColors.accent))
+            Text(_error!, style: TextStyle(color: KodaColors.accent))
           else if (_safetyNumber == null)
-            const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+            Center(child: CircularProgressIndicator(color: KodaColors.koda))
           else
             Container(
               width: double.infinity,
@@ -146,7 +146,7 @@ class _SafetyNumberScreenState extends State<SafetyNumberScreen> {
               child: Text(
                 _safetyNumber!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                     color: KodaColors.text1,
                     fontSize: 18,
                     fontFamily: 'monospace',

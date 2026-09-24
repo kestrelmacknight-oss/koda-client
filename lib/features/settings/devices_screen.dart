@@ -47,8 +47,8 @@ class _DevicesScreenState extends State<DevicesScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('Remove this device?', style: TextStyle(color: KodaColors.text1)),
-        content: const Text(
+        title: Text('Remove this device?', style: TextStyle(color: KodaColors.text1)),
+        content: Text(
             'It will need to sign in again, and any messages sent to it while removed '
             "won't reach it after -- Double Ratchet sessions don't retroactively fill in gaps.",
             style: TextStyle(color: KodaColors.text2)),
@@ -56,7 +56,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
           TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Remove', style: TextStyle(color: KodaColors.accent))),
+              child: Text('Remove', style: TextStyle(color: KodaColors.accent))),
         ],
       ),
     );
@@ -86,22 +86,22 @@ class _DevicesScreenState extends State<DevicesScreen> {
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: const Text('Linked Devices',
+        title: Text('Linked Devices',
             style: TextStyle(color: KodaColors.text1, fontSize: 16)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+          ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
           : ListView(
               padding: const EdgeInsets.all(20),
               children: [
-                const Text(
+                Text(
                     'Each device you sign into has its own encryption identity -- a message '
                     "sent to you reaches every device below. Remove one you don't use or don't "
                     'recognize.',
                     style: TextStyle(color: KodaColors.text3, fontSize: 12, height: 1.5)),
                 const SizedBox(height: 16),
                 if (_devices.isEmpty)
-                  const Text('No devices found.', style: TextStyle(color: KodaColors.text3))
+                  Text('No devices found.', style: TextStyle(color: KodaColors.text3))
                 else
                   ..._devices.map((d) {
                     final deviceId = d['device_id'] as String;
@@ -115,13 +115,13 @@ class _DevicesScreenState extends State<DevicesScreen> {
                         border: Border.all(color: KodaColors.border),
                       ),
                       child: Row(children: [
-                        const Icon(Icons.devices_outlined, color: KodaColors.text3, size: 20),
+                        Icon(Icons.devices_outlined, color: KodaColors.text3, size: 20),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Row(children: [
                               Text(d['name'] as String? ?? 'Unknown device',
-                                  style: const TextStyle(color: KodaColors.text1, fontSize: 13,
+                                  style: TextStyle(color: KodaColors.text1, fontSize: 13,
                                       fontWeight: FontWeight.w600)),
                               if (isThisDevice) ...[
                                 const SizedBox(width: 6),
@@ -137,12 +137,12 @@ class _DevicesScreenState extends State<DevicesScreen> {
                             ]),
                             const SizedBox(height: 2),
                             Text(_formatLastActive(d['last_active_at'] as String?),
-                                style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+                                style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                           ]),
                         ),
                         if (!isThisDevice)
                           IconButton(
-                            icon: const Icon(Icons.delete_outline, size: 18, color: KodaColors.accent),
+                            icon: Icon(Icons.delete_outline, size: 18, color: KodaColors.accent),
                             tooltip: 'Remove device',
                             onPressed: () => _remove(deviceId),
                           ),

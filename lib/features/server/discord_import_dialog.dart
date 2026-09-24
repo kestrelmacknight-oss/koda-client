@@ -106,19 +106,19 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
             children: [
               // Header
               Row(children: [
-                const Icon(Icons.download_outlined, color: KodaColors.koda, size: 20),
+                Icon(Icons.download_outlined, color: KodaColors.koda, size: 20),
                 const SizedBox(width: 10),
-                const Text('Import Discord Template',
+                Text('Import Discord Template',
                     style: TextStyle(color: KodaColors.text1, fontSize: 16,
                         fontWeight: FontWeight.w700)),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 18, color: KodaColors.text3),
+                  icon: Icon(Icons.close, size: 18, color: KodaColors.text3),
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),
               const SizedBox(height: 6),
-              const Text(
+              Text(
                 'Paste a discord.new link or template code to import '
                 'roles, categories, and channels into this server.',
                 style: TextStyle(color: KodaColors.text3, fontSize: 12),
@@ -157,7 +157,7 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                     border: Border.all(color: KodaColors.accent.withValues(alpha: 0.3)),
                   ),
                   child: Text(_error!,
-                      style: const TextStyle(color: KodaColors.accent, fontSize: 12)),
+                      style: TextStyle(color: KodaColors.accent, fontSize: 12)),
                 ),
               ],
 
@@ -173,7 +173,7 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                   ),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(preview['name'] as String? ?? 'Template',
-                        style: const TextStyle(color: KodaColors.text1,
+                        style: TextStyle(color: KodaColors.text1,
                             fontWeight: FontWeight.w600, fontSize: 14)),
                     const SizedBox(height: 10),
                     _previewRow(Icons.shield_outlined,
@@ -237,9 +237,9 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                             context: context,
                             builder: (_) => AlertDialog(
                               backgroundColor: KodaColors.card,
-                              title: const Text('Replace server structure?',
+                              title: Text('Replace server structure?',
                                   style: TextStyle(color: KodaColors.accent)),
-                              content: const Text(
+                              content: Text(
                                 'This will permanently delete ALL existing channels, '
                                 'categories, and roles before importing. '
                                 'This cannot be undone.',
@@ -252,7 +252,7 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                                 ),
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('Yes, Replace',
+                                  child: Text('Yes, Replace',
                                       style: TextStyle(color: KodaColors.accent,
                                           fontWeight: FontWeight.w700)),
                                 ),
@@ -299,7 +299,7 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
 
               if (_loading && !_previewed) ...[
                 const SizedBox(height: 20),
-                const Center(child: CircularProgressIndicator(color: KodaColors.koda)),
+                Center(child: CircularProgressIndicator(color: KodaColors.koda)),
               ],
             ],
           ),
@@ -313,7 +313,7 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
     child: Row(children: [
       Icon(icon, size: 14, color: KodaColors.text3),
       const SizedBox(width: 6),
-      Text(text, style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+      Text(text, style: TextStyle(color: KodaColors.text2, fontSize: 12)),
     ]),
   );
 }

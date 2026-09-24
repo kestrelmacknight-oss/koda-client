@@ -80,15 +80,15 @@ class _ForcePasswordChangeScreenState
                   border: Border.all(color: KodaColors.gold.withValues(alpha: 0.3)),
                 ),
                 child: Column(children: [
-                  const Icon(Icons.lock_reset, color: KodaColors.gold, size: 40),
+                  Icon(Icons.lock_reset, color: KodaColors.gold, size: 40),
                   const SizedBox(height: 12),
                   Text('Welcome, ${widget.username}',
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: KodaColors.text1,
                           fontSize: 20,
                           fontWeight: FontWeight.w800)),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Your account requires a new password before you can continue.',
                     style: TextStyle(color: KodaColors.text2, fontSize: 13),
                     textAlign: TextAlign.center,

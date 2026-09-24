@@ -22,7 +22,7 @@ class NotificationBell extends ConsumerWidget {
       clipBehavior: Clip.none,
       children: [
         IconButton(
-          icon: const Icon(Icons.notifications_outlined,
+          icon: Icon(Icons.notifications_outlined,
               color: KodaColors.text2, size: 20),
           tooltip: 'Notifications',
           onPressed: () => _showDropdown(context, ref),
@@ -32,7 +32,7 @@ class NotificationBell extends ConsumerWidget {
             top: 6, right: 6,
             child: Container(
               width: 16, height: 16,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: KodaColors.accent,
                 shape: BoxShape.circle,
               ),
@@ -78,7 +78,7 @@ class NotificationBell extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 14, 8, 8),
                     child: Row(children: [
-                      const Text('Notifications',
+                      Text('Notifications',
                           style: TextStyle(color: KodaColors.text1,
                               fontSize: 15, fontWeight: FontWeight.w700)),
                       const Spacer(),
@@ -88,22 +88,22 @@ class NotificationBell extends ConsumerWidget {
                             notifier.markAllRead();
                             Navigator.pop(context);
                           },
-                          child: const Text('Mark all read',
+                          child: Text('Mark all read',
                               style: TextStyle(
                                   color: KodaColors.koda, fontSize: 12)),
                         ),
                     ]),
                   ),
-                  const Divider(color: KodaColors.border, height: 1),
+                  Divider(color: KodaColors.border, height: 1),
 
                   // Notification list
                   if (state.loading)
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.all(32),
                       child: CircularProgressIndicator(color: KodaColors.koda),
                     )
                   else if (state.notifications.isEmpty)
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.all(32),
                       child: Text('No notifications yet',
                           style: TextStyle(color: KodaColors.text3,
@@ -116,7 +116,7 @@ class NotificationBell extends ConsumerWidget {
                         padding: EdgeInsets.zero,
                         itemCount: state.notifications.length,
                         separatorBuilder: (_, __) =>
-                            const Divider(color: KodaColors.border, height: 1),
+                            Divider(color: KodaColors.border, height: 1),
                         itemBuilder: (ctx, i) {
                           final n = state.notifications[i];
                           final read = n['read'] == true;
@@ -157,13 +157,13 @@ class NotificationBell extends ConsumerWidget {
                                               : FontWeight.w600)),
                                   if (n['body'] != null)
                                     Text(n['body'] as String,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                             color: KodaColors.text3,
                                             fontSize: 11)),
                                 ])),
                                 if (time.isNotEmpty)
                                   Text(time,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           color: KodaColors.text3,
                                           fontSize: 10)),
                               ]),

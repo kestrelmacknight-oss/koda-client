@@ -95,20 +95,20 @@ class _ServerSubscriptionScreenState
           widget.isOwner
               ? 'Manage Subscriptions'
               : '${widget.server['name']} Subscriptions',
-          style: const TextStyle(color: KodaColors.text1,
+          style: TextStyle(color: KodaColors.text1,
               fontSize: 16, fontWeight: FontWeight.w700),
         ),
         actions: [
           if (widget.isOwner && _tiers.length < 3)
             IconButton(
-              icon: const Icon(Icons.add, color: KodaColors.koda),
+              icon: Icon(Icons.add, color: KodaColors.koda),
               tooltip: 'Add tier',
               onPressed: _showCreateTierDialog,
             ),
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+          ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
           : widget.isOwner
               ? _buildOwnerView()
               : _buildMemberView(),
@@ -121,14 +121,14 @@ class _ServerSubscriptionScreenState
     if (_tiers.isEmpty) {
       return Center(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.subscriptions_outlined,
+          Icon(Icons.subscriptions_outlined,
               color: KodaColors.text3, size: 48),
           const SizedBox(height: 12),
-          const Text('No subscription tiers yet',
+          Text('No subscription tiers yet',
               style: TextStyle(color: KodaColors.text1, fontSize: 16,
                   fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
-          const Text('Create up to 3 tiers for your community',
+          Text('Create up to 3 tiers for your community',
               style: TextStyle(color: KodaColors.text3, fontSize: 13)),
           const SizedBox(height: 20),
           ElevatedButton.icon(
@@ -151,7 +151,7 @@ class _ServerSubscriptionScreenState
           return Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(children: [
-              const Expanded(
+              Expanded(
                 child: Text('Show subscriber counts',
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
               ),
@@ -185,7 +185,7 @@ class _ServerSubscriptionScreenState
         // Header
         Container(
           padding: const EdgeInsets.all(14),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: KodaColors.elevated,
             borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
           ),
@@ -197,17 +197,17 @@ class _ServerSubscriptionScreenState
                 shape: BoxShape.circle,
               ),
               child: Center(child: Text('$position',
-                  style: const TextStyle(color: KodaColors.koda,
+                  style: TextStyle(color: KodaColors.koda,
                       fontWeight: FontWeight.w700))),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(tier['name'] as String? ?? '',
-                  style: const TextStyle(color: KodaColors.text1,
+                  style: TextStyle(color: KodaColors.text1,
                       fontSize: 15, fontWeight: FontWeight.w700)),
             ),
             Text('\$${price.toStringAsFixed(2)}/mo',
-                style: const TextStyle(color: KodaColors.koda,
+                style: TextStyle(color: KodaColors.koda,
                     fontWeight: FontWeight.w600)),
           ]),
         ),
@@ -219,32 +219,32 @@ class _ServerSubscriptionScreenState
             if (tier['description'] != null &&
                 (tier['description'] as String).isNotEmpty) ...[
               Text(tier['description'] as String,
-                  style: const TextStyle(color: KodaColors.text2, fontSize: 13)),
+                  style: TextStyle(color: KodaColors.text2, fontSize: 13)),
               const SizedBox(height: 8),
             ],
             if (_showSubscriberCounts) ...[
               Row(children: [
-                const Icon(Icons.people_outline, size: 14, color: KodaColors.text3),
+                Icon(Icons.people_outline, size: 14, color: KodaColors.text3),
                 const SizedBox(width: 4),
                 Text('$subscriberCount active subscriber${subscriberCount == 1 ? '' : 's'}',
-                    style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+                    style: TextStyle(color: KodaColors.text3, fontSize: 12)),
               ]),
               const SizedBox(height: 8),
             ],
             Row(children: [
               if (tier['role_id'] != null) ...[
-                const Icon(Icons.badge_outlined, size: 14, color: KodaColors.text3),
+                Icon(Icons.badge_outlined, size: 14, color: KodaColors.text3),
                 const SizedBox(width: 4),
-                const Text('Role auto-assigned',
+                Text('Role auto-assigned',
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(width: 12),
               ],
               if (discount > 0) ...[
-                const Icon(Icons.local_offer_outlined,
+                Icon(Icons.local_offer_outlined,
                     size: 14, color: KodaColors.text3),
                 const SizedBox(width: 4),
                 Text('$discount% marketplace discount',
-                    style: const TextStyle(color: KodaColors.text3, fontSize: 12)),
+                    style: TextStyle(color: KodaColors.text3, fontSize: 12)),
               ],
             ]),
             const SizedBox(height: 12),
@@ -253,7 +253,7 @@ class _ServerSubscriptionScreenState
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     foregroundColor: KodaColors.text2,
-                    side: const BorderSide(color: KodaColors.border),
+                    side: BorderSide(color: KodaColors.border),
                   ),
                   icon: const Icon(Icons.edit_outlined, size: 14),
                   label: const Text('Edit'),
@@ -264,7 +264,7 @@ class _ServerSubscriptionScreenState
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: KodaColors.accent,
-                  side: const BorderSide(color: KodaColors.accent),
+                  side: BorderSide(color: KodaColors.accent),
                 ),
                 icon: const Icon(Icons.delete_outline, size: 14),
                 label: const Text('Delete'),
@@ -281,7 +281,7 @@ class _ServerSubscriptionScreenState
 
   Widget _buildMemberView() {
     if (_tiers.isEmpty) {
-      return const Center(child: Text('This server has no subscription tiers',
+      return Center(child: Text('This server has no subscription tiers',
           style: TextStyle(color: KodaColors.text3)));
     }
 
@@ -299,15 +299,15 @@ class _ServerSubscriptionScreenState
               border: Border.all(color: KodaColors.koda.withValues(alpha: 0.3)),
             ),
             child: Row(children: [
-              const Icon(Icons.check_circle, color: KodaColors.koda, size: 20),
+              Icon(Icons.check_circle, color: KodaColors.koda, size: 20),
               const SizedBox(width: 10),
               Expanded(child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text('Active Subscriber',
+                Text('Active Subscriber',
                     style: TextStyle(color: KodaColors.koda,
                         fontWeight: FontWeight.w600)),
                 Text('Expires ${_formatDate(_mySubscription!['expires_at'])}',
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: KodaColors.text3, fontSize: 12)),
               ])),
             ]),
@@ -341,18 +341,18 @@ class _ServerSubscriptionScreenState
           Row(children: [
             Expanded(
               child: Text(tier['name'] as String? ?? '',
-                  style: const TextStyle(color: KodaColors.text1,
+                  style: TextStyle(color: KodaColors.text1,
                       fontSize: 16, fontWeight: FontWeight.w700)),
             ),
             Text('\$${price.toStringAsFixed(2)}/mo',
-                style: const TextStyle(color: KodaColors.koda,
+                style: TextStyle(color: KodaColors.koda,
                     fontSize: 16, fontWeight: FontWeight.w700)),
           ]),
           if (tier['description'] != null &&
               (tier['description'] as String).isNotEmpty) ...[
             const SizedBox(height: 6),
             Text(tier['description'] as String,
-                style: const TextStyle(color: KodaColors.text2, fontSize: 13)),
+                style: TextStyle(color: KodaColors.text2, fontSize: 13)),
           ],
           const SizedBox(height: 10),
 
@@ -374,7 +374,7 @@ class _ServerSubscriptionScreenState
                 color: KodaColors.koda.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text('Currently Subscribed',
+              child: Text('Currently Subscribed',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: KodaColors.koda,
                       fontWeight: FontWeight.w600)),
@@ -400,7 +400,7 @@ class _ServerSubscriptionScreenState
       child: Row(children: [
         Icon(icon, size: 14, color: KodaColors.koda),
         const SizedBox(width: 6),
-        Text(text, style: const TextStyle(color: KodaColors.text2, fontSize: 12)),
+        Text(text, style: TextStyle(color: KodaColors.text2, fontSize: 12)),
       ]),
     );
   }
@@ -432,7 +432,7 @@ class _ServerSubscriptionScreenState
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
           title: Text(existing == null ? 'Create Tier' : 'Edit Tier',
-              style: const TextStyle(color: KodaColors.text1)),
+              style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 360,
             child: SingleChildScrollView(
@@ -444,7 +444,7 @@ class _ServerSubscriptionScreenState
                 const SizedBox(height: 10),
                 KodaTextField(controller: priceCtrl, hintText: 'Price per month (USD)'),
                 const SizedBox(height: 12),
-                const Text('Marketplace discount %',
+                Text('Marketplace discount %',
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
                 Row(children: [
@@ -457,17 +457,17 @@ class _ServerSubscriptionScreenState
                     ),
                   ),
                   Text('$discount%',
-                      style: const TextStyle(color: KodaColors.text1,
+                      style: TextStyle(color: KodaColors.text1,
                           fontWeight: FontWeight.w600)),
                 ]),
                 const SizedBox(height: 8),
-                const Text('Position',
+                Text('Position',
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
                 DropdownButton<int>(
                   value: position,
                   dropdownColor: KodaColors.card,
-                  style: const TextStyle(color: KodaColors.text1),
+                  style: TextStyle(color: KodaColors.text1),
                   onChanged: (v) => setDialogState(() => position = v!),
                   items: [1, 2, 3].map((p) => DropdownMenuItem(
                     value: p,
@@ -475,14 +475,14 @@ class _ServerSubscriptionScreenState
                   )).toList(),
                 ),
                 const SizedBox(height: 12),
-                const Text('Grants role on subscribe — optional',
+                Text('Grants role on subscribe — optional',
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
                 DropdownButton<String?>(
                   value: selectedRoleId,
                   isExpanded: true,
                   dropdownColor: KodaColors.card,
-                  style: const TextStyle(color: KodaColors.text1, fontSize: 13),
+                  style: TextStyle(color: KodaColors.text1, fontSize: 13),
                   onChanged: (v) => setDialogState(() => selectedRoleId = v),
                   items: [
                     const DropdownMenuItem<String?>(value: null, child: Text('None')),
@@ -493,7 +493,7 @@ class _ServerSubscriptionScreenState
                   ],
                 ),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'Automatically given to a member the moment they subscribe, '
                   'and taken away the moment their subscription expires.',
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
@@ -563,16 +563,16 @@ class _ServerSubscriptionScreenState
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: const Text('Delete Tier',
+        title: Text('Delete Tier',
             style: TextStyle(color: KodaColors.text1)),
         content: Text('Delete "${tier['name']}"? Existing subscribers will keep access until expiry.',
-            style: const TextStyle(color: KodaColors.text2)),
+            style: TextStyle(color: KodaColors.text2)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false),
               child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete',
+            child: Text('Delete',
                 style: TextStyle(color: KodaColors.accent)),
           ),
         ],
@@ -591,7 +591,7 @@ class _ServerSubscriptionScreenState
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
         title: Text('Subscribe to ${tier['name']}',
-            style: const TextStyle(color: KodaColors.text1)),
+            style: TextStyle(color: KodaColors.text1)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
           Container(
             padding: const EdgeInsets.all(14),
@@ -601,23 +601,23 @@ class _ServerSubscriptionScreenState
             ),
             child: Column(children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                const Text('Monthly subscription',
+                Text('Monthly subscription',
                     style: TextStyle(color: KodaColors.text2)),
                 Text('\$${price.toStringAsFixed(2)}',
-                    style: const TextStyle(color: KodaColors.text1,
+                    style: TextStyle(color: KodaColors.text1,
                         fontWeight: FontWeight.w600)),
               ]),
-              const Divider(color: KodaColors.border, height: 16),
+              Divider(color: KodaColors.border, height: 16),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                const Text('Server bank earns',
+                Text('Server bank earns',
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 Text('${((tier['price_cents'] as int) * 0.05).round()} pts',
-                    style: const TextStyle(color: KodaColors.koda, fontSize: 12)),
+                    style: TextStyle(color: KodaColors.koda, fontSize: 12)),
               ]),
             ]),
           ),
           const SizedBox(height: 10),
-          const Text('Payment processed securely by Stripe',
+          Text('Payment processed securely by Stripe',
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         ]),
         actions: [

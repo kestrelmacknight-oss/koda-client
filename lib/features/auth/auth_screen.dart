@@ -171,7 +171,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               Container(
                 width: 56, height: 56,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
+                  gradient: LinearGradient(
                       colors: [KodaColors.koda, KodaColors.mint],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight),
@@ -185,12 +185,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                             color: Colors.white))),
               ),
               const SizedBox(height: 14),
-              const Text(KodaConfig.appName,
+              Text(KodaConfig.appName,
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w800,
                       color: KodaColors.text1)),
-              const Text('${KodaConfig.buildLabel} v${KodaConfig.appVersion}',
+              Text('${KodaConfig.buildLabel} v${KodaConfig.appVersion}',
                   style: TextStyle(fontSize: 12, color: KodaColors.gold)),
               const SizedBox(height: 28),
 
@@ -223,18 +223,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
               const SizedBox(height: 22),
               Text.rich(
-                TextSpan(style: const TextStyle(color: KodaColors.text3, fontSize: 11), children: [
+                TextSpan(style: TextStyle(color: KodaColors.text3, fontSize: 11), children: [
                   const TextSpan(text: 'By using Koda you agree to our '),
                   TextSpan(
                     text: 'Terms & Conditions',
-                    style: const TextStyle(color: KodaColors.koda),
+                    style: TextStyle(color: KodaColors.koda),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () => _openUrl(KodaConfig.termsUrl),
                   ),
                   const TextSpan(text: ' and '),
                   TextSpan(
                     text: 'Privacy Policy',
-                    style: const TextStyle(color: KodaColors.koda),
+                    style: TextStyle(color: KodaColors.koda),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () => _openUrl(KodaConfig.privacyUrl),
                   ),
@@ -259,7 +259,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           child: TextButton(
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const ForgotPasswordScreen())),
-            child: const Text('Forgot password?',
+            child: Text('Forgot password?',
                 style: TextStyle(color: KodaColors.koda, fontSize: 12)),
           ),
         ),
@@ -286,7 +286,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 onChanged: (v) => setState(() => _agree = v ?? false),
                 activeColor: KodaColors.koda,
               ),
-              const Expanded(
+              Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(top: 12),
                   child: Text('I agree to the Terms & Conditions and Privacy Policy',

@@ -94,11 +94,11 @@ class _ReportDialogState extends State<_ReportDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: KodaColors.card,
-      title: const Text('Report Message', style: TextStyle(color: KodaColors.text1)),
+      title: Text('Report Message', style: TextStyle(color: KodaColors.text1)),
       content: SizedBox(
         width: 320,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Align(
+          Align(
             alignment: Alignment.centerLeft,
             child: Text('Reason', style: TextStyle(color: KodaColors.text2, fontSize: 12)),
           ),
@@ -128,20 +128,20 @@ class _ReportDialogState extends State<_ReportDialog> {
           TextField(
             controller: _noteCtrl,
             maxLines: 3,
-            style: const TextStyle(color: KodaColors.text1, fontSize: 13),
-            decoration: const InputDecoration(
+            style: TextStyle(color: KodaColors.text1, fontSize: 13),
+            decoration: InputDecoration(
               hintText: 'Anything else moderators should know? (optional)',
               hintStyle: TextStyle(color: KodaColors.text3, fontSize: 12),
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'The message content shown to you and who sent it will be shared with this server\'s moderators.',
             style: TextStyle(color: KodaColors.text3, fontSize: 11),
           ),
           if (_error != null) ...[
             const SizedBox(height: 8),
-            Text(_error!, style: const TextStyle(color: KodaColors.accent, fontSize: 12)),
+            Text(_error!, style: TextStyle(color: KodaColors.accent, fontSize: 12)),
           ],
         ]),
       ),
@@ -153,7 +153,7 @@ class _ReportDialogState extends State<_ReportDialog> {
         TextButton(
           onPressed: _submitting ? null : _submit,
           child: _submitting
-              ? const SizedBox(
+              ? SizedBox(
                   width: 16, height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
               : const Text('Submit Report'),

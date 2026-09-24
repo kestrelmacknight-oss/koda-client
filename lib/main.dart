@@ -78,6 +78,14 @@ class KodaApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final a11y = ref.watch(accessibilityPrefsProvider);
+
+    // A deliberate side effect during build, not a widget/State mutation
+    // -- KodaColors is a plain static palette selector (see theme.dart),
+    // so every getter read anywhere below this point in the same build
+    // pass (and every one after) picks up the change immediately. Must
+    // run before MaterialApp/AuthGate are constructed.
+    KodaColors.setHighContrast(a11y.highContrast);
+
     return MaterialApp(
       title: 'Koda',
       debugShowCheckedModeBanner: false,
@@ -91,7 +99,21 @@ class KodaApp extends ConsumerWidget {
         data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(a11y.textScale)),
         child: child!,
       ),
-      home: const AuthGate(),
+      // Keyed on highContrast so toggling it discards and rebuilds this
+      // entire subtree from scratch -- the only way a plain static
+      // palette selector (not a Theme/InheritedWidget) actually takes
+      // effect live rather than only on next navigation. Riverpod
+      // provider state (auth, selected server/channel, an active voice
+      // session) lives in the ProviderScope above this point, so none
+      // of that is lost -- only this subtree's own local widget State
+      // (cached channel/message lists, scroll position) resets and
+      // reloads fresh. See accessibility_prefs.dart / the Settings
+      // High Contrast toggle's subtitle for the same trade-off spelled
+      // out to the user.
+      home: KeyedSubtree(
+        key: ValueKey('root-${a11y.highContrast}'),
+        child: const AuthGate(),
+      ),
     );
   }
 

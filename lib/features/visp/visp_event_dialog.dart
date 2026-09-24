@@ -206,20 +206,20 @@ class _VispEventDialogState extends State<VispEventDialog> {
               Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                 _showAvatar
                     ? VispAvatar(size: 44, mood: _mood)
-                    : const Icon(Icons.auto_awesome, color: KodaColors.koda, size: 20),
+                    : Icon(Icons.auto_awesome, color: KodaColors.koda, size: 20),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: Text('Ask Visp to create an event',
                       style: TextStyle(color: KodaColors.text1, fontSize: 16,
                           fontWeight: FontWeight.w700)),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 18, color: KodaColors.text3),
+                  icon: Icon(Icons.close, size: 18, color: KodaColors.text3),
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),
               const SizedBox(height: 6),
-              const Text(
+              Text(
                 'Describe the event -- Visp will propose a title, date/time, and any other details.',
                 style: TextStyle(color: KodaColors.text3, fontSize: 12),
               ),
@@ -230,14 +230,14 @@ class _VispEventDialogState extends State<VispEventDialog> {
                   controller: _promptCtrl,
                   maxLines: 3,
                   minLines: 3,
-                  style: const TextStyle(color: KodaColors.text1, fontSize: 14),
+                  style: TextStyle(color: KodaColors.text1, fontSize: 14),
                   decoration: const InputDecoration(
                     hintText: 'e.g. "Weekly D&D session every Friday at 7pm for about 3 hours"',
                     contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 13),
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
+                Text(
                   'Your description is sent to Visp (a self-hosted assistant -- '
                   'nothing leaves Koda\'s servers) to generate this plan.',
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
@@ -266,7 +266,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
                     border: Border.all(color: KodaColors.accent.withValues(alpha: 0.3)),
                   ),
                   child: Text(_error!,
-                      style: const TextStyle(color: KodaColors.accent, fontSize: 12)),
+                      style: TextStyle(color: KodaColors.accent, fontSize: 12)),
                 ),
               ],
 
@@ -279,7 +279,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: KodaColors.text2,
-                        side: const BorderSide(color: KodaColors.border),
+                        side: BorderSide(color: KodaColors.border),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: _loading ? null : _startOver,
@@ -347,10 +347,10 @@ class _VispEventDialogState extends State<VispEventDialog> {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(plan['title'] as String? ?? '',
-            style: const TextStyle(color: KodaColors.text1, fontSize: 15, fontWeight: FontWeight.w700)),
+            style: TextStyle(color: KodaColors.text1, fontSize: 15, fontWeight: FontWeight.w700)),
         const SizedBox(height: 6),
         Text(plan['summary'] as String? ?? '',
-            style: const TextStyle(color: KodaColors.text2, fontSize: 12, height: 1.4)),
+            style: TextStyle(color: KodaColors.text2, fontSize: 12, height: 1.4)),
         const SizedBox(height: 10),
         _previewRow(Icons.event_outlined,
             startLocal != null
@@ -378,7 +378,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Icon(icon, size: 14, color: KodaColors.text3),
       const SizedBox(width: 6),
-      Expanded(child: Text(text, style: const TextStyle(color: KodaColors.text2, fontSize: 12))),
+      Expanded(child: Text(text, style: TextStyle(color: KodaColors.text2, fontSize: 12))),
     ]),
   );
 
@@ -387,15 +387,15 @@ class _VispEventDialogState extends State<VispEventDialog> {
   // rather than just trusting the model's claim.
   Widget _sourcesRow(List<String> sources) {
     return Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
-      const Icon(Icons.menu_book_outlined, size: 12, color: KodaColors.text3),
-      const Text('Based on:', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+      Icon(Icons.menu_book_outlined, size: 12, color: KodaColors.text3),
+      Text('Based on:', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       ...sources.map((title) => Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
               color: KodaColors.koda.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Text(title, style: const TextStyle(color: KodaColors.koda, fontSize: 11)),
+            child: Text(title, style: TextStyle(color: KodaColors.koda, fontSize: 11)),
           )),
     ]);
   }

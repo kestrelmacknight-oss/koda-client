@@ -60,17 +60,17 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              const Icon(Icons.mark_email_unread_outlined,
+              Icon(Icons.mark_email_unread_outlined,
                   color: KodaColors.koda, size: 40),
               const SizedBox(height: 16),
-              const Text('Check your email',
+              Text('Check your email',
                   style: TextStyle(
                       color: KodaColors.text1,
                       fontSize: 20,
                       fontWeight: FontWeight.w800)),
               const SizedBox(height: 8),
               Text('We sent a 6-digit code to ${widget.email}',
-                  style: const TextStyle(color: KodaColors.text2, fontSize: 13),
+                  style: TextStyle(color: KodaColors.text2, fontSize: 13),
                   textAlign: TextAlign.center),
               const SizedBox(height: 24),
               if (_error != null) KodaErrorBanner(message: _error!),
@@ -78,7 +78,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 14),
                   child: Text(_info!,
-                      style: const TextStyle(color: KodaColors.mint, fontSize: 12)),
+                      style: TextStyle(color: KodaColors.mint, fontSize: 12)),
                 ),
               KodaTextField(controller: _code, hintText: '000000',
                   keyboardType: TextInputType.number),
@@ -87,7 +87,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               const SizedBox(height: 12),
               TextButton(
                 onPressed: _resend,
-                child: const Text('Resend code',
+                child: Text('Resend code',
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
               ),
             ]),

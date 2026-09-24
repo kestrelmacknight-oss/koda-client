@@ -97,7 +97,7 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
   @override
   Widget build(BuildContext context) {
     if (_serverId == null) {
-      return const Center(child: Text('Select a server to view its merch',
+      return Center(child: Text('Select a server to view its merch',
           style: TextStyle(color: KodaColors.text3)));
     }
 
@@ -108,7 +108,7 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
           Expanded(
             child: Text(
               _creatorMode ? 'Manage Merch Catalog' : 'Merch',
-              style: const TextStyle(color: KodaColors.text1,
+              style: TextStyle(color: KodaColors.text1,
                   fontSize: 16, fontWeight: FontWeight.w700),
             ),
           ),
@@ -116,10 +116,10 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
                 foregroundColor: KodaColors.koda,
-                side: const BorderSide(color: KodaColors.koda),
+                side: BorderSide(color: KodaColors.koda),
               ),
               icon: _syncing
-                  ? const SizedBox(width: 14, height: 14,
+                  ? SizedBox(width: 14, height: 14,
                       child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
                   : const Icon(Icons.sync, size: 16),
               label: Text(_syncing ? 'Syncing...' : 'Sync Catalog'),
@@ -136,7 +136,7 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
       ),
       Expanded(
         child: _loading
-            ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+            ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
             : _buildList(),
       ),
     ]);
@@ -145,18 +145,18 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
   Widget _buildList() {
     if (_products.isEmpty) {
       return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.storefront_outlined, color: KodaColors.text3, size: 48),
+        Icon(Icons.storefront_outlined, color: KodaColors.text3, size: 48),
         const SizedBox(height: 12),
         Text(
           _creatorMode ? 'Nothing synced yet' : 'No merch available yet',
-          style: const TextStyle(color: KodaColors.text1, fontSize: 16, fontWeight: FontWeight.w600),
+          style: TextStyle(color: KodaColors.text1, fontSize: 16, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         Text(
           _creatorMode
               ? 'Sync your Printful store to pull in your product catalog'
               : 'Check back later for merch from this server',
-          style: const TextStyle(color: KodaColors.text3, fontSize: 13),
+          style: TextStyle(color: KodaColors.text3, fontSize: 13),
         ),
       ]));
     }
@@ -191,8 +191,8 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
               width: 56, height: 56,
               child: product['thumbnail_url'] != null
                   ? Image.network(product['thumbnail_url'] as String, fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const ColoredBox(color: KodaColors.elevated))
-                  : const ColoredBox(color: KodaColors.elevated,
+                      errorBuilder: (_, __, ___) => ColoredBox(color: KodaColors.elevated))
+                  : ColoredBox(color: KodaColors.elevated,
                       child: Icon(Icons.checkroom_outlined, color: KodaColors.text3)),
             ),
           ),
@@ -200,14 +200,14 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(product['name'] as String? ?? '',
-                  style: const TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w600),
                   maxLines: 1, overflow: TextOverflow.ellipsis),
               const SizedBox(height: 2),
               Text(
                 cheapest == null
                     ? 'Out of stock'
                     : 'From \$${((cheapest['retail_price_cents'] as int) / 100).toStringAsFixed(2)} • ${inStock.length} option${inStock.length == 1 ? '' : 's'}',
-                style: const TextStyle(color: KodaColors.text3, fontSize: 12),
+                style: TextStyle(color: KodaColors.text3, fontSize: 12),
               ),
             ]),
           ),
@@ -339,7 +339,7 @@ class _PurchaseDialogState extends State<_PurchaseDialog> {
     return AlertDialog(
       backgroundColor: KodaColors.card,
       title: Text(widget.productName,
-          style: const TextStyle(color: KodaColors.text1, fontSize: 16)),
+          style: TextStyle(color: KodaColors.text1, fontSize: 16)),
       content: SizedBox(width: 360, child: _buildStep()),
       actions: _buildActions(),
     );
@@ -364,13 +364,13 @@ class _PurchaseDialogState extends State<_PurchaseDialog> {
 
   Widget _buildVariantStep() {
     return Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('Option', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+      Text('Option', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
       const SizedBox(height: 4),
       DropdownButton<String>(
         value: _selectedVariant['id'] as String,
         dropdownColor: KodaColors.card,
         isExpanded: true,
-        style: const TextStyle(color: KodaColors.text1, fontSize: 13),
+        style: TextStyle(color: KodaColors.text1, fontSize: 13),
         onChanged: (id) => setState(() =>
             _selectedVariant = widget.variants.firstWhere((v) => v['id'] == id)),
         items: widget.variants.map((v) => DropdownMenuItem(
@@ -379,16 +379,16 @@ class _PurchaseDialogState extends State<_PurchaseDialog> {
             )).toList(),
       ),
       const SizedBox(height: 12),
-      const Text('Quantity', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+      Text('Quantity', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
       const SizedBox(height: 4),
       Row(children: [
         IconButton(
-          icon: const Icon(Icons.remove_circle_outline, color: KodaColors.text2),
+          icon: Icon(Icons.remove_circle_outline, color: KodaColors.text2),
           onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
         ),
-        Text('$_quantity', style: const TextStyle(color: KodaColors.text1, fontSize: 14)),
+        Text('$_quantity', style: TextStyle(color: KodaColors.text1, fontSize: 14)),
         IconButton(
-          icon: const Icon(Icons.add_circle_outline, color: KodaColors.text2),
+          icon: Icon(Icons.add_circle_outline, color: KodaColors.text2),
           onPressed: () => setState(() => _quantity++),
         ),
       ]),
@@ -397,7 +397,7 @@ class _PurchaseDialogState extends State<_PurchaseDialog> {
 
   Widget _buildRatesStep() {
     return Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('Shipping speed', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+      Text('Shipping speed', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
       const SizedBox(height: 6),
       ..._rates.map((r) {
         final selected = _selectedRate?['id'] == r['id'];
@@ -419,14 +419,14 @@ class _PurchaseDialogState extends State<_PurchaseDialog> {
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(r['name'] as String? ?? '',
-                        style: const TextStyle(color: KodaColors.text1, fontSize: 13)),
+                        style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                     if (r['min_delivery_days'] != null)
                       Text('${r['min_delivery_days']}-${r['max_delivery_days']} business days',
-                          style: const TextStyle(color: KodaColors.text3, fontSize: 11)),
+                          style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                   ]),
                 ),
                 Text('\$${((r['rate_cents'] as int) / 100).toStringAsFixed(2)}',
-                    style: const TextStyle(color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
+                    style: TextStyle(color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
               ]),
             ),
           ),
@@ -438,7 +438,7 @@ class _PurchaseDialogState extends State<_PurchaseDialog> {
 
   Widget _buildError() => Padding(
         padding: const EdgeInsets.only(top: 8),
-        child: Text(_error!, style: const TextStyle(color: KodaColors.accent, fontSize: 12)),
+        child: Text(_error!, style: TextStyle(color: KodaColors.accent, fontSize: 12)),
       );
 
   List<Widget> _buildActions() {
