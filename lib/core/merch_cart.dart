@@ -11,12 +11,30 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// Formats [cents] in [currencyCode] (ISO 4217, e.g. 'USD') -- a
+/// creator's Printful store isn't necessarily USD-priced, so this must
+/// never hardcode "$". Symbols only for currencies common enough to be
+/// unambiguous (a bare "$" alone is used by USD/CAD/AUD/MXN/etc., so
+/// guessing wrong is worse than a plain code prefix); anything else
+/// falls back to "<CODE> <amount>" rather than a potentially-wrong symbol.
+String formatMerchPrice(int cents, String currencyCode) {
+  final amount = (cents / 100).toStringAsFixed(2);
+  switch (currencyCode.toUpperCase()) {
+    case 'USD': return '\$$amount';
+    case 'EUR': return '€$amount';
+    case 'GBP': return '£$amount';
+    case 'JPY': return '¥$amount';
+    default: return '${currencyCode.toUpperCase()} $amount';
+  }
+}
+
 class CartItem {
   final String variantId; // Koda's local Variant.id, not Printful's
   final String productName;
   final String variantName;
   final String? imageUrl;
   final int unitPriceCents;
+  final String currency; // ISO 4217, e.g. 'USD' -- whatever the creator's Printful store is priced in, never assumed
   int quantity;
 
   CartItem({
@@ -25,6 +43,7 @@ class CartItem {
     required this.variantName,
     required this.imageUrl,
     required this.unitPriceCents,
+    required this.currency,
     required this.quantity,
   });
 
@@ -50,6 +69,7 @@ class MerchCartNotifier extends StateNotifier<MerchCartState> {
     required String variantName,
     required String? imageUrl,
     required int unitPriceCents,
+    required String currency,
     required int quantity,
   }) {
     // Different store -- this session's cart follows whichever
@@ -67,6 +87,7 @@ class MerchCartNotifier extends StateNotifier<MerchCartState> {
         variantName: variantName,
         imageUrl: imageUrl,
         unitPriceCents: unitPriceCents,
+        currency: currency,
         quantity: quantity,
       ));
     }

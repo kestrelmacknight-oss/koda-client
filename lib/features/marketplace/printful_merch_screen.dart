@@ -208,7 +208,7 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
               Text(
                 cheapest == null
                     ? 'Out of stock'
-                    : 'From \$${((cheapest['retail_price_cents'] as int) / 100).toStringAsFixed(2)} • ${inStock.length} option${inStock.length == 1 ? '' : 's'}',
+                    : 'From ${formatMerchPrice(cheapest['retail_price_cents'] as int, cheapest['currency'] as String? ?? 'USD')} • ${inStock.length} option${inStock.length == 1 ? '' : 's'}',
                 style: TextStyle(color: KodaColors.text3, fontSize: 12),
               ),
             ]),
@@ -387,6 +387,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
           variantName: _selectedVariant['name'] as String? ?? '',
           imageUrl: (_selectedVariant['image_url'] as String?) ?? widget.productThumbnailUrl,
           unitPriceCents: _selectedVariant['retail_price_cents'] as int,
+          currency: _selectedVariant['currency'] as String? ?? 'USD',
           quantity: _quantity,
         );
     Navigator.pop(context);
@@ -397,7 +398,8 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
   @override
   Widget build(BuildContext context) {
     final imageUrl = (_selectedVariant['image_url'] as String?) ?? widget.productThumbnailUrl;
-    final price = (_selectedVariant['retail_price_cents'] as int) / 100;
+    final priceText = formatMerchPrice(_selectedVariant['retail_price_cents'] as int,
+        _selectedVariant['currency'] as String? ?? 'USD');
 
     return Dialog(
       backgroundColor: KodaColors.card,
@@ -422,7 +424,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
             Text(widget.productName,
                 style: TextStyle(color: KodaColors.text1, fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: 4),
-            Text('\$${price.toStringAsFixed(2)}',
+            Text(priceText,
                 style: TextStyle(color: KodaColors.koda, fontSize: 16, fontWeight: FontWeight.w600)),
             const SizedBox(height: 16),
             if (widget.variants.length > 1) _buildVariantPicker(),
@@ -484,7 +486,8 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
               _selectedVariant = widget.variants.firstWhere((v) => v['id'] == id)),
           items: widget.variants.map((v) => DropdownMenuItem(
                 value: v['id'] as String,
-                child: Text('${v['name']} -- \$${((v['retail_price_cents'] as int) / 100).toStringAsFixed(2)}'),
+                child: Text('${v['name']} -- '
+                    '${formatMerchPrice(v['retail_price_cents'] as int, v['currency'] as String? ?? 'USD')}'),
               )).toList(),
         ),
       ]);
@@ -551,7 +554,9 @@ class _CartDialog extends StatelessWidget {
                 const Divider(),
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                   Text('Subtotal', style: TextStyle(color: KodaColors.text2, fontSize: 13)),
-                  Text('\$${(cart.subtotalCents / 100).toStringAsFixed(2)}',
+                  // One Printful store has one currency -- every line in
+                  // this (single-store, see merch_cart.dart) cart shares it.
+                  Text(formatMerchPrice(cart.subtotalCents, items.first.currency),
                       style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w700)),
                 ]),
               ]),
@@ -762,7 +767,7 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
                           style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                   ]),
                 ),
-                Text('\$${((r['rate_cents'] as int) / 100).toStringAsFixed(2)}',
+                Text(formatMerchPrice(r['rate_cents'] as int, r['currency'] as String? ?? 'USD'),
                     style: TextStyle(color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
               ]),
             ),
