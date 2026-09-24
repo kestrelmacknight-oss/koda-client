@@ -7,12 +7,21 @@
 
 import 'dart:async';
 
+import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
 import 'package:livekit_client/livekit_client.dart' as lk;
+import 'platform.dart';
 import 'providers.dart';
 import 'voice_activity_controller.dart';
+
+// Shared name both windows agree on -- see pop_out_video_window.dart's
+// Leave button, the only other user of this channel. Named channels in
+// desktop_multi_window are a simple broadcast rendezvous: whichever
+// side calls setMethodCallHandler on this exact name receives whatever
+// the other side invokes on it, no windowId bookkeeping needed.
+const _voiceControlChannel = WindowMethodChannel('koda_voice_control');
 
 class VoiceSession {
   final lk.Room room;
@@ -100,6 +109,21 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
       if (eqChanged) _applyEqGains(next);
       if (boostChanged) _applyMicBoost(next);
     });
+
+    // The pop-out video window (see pop_out_video_window.dart) runs in
+    // its own Flutter engine with its own separate, subscribe-only
+    // LiveKit connection -- its own Leave button can only disconnect
+    // that local viewer connection, not this, the *actual* session a
+    // remote participant hears. Without this, clicking Leave there just
+    // closed that window while the real call kept running in the
+    // background, forcing a second/third trip to a leave button that
+    // does reach this notifier (voice_bar.dart, voice_screen.dart).
+    if (isDesktop) {
+      _voiceControlChannel.setMethodCallHandler((call) async {
+        if (call.method == 'leave_voice') await leave();
+        return null;
+      });
+    }
   }
   final Ref _ref;
   final VoiceActivityController _voiceActivity = VoiceActivityController();

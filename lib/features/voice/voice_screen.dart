@@ -243,7 +243,10 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
     _levelTimer?.cancel();
     _room.removeListener(_onRoomChange);
     if (widget.existingSession != null) {
-      // Session managed by provider -- just pop
+      // This button is labeled/iconed as "Leave Voice", not "minimize" --
+      // it must actually end the call, not just close this view while
+      // voiceSessionProvider keeps the session alive in the background.
+      await ref.read(voiceSessionProvider.notifier).leave();
       if (mounted) Navigator.of(context).pop();
       return;
     }
@@ -274,12 +277,12 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: Text('$name\'s Volume', style: const TextStyle(color: KodaColors.text1)),
+          title: Text('$name\'s Volume', style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 280,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Text('${(volume * 100).round()}%',
-                  style: const TextStyle(color: KodaColors.text2, fontSize: 13)),
+                  style: TextStyle(color: KodaColors.text2, fontSize: 13)),
               Slider(
                 value: volume,
                 min: 0.0,
@@ -292,7 +295,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                   notifier.setParticipantVolume(participant.identity, v);
                 },
               ),
-              const Text(
+              Text(
                 'Only affects what you hear -- this device, this call.',
                 style: TextStyle(color: KodaColors.text3, fontSize: 11),
                 textAlign: TextAlign.center,
@@ -371,22 +374,22 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
         title: Text('🔊 ${widget.channelName}',
-            style: const TextStyle(color: KodaColors.text1, fontSize: 16)),
+            style: TextStyle(color: KodaColors.text1, fontSize: 16)),
       ),
       body: _connecting
-          ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+          ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
           : _error != null
               ? Center(child: Padding(
                   padding: const EdgeInsets.all(24),
                   child: Text('Could not connect: $_error',
-                      style: const TextStyle(color: KodaColors.accent),
+                      style: TextStyle(color: KodaColors.accent),
                       textAlign: TextAlign.center)))
               : Column(children: [
                   Expanded(
                     child: Stack(children: [
                       // Participant grid
                       participants.isEmpty
-                          ? const Center(child: Text('Connecting...',
+                          ? Center(child: Text('Connecting...',
                               style: TextStyle(color: KodaColors.text3)))
                           : GridView.builder(
                               padding: const EdgeInsets.all(16),
@@ -440,7 +443,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                                 child: lk.VideoTrackRenderer(_screenShareTrack!)),
                                           ),
                                         ),
-                                        const Padding(
+                                        Padding(
                                           padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                                           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                                             Icon(Icons.screen_share, color: KodaColors.koda, size: 12),
@@ -520,7 +523,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                                         child: Text(
                                           isLocal ? '$name (you)' : name,
-                                          style: const TextStyle(color: KodaColors.text1, fontSize: 11),
+                                          style: TextStyle(color: KodaColors.text1, fontSize: 11),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
@@ -535,7 +538,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                   // Controls
                   Container(
                     padding: const EdgeInsets.all(20),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                         border: Border(top: BorderSide(color: KodaColors.border))),
                     child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                       IconButton(
@@ -587,7 +590,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                         ),
                         IconButton(
                           iconSize: 24,
-                          icon: const Icon(Icons.open_in_new, color: KodaColors.text2),
+                          icon: Icon(Icons.open_in_new, color: KodaColors.text2),
                           tooltip: 'Pop out voice to separate window',
                           onPressed: () async {
                             final channelId = widget.existingSession?.channelId;
@@ -629,7 +632,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
 
                       IconButton(
                         iconSize: 28,
-                        icon: const Icon(Icons.call_end, color: KodaColors.accent),
+                        icon: Icon(Icons.call_end, color: KodaColors.accent),
                         onPressed: _leave,
                         tooltip: 'Leave Voice',
                       ),
@@ -686,17 +689,17 @@ class _PopOutWindowState extends State<_PopOutWindow> {
                 Container(
                   height: 36,
                   padding: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: KodaColors.elevated,
                     borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
                   ),
                   child: Row(children: [
-                    const Icon(Icons.drag_indicator,
+                    Icon(Icons.drag_indicator,
                         size: 14, color: KodaColors.text3),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(widget.name,
-                          style: const TextStyle(color: KodaColors.text1,
+                          style: TextStyle(color: KodaColors.text1,
                               fontSize: 12, fontWeight: FontWeight.w600),
                           overflow: TextOverflow.ellipsis),
                     ),
@@ -715,7 +718,7 @@ class _PopOutWindowState extends State<_PopOutWindow> {
                     const SizedBox(width: 8),
                     // Resize
                     PopupMenuButton<Size>(
-                      icon: const Icon(Icons.open_in_full,
+                      icon: Icon(Icons.open_in_full,
                           size: 14, color: KodaColors.text3),
                       itemBuilder: (_) => [
                         const PopupMenuItem(value: Size(320, 180), child: Text('Small (320x180)')),
@@ -729,7 +732,7 @@ class _PopOutWindowState extends State<_PopOutWindow> {
                     // Close
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: const Icon(Icons.close,
+                      child: Icon(Icons.close,
                           size: 16, color: KodaColors.text3),
                     ),
                   ]),
@@ -746,11 +749,11 @@ class _PopOutWindowState extends State<_PopOutWindow> {
                           : Center(
                               child: Column(mainAxisSize: MainAxisSize.min,
                                   children: [
-                                const Icon(Icons.videocam_off,
+                                Icon(Icons.videocam_off,
                                     color: KodaColors.text3, size: 32),
                                 const SizedBox(height: 8),
                                 Text(widget.name,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         color: KodaColors.text3, fontSize: 13)),
                               ])),
                     ),

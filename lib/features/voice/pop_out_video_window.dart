@@ -11,6 +11,10 @@ import 'package:livekit_client/livekit_client.dart' as lk;
 import '../../core/theme.dart';
 import '../../shared/widgets.dart';
 
+// Shared name both windows agree on -- see voice_session.dart's
+// VoiceSessionNotifier, the only other user of this channel.
+const _voiceControlChannel = WindowMethodChannel('koda_voice_control');
+
 class PopOutVideoWindow extends StatefulWidget {
   final String windowId;
   final String arguments; // JSON string
@@ -140,12 +144,17 @@ class _PopOutVideoWindowState extends State<PopOutVideoWindow> {
         appBar: AppBar(
           backgroundColor: KodaColors.bg2,
           title: Text('🔊 $channelName',
-              style: const TextStyle(color: KodaColors.text1, fontSize: 14)),
+              style: TextStyle(color: KodaColors.text1, fontSize: 14)),
           actions: [
             TextButton.icon(
-              icon: const Icon(Icons.call_end, color: KodaColors.accent, size: 16),
-              label: const Text('Leave', style: TextStyle(color: KodaColors.accent)),
+              icon: Icon(Icons.call_end, color: KodaColors.accent, size: 16),
+              label: Text('Leave', style: TextStyle(color: KodaColors.accent)),
               onPressed: () async {
+                // This window's own connection is a subscribe-only
+                // viewer, not the real session -- tell the main window's
+                // VoiceSessionNotifier to actually end the call, not
+                // just close this view of it.
+                await _voiceControlChannel.invokeMethod('leave_voice');
                 await _room?.disconnect();
                 final ctrl = WindowController.fromWindowId(widget.windowId);
                 await ctrl.hide();
@@ -154,12 +163,12 @@ class _PopOutVideoWindowState extends State<PopOutVideoWindow> {
           ],
         ),
         body: _connecting
-            ? const Center(child: CircularProgressIndicator(color: KodaColors.koda))
+            ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
             : _error != null
                 ? Center(child: Text('Error: $_error',
-                    style: const TextStyle(color: KodaColors.accent)))
+                    style: TextStyle(color: KodaColors.accent)))
                 : participants.isEmpty
-                    ? const Center(child: Text('No participants',
+                    ? Center(child: Text('No participants',
                         style: TextStyle(color: KodaColors.text3)))
                     : GridView.builder(
                         padding: const EdgeInsets.all(16),
@@ -215,7 +224,7 @@ class _PopOutVideoWindowState extends State<PopOutVideoWindow> {
                                   top: 6, right: 6,
                                   child: Container(
                                     width: 8, height: 8,
-                                    decoration: const BoxDecoration(
+                                    decoration: BoxDecoration(
                                       color: KodaColors.mint,
                                       shape: BoxShape.circle,
                                     ),
