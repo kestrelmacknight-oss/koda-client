@@ -136,10 +136,16 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5)),
             const Spacer(),
-            GestureDetector(
-              onTap: _load,
-              child: Icon(Icons.refresh_outlined,
-                  color: KodaColors.text3, size: 14),
+            Semantics(
+              button: true,
+              label: 'Refresh member list',
+              child: GestureDetector(
+                onTap: _load,
+                child: ExcludeSemantics(
+                  child: Icon(Icons.refresh_outlined,
+                      color: KodaColors.text3, size: 14),
+                ),
+              ),
             ),
           ]),
         ),
@@ -164,33 +170,40 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Role header
-        GestureDetector(
-          onTap: () => setState(() {
-            if (collapsed) {
-              _collapsedRoles.remove(group.id);
-            } else {
-              _collapsedRoles.add(group.id);
-            }
-          }),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(10, 14, 10, 4),
-            child: Row(children: [
-              Icon(
-                collapsed ? Icons.chevron_right : Icons.expand_more,
-                size: 14,
-                color: KodaColors.text3,
+        Semantics(
+          button: true,
+          label: '${group.name}, ${group.members.length} members, '
+              '${collapsed ? "collapsed" : "expanded"}',
+          child: GestureDetector(
+            onTap: () => setState(() {
+              if (collapsed) {
+                _collapsedRoles.remove(group.id);
+              } else {
+                _collapsedRoles.add(group.id);
+              }
+            }),
+            child: ExcludeSemantics(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 14, 10, 4),
+                child: Row(children: [
+                  Icon(
+                    collapsed ? Icons.chevron_right : Icons.expand_more,
+                    size: 14,
+                    color: KodaColors.text3,
+                  ),
+                  const SizedBox(width: 2),
+                  Text(
+                    '${group.name.toUpperCase()} — ${group.members.length}',
+                    style: TextStyle(
+                      color: group.isOffline ? KodaColors.text3 : color,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ]),
               ),
-              const SizedBox(width: 2),
-              Text(
-                '${group.name.toUpperCase()} — ${group.members.length}',
-                style: TextStyle(
-                  color: group.isOffline ? KodaColors.text3 : color,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ]),
+            ),
           ),
         ),
 
@@ -213,69 +226,78 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
         ? _parseColor(topRole['color'] as String? ?? '#e2e4f0')
         : KodaColors.text2;
 
-    return GestureDetector(
-      onSecondaryTapUp: (d) => _showModerationMenu(member, d.globalPosition),
-      child: InkWell(
-      onTap: () => widget.onMemberTap(member),
-      borderRadius: BorderRadius.circular(6),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-        child: Row(children: [
-          TierFramedAvatar(
-            tier: tier,
-            avatarSize: 32,
-            child: Stack(clipBehavior: Clip.none, children: [
-              // Avatar
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: KodaColors.elevated,
-                backgroundImage: avatarUrl != null
-                    ? NetworkImage(avatarUrl)
-                    : null,
-                child: avatarUrl == null
-                    ? Text(username[0].toUpperCase(),
-                        style: TextStyle(
-                            color: KodaColors.text1,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700))
-                    : null,
-              ),
-              // Status dot
-              Positioned(
-                bottom: -1,
-                right: -1,
-                child: Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: isOffline
-                        ? const Color(0xFF6b7280)
-                        : KodaColors.koda,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                        color: KodaColors.bg2, width: 1.5),
+    final statusLabel = isOffline ? 'Offline' : 'Online';
+    final tierLabel = tier != null && tier != 'free' ? ', $tier tier' : '';
+
+    return Semantics(
+      button: true,
+      label: '$username, $statusLabel$tierLabel',
+      child: GestureDetector(
+        onSecondaryTapUp: (d) => _showModerationMenu(member, d.globalPosition),
+        child: InkWell(
+        onTap: () => widget.onMemberTap(member),
+        borderRadius: BorderRadius.circular(6),
+        child: ExcludeSemantics(
+          child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          child: Row(children: [
+            TierFramedAvatar(
+              tier: tier,
+              avatarSize: 32,
+              child: Stack(clipBehavior: Clip.none, children: [
+                // Avatar
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: KodaColors.elevated,
+                  backgroundImage: avatarUrl != null
+                      ? NetworkImage(avatarUrl)
+                      : null,
+                  child: avatarUrl == null
+                      ? Text(username[0].toUpperCase(),
+                          style: TextStyle(
+                              color: KodaColors.text1,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700))
+                      : null,
+                ),
+                // Status dot
+                Positioned(
+                  bottom: -1,
+                  right: -1,
+                  child: Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: isOffline
+                          ? const Color(0xFF6b7280)
+                          : KodaColors.koda,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                          color: KodaColors.bg2, width: 1.5),
+                    ),
                   ),
                 ),
-              ),
-            ]),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              withPronouns(username, member),
-              style: TextStyle(
-                color: isOffline
-                    ? KodaColors.text3
-                    : nameColor,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-              overflow: TextOverflow.ellipsis,
+              ]),
             ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                withPronouns(username, member),
+                style: TextStyle(
+                  color: isOffline
+                      ? KodaColors.text3
+                      : nameColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            TierBadge(tier: tier, size: 13),
+          ]),
           ),
-          TierBadge(tier: tier, size: 13),
-        ]),
-      ),
+        ),
+        ),
       ),
     );
   }

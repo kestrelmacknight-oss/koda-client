@@ -619,6 +619,7 @@ class _PostTileState extends State<_PostTile> {
                 ),
                 IconButton(
                   icon: Icon(Icons.close, color: KodaColors.text3, size: 18),
+                  tooltip: 'Close',
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),

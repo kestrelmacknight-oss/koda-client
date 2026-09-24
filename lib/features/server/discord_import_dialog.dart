@@ -114,6 +114,7 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                 const Spacer(),
                 IconButton(
                   icon: Icon(Icons.close, size: 18, color: KodaColors.text3),
+                  tooltip: 'Close',
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),

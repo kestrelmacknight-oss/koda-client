@@ -125,6 +125,7 @@ class _MessageSearchDialogState extends State<MessageSearchDialog> {
               const SizedBox(width: 8),
               IconButton(
                 icon: Icon(Icons.search, color: KodaColors.koda),
+                tooltip: 'Search',
                 onPressed: _searching ? null : _search,
               ),
             ]),

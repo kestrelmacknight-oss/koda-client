@@ -388,6 +388,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                   IconButton(
                     icon: Icon(Icons.copy_outlined, size: 14,
                         color: KodaColors.text3),
+                    tooltip: 'Copy key',
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                     onPressed: () {
@@ -628,6 +629,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                         ),
                         IconButton(
                           icon: Icon(Icons.close, size: 14, color: KodaColors.text3),
+                          tooltip: 'Remove file',
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                           onPressed: () => setDialogState(() {

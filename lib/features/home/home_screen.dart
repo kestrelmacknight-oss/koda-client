@@ -1460,13 +1460,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             final count = r['count'] as int;
             final userIds = List<String>.from(r['user_ids'] ?? []);
             final reacted = me != null && userIds.contains(me.id);
-            return GestureDetector(
+            final emojiName = emoji.startsWith(kCustomEmojiPrefix) ? 'custom emoji' : emoji;
+            return Semantics(
+              button: true,
+              label: '$emojiName, $count reaction${count == 1 ? "" : "s"}'
+                  '${reacted ? ", you reacted, double tap to remove" : ", double tap to add"}',
+              child: GestureDetector(
               onTap: () async {
                 final updated = reacted
                     ? await KodaApi.instance.removeReaction(m['id'] as String, emoji)
                     : await KodaApi.instance.addReaction(m['id'] as String, emoji);
                 if (updated != null && mounted) setState(() => m['reactions'] = updated);
               },
+              child: ExcludeSemantics(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -1481,18 +1487,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   Text('$count', style: const TextStyle(fontSize: 12)),
                 ]),
               ),
+              ),
+              ),
             );
           }),
-          GestureDetector(
-            onTap: () => _showReactionPicker(m),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: KodaColors.elevated,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: KodaColors.border),
+          Semantics(
+            button: true,
+            label: 'Add reaction',
+            child: GestureDetector(
+              onTap: () => _showReactionPicker(m),
+              child: ExcludeSemantics(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: KodaColors.elevated,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: KodaColors.border),
+                  ),
+                  child: const Text('+ :)', style: TextStyle(fontSize: 12)),
+                ),
               ),
-              child: const Text('+ :)', style: TextStyle(fontSize: 12)),
             ),
           ),
         ],
@@ -1770,8 +1784,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     for (final cat in _categories) {
       final catChannels = regular.where((c) => c['category_id'] == cat['id']).toList();
       if (catChannels.isEmpty) continue;
-      result.add(GestureDetector(
+      // Edit/Delete Category is currently only reachable via the
+      // right-click menu this GestureDetector opens -- a keyboard/
+      // screen-reader entry point for that belongs with the keyboard
+      // navigation phase, not here. This just identifies the label
+      // itself as a heading rather than leaving it entirely mute.
+      result.add(Semantics(
+        header: true,
+        label: cat['name'] as String? ?? 'Category',
+        child: GestureDetector(
         onSecondaryTapUp: (d) => _showCategoryContextMenu(cat, d.globalPosition),
+        child: ExcludeSemantics(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 2),
           child: Text(
@@ -1779,6 +1802,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             style: TextStyle(color: KodaColors.text3, fontSize: 10,
                 fontWeight: FontWeight.w700, letterSpacing: 1),
           ),
+        ),
+        ),
         ),
       ));
       result.addAll(catChannels.map((c) => _buildChannelTile(c, selectedChannel)));
@@ -2105,12 +2130,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                GestureDetector(
-                  onTap: () => _showUserProfile(context, m['author'] as Map<String, dynamic>?),
-                  child: KodaAvatar(
-                  username: author,
-                  size: 34,
-                  avatarUrl: (m['author'] as Map<String, dynamic>?)?['avatar_url'] as String?,
+                Semantics(
+                  button: true,
+                  label: "View $author's profile",
+                  child: GestureDetector(
+                    onTap: () => _showUserProfile(context, m['author'] as Map<String, dynamic>?),
+                    child: ExcludeSemantics(
+                      child: KodaAvatar(
+                      username: author,
+                      size: 34,
+                      avatarUrl: (m['author'] as Map<String, dynamic>?)?['avatar_url'] as String?,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -2193,6 +2224,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             ),
             IconButton(
               icon: Icon(Icons.close, size: 14, color: KodaColors.text3),
+              tooltip: 'Cancel reply',
               onPressed: () => setState(() => _replyingTo = null),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
@@ -2213,6 +2245,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             ),
             IconButton(
               icon: Icon(Icons.close, size: 14, color: KodaColors.text3),
+              tooltip: 'Remove attachment',
               onPressed: () => setState(() => _pendingAttachment = null),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
@@ -2285,6 +2318,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           const SizedBox(width: 10),
           IconButton(
             icon: Icon(Icons.send, color: KodaColors.koda),
+            tooltip: 'Send message',
             onPressed: _sendMessage,
           ),
         ]),
@@ -2514,12 +2548,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                         // boosted-server ring.
                         final borderHex =
                             (s['cosmetics'] as Map?)?['icon_border_color'] as String?;
+                        final serverName = s['name'] as String? ?? 'Server';
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: GestureDetector(
+                          child: Semantics(
+                            button: true,
+                            selected: selected,
+                            label: '$serverName'
+                                '${borderHex != null ? ", boosted" : ""}',
+                            child: GestureDetector(
                             onTap: () => _selectServer(s),
                             onSecondaryTapUp: (d) => _showServerContextMenu(s, d.globalPosition),
 
+                            child: ExcludeSemantics(
                             child: Container(
                               width: 48, height: 48,
                               margin: const EdgeInsets.symmetric(horizontal: 12),
@@ -2556,6 +2597,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                                         color: Colors.white,
                                         fontWeight: FontWeight.w700),
                                   ),
+                            ),
+                            ),
                             ),
                           ),
                         );
@@ -2671,6 +2714,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   IconButton(
                     icon: Icon(Icons.settings_outlined,
                         size: 16, color: KodaColors.text3),
+                    tooltip: 'Settings',
                     onPressed: () => Navigator.push(
                         context,
                         MaterialPageRoute(

@@ -390,14 +390,21 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                 const SizedBox(height: 6),
                 Wrap(spacing: 8, runSpacing: 8, children: _colorSwatches.map((hex) {
                   final selected = color == hex;
-                  return GestureDetector(
-                    onTap: () => setDialogState(() => color = hex),
-                    child: Container(
-                      width: 28, height: 28,
-                      decoration: BoxDecoration(
-                        color: _parseColor(hex),
-                        shape: BoxShape.circle,
-                        border: selected ? Border.all(color: Colors.white, width: 2) : null,
+                  return Semantics(
+                    button: true,
+                    selected: selected,
+                    label: 'Color $hex',
+                    child: GestureDetector(
+                      onTap: () => setDialogState(() => color = hex),
+                      child: ExcludeSemantics(
+                        child: Container(
+                          width: 28, height: 28,
+                          decoration: BoxDecoration(
+                            color: _parseColor(hex),
+                            shape: BoxShape.circle,
+                            border: selected ? Border.all(color: Colors.white, width: 2) : null,
+                          ),
+                        ),
                       ),
                     ),
                   );
@@ -532,22 +539,28 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
         title: Row(children: [
-          GestureDetector(
-            onTap: () => _uploadServerIcon(server),
-            child: Container(
-              width: 36, height: 36,
-              decoration: BoxDecoration(
-                color: KodaColors.elevated,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: KodaColors.border),
+          Semantics(
+            button: true,
+            label: 'Change server icon',
+            child: GestureDetector(
+              onTap: () => _uploadServerIcon(server),
+              child: ExcludeSemantics(
+                child: Container(
+                  width: 36, height: 36,
+                  decoration: BoxDecoration(
+                    color: KodaColors.elevated,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: KodaColors.border),
+                  ),
+                  child: server?['icon_url'] != null && (server!['icon_url'] as String).isNotEmpty
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(server['icon_url'] as String,
+                              width: 36, height: 36, fit: BoxFit.cover))
+                      : Icon(Icons.add_photo_alternate_outlined,
+                          color: KodaColors.text3, size: 18),
+                ),
               ),
-              child: server?['icon_url'] != null && (server!['icon_url'] as String).isNotEmpty
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.network(server['icon_url'] as String,
-                          width: 36, height: 36, fit: BoxFit.cover))
-                  : Icon(Icons.add_photo_alternate_outlined,
-                      color: KodaColors.text3, size: 18),
             ),
           ),
           const SizedBox(width: 10),
@@ -888,6 +901,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                           style: TextStyle(color: KodaColors.text2, fontSize: 10)),
                       IconButton(
                         icon: Icon(Icons.delete_outline, size: 14, color: KodaColors.accent),
+                        tooltip: 'Delete emoji',
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                         onPressed: () => _deleteEmoji(e['id'] as String),
@@ -1011,14 +1025,21 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         child: iconBorderUnlocked
             ? Wrap(spacing: 8, runSpacing: 8, children: _colorSwatches.map((hex) {
                 final selected = cosmetics['icon_border_color'] == hex;
-                return GestureDetector(
-                  onTap: () => _setIconBorderColor(hex),
-                  child: Container(
-                    width: 32, height: 32,
-                    decoration: BoxDecoration(
-                      color: _parseColor(hex),
-                      shape: BoxShape.circle,
-                      border: selected ? Border.all(color: Colors.white, width: 2) : null,
+                return Semantics(
+                  button: true,
+                  selected: selected,
+                  label: 'Color $hex',
+                  child: GestureDetector(
+                    onTap: () => _setIconBorderColor(hex),
+                    child: ExcludeSemantics(
+                      child: Container(
+                        width: 32, height: 32,
+                        decoration: BoxDecoration(
+                          color: _parseColor(hex),
+                          shape: BoxShape.circle,
+                          border: selected ? Border.all(color: Colors.white, width: 2) : null,
+                        ),
+                      ),
                     ),
                   ),
                 );
@@ -1421,7 +1442,10 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                 if (_isCurrentlyMuted(m))
                   Padding(
                     padding: EdgeInsets.only(right: 4),
-                    child: Icon(Icons.volume_off, size: 14, color: KodaColors.gold),
+                    child: Semantics(
+                      label: 'Muted',
+                      child: Icon(Icons.volume_off, size: 14, color: KodaColors.gold),
+                    ),
                   ),
                 if (!isSelf)
                   PopupMenuButton<String>(
@@ -1448,7 +1472,10 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           );
         }),
         const SizedBox(height: 8),
-        InkWell(
+        MergeSemantics(
+          child: Semantics(
+            label: _showBans ? 'expanded' : 'collapsed',
+            child: InkWell(
           onTap: () => setState(() => _showBans = !_showBans),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -1460,6 +1487,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                   style: TextStyle(color: KodaColors.text3, fontSize: 11,
                       fontWeight: FontWeight.w700, letterSpacing: 0.5)),
             ]),
+          ),
+            ),
           ),
         ),
         if (_showBans)
@@ -1872,6 +1901,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                     ),
                     IconButton(
                       icon: Icon(Icons.delete_outline, size: 16, color: KodaColors.accent),
+                      tooltip: 'Delete invite',
                       onPressed: () async {
                         await KodaApi.instance.deleteInvite(
                             serverId, inv['code'] as String);

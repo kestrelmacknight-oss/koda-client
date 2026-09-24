@@ -181,6 +181,7 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
                         IconButton(
                           icon: Icon(Icons.copy, size: 16,
                               color: KodaColors.text3),
+                          tooltip: 'Copy code',
                           onPressed: () =>
                               Clipboard.setData(ClipboardData(text: code)),
                         ),
@@ -285,6 +286,7 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
                                 constraints: const BoxConstraints(),
                                 icon: Icon(Icons.copy, size: 14,
                                     color: KodaColors.text3),
+                                tooltip: 'Copy code',
                                 onPressed: () => Clipboard.setData(
                                     ClipboardData(text: c['code'] as String)),
                               ),
@@ -881,10 +883,12 @@ class _WikiTabState extends State<_WikiTab> {
                           ])),
                           IconButton(
                             icon: Icon(Icons.edit_outlined, size: 18, color: KodaColors.text3),
+                            tooltip: 'Edit article',
                             onPressed: () => _showEditor(article: a),
                           ),
                           IconButton(
                             icon: Icon(Icons.delete_outline, size: 18, color: KodaColors.text3),
+                            tooltip: 'Delete article',
                             onPressed: () => _delete(a),
                           ),
                         ]),

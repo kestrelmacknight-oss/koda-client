@@ -403,7 +403,10 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                               itemBuilder: (_, i) {
                                 // Screen share tile
                                 if (_screenShareOn && i == participants.length) {
-                                  return GestureDetector(
+                                  return Semantics(
+                                    button: true,
+                                    label: 'Your screen, tap to view full-screen',
+                                    child: GestureDetector(
                                     onTap: () => showDialog(
                                       context: context,
                                       barrierColor: Colors.black87,
@@ -429,6 +432,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                         ),
                                       ),
                                     ),
+                                    child: ExcludeSemantics(
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color: KodaColors.card,
@@ -454,7 +458,8 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                         ),
                                       ]),
                                     ),
-                                  );
+                                    ),
+                                  ));
                                 }
 
                                 // Participant tile
@@ -477,12 +482,19 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                         : null)
                                     : _varmConfigFor(p);
 
-                                return GestureDetector(
+                                return Semantics(
+                                  button: true,
+                                  label: '${isLocal ? "$name (you)" : name}'
+                                      '${speaking ? ", speaking" : ""}'
+                                      '${isLocal && _cameraOn ? ", camera on" : ""}'
+                                      ', double tap to pop out',
+                                  child: GestureDetector(
                                   onDoubleTap: () => _popOutParticipant(context, name, videoTrack),
                                   onTap: () => _popOutParticipant(context, name, videoTrack),
                                   onSecondaryTapUp: isLocal
                                       ? null
                                       : (d) => _showVolumeDialog(p, name),
+                                  child: ExcludeSemantics(
                                   child: Container(
                                     decoration: BoxDecoration(
                                       color: KodaColors.card,
@@ -528,6 +540,8 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                         ),
                                       ),
                                     ]),
+                                  ),
+                                  ),
                                   ),
                                 );
                               },

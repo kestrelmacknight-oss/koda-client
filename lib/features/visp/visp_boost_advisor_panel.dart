@@ -183,6 +183,7 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
                 ? SizedBox(width: 16, height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
                 : Icon(Icons.send, size: 18, color: KodaColors.koda),
+            tooltip: 'Send',
             onPressed: _loading ? null : _submitFollowUp,
           ),
         ]),

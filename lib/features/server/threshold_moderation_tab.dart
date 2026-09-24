@@ -109,11 +109,13 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
                 const SizedBox(width: 12),
                 IconButton(
                   icon: Icon(Icons.remove_circle_outline, size: 20, color: KodaColors.text3),
+                  tooltip: 'Decrease threshold',
                   onPressed: threshold > 2 ? () => setDialogState(() => threshold--) : null,
                 ),
                 Text('$threshold', style: TextStyle(color: KodaColors.text1, fontSize: 15, fontWeight: FontWeight.w700)),
                 IconButton(
                   icon: Icon(Icons.add_circle_outline, size: 20, color: KodaColors.text3),
+                  tooltip: 'Increase threshold',
                   onPressed: threshold < selected.length ? () => setDialogState(() => threshold++) : null,
                 ),
                 const Spacer(),

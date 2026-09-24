@@ -70,7 +70,16 @@ class KodaAvatar extends StatelessWidget {
             ),
           )
         : _initialCircle();
-    return TierFramedAvatar(tier: tier, avatarSize: size, child: avatar);
+    // One label for the whole visual unit (frame + image/initial) --
+    // ExcludeSemantics on the content stops the inner Image/Text from
+    // also being announced as a separate, redundant node.
+    return Semantics(
+      label: 'Avatar for $username',
+      image: true,
+      child: ExcludeSemantics(
+        child: TierFramedAvatar(tier: tier, avatarSize: size, child: avatar),
+      ),
+    );
   }
 
   Widget _initialCircle() {

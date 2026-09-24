@@ -121,7 +121,8 @@ class NotificationBell extends ConsumerWidget {
                           final n = state.notifications[i];
                           final read = n['read'] == true;
                           final time = _formatTime(n['inserted_at']);
-                          return InkWell(
+                          return MergeSemantics(
+                            child: InkWell(
                             onTap: () {
                               if (!read) notifier.markRead(n['id'] as String);
                               Navigator.pop(context);
@@ -134,6 +135,12 @@ class NotificationBell extends ConsumerWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 12),
                               child: Row(children: [
+                                // No visual footprint -- gives the tint-only
+                                // "unread" status (Container.color above) a
+                                // text equivalent, merged into this row's
+                                // announcement by the MergeSemantics above.
+                                if (!read)
+                                  Semantics(label: 'Unread', child: const SizedBox.shrink()),
                                 Icon(
                                   _notifIcon(n['type'] as String? ?? ''),
                                   color: read
@@ -167,6 +174,7 @@ class NotificationBell extends ConsumerWidget {
                                           color: KodaColors.text3,
                                           fontSize: 10)),
                               ]),
+                            ),
                             ),
                           );
                         },

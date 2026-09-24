@@ -157,6 +157,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       child: Row(children: [
         IconButton(
           icon: Icon(Icons.chevron_left, color: KodaColors.text2),
+          tooltip: 'Previous month',
           onPressed: () => _changeMonth(-1),
         ),
         Expanded(
@@ -169,6 +170,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         ),
         IconButton(
           icon: Icon(Icons.chevron_right, color: KodaColors.text2),
+          tooltip: 'Next month',
           onPressed: () => _changeMonth(1),
         ),
         TextButton(
@@ -230,8 +232,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             day.day == _selectedDay!.day;
         final dayEvents = _eventsForDay(day);
 
-        return GestureDetector(
+        return Semantics(
+          button: true,
+          selected: isSelected,
+          label: '${DateFormat('MMMM d').format(day)}'
+              '${isToday ? ", today" : ""}'
+              '${dayEvents.isNotEmpty ? ", ${dayEvents.length} event${dayEvents.length == 1 ? "" : "s"}" : ""}',
+          child: GestureDetector(
           onTap: () => setState(() => _selectedDay = day),
+          child: ExcludeSemantics(
           child: Container(
             margin: const EdgeInsets.all(2),
             decoration: BoxDecoration(
@@ -271,6 +280,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   ),
               ],
             ),
+          ),
+          ),
           ),
         );
       },
@@ -512,7 +523,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 Text('Start (${DateTime.now().timeZoneName})',
                   style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
-                GestureDetector(
+                Semantics(
+                  button: true,
+                  label: 'Start date and time, '
+                      '${DateFormat('MMM d, yyyy h:mm a').format(startAt)}',
+                  child: GestureDetector(
                   onTap: () async {
                     final date = await showDatePicker(
                       context: ctx,
@@ -528,6 +543,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     setDialogState(() => startAt = DateTime(
                         date.year, date.month, date.day, time.hour, time.minute));
                   },
+                  child: ExcludeSemantics(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(
@@ -537,6 +553,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     child: Text(DateFormat('MMM d, yyyy h:mm a').format(startAt),
                         style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                   ),
+                  ),
+                  ),
                 ),
                 const SizedBox(height: 10),
 
@@ -544,7 +562,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 Text('End — optional (${DateTime.now().timeZoneName})',
                   style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
-                GestureDetector(
+                Semantics(
+                  button: true,
+                  label: 'End date and time, ${endAt != null
+                      ? DateFormat('MMM d, yyyy h:mm a').format(endAt!)
+                      : "not set"}',
+                  child: GestureDetector(
                   onTap: () async {
                     final date = await showDatePicker(
                       context: ctx,
@@ -562,6 +585,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     setDialogState(() => endAt = DateTime(
                         date.year, date.month, date.day, time.hour, time.minute));
                   },
+                  child: ExcludeSemantics(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(
@@ -576,6 +600,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                           color: endAt != null ? KodaColors.text1 : KodaColors.text3,
                           fontSize: 13),
                     ),
+                  ),
+                  ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -605,8 +631,13 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   '#3B82F6', '#EC4899', '#10B981',
                 ].map((c) {
                   final col = Color(int.parse(c.replaceFirst('#', '0xFF')));
-                  return GestureDetector(
+                  return Semantics(
+                    button: true,
+                    selected: color == c,
+                    label: 'Color $c',
+                    child: GestureDetector(
                     onTap: () => setDialogState(() => color = c),
+                    child: ExcludeSemantics(
                     child: Container(
                       width: 24, height: 24,
                       decoration: BoxDecoration(
@@ -616,6 +647,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                             ? Border.all(color: Colors.white, width: 2)
                             : null,
                       ),
+                    ),
+                    ),
                     ),
                   );
                 }).toList()),

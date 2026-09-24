@@ -215,6 +215,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
                 ),
                 IconButton(
                   icon: Icon(Icons.close, size: 18, color: KodaColors.text3),
+                  tooltip: 'Close',
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),

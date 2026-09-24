@@ -25,18 +25,20 @@ class VoiceBar extends ConsumerWidget {
     final isSpeaking = localSid != null && activeSpeakers.contains(localSid);
     final participantCount = 1 + session.room.remoteParticipants.length;
 
-    return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => VoiceScreen(
-            channelName: session.channelName,
-            token: '',   // room already connected -- VoiceScreen detects this
-            url:   '',
-            existingSession: session,
+    void openVoiceScreen() => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => VoiceScreen(
+              channelName: session.channelName,
+              token: '',   // room already connected -- VoiceScreen detects this
+              url:   '',
+              existingSession: session,
+            ),
           ),
-        ),
-      ),
+        );
+
+    return GestureDetector(
+      onTap: openVoiceScreen,
       child: Container(
         height: 52,
         decoration: BoxDecoration(
@@ -52,36 +54,50 @@ class VoiceBar extends ConsumerWidget {
         ),
         padding: const EdgeInsets.symmetric(horizontal: 14),
         child: Row(children: [
-          // Speaking indicator dot
-          Container(
-            width: 8, height: 8,
-            decoration: BoxDecoration(
-              color: isSpeaking ? KodaColors.mint : KodaColors.text3,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 8),
-
-          // Channel name and participant count
+          // Speaking indicator dot + channel name/count -- merged into
+          // one informational node (not the 3 real buttons below, which
+          // must stay independently focusable) with its own double-tap
+          // action so the "tap to expand" hint stays true for a screen
+          // reader too, not just visually.
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  session.channelName,
-                  style: TextStyle(
-                      color: KodaColors.text1,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  '$participantCount connected · tap to expand',
-                  style: TextStyle(
-                      color: KodaColors.text3, fontSize: 10),
-                ),
-              ],
+            child: Semantics(
+              button: true,
+              label: '${session.channelName}, $participantCount connected'
+                  '${isSpeaking ? ", you are speaking" : ""}',
+              onTap: openVoiceScreen,
+              child: ExcludeSemantics(
+                child: Row(children: [
+                  Container(
+                    width: 8, height: 8,
+                    decoration: BoxDecoration(
+                      color: isSpeaking ? KodaColors.mint : KodaColors.text3,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          session.channelName,
+                          style: TextStyle(
+                              color: KodaColors.text1,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          '$participantCount connected · tap to expand',
+                          style: TextStyle(
+                              color: KodaColors.text3, fontSize: 10),
+                        ),
+                      ],
+                    ),
+                  ),
+                ]),
+              ),
             ),
           ),
 

@@ -766,6 +766,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                 ),
                 IconButton(
                   icon: Icon(Icons.close, size: 14, color: KodaColors.text3),
+                  tooltip: 'Remove attachment',
                   onPressed: () => setState(() => _pendingAttachment = null),
                   constraints: const BoxConstraints(),
                   padding: const EdgeInsets.only(left: 6),
@@ -780,6 +781,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                       width: 16, height: 16,
                       child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
                   : Icon(Icons.attach_file, color: KodaColors.text3),
+              tooltip: 'Attach file',
               onPressed: _uploadingAttachment ? null : _pickAndEncryptAttachment,
             ),
             Expanded(
@@ -792,6 +794,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
             const SizedBox(width: 10),
             IconButton(
               icon: Icon(Icons.send, color: KodaColors.koda),
+              tooltip: 'Send message',
               onPressed: _sendMessage,
             ),
           ]),
