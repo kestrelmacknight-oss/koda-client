@@ -199,9 +199,12 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
                     : Icon(Icons.auto_awesome, color: KodaColors.koda, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(_isNewServer ? 'Describe your server to Visp' : 'Ask Visp to add to this server',
-                      style: TextStyle(color: KodaColors.text1, fontSize: 16,
-                          fontWeight: FontWeight.w700)),
+                  child: Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 8, children: [
+                    Text(_isNewServer ? 'Describe your server to Visp' : 'Ask Visp to add to this server',
+                        style: TextStyle(color: KodaColors.text1, fontSize: 16,
+                            fontWeight: FontWeight.w700)),
+                    const VispDevBadge(),
+                  ]),
                 ),
                 IconButton(
                   icon: Icon(Icons.close, size: 18, color: KodaColors.text3),

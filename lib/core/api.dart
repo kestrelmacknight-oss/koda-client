@@ -1120,6 +1120,26 @@ class KodaApi {
     } catch (e) { _log('searchUsers', e); return []; }
   }
 
+  Future<List<Map<String, dynamic>>> adminSearchServers(String query) async {
+    try {
+      final res = await _dio.get('/admin/servers/search',
+          queryParameters: {'q': query});
+      return List<Map<String, dynamic>>.from(res.data['servers'] ?? []);
+    } catch (e) { _log('adminSearchServers', e); return []; }
+  }
+
+  /// Directly applies [count] boosts to a server, bypassing the token/
+  /// purchase flow -- for comping a server or fixing a support issue.
+  /// Returns the server's updated boost status (count/level/etc, same
+  /// shape as getBoostStatus) on success.
+  Future<Map<String, dynamic>?> adminGrantBoosts(String serverId, int count) async {
+    try {
+      final res = await _dio.post('/admin/servers/$serverId/boosts/grant',
+          data: {'count': count});
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('adminGrantBoosts', e); return null; }
+  }
+
 
   // ── Discovery ────────────────────────────────────────────────────────
 
@@ -2023,6 +2043,27 @@ class KodaApi {
       final err = e.response?.data is Map ? e.response?.data['error'] as String? : null;
       return err ?? 'Could not boost this server.';
     } catch (e) { _log('boostServer', e); return 'Could not boost this server.'; }
+  }
+
+  /// Starts a direct, one-time purchase of a single boost token (see
+  /// Koda.Boosts.create_purchase_intent/1) -- separate from the token
+  /// Pulse subscribers already get minted on renewal.
+  Future<String?> purchaseBoost() async {
+    try {
+      final res = await _dio.post('/boost_tokens/purchase');
+      return res.data['checkout_url'] as String?;
+    } catch (e) { _log('purchaseBoost', e); return null; }
+  }
+
+  /// Servers opted into the platform-wide Koda Marketplace (public,
+  /// no auth needed -- see Koda.Servers.list_marketplace_servers/1).
+  /// [featuredOnly] restricts to this week's random featured rotation.
+  Future<List<Map<String, dynamic>>> getMarketplaceServers({bool featuredOnly = false}) async {
+    try {
+      final res = await _dio.get('/marketplace/servers',
+          queryParameters: {if (featuredOnly) 'featured': 'true'});
+      return List<Map<String, dynamic>>.from(res.data['servers'] ?? []);
+    } catch (e) { _log('getMarketplaceServers', e); return []; }
   }
 
   // -- Custom server emoji (boost-level-gated slots, see Koda.Emoji) -----------

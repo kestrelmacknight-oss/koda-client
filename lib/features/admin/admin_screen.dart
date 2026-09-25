@@ -26,7 +26,7 @@ class _AdminScreenState extends State<AdminScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 5, vsync: this);
+    _tabs = TabController(length: 6, vsync: this);
   }
 
   @override
@@ -59,6 +59,7 @@ class _AdminScreenState extends State<AdminScreen>
             Tab(text: 'DM Reports'),
             Tab(text: 'Spam Flags'),
             Tab(text: 'Wiki'),
+            Tab(text: 'Boosts'),
           ],
         ),
       ),
@@ -70,6 +71,7 @@ class _AdminScreenState extends State<AdminScreen>
           _DmReportsTab(),
           _SpamFlagsTab(),
           _WikiTab(),
+          _BoostsTab(),
         ],
       ),
     );
@@ -891,6 +893,159 @@ class _WikiTabState extends State<_WikiTab> {
                             tooltip: 'Delete article',
                             onPressed: () => _delete(a),
                           ),
+                        ]),
+                      );
+                    },
+                  ),
+      ),
+    ]);
+  }
+}
+
+// ── Boosts Tab ───────────────────────────────────────────────────────────────
+// Manually applies server boosts, bypassing the token/purchase flow --
+// for comping a server or fixing a support issue (see koda-server's
+// Koda.Boosts.admin_grant_boosts/3). Search-then-select mirrors
+// _UsersTab above.
+
+class _BoostsTab extends StatefulWidget {
+  @override
+  State<_BoostsTab> createState() => _BoostsTabState();
+}
+
+class _BoostsTabState extends State<_BoostsTab> {
+  final _searchCtrl = TextEditingController();
+  List<Map<String, dynamic>> _results = [];
+  bool _loading = false;
+  String? _grantingServerId;
+
+  Future<void> _search(String query) async {
+    if (query.trim().isEmpty) return;
+    setState(() => _loading = true);
+    final results = await KodaApi.instance.adminSearchServers(query.trim());
+    if (!mounted) return;
+    setState(() { _results = results; _loading = false; });
+  }
+
+  Future<void> _grant(Map<String, dynamic> server) async {
+    final countText = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        final ctrl = TextEditingController(text: '1');
+        return AlertDialog(
+          backgroundColor: KodaColors.card,
+          title: Text('Grant boosts to ${server['name']}',
+              style: TextStyle(color: KodaColors.text1)),
+          content: KodaTextField(
+            controller: ctrl,
+            hintText: 'Number of boosts',
+            keyboardType: TextInputType.number,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel', style: TextStyle(color: KodaColors.text3)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, ctrl.text),
+              child: Text('Grant', style: TextStyle(color: KodaColors.koda)),
+            ),
+          ],
+        );
+      },
+    );
+    if (countText == null || !mounted) return;
+    final count = int.tryParse(countText.trim());
+    if (count == null || count <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Enter a positive whole number.')));
+      return;
+    }
+
+    setState(() => _grantingServerId = server['id'] as String);
+    final status = await KodaApi.instance.adminGrantBoosts(server['id'] as String, count);
+    if (!mounted) return;
+    setState(() => _grantingServerId = null);
+
+    if (status == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to grant boosts.')));
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+        'Granted $count boost${count == 1 ? '' : 's'} to ${server['name']} '
+        '-- now level ${status['level']} (${status['count']} active).')));
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.all(16),
+        child: KodaTextField(
+          controller: _searchCtrl,
+          hintText: 'Search servers by name...',
+          onSubmitted: _search,
+        ),
+      ),
+      Divider(color: KodaColors.border, height: 1),
+      Expanded(
+        child: _loading
+            ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
+            : _results.isEmpty
+                ? Center(child: Text('Search for a server above',
+                    style: TextStyle(color: KodaColors.text3)))
+                : ListView.builder(
+                    padding: const EdgeInsets.all(12),
+                    itemCount: _results.length,
+                    itemBuilder: (_, i) {
+                      final s = _results[i];
+                      final iconUrl = s['icon_url'] as String?;
+                      final granting = _grantingServerId == s['id'];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: KodaColors.card,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: KodaColors.border),
+                        ),
+                        child: Row(children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: SizedBox(
+                              width: 36, height: 36,
+                              child: iconUrl != null
+                                  ? Image.network(iconUrl, fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => ColoredBox(color: KodaColors.elevated))
+                                  : ColoredBox(color: KodaColors.elevated,
+                                      child: Icon(Icons.groups_outlined, color: KodaColors.text3, size: 18)),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                            Text(s['name'] as String? ?? '',
+                                style: TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w600)),
+                            Text('${s['member_count'] ?? 0} members',
+                                style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                          ])),
+                          const SizedBox(width: 8),
+                          granting
+                              ? SizedBox(width: 20, height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
+                              : TextButton.icon(
+                                  onPressed: () => _grant(s),
+                                  icon: Icon(Icons.bolt, size: 16, color: KodaColors.koda),
+                                  label: Text('Grant Boosts', style: TextStyle(color: KodaColors.koda)),
+                                ),
                         ]),
                       );
                     },

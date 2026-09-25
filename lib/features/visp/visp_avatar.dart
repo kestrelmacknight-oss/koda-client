@@ -41,6 +41,32 @@ class VispAvatarPrefs {
   }
 }
 
+/// Small "In Development" pill shown wherever Visp is actually invoked
+/// (dialog headers, the Boost ROI advisor) -- Visp depends on a
+/// self-hosted Ollama instance that isn't yet reachable from production
+/// (see koda-server's runtime.exs), so responses can be flaky or
+/// unavailable while that gets sorted out and the model itself keeps
+/// getting tuned locally. This is purely a "manage expectations" label,
+/// not a feature gate -- Visp still works whenever Ollama is reachable.
+class VispDevBadge extends StatelessWidget {
+  const VispDevBadge({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: KodaColors.koda.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: KodaColors.koda.withValues(alpha: 0.4)),
+      ),
+      child: Text('IN DEVELOPMENT',
+          style: TextStyle(color: KodaColors.koda, fontSize: 9,
+              fontWeight: FontWeight.w700, letterSpacing: 0.4)),
+    );
+  }
+}
+
 enum VispMood { idle, thinking, asking, planReady, error }
 
 /// Plain-text kaomoji per mood -- this is Visp's "face". Kept as a pure

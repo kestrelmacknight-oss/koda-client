@@ -209,9 +209,12 @@ class _VispEventDialogState extends State<VispEventDialog> {
                     : Icon(Icons.auto_awesome, color: KodaColors.koda, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text('Ask Visp to create an event',
-                      style: TextStyle(color: KodaColors.text1, fontSize: 16,
-                          fontWeight: FontWeight.w700)),
+                  child: Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 8, children: [
+                    Text('Ask Visp to create an event',
+                        style: TextStyle(color: KodaColors.text1, fontSize: 16,
+                            fontWeight: FontWeight.w700)),
+                    const VispDevBadge(),
+                  ]),
                 ),
                 IconButton(
                   icon: Icon(Icons.close, size: 18, color: KodaColors.text3),

@@ -42,6 +42,7 @@ import '../gallery/gallery_screen.dart';
 import '../stage/stage_screen.dart';
 import '../server/rules_screen.dart';
 import '../server/calendar_screen.dart';
+import '../marketplace/koda_marketplace_screen.dart';
 import '../marketplace/marketplace_screen.dart';
 import '../marketplace/tip_dialog.dart';
 import '../server/role_select_screen.dart';
@@ -2609,6 +2610,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               icon: Icon(Icons.add, color: KodaColors.text2),
               tooltip: 'Create or Join',
               onPressed: () => _showAddServerMenu(),
+            ),
+            IconButton(
+              icon: Icon(Icons.storefront_outlined, color: KodaColors.text2),
+              tooltip: 'Koda Marketplace',
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const KodaMarketplaceScreen())),
             ),
             if (ref.watch(authProvider).user?.isAdmin == true)
               IconButton(

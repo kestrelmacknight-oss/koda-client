@@ -1,22 +1,25 @@
 ﻿// lib/features/marketplace/marketplace_screen.dart
 //
-// Marketplace hub: Creator setup, Spark/Pulse subscriptions,
-// server bank balance, tip history.
+// Server-scoped marketplace hub: Creator Payouts (only reachable in
+// accountOnly mode, see Settings > Billing) plus, embedded inside a
+// specific server's own view, Server Bank/Digital Goods/Merch/
+// Subscription/Revenue -- all server-scoped, all read
+// ref.watch(selectedServerProvider). The account-wide Spark/Pulse
+// subscription and boost purchasing live in KodaMarketplaceScreen
+// instead (reachable from the server rail), not here.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/api.dart';
-import '../../core/checkout.dart';
 import '../../core/permissions.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../core/time_utils.dart';
-import '../../shared/tier_badge.dart';
 import '../visp/visp_boost_advisor_panel.dart';
-import '../../shared/widgets.dart';
 import 'digital_goods_screen.dart';
 import 'printful_merch_screen.dart';
+import 'server_subscription_screen.dart';
 
 class MarketplaceScreen extends ConsumerStatefulWidget {
   /// When true, renders just the tab bar + tab content (no Scaffold/AppBar
@@ -24,14 +27,15 @@ class MarketplaceScreen extends ConsumerStatefulWidget {
   /// see home_screen.dart, where this is shown in the main content area
   /// as a server-scoped pseudo-channel.
   final bool embedded;
-  /// Settings > Billing's mode: only Subscriptions/Creator, the two tabs
-  /// that are genuinely account-level. Server Bank/Digital Goods/Merch/
-  /// Revenue all read ref.watch(selectedServerProvider) as their primary
-  /// data source -- meaningful when this screen is embedded inside a
-  /// specific server's own view (home_screen.dart, selectedServerProvider
-  /// correctly reflects that server), but not from account Settings,
-  /// where there's no server the user deliberately chose to be looking
-  /// at -- just whatever server happened to be selected last.
+  /// Settings > Billing's mode: Creator Payouts only, no tab bar (it's
+  /// the only thing left here that's genuinely account-level -- Spark/
+  /// Pulse subscriptions live in KodaMarketplaceScreen instead). Server
+  /// Bank/Digital Goods/Merch/Subscription/Revenue all read
+  /// ref.watch(selectedServerProvider) as their primary data source --
+  /// meaningful when this screen is embedded inside a specific server's
+  /// own view (home_screen.dart, selectedServerProvider correctly
+  /// reflects that server), but not from account Settings, where
+  /// there's no server the user deliberately chose to be looking at.
   final bool accountOnly;
   const MarketplaceScreen({super.key, this.embedded = false, this.accountOnly = false});
   @override
@@ -40,70 +44,86 @@ class MarketplaceScreen extends ConsumerStatefulWidget {
 
 class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
     with SingleTickerProviderStateMixin {
-  late final TabController _tabs;
+  TabController? _tabs;
   Map<String, dynamic>? _connectAccount;
-  Map<String, dynamic>? _subscriptionInfo;
-  List<Map<String, dynamic>> _boostTokens = [];
   bool _loadingConnect = true;
-  bool _loadingSub = true;
+  bool _canManageMarketplace = false;
 
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: widget.accountOnly ? 2 : 6, vsync: this);
+    if (!widget.accountOnly) {
+      _tabs = TabController(length: 5, vsync: this);
+      _loadPermission();
+    }
     _loadData();
   }
 
   @override
   void dispose() {
-    _tabs.dispose();
+    _tabs?.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadPermission() async {
+    final server = ref.read(selectedServerProvider);
+    if (server == null) return;
+    final user = ref.read(authProvider).user;
+    final canManage = await hasServerPermission(server, 'manage_marketplace',
+        currentUserId: user?.id, isKodaAdmin: user?.isAdmin ?? false);
+    if (mounted) setState(() => _canManageMarketplace = canManage);
   }
 
   Future<void> _loadData() async {
     final connect = await KodaApi.instance.getConnectAccount();
-    final sub = await KodaApi.instance.getSubscriptionInfo();
-    final tokens = await KodaApi.instance.getMyBoostTokens();
     if (!mounted) return;
     setState(() {
       _connectAccount = connect;
-      _subscriptionInfo = sub;
-      _boostTokens = tokens;
       _loadingConnect = false;
-      _loadingSub = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.accountOnly) {
+      // The only thing left here now -- no tab chrome needed for one tab.
+      final content = _buildCreatorTab();
+      if (widget.embedded) return content;
+      return Scaffold(
+        backgroundColor: KodaColors.voidBg,
+        appBar: AppBar(
+          backgroundColor: KodaColors.bg2,
+          title: Text('Creator Payouts',
+              style: TextStyle(color: KodaColors.text1,
+                  fontSize: 16, fontWeight: FontWeight.w700)),
+        ),
+        body: content,
+      );
+    }
+
     final tabBar = TabBar(
       controller: _tabs,
       indicatorColor: KodaColors.koda,
       labelColor: KodaColors.text1,
       unselectedLabelColor: KodaColors.text3,
-      tabs: widget.accountOnly
-          ? const [Tab(text: 'Subscriptions'), Tab(text: 'Creator')]
-          : const [
-              Tab(text: 'Subscriptions'),
-              Tab(text: 'Creator'),
-              Tab(text: 'Server Bank'),
-              Tab(text: 'Digital Goods'),
-              Tab(text: 'Merch'),
-              Tab(text: 'Revenue'),
-            ],
+      isScrollable: true,
+      tabs: const [
+        Tab(text: 'Server Bank'),
+        Tab(text: 'Digital Goods'),
+        Tab(text: 'Merch'),
+        Tab(text: 'Subscription'),
+        Tab(text: 'Revenue'),
+      ],
     );
     final tabViews = TabBarView(
       controller: _tabs,
-      children: widget.accountOnly
-          ? [_buildSubscriptionsTab(), _buildCreatorTab()]
-          : [
-              _buildSubscriptionsTab(),
-              _buildCreatorTab(),
-              _buildServerBankTab(),
-              _buildDigitalGoodsTab(),
-              _buildMerchTab(),
-              _buildRevenueTab(),
-            ],
+      children: [
+        _buildServerBankTab(),
+        _buildDigitalGoodsTab(),
+        _buildMerchTab(),
+        _buildSubscriptionTab(),
+        _buildRevenueTab(),
+      ],
     );
 
     if (widget.embedded) {
@@ -133,302 +153,15 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
 
   // ── Subscriptions tab ─────────────────────────────────────────────────────
 
-  Widget _buildSubscriptionsTab() {
-    if (_loadingSub) {
-      return Center(
-          child: CircularProgressIndicator(color: KodaColors.koda));
+  // ── Subscription tab (server-scoped tier, not the account-wide Spark/Pulse) ──
+
+  Widget _buildSubscriptionTab() {
+    final server = ref.watch(selectedServerProvider);
+    if (server == null) {
+      return Center(child: Text('Select a server to view its subscription',
+          style: TextStyle(color: KodaColors.text3)));
     }
-
-    final tier = _subscriptionInfo?['tier'] as String? ?? 'free';
-    final sub = _subscriptionInfo?['subscription'] as Map<String, dynamic>?;
-    final sparkPrice = _subscriptionInfo?['prices']?['spark'] as int? ?? 500;
-    final pulsePrice = _subscriptionInfo?['prices']?['pulse'] as int? ?? 1000;
-
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        // Current status
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: KodaColors.card,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: KodaColors.border),
-          ),
-          child: Row(children: [
-            tier == 'free'
-                ? Icon(Icons.person_outline, color: KodaColors.text3, size: 28)
-                : TierBadge(tier: tier, size: 32),
-            const SizedBox(width: 12),
-            Expanded(child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(
-                tier == 'free' ? 'Free' :
-                tier == 'spark' ? 'Spark' : 'Pulse',
-                style: TextStyle(color: KodaColors.text1,
-                    fontSize: 18, fontWeight: FontWeight.w700),
-              ),
-              if (sub != null)
-                Text('Expires ${_formatDate(sub['expires_at'])}',
-                    style: TextStyle(color: KodaColors.text3, fontSize: 12)),
-              if (tier == 'free')
-                Text('Upgrade for exclusive perks',
-                    style: TextStyle(color: KodaColors.text3, fontSize: 12)),
-            ])),
-          ]),
-        ),
-
-        if (tier == 'pulse' || _boostTokens.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: KodaColors.card,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: KodaColors.border),
-            ),
-            child: Row(children: [
-              Icon(Icons.rocket_launch_outlined, color: KodaColors.koda, size: 24),
-              const SizedBox(width: 12),
-              Expanded(child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('${_boostTokens.length} boost token${_boostTokens.length == 1 ? '' : 's'} available',
-                    style: TextStyle(color: KodaColors.text1,
-                        fontSize: 14, fontWeight: FontWeight.w600)),
-                Text('Gift a token to any server you\'re in from its Server Bank tab',
-                    style: TextStyle(color: KodaColors.text3, fontSize: 11)),
-              ])),
-            ]),
-          ),
-        ],
-        const SizedBox(height: 20),
-
-        // Spark tier
-        _buildTierCard(
-          tier: 'spark',
-          name: 'Spark',
-          price: sparkPrice,
-          color: const Color(0xFFFF6B35),
-          current: tier == 'spark',
-          perks: [
-            'Custom avatar frame',
-            'Spark badge on profile',
-            'Increased file upload limit (50MB)',
-            'Priority voice quality',
-          ],
-        ),
-        const SizedBox(height: 12),
-
-        // Pulse tier
-        _buildTierCard(
-          tier: 'pulse',
-          name: 'Pulse',
-          price: pulsePrice,
-          color: KodaColors.koda,
-          current: tier == 'pulse',
-          perks: [
-            'Everything in Spark',
-            'Animated avatar frame',
-            'Pulse badge on profile',
-            '100MB file upload limit',
-            '1 server boost token per month',
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTierCard({
-    required String tier,
-    required String name,
-    required int price,
-    required Color color,
-    required bool current,
-    required List<String> perks,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: KodaColors.card,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-            color: current ? color : KodaColors.border,
-            width: current ? 2 : 1),
-      ),
-      child: Column(children: [
-        // Header
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
-          ),
-          child: Row(children: [
-            TierBadge(tier: tier, size: 24),
-            const SizedBox(width: 10),
-            Text(name, style: TextStyle(color: color,
-                fontSize: 18, fontWeight: FontWeight.w700)),
-            const Spacer(),
-            Text('\$${(price / 100).toStringAsFixed(2)}/mo',
-                style: TextStyle(color: KodaColors.text1,
-                    fontSize: 16, fontWeight: FontWeight.w600)),
-          ]),
-        ),
-
-        // Perks
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(children: [
-            ...perks.map((p) => Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Row(children: [
-                Icon(Icons.check_circle_outline, size: 14, color: color),
-                const SizedBox(width: 8),
-                Text(p, style: TextStyle(
-                    color: KodaColors.text2, fontSize: 13)),
-              ]),
-            )),
-            const SizedBox(height: 12),
-            if (current)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text('Current Plan',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: color, fontWeight: FontWeight.w600)),
-              )
-            else
-              Row(children: [
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: color,
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () => _showSubscribeDialog(tier, price, false),
-                    child: Text('Get $name'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: color,
-                      side: BorderSide(color: color),
-                    ),
-                    onPressed: () => _showSubscribeDialog(tier, price, true),
-                    child: Text('Gift $name'),
-                  ),
-                ),
-              ]),
-          ]),
-        ),
-      ]),
-    );
-  }
-
-  Future<void> _showSubscribeDialog(String tier, int price, bool isGift) async {
-    final recipientCtrl = TextEditingController();
-    final server = ref.read(selectedServerProvider);
-
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: KodaColors.card,
-        title: Text(isGift ? 'Gift ${tier.toUpperCase()}' : 'Subscribe to ${tier.toUpperCase()}',
-            style: TextStyle(color: KodaColors.text1)),
-        content: Column(mainAxisSize: MainAxisSize.min, children: [
-          if (isGift) ...[
-            Text('Gift username:', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
-            const SizedBox(height: 4),
-            KodaTextField(controller: recipientCtrl, hintText: 'Username'),
-            const SizedBox(height: 10),
-          ],
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: KodaColors.elevated,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(children: [
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text('Subscription', style: TextStyle(color: KodaColors.text2)),
-                Text('\$${(price / 100).toStringAsFixed(2)}',
-                    style: TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w600)),
-              ]),
-              Divider(color: KodaColors.border),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text('Total', style: TextStyle(
-                    color: KodaColors.text1, fontWeight: FontWeight.w600)),
-                Text('\$${(price / 100).toStringAsFixed(2)}',
-                    style: TextStyle(
-                        color: KodaColors.koda, fontWeight: FontWeight.w700)),
-              ]),
-            ]),
-          ),
-          const SizedBox(height: 8),
-          Text('Payment processed securely by Stripe',
-              style: TextStyle(color: KodaColors.text3, fontSize: 11)),
-        ]),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: KodaColors.koda,
-                foregroundColor: Colors.black),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Proceed to Payment'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true || !mounted) return;
-
-    String? giftedTo;
-    if (isGift && recipientCtrl.text.trim().isNotEmpty) {
-      final user = await KodaApi.instance.getUserByUsername(recipientCtrl.text.trim());
-      giftedTo = user?['id'] as String?;
-      if (giftedTo == null && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('User not found')));
-        return;
-      }
-    }
-
-    final result = await KodaApi.instance.createSubscription(
-      tier,
-      serverId: server?['id'] as String?,
-      giftedToUserId: giftedTo,
-    );
-
-    final checkoutUrl = result?['checkout_url'] as String?;
-    if (checkoutUrl == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not start checkout. Try again in a moment.')));
-      }
-      return;
-    }
-
-    if (!mounted) return;
-    final messenger = ScaffoldMessenger.of(context);
-    final paymentConfirmed = await launchCheckoutAndWait(context, ref,
-        checkoutUrl: checkoutUrl,
-        // No subscription id exists yet at this point -- it's only
-        // created once the webhook confirms -- so this matches loosely
-        // on payment_type rather than a specific record.
-        matches: (data) => data['payment_type'] == 'subscription');
-    if (mounted) {
-      messenger.showSnackBar(SnackBar(content: Text(paymentConfirmed
-          ? 'Subscription active!'
-          : 'Still waiting on that payment -- it\'ll activate once completed.')));
-      _loadData();
-    }
+    return ServerSubscriptionScreen(server: server, isOwner: _canManageMarketplace);
   }
 
   // ── Creator tab ───────────────────────────────────────────────────────────
@@ -632,6 +365,21 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
       return Center(child: Text('Select a server to view its bank',
           style: TextStyle(color: KodaColors.text3)));
     }
+    // Financial balance/boost management -- owner or a manage_marketplace
+    // role only, same authority as pricing tiers/products or the
+    // revenue dashboard. Server-side enforced too (GET /servers/:id/bank
+    // and /boost_status), this is UX, not the real boundary.
+    if (!_canManageMarketplace) {
+      return Center(child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Text(
+          'Only the server owner or someone with the Manage Marketplace '
+          'permission can view the Server Bank.',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: KodaColors.text3),
+        ),
+      ));
+    }
     return _ServerBankView(server: server);
   }
 
@@ -649,14 +397,6 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
       server: server,
       creatorMode: false,
     );
-  }
-
-  String _formatDate(dynamic raw) {
-    if (raw == null) return '';
-    try {
-      final dt = parseServerTimestamp(raw.toString());
-      return '${dt.month}/${dt.day}/${dt.year}';
-    } catch (_) { return ''; }
   }
 
   // ── Revenue tab ──────────────────────────────────────────────────────────
@@ -726,7 +466,7 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
   // Boost-count thresholds for the next level -- mirrors
   // Koda.Boosts.boost_level/1 server-side. Purely informational text
   // here; the server is the actual source of truth for the level.
-  static const _levelThresholds = {0: 2, 1: 5, 2: 10, 3: 15, 4: 20};
+  static const _levelThresholds = {0: 1, 1: 3, 2: 6, 3: 10, 4: 15};
 
   String get _emojiSlotText {
     final limit = _boostStatus?['emoji_slot_limit'] as int? ?? 10;

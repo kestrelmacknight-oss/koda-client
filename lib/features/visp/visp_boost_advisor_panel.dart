@@ -112,6 +112,8 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
           const SizedBox(width: 8),
           Text('Ask Visp: Boost ROI Advisor',
               style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w700)),
+          const SizedBox(width: 8),
+          const VispDevBadge(),
         ]),
         const SizedBox(height: 12),
 

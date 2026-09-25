@@ -55,6 +55,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   Map<String, dynamic>? _boostStatus;
   bool _uploadingEmoji = false;
   bool _uploadingBackground = false;
+  final _marketplaceLinkCtrl = TextEditingController();
 
   // Matches the flat permission map used server-side on Koda.Servers.Role.
   static const List<String> _permissionKeys = [
@@ -94,6 +95,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     _loadTiltifyStatus();
     _loadEmoji();
     _loadBoostStatus();
+    _marketplaceLinkCtrl.text =
+        ref.read(selectedServerProvider)?['marketplace_link'] as String? ?? '';
   }
 
   Future<void> _loadEmoji() async {
@@ -239,6 +242,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   @override
   void dispose() {
     _tabController.dispose();
+    _marketplaceLinkCtrl.dispose();
     super.dispose();
   }
 
@@ -1051,7 +1055,115 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         Text('Boost this server from the Server Bank in Marketplace to raise its level.',
             style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       ],
+      const SizedBox(height: 24),
+      Text('MARKETPLACE LISTING', style: TextStyle(color: KodaColors.text3,
+          fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+      const SizedBox(height: 8),
+      Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: KodaColors.card,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: KodaColors.border),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('List in Koda Marketplace', style: TextStyle(
+                  color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
+              Text('Opts this server into the platform-wide Discover tab, '
+                  'and a chance at the weekly featured rotation. Separate '
+                  'from general server-join discoverability.',
+                  style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+            ])),
+            Switch(
+              value: server?['marketplace_discoverable'] as bool? ?? false,
+              activeThumbColor: KodaColors.koda,
+              onChanged: _setMarketplaceDiscoverable,
+            ),
+          ]),
+          if (server?['marketplace_discoverable'] == true) ...[
+            const SizedBox(height: 12),
+            Text('Social / Invite Link (optional)',
+                style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+            const SizedBox(height: 4),
+            KodaTextField(
+              controller: _marketplaceLinkCtrl,
+              hintText: 'https://...',
+              onSubmitted: (_) => _saveMarketplaceLink(),
+            ),
+            const SizedBox(height: 4),
+            TextButton(
+              onPressed: _saveMarketplaceLink,
+              child: const Text('Save Link'),
+            ),
+          ],
+        ]),
+      ),
+      const SizedBox(height: 16),
+      Text('PRICING', style: TextStyle(color: KodaColors.text3,
+          fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+      const SizedBox(height: 8),
+      Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: KodaColors.card,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: KodaColors.border),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Primary Currency', style: TextStyle(
+              color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
+          Text('Applies to Server Subscription tiers and Digital Goods prices '
+              'you set for this server.',
+              style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+          const SizedBox(height: 10),
+          DropdownButton<String>(
+            value: server?['primary_currency'] as String? ?? 'USD',
+            dropdownColor: KodaColors.card,
+            style: TextStyle(color: KodaColors.text1, fontSize: 13),
+            onChanged: (v) { if (v != null) _setPrimaryCurrency(v); },
+            items: _currencyOptions.map((c) => DropdownMenuItem(
+                  value: c,
+                  child: Text(c),
+                )).toList(),
+          ),
+        ]),
+      ),
     ]);
+  }
+
+  // USD/EUR/GBP/JPY get real symbols client-side elsewhere (see
+  // lib/core/merch_cart.dart's formatMerchPrice) -- this is just the
+  // set of codes a creator can pick from, kept small and unambiguous
+  // rather than the full ISO 4217 list.
+  static const _currencyOptions = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD'];
+
+  Future<void> _setMarketplaceDiscoverable(bool value) async {
+    final updated = await KodaApi.instance.updateServer(
+        _serverId, {'marketplace_discoverable': value});
+    if (updated != null && mounted) {
+      ref.read(selectedServerProvider.notifier).state = updated;
+      _marketplaceLinkCtrl.text = updated['marketplace_link'] as String? ?? '';
+    }
+  }
+
+  Future<void> _saveMarketplaceLink() async {
+    final updated = await KodaApi.instance.updateServer(
+        _serverId, {'marketplace_link': _marketplaceLinkCtrl.text.trim()});
+    if (updated != null && mounted) {
+      ref.read(selectedServerProvider.notifier).state = updated;
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Marketplace link saved.')));
+    }
+  }
+
+  Future<void> _setPrimaryCurrency(String currency) async {
+    final updated = await KodaApi.instance.updateServer(
+        _serverId, {'primary_currency': currency});
+    if (updated != null && mounted) {
+      ref.read(selectedServerProvider.notifier).state = updated;
+    }
   }
 
   Widget _customizeCard({
