@@ -14,6 +14,7 @@
 
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class VispQuestionStep extends StatefulWidget {
   final String question;
@@ -57,8 +58,9 @@ class _VispQuestionStepState extends State<VispQuestionStep> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Question ${widget.questionNumber} of ${widget.maxQuestions}',
+      Text(t.vispQuestionStepProgress(widget.questionNumber, widget.maxQuestions),
           style: TextStyle(color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w600)),
       const SizedBox(height: 8),
       Container(
@@ -97,9 +99,9 @@ class _VispQuestionStepState extends State<VispQuestionStep> {
             controller: _answerCtrl,
             enabled: !widget.loading,
             style: TextStyle(color: KodaColors.text1, fontSize: 14),
-            decoration: const InputDecoration(
-              hintText: 'Or type your own answer...',
-              contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: InputDecoration(
+              hintText: t.vispQuestionStepAnswerHint,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             ),
             onSubmitted: (_) => _submitFreeText(),
           ),
@@ -110,7 +112,7 @@ class _VispQuestionStepState extends State<VispQuestionStep> {
               ? SizedBox(width: 16, height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
               : Icon(Icons.send, size: 18, color: KodaColors.koda),
-          tooltip: 'Send',
+          tooltip: t.vispQuestionStepSendTooltip,
           onPressed: widget.loading ? null : _submitFreeText,
         ),
       ]),
@@ -120,7 +122,7 @@ class _VispQuestionStepState extends State<VispQuestionStep> {
         child: TextButton(
           style: TextButton.styleFrom(padding: EdgeInsets.zero),
           onPressed: widget.loading ? null : widget.onSkip,
-          child: Text('Skip and generate now',
+          child: Text(t.vispQuestionStepSkip,
               style: TextStyle(color: KodaColors.text3, fontSize: 12)),
         ),
       ),

@@ -14,6 +14,17 @@
 import 'dart:convert';
 import 'secure_storage.dart';
 import 'crypto/channel_key_manager.dart';
+import 'message_language.dart';
+
+// Detected once per message right here (the one place every path through
+// this function converges on final plaintext) and cached on the map
+// under '_detectedLang' -- see message_language.dart for why this has
+// to be a client-side, on-device computation rather than anything the
+// server could annotate for us.
+Map<String, dynamic> _withPlaintext(Map<String, dynamic> m, String content) {
+  final lang = detectMessageLanguage(content);
+  return {...m, 'content': content, if (lang != null) '_detectedLang': lang};
+}
 
 Future<List<Map<String, dynamic>>> decryptMessages(
     List<Map<String, dynamic>> msgs,
@@ -23,7 +34,7 @@ Future<List<Map<String, dynamic>>> decryptMessages(
   for (final m in msgs) {
     final isEncrypted = m['encrypted'] == true || m['encrypted'] == 'true';
     if (!isEncrypted) {
-      out.add(m);
+      out.add(_withPlaintext(m, m['content'] as String? ?? ''));
       continue;
     }
 
@@ -33,7 +44,7 @@ Future<List<Map<String, dynamic>>> decryptMessages(
       final raw = m['content'] as String? ?? '';
       try {
         final padded = raw.padRight((raw.length + 3) ~/ 4 * 4, '=');
-        out.add({...m, 'content': utf8.decode(base64Decode(padded))});
+        out.add(_withPlaintext(m, utf8.decode(base64Decode(padded))));
       } catch (_) {
         out.add(m); // not legacy-decodable -- show as-is rather than crash
       }
@@ -45,7 +56,7 @@ Future<List<Map<String, dynamic>>> decryptMessages(
         ? await SecureStorage.getCachedDecryptedContent(messageId)
         : null;
     if (cached != null) {
-      out.add({...m, 'content': cached});
+      out.add(_withPlaintext(m, cached));
       continue;
     }
 
@@ -68,7 +79,7 @@ Future<List<Map<String, dynamic>>> decryptMessages(
     }
 
     if (messageId != null) await SecureStorage.cacheDecryptedContent(messageId, plaintext);
-    out.add({...m, 'content': plaintext});
+    out.add(_withPlaintext(m, plaintext));
   }
 
   return out;

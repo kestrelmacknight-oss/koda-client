@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 
 class DiscordImportDialog extends StatefulWidget {
@@ -51,6 +52,7 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
 
     final result = await KodaApi.instance.previewDiscordTemplate(code);
     if (!mounted) return;
+    final t = AppLocalizations.of(context);
 
     if (result != null && result['ok'] == true) {
       setState(() {
@@ -60,7 +62,7 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
       });
     } else {
       setState(() {
-        _error   = result?['error'] as String? ?? 'Could not fetch template.';
+        _error   = result?['error'] as String? ?? t.discordImportFetchError;
         _loading = false;
       });
     }
@@ -82,8 +84,9 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
       Navigator.pop(context);
       widget.onImported();
     } else {
+      final t = AppLocalizations.of(context);
       setState(() {
-        _error   = 'Failed to apply template. Please try again.';
+        _error   = t.discordImportApplyError;
         _loading = false;
       });
     }
@@ -92,6 +95,7 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
   @override
   Widget build(BuildContext context) {
     final preview = _previewData;
+    final t = AppLocalizations.of(context);
 
     return Dialog(
       backgroundColor: KodaColors.card,
@@ -108,20 +112,19 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
               Row(children: [
                 Icon(Icons.download_outlined, color: KodaColors.koda, size: 20),
                 const SizedBox(width: 10),
-                Text('Import Discord Template',
+                Text(t.discordImportTitle,
                     style: TextStyle(color: KodaColors.text1, fontSize: 16,
                         fontWeight: FontWeight.w700)),
                 const Spacer(),
                 IconButton(
                   icon: Icon(Icons.close, size: 18, color: KodaColors.text3),
-                  tooltip: 'Close',
+                  tooltip: t.commonClose,
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),
               const SizedBox(height: 6),
               Text(
-                'Paste a discord.new link or template code to import '
-                'roles, categories, and channels into this server.',
+                t.discordImportDescription,
                 style: TextStyle(color: KodaColors.text3, fontSize: 12),
               ),
               const SizedBox(height: 20),
@@ -131,8 +134,9 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                 Expanded(
                   child: KodaTextField(
                     controller: _codeCtrl,
-                    hintText: 'discord.new/ABC123 or template code',
+                    hintText: t.discordImportCodeHint,
                     onSubmitted: (_) => _fetchPreview(),
+                    autofocus: true,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -143,7 +147,7 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                   onPressed: _loading ? null : _fetchPreview,
-                  child: const Text('Preview'),
+                  child: Text(t.discordImportPreviewButton),
                 ),
               ]),
 
@@ -173,16 +177,16 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                     border: Border.all(color: KodaColors.border),
                   ),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(preview['name'] as String? ?? 'Template',
+                    Text(preview['name'] as String? ?? t.discordImportTemplateFallback,
                         style: TextStyle(color: KodaColors.text1,
                             fontWeight: FontWeight.w600, fontSize: 14)),
                     const SizedBox(height: 10),
                     _previewRow(Icons.shield_outlined,
-                        '${(preview['roles'] as List).length} roles'),
+                        t.discordImportRolesCount((preview['roles'] as List).length)),
                     _previewRow(Icons.folder_outlined,
-                        '${(preview['categories'] as List).length} categories'),
+                        t.discordImportCategoriesCount((preview['categories'] as List).length)),
                     _previewRow(Icons.tag,
-                        '${(preview['channels'] as List).length} channels'),
+                        t.discordImportChannelsCount((preview['channels'] as List).length)),
                   ]),
                 ),
 
@@ -207,7 +211,7 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Text(
-                          'REPLACE EXISTING STRUCTURE',
+                          t.discordImportReplaceStructureLabel,
                           style: TextStyle(
                             color: _replace ? KodaColors.accent : KodaColors.text2,
                             fontSize: 12,
@@ -218,8 +222,8 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                         const SizedBox(height: 3),
                         Text(
                           _replace
-                              ? 'All existing channels, categories and roles will be permanently deleted.'
-                              : 'Template will be added to your existing server structure.',
+                              ? t.discordImportReplaceWarning
+                              : t.discordImportAddDescription,
                           style: TextStyle(
                             color: _replace
                                 ? KodaColors.accent.withValues(alpha: 0.8)
@@ -238,22 +242,20 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                             context: context,
                             builder: (_) => AlertDialog(
                               backgroundColor: KodaColors.card,
-                              title: Text('Replace server structure?',
+                              title: Text(t.discordImportReplaceConfirmTitle,
                                   style: TextStyle(color: KodaColors.accent)),
                               content: Text(
-                                'This will permanently delete ALL existing channels, '
-                                'categories, and roles before importing. '
-                                'This cannot be undone.',
+                                t.discordImportReplaceConfirmBody,
                                 style: TextStyle(color: KodaColors.text2, fontSize: 13),
                               ),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, false),
-                                  child: const Text('Cancel'),
+                                  child: Text(t.commonCancel),
                                 ),
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, true),
-                                  child: Text('Yes, Replace',
+                                  child: Text(t.discordImportYesReplace,
                                       style: TextStyle(color: KodaColors.accent,
                                           fontWeight: FontWeight.w700)),
                                 ),
@@ -288,8 +290,8 @@ class _DiscordImportDialogState extends State<DiscordImportDialog> {
                                 strokeWidth: 2, color: Colors.white))
                         : Text(
                             _replace
-                                ? 'Replace & Import Template'
-                                : 'Add Template to Server',
+                                ? t.discordImportReplaceAndImportButton
+                                : t.discordImportAddToServerButton,
                             style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w700),

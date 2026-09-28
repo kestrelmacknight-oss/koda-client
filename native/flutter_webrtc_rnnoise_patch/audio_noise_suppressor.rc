@@ -1,0 +1,11 @@
+// Embeds the RNNoise model weights (native/rnnoise/weights_blob.bin,
+// vendored into windows/rnnoise/ by tool/vendor_flutter_webrtc.ps1) as a
+// raw-data Windows resource, loaded at runtime via FindResource/
+// LoadResource/LockResource in audio_noise_suppressor.cc's
+// LoadEmbeddedModel(). RCDATA is the standard resource type for
+// arbitrary binary blobs; RT_RCDATA is how audio_noise_suppressor.cc
+// looks it up. The resource name (not a numeric ID -- simpler, no
+// shared resource.h needed between this file and the .cc loader) must
+// match the "RNNOISE_WEIGHTS" string literal there exactly.
+
+RNNOISE_WEIGHTS RCDATA "rnnoise/weights_blob.bin"

@@ -21,6 +21,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import 'visp_avatar.dart';
 import 'visp_question_step.dart';
 
@@ -105,12 +106,13 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
       forcePlan: forcePlan,
     );
     if (!mounted) return;
+    final t = AppLocalizations.of(context);
 
     switch (result?['action']) {
       case 'ask':
         final question = result?['question'] as String?;
         if (question == null) {
-          setState(() { _error = 'Visp could not generate a plan.'; _loading = false; });
+          setState(() { _error = t.vispSetupDialogCouldNotGeneratePlan; _loading = false; });
           return;
         }
         // Round-trips this turn back to the server next call, exactly
@@ -130,7 +132,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
       case 'plan':
         final plan = result?['plan'] as Map<String, dynamic>?;
         if (plan == null) {
-          setState(() { _error = 'Visp could not generate a plan.'; _loading = false; });
+          setState(() { _error = t.vispSetupDialogCouldNotGeneratePlan; _loading = false; });
           return;
         }
         setState(() { _plan = plan; _currentQuestion = null; _loading = false; });
@@ -138,7 +140,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
 
       default:
         setState(() {
-          _error = result?['error'] as String? ?? 'Visp could not generate a plan.';
+          _error = result?['error'] as String? ?? t.vispSetupDialogCouldNotGeneratePlan;
           _loading = false;
         });
     }
@@ -154,6 +156,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
       plan: plan,
     );
     if (!mounted) return;
+    final t = AppLocalizations.of(context);
 
     final serverId = result?['server_id'] as String?;
     if (result?['ok'] == true && serverId != null) {
@@ -161,7 +164,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
       widget.onApplied(serverId);
     } else {
       setState(() {
-        _error = result?['error'] as String? ?? 'Could not apply that plan.';
+        _error = result?['error'] as String? ?? t.vispSetupDialogCouldNotApplyPlan;
         _loading = false;
       });
     }
@@ -179,6 +182,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final plan = _plan;
     final question = _currentQuestion;
 
@@ -200,7 +204,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 8, children: [
-                    Text(_isNewServer ? 'Describe your server to Visp' : 'Ask Visp to add to this server',
+                    Text(_isNewServer ? t.vispSetupDialogTitleNew : t.vispSetupDialogTitleExisting,
                         style: TextStyle(color: KodaColors.text1, fontSize: 16,
                             fontWeight: FontWeight.w700)),
                     const VispDevBadge(),
@@ -208,15 +212,15 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
                 ),
                 IconButton(
                   icon: Icon(Icons.close, size: 18, color: KodaColors.text3),
-                  tooltip: 'Close',
+                  tooltip: t.commonClose,
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),
               const SizedBox(height: 6),
               Text(
                 _isNewServer
-                    ? 'Describe the server you want -- Visp will propose a name and a set of roles, categories, and channels.'
-                    : 'Describe what you\'d like to add -- Visp will propose roles, categories, and channels to create.',
+                    ? t.vispSetupDialogDescriptionNew
+                    : t.vispSetupDialogDescriptionExisting,
                 style: TextStyle(color: KodaColors.text3, fontSize: 12),
               ),
               const SizedBox(height: 16),
@@ -224,20 +228,20 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
               if (plan == null && question == null) ...[
                 TextField(
                   controller: _promptCtrl,
+                  autofocus: true,
                   maxLines: 3,
                   minLines: 3,
                   style: TextStyle(color: KodaColors.text1, fontSize: 14),
                   decoration: InputDecoration(
                     hintText: _isNewServer
-                        ? 'e.g. "A cozy server for my D&D group with voice channels for two tables"'
-                        : 'e.g. "Add a couple more channels for our raid teams"',
+                        ? t.vispSetupDialogPromptHintNew
+                        : t.vispSetupDialogPromptHintExisting,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
                   ),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Your description is sent to Visp (a self-hosted assistant -- '
-                  'nothing leaves Koda\'s servers) to generate this plan.',
+                  t.vispSetupDialogPrivacyNote,
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
                 ),
               ],
@@ -270,7 +274,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
 
               if (plan != null) ...[
                 const SizedBox(height: 6),
-                _buildPreview(plan),
+                _buildPreview(t, plan),
                 const SizedBox(height: 20),
                 Row(children: [
                   Expanded(
@@ -281,7 +285,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: _loading ? null : _startOver,
-                      child: const Text('Start Over'),
+                      child: Text(t.vispSetupDialogStartOver),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -296,7 +300,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
                       child: _loading
                           ? const SizedBox(width: 18, height: 18,
                               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-                          : Text(_isNewServer ? 'Create Server' : 'Add to Server',
+                          : Text(_isNewServer ? t.vispSetupDialogCreateServer : t.vispSetupDialogAddToServer,
                               style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700)),
                     ),
                   ),
@@ -316,7 +320,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
                         ? const SizedBox(width: 16, height: 16,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
                         : const Icon(Icons.auto_awesome, size: 16, color: Colors.black),
-                    label: Text(_loading ? 'Thinking...' : 'Generate Plan',
+                    label: Text(_loading ? t.vispSetupDialogThinking : t.vispSetupDialogGeneratePlan,
                         style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700)),
                   ),
                 ),
@@ -328,7 +332,7 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
     );
   }
 
-  Widget _buildPreview(Map<String, dynamic> plan) {
+  Widget _buildPreview(AppLocalizations t, Map<String, dynamic> plan) {
     final server = plan['server'] as Map<String, dynamic>?;
     final roles = List<Map<String, dynamic>>.from(plan['roles'] ?? []);
     final categories = List<Map<String, dynamic>>.from(plan['categories'] ?? []);
@@ -347,27 +351,27 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
             style: TextStyle(color: KodaColors.text1, fontSize: 13, height: 1.4)),
         if (server != null) ...[
           const SizedBox(height: 10),
-          _previewSection(Icons.dns_outlined, 'New server', [server['name'] as String? ?? '']),
+          _previewSection(Icons.dns_outlined, t.vispSetupDialogNewServerLabel, [server['name'] as String? ?? '']),
         ],
         if (roles.isNotEmpty) ...[
           const SizedBox(height: 10),
-          _previewSection(Icons.shield_outlined, '${roles.length} role${roles.length == 1 ? '' : 's'}',
+          _previewSection(Icons.shield_outlined, t.vispSetupDialogRoleCount(roles.length),
               roles.map((r) => r['name'] as String? ?? '').toList()),
         ],
         if (categories.isNotEmpty) ...[
           const SizedBox(height: 10),
           _previewSection(Icons.folder_outlined,
-              '${categories.length} categor${categories.length == 1 ? 'y' : 'ies'}',
+              t.vispSetupDialogCategoryCount(categories.length),
               categories.map((c) => c['name'] as String? ?? '').toList()),
         ],
         if (channels.isNotEmpty) ...[
           const SizedBox(height: 10),
-          _previewSection(Icons.tag, '${channels.length} channel${channels.length == 1 ? '' : 's'}',
+          _previewSection(Icons.tag, t.vispSetupDialogChannelCount(channels.length),
               channels.map((c) => '${c['name']} (${c['type']})').toList()),
         ],
         if (sources.isNotEmpty) ...[
           const SizedBox(height: 12),
-          _sourcesRow(sources),
+          _sourcesRow(t, sources),
         ],
       ]),
     );
@@ -376,10 +380,10 @@ class _VispSetupDialogState extends State<VispSetupDialog> {
   // Which wiki articles (see koda-server's Koda.Wiki) Visp actually
   // grounded this plan in, if any -- lets the user check the source
   // rather than just trusting the model's claim.
-  Widget _sourcesRow(List<String> sources) {
+  Widget _sourcesRow(AppLocalizations t, List<String> sources) {
     return Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
       Icon(Icons.menu_book_outlined, size: 12, color: KodaColors.text3),
-      Text('Based on:', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+      Text(t.vispSetupDialogBasedOn, style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       ...sources.map((title) => Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(

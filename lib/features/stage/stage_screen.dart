@@ -15,6 +15,7 @@ import '../../core/api.dart';
 import '../../core/checkout.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 
 class StageScreen extends ConsumerStatefulWidget {
@@ -44,7 +45,10 @@ class _StageScreenState extends ConsumerState<StageScreen> {
   final Map<String, String> _handRaises = {};
 
   String get _channelId => widget.channel['id'] as String;
-  String get _channelName => widget.channel['name'] as String? ?? 'Stage';
+  // Takes AppLocalizations explicitly (rather than reading
+  // AppLocalizations.of(context) here) since this is a plain getter-turned-
+  // method, not a build method -- callers already have `t` in scope.
+  String _channelName(AppLocalizations t) => widget.channel['name'] as String? ?? t.stageFallbackTitle;
 
   bool get _isAdmin {
     final user   = ref.read(authProvider).user;
@@ -76,7 +80,10 @@ class _StageScreenState extends ConsumerState<StageScreen> {
 
       final result = apiResult.data;
       if (result == null) {
-        if (mounted) setState(() { _connecting = false; _error = 'Could not join stage.'; });
+        if (mounted) {
+          final t = AppLocalizations.of(context);
+          setState(() { _connecting = false; _error = t.stageCouldNotJoin; });
+        }
         return;
       }
 
@@ -153,6 +160,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
   }
 
   Widget _buildTicketRequired() {
+    final t = AppLocalizations.of(context);
     final event = _ticketRequiredEvent!;
     final priceCents = event['price_cents'] as int? ?? 0;
     final price = (priceCents / 100).toStringAsFixed(2);
@@ -164,12 +172,12 @@ class _StageScreenState extends ConsumerState<StageScreen> {
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Icon(Icons.confirmation_number_outlined, size: 48, color: KodaColors.koda),
             const SizedBox(height: 16),
-            Text(event['title'] as String? ?? 'This stage',
+            Text(event['title'] as String? ?? t.stageThisStageFallback,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: KodaColors.text1,
                     fontSize: 17, fontWeight: FontWeight.w700)),
             const SizedBox(height: 6),
-            Text('requires a ticket to join',
+            Text(t.stageRequiresTicketToJoin,
                 style: TextStyle(color: KodaColors.text3, fontSize: 13)),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -180,13 +188,13 @@ class _StageScreenState extends ConsumerState<StageScreen> {
               ),
               onPressed: _buyingTicket ? null : _buyTicket,
               child: Text(_buyingTicket
-                  ? 'Please wait...'
-                  : (priceCents == 0 ? 'Get Free Ticket' : 'Buy Ticket -- \$$price')),
+                  ? t.stagePleaseWaitLabel
+                  : (priceCents == 0 ? t.stageGetFreeTicketButton : t.stageBuyTicketButton('\$$price'))),
             ),
             const SizedBox(height: 10),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Not now', style: TextStyle(color: KodaColors.text3)),
+              child: Text(t.stageNotNowButton, style: TextStyle(color: KodaColors.text3)),
             ),
           ]),
         ),
@@ -200,11 +208,14 @@ class _StageScreenState extends ConsumerState<StageScreen> {
     setState(() => _buyingTicket = true);
     final result = await KodaApi.instance.purchaseEventTicket(event['id'] as String);
     if (!mounted) return;
+    // Captured before the `await launchCheckoutAndWait` below, which may
+    // pop/navigate away -- see the pattern note on capturing `t` early.
+    final t = AppLocalizations.of(context);
     setState(() => _buyingTicket = false);
 
     if (result == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not start ticket purchase.')));
+          SnackBar(content: Text(t.stageCouldNotStartTicketPurchase)));
       return;
     }
     if (result['free'] == true) {
@@ -215,8 +226,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
       final checkoutUrl = result['checkout_url'] as String?;
       if (checkoutUrl == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text(
-                "Could not start checkout -- this server's owner may not have connected Stripe yet.")));
+            SnackBar(content: Text(t.serverSubscriptionCheckoutStripeNotConnected)));
         return;
       }
 
@@ -231,8 +241,8 @@ class _StageScreenState extends ConsumerState<StageScreen> {
         setState(() { _ticketRequiredEvent = null; _connecting = true; });
         _connect();
       } else {
-        messenger.showSnackBar(const SnackBar(content: Text(
-            "Still waiting on that payment -- try joining again once it's confirmed.")));
+        messenger.showSnackBar(SnackBar(content: Text(
+            t.stagePaymentStillPendingTryAgain)));
       }
     }
   }
@@ -313,6 +323,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final speakers  = _room.remoteParticipants.values
         .where((p) => p.permissions.canPublish == true)
         .toList();
@@ -328,7 +339,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
         title: Row(children: [
           Icon(Icons.campaign_outlined, size: 18, color: KodaColors.koda),
           const SizedBox(width: 8),
-          Text(_channelName,
+          Text(_channelName(t),
               style: TextStyle(color: KodaColors.text1, fontSize: 16)),
           const SizedBox(width: 8),
           Container(
@@ -337,7 +348,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
               color: KodaColors.koda.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(99),
             ),
-            child: Text(_isSpeaker ? 'Speaker' : 'Listener',
+            child: Text(_isSpeaker ? t.stageSpeakerBadge : t.stageListenerBadge,
                 style: TextStyle(
                     color: _isSpeaker ? KodaColors.koda : KodaColors.text3,
                     fontSize: 11)),
@@ -349,7 +360,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
           : _ticketRequiredEvent != null
               ? _buildTicketRequired()
               : _error != null
-              ? Center(child: Text('Could not join: $_error',
+              ? Center(child: Text(t.stageCouldNotJoinWithError(_error!),
                   style: TextStyle(color: KodaColors.accent)))
               : Column(children: [
                   Expanded(
@@ -359,7 +370,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                         // ── Speakers ──────────────────────────────────
-                        Text('SPEAKERS',
+                        Text(t.stageSpeakersHeader,
                             style: TextStyle(color: KodaColors.text3,
                                 fontSize: 11, fontWeight: FontWeight.w700,
                                 letterSpacing: 1)),
@@ -368,7 +379,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
                           // Local participant if speaker
                           if (_isSpeaker)
                             _SpeakerTile(
-                              name: ref.read(authProvider).user?.username ?? 'You',
+                              name: ref.read(authProvider).user?.username ?? t.stageYouFallbackName,
                               speaking: speakingSids.contains(
                                   _room.localParticipant?.sid),
                               muted: _muted,
@@ -396,7 +407,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
 
                         // ── Hand raises (admin only) ──────────────────
                         if (_isAdmin && _handRaises.isNotEmpty) ...[
-                          Text('RAISED HANDS',
+                          Text(t.stageRaisedHandsHeader,
                               style: TextStyle(color: KodaColors.gold,
                                   fontSize: 11, fontWeight: FontWeight.w700,
                                   letterSpacing: 1)),
@@ -420,7 +431,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
                                       color: KodaColors.text1, fontSize: 13))),
                               TextButton(
                                 onPressed: () => _grantSpeaker(e.key),
-                                child: Text('Allow',
+                                child: Text(t.stageAllowButton,
                                     style: TextStyle(color: KodaColors.mint)),
                               ),
                               TextButton(
@@ -428,7 +439,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
                                   _handRaises.remove(e.key);
                                   setState(() {});
                                 },
-                                child: Text('Ignore',
+                                child: Text(t.stageIgnoreButton,
                                     style: TextStyle(color: KodaColors.text3)),
                               ),
                             ]),
@@ -438,7 +449,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
 
                         // ── Listeners ─────────────────────────────────
                         if (listeners.isNotEmpty || !_isSpeaker) ...[
-                          Text('LISTENERS',
+                          Text(t.stageListenersHeader,
                               style: TextStyle(color: KodaColors.text3,
                                   fontSize: 11, fontWeight: FontWeight.w700,
                                   letterSpacing: 1)),
@@ -446,7 +457,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
                           Wrap(spacing: 12, runSpacing: 10, children: [
                             if (!_isSpeaker)
                               _ListenerChip(
-                                name: ref.read(authProvider).user?.username ?? 'You',
+                                name: ref.read(authProvider).user?.username ?? t.stageYouFallbackName,
                                 handRaised: _handRaised,
                                 isYou: true,
                               ),
@@ -478,7 +489,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
                                   ? KodaColors.accent
                                   : KodaColors.text1),
                           onPressed: _toggleMute,
-                          tooltip: _muted ? 'Unmute' : 'Mute',
+                          tooltip: _muted ? t.serverUnmute : t.serverMute,
                         ),
                         const SizedBox(width: 16),
                       ] else ...[
@@ -493,7 +504,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
                                 : KodaColors.text2,
                           ),
                           onPressed: _toggleHand,
-                          tooltip: _handRaised ? 'Lower hand' : 'Raise hand',
+                          tooltip: _handRaised ? t.stageLowerHandTooltip : t.stageRaiseHandTooltip,
                         ),
                         const SizedBox(width: 16),
                       ],
@@ -502,7 +513,7 @@ class _StageScreenState extends ConsumerState<StageScreen> {
                         icon: Icon(Icons.logout,
                             color: KodaColors.accent),
                         onPressed: _leave,
-                        tooltip: 'Leave Stage',
+                        tooltip: t.stageLeaveStageTooltip,
                       ),
                     ]),
                   ),
@@ -532,6 +543,7 @@ class _SpeakerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Column(children: [
       Stack(alignment: Alignment.bottomRight, children: [
         Container(
@@ -552,14 +564,14 @@ class _SpeakerTile extends StatelessWidget {
           ),
       ]),
       const SizedBox(height: 6),
-      Text(isYou ? '$name (you)' : name,
+      Text(isYou ? t.stageYouSuffixLabel(name) : name,
           style: TextStyle(color: KodaColors.text1, fontSize: 12)),
       if (isAdmin && onRevoke != null)
         TextButton(
           onPressed: onRevoke,
           style: TextButton.styleFrom(
               minimumSize: Size.zero, padding: EdgeInsets.zero),
-          child: Text('Move to listeners',
+          child: Text(t.stageMoveToListenersButton,
               style: TextStyle(color: KodaColors.text3, fontSize: 10)),
         ),
     ]);
@@ -579,6 +591,7 @@ class _ListenerChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
@@ -594,7 +607,7 @@ class _ListenerChip extends StatelessWidget {
           Icon(Icons.back_hand, size: 12, color: KodaColors.gold),
           const SizedBox(width: 4),
         ],
-        Text(isYou ? '$name (you)' : name,
+        Text(isYou ? t.stageYouSuffixLabel(name) : name,
             style: TextStyle(
                 color: isYou ? KodaColors.koda : KodaColors.text2,
                 fontSize: 12)),

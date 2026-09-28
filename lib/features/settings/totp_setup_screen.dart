@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 
 class TotpSetupScreen extends StatefulWidget {
@@ -35,21 +36,24 @@ class _TotpSetupScreenState extends State<TotpSetupScreen> {
 
   Future<void> _verify() async {
     setState(() => _error = null);
+    final t = AppLocalizations.of(context);
     final ok = await KodaApi.instance.totpVerify(_code.text.trim());
     if (!mounted) return;
     if (ok) {
       setState(() => _enabled = true);
     } else {
-      setState(() => _error = 'Invalid code. Try again.');
+      setState(() => _error = t.totpSetupInvalidCode);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(backgroundColor: KodaColors.voidBg, elevation: 0,
-          title: const Text('Two-Factor Authentication')),
+          // Exact match with the Settings nav entry's own title.
+          title: Text(t.settingsTwoFactorTitle)),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
@@ -60,13 +64,12 @@ class _TotpSetupScreenState extends State<TotpSetupScreen> {
                     ? Column(mainAxisSize: MainAxisSize.min, children: [
                         Icon(Icons.check_circle, color: KodaColors.mint, size: 40),
                         SizedBox(height: 12),
-                        Text('Two-factor authentication is enabled.',
+                        Text(t.totpSetupEnabledMessage,
                             style: TextStyle(color: KodaColors.text1, fontSize: 15)),
                       ])
                     : Column(mainAxisSize: MainAxisSize.min, children: [
                         Text(
-                          'Scan this secret into your authenticator app '
-                          '(Google Authenticator, 1Password, Authy):',
+                          t.totpSetupScanInstructions,
                           style: TextStyle(color: KodaColors.text2, fontSize: 13)),
                         const SizedBox(height: 16),
                         Container(
@@ -83,9 +86,9 @@ class _TotpSetupScreenState extends State<TotpSetupScreen> {
                         ),
                         const SizedBox(height: 20),
                         if (_error != null) KodaErrorBanner(message: _error!),
-                        KodaTextField(controller: _code, hintText: 'Enter 6-digit code to confirm'),
+                        KodaTextField(controller: _code, hintText: t.totpSetupCodeHint),
                         const SizedBox(height: 14),
-                        KodaPrimaryButton(label: 'Verify & Enable', onPressed: _verify),
+                        KodaPrimaryButton(label: t.totpSetupVerifyButton, onPressed: _verify),
                       ]),
               ),
             ),

@@ -15,6 +15,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api.dart';
 import '../../core/uploader.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 
 class GalleryScreen extends ConsumerStatefulWidget {
@@ -78,6 +79,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen>
     }
   }
 Future<void> _showCreatePost({String? collectionId}) async {
+    final t = AppLocalizations.of(context);
     final urlCtrl     = TextEditingController();
     final captionCtrl = TextEditingController();
     String mediaType  = 'image';
@@ -89,7 +91,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDlg) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: Text('New Post', style: TextStyle(color: KodaColors.text1)),
+          title: Text(t.galleryNewPostTitle, style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 400,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -112,48 +114,48 @@ Future<void> _showCreatePost({String? collectionId}) async {
                   }
                 },
                 icon: const Icon(Icons.upload_file, size: 16),
-                label: Text(pickedFileName ?? 'Choose File'),
+                label: Text(pickedFileName ?? t.galleryChooseFileButton),
               ),
               const SizedBox(height: 8),
               Row(children: [
                 Expanded(child: Divider()),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Text('or', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+                  child: Text(t.galleryOrDivider, style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                 ),
                 Expanded(child: Divider()),
               ]),
               const SizedBox(height: 8),
               KodaTextField(
                 controller: urlCtrl,
-                hintText: 'Paste image/video URL',
+                hintText: t.galleryPasteUrlHint,
               ),
               const SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 initialValue: mediaType,
                 dropdownColor: KodaColors.card,
-                decoration: const InputDecoration(labelText: 'Type'),
-                items: const [
-                  DropdownMenuItem(value: 'image', child: Text('Image')),
-                  DropdownMenuItem(value: 'video', child: Text('Video')),
+                decoration: InputDecoration(labelText: t.galleryTypeLabel),
+                items: [
+                  DropdownMenuItem(value: 'image', child: Text(t.galleryImageOption)),
+                  DropdownMenuItem(value: 'video', child: Text(t.galleryVideoOption)),
                 ],
                 onChanged: (v) => setDlg(() => mediaType = v ?? 'image'),
               ),
               const SizedBox(height: 10),
               KodaTextField(
                 controller: captionCtrl,
-                hintText: 'Caption (optional)',
+                hintText: t.galleryCaptionHint,
               ),
             ]),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel'),
+              child: Text(t.commonCancel),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Post'),
+              child: Text(t.galleryPostButton),
             ),
           ],
         ),
@@ -215,6 +217,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
   // -- Collection management --------------------------------------------------
 
   Future<void> _showCreateCollection() async {
+    final t = AppLocalizations.of(context);
     final nameCtrl = TextEditingController();
     final descCtrl = TextEditingController();
 
@@ -222,20 +225,20 @@ Future<void> _showCreatePost({String? collectionId}) async {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('New Collection', style: TextStyle(color: KodaColors.text1)),
+        title: Text(t.galleryNewCollectionTitle, style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 360,
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            KodaTextField(controller: nameCtrl, hintText: 'Collection name'),
+            KodaTextField(controller: nameCtrl, hintText: t.galleryCollectionNameHint, autofocus: true),
             const SizedBox(height: 10),
-            KodaTextField(controller: descCtrl, hintText: 'Description (optional)'),
+            KodaTextField(controller: descCtrl, hintText: t.calendarDescriptionHint),
           ]),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
+              child: Text(t.commonCancel)),
           TextButton(onPressed: () => Navigator.pop(context, true),
-              child: const Text('Create')),
+              child: Text(t.commonCreate)),
         ],
       ),
     );
@@ -252,17 +255,18 @@ Future<void> _showCreatePost({String? collectionId}) async {
   }
 
   Future<void> _deleteCollection(Map<String, dynamic> col) async {
+    final t = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: KodaColors.card,
-        content: Text('Delete "${col['name']}"? Posts inside will become uncollected.',
+        content: Text(t.galleryDeleteCollectionConfirm(col['name'] as String? ?? ''),
             style: TextStyle(color: KodaColors.text1)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+              child: Text(t.commonCancel)),
           TextButton(onPressed: () => Navigator.pop(ctx, true),
-              child: Text('Delete', style: TextStyle(color: KodaColors.accent))),
+              child: Text(t.commonDelete, style: TextStyle(color: KodaColors.accent))),
         ],
       ),
     );
@@ -302,6 +306,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Column(children: [
       // Header with tabs
       Container(
@@ -323,7 +328,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
               IconButton(
                 icon: Icon(Icons.add_photo_alternate_outlined,
                     size: 18, color: KodaColors.text3),
-                tooltip: 'New Post',
+                tooltip: t.galleryNewPostTitle,
                 onPressed: () => _showCreatePost(
                     collectionId: _activeCollection?['id'] as String?),
               ),
@@ -334,7 +339,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
             indicatorColor: KodaColors.koda,
             labelColor: KodaColors.text1,
             unselectedLabelColor: KodaColors.text3,
-            tabs: const [Tab(text: 'Feed'), Tab(text: 'Collections')],
+            tabs: [Tab(text: t.galleryFeedTab), Tab(text: t.galleryCollectionsTab)],
           ),
         ]),
       ),
@@ -350,12 +355,13 @@ Future<void> _showCreatePost({String? collectionId}) async {
   }
 
   Widget _buildFeed() {
+    final t = AppLocalizations.of(context);
     if (_loadingFeed) {
       return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
     if (_feedPosts.isEmpty) {
       return Center(
-          child: Text('No posts yet', style: TextStyle(color: KodaColors.text3)));
+          child: Text(t.galleryNoPostsYet, style: TextStyle(color: KodaColors.text3)));
     }
     return GridView.builder(
       padding: const EdgeInsets.all(12),
@@ -374,6 +380,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
   }
 
   Widget _buildCollections() {
+    final t = AppLocalizations.of(context);
     if (_loadingCollections) {
       return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
@@ -388,12 +395,12 @@ Future<void> _showCreatePost({String? collectionId}) async {
             TextButton.icon(
               onPressed: _showCreateCollection,
               icon: const Icon(Icons.add, size: 14),
-              label: const Text('New Collection'),
+              label: Text(t.galleryNewCollectionTitle),
             ),
           Expanded(
             child: _collections.isEmpty
                 ? Center(
-                    child: Text('No collections yet',
+                    child: Text(t.galleryNoCollectionsYet,
                         style: TextStyle(color: KodaColors.text3, fontSize: 12),
                         textAlign: TextAlign.center))
                 : ListView.builder(
@@ -421,9 +428,9 @@ Future<void> _showCreatePost({String? collectionId}) async {
                                 onSelected: (v) {
                                   if (v == 'delete') _deleteCollection(col);
                                 },
-                                itemBuilder: (_) => const [
+                                itemBuilder: (_) => [
                                   PopupMenuItem(
-                                      value: 'delete', child: Text('Delete')),
+                                      value: 'delete', child: Text(t.commonDelete)),
                                 ],
                               )
                             : null,
@@ -439,7 +446,7 @@ Future<void> _showCreatePost({String? collectionId}) async {
       Expanded(
         child: _activeCollection == null
             ? Center(
-                child: Text('Select a collection',
+                child: Text(t.gallerySelectACollection,
                     style: TextStyle(color: KodaColors.text3)))
             : _loadingCollectionPosts
                 ? Center(
@@ -447,14 +454,14 @@ Future<void> _showCreatePost({String? collectionId}) async {
                 : _collectionPosts.isEmpty
                     ? Center(
                         child: Column(mainAxisSize: MainAxisSize.min, children: [
-                          Text('No posts in this collection',
+                          Text(t.galleryNoPostsInCollection,
                               style: TextStyle(color: KodaColors.text3)),
                           const SizedBox(height: 12),
                           OutlinedButton.icon(
                             onPressed: () => _showCreatePost(
                                 collectionId: _activeCollection!['id'] as String),
                             icon: const Icon(Icons.add, size: 14),
-                            label: const Text('Add Post'),
+                            label: Text(t.galleryAddPostButton),
                           ),
                         ]),
                       )
@@ -571,6 +578,7 @@ class _PostTileState extends State<_PostTile> {
       );
 
   void _showDetail(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final caption  = widget.post['caption'] as String?;
     final creator  = widget.post['creator'] as Map<String, dynamic>?;
     final username = creator?['username'] as String? ?? '?';
@@ -619,7 +627,7 @@ class _PostTileState extends State<_PostTile> {
                 ),
                 IconButton(
                   icon: Icon(Icons.close, color: KodaColors.text3, size: 18),
-                  tooltip: 'Close',
+                  tooltip: t.commonClose,
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/message_utils.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 
 class MessageSearchResult {
@@ -106,6 +107,7 @@ class _MessageSearchDialogState extends State<MessageSearchDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Dialog(
       backgroundColor: KodaColors.card,
       child: SizedBox(
@@ -118,14 +120,14 @@ class _MessageSearchDialogState extends State<MessageSearchDialog> {
               Expanded(
                 child: KodaTextField(
                   controller: _queryCtrl,
-                  hintText: 'Search this channel...',
+                  hintText: t.messageSearchHint,
                   onSubmitted: (_) => _search(),
                 ),
               ),
               const SizedBox(width: 8),
               IconButton(
                 icon: Icon(Icons.search, color: KodaColors.koda),
-                tooltip: 'Search',
+                tooltip: t.messageSearchTooltip,
                 onPressed: _searching ? null : _search,
               ),
             ]),
@@ -133,12 +135,11 @@ class _MessageSearchDialogState extends State<MessageSearchDialog> {
           Divider(color: KodaColors.border, height: 1),
           Expanded(
             child: !_hasSearched
-                ? Center(child: Text('Searches messages already loaded on this device -- '
-                    'older history gets fetched (and decrypted locally) as you scan further back.',
+                ? Center(child: Text(t.messageSearchInitialHint,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)))
                 : _results.isEmpty && !_searching
-                    ? Center(child: Text('No matches',
+                    ? Center(child: Text(t.messageSearchNoMatches,
                         style: TextStyle(color: KodaColors.text3)))
                     : ListView.builder(
                         padding: const EdgeInsets.all(12),
@@ -155,7 +156,7 @@ class _MessageSearchDialogState extends State<MessageSearchDialog> {
                             if (_reachedStart) {
                               return Padding(
                                 padding: EdgeInsets.all(16),
-                                child: Center(child: Text('Start of channel history',
+                                child: Center(child: Text(t.messageSearchStartOfHistory,
                                     style: TextStyle(color: KodaColors.text3, fontSize: 11))),
                               );
                             }
@@ -163,13 +164,13 @@ class _MessageSearchDialogState extends State<MessageSearchDialog> {
                               padding: const EdgeInsets.all(8),
                               child: TextButton(
                                 onPressed: _searchMore,
-                                child: const Text('Search further back'),
+                                child: Text(t.messageSearchFurtherBackButton),
                               ),
                             );
                           }
                           final m = _results[i];
                           final author = (m['author'] as Map<String, dynamic>?)?['username']
-                              as String? ?? 'Unknown';
+                              as String? ?? t.messageSearchUnknownAuthor;
                           return ListTile(
                             dense: true,
                             title: Text(author, style: TextStyle(

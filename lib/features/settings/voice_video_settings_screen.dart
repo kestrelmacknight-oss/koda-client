@@ -14,6 +14,7 @@ import '../../core/api.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
 import '../../core/uploader.dart';
+import '../../l10n/generated/app_localizations.dart';
 import 'device_test_screen.dart';
 
 class VoiceVideoSettingsScreen extends ConsumerStatefulWidget {
@@ -48,6 +49,7 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
   }
 
   Future<void> _captureKeybind() async {
+    final t = AppLocalizations.of(context);
     final focusNode = FocusNode();
     final result = await showDialog<String>(
       context: context,
@@ -62,11 +64,11 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
         },
         child: AlertDialog(
           backgroundColor: KodaColors.card,
-          title: Text('Push to Talk', style: TextStyle(color: KodaColors.text1)),
-          content: Text('Press any key to bind it...',
+          title: Text(t.voiceVideoSettingsPushToTalkLabel, style: TextStyle(color: KodaColors.text1)),
+          content: Text(t.voiceVideoSettingsPressAnyKeyHint,
               style: TextStyle(color: KodaColors.text2)),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(t.commonCancel)),
           ],
         ),
       ),
@@ -85,13 +87,15 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final settings = ref.watch(voiceSettingsProvider);
 
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: Text('Voice & Video',
+        // Exact match with the Settings nav entry's own title.
+        title: Text(t.settingsSectionVoiceVideo,
             style: TextStyle(color: KodaColors.text1, fontSize: 16)),
       ),
       body: _loading
@@ -103,50 +107,69 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                   onPressed: () => Navigator.push(context,
                       MaterialPageRoute(builder: (_) => const DeviceTestScreen())),
                   icon: const Icon(Icons.tune, size: 16),
-                  label: const Text('Test Devices'),
+                  label: Text(t.voiceVideoSettingsTestDevicesButton),
                 ),
                 const SizedBox(height: 20),
 
-                _sectionLabel('Voice Processing'),
+                _sectionLabel(t.voiceVideoSettingsSectionVoiceProcessing),
                 _toggleTile(
-                  title: 'Noise Suppression',
-                  subtitle: 'Reduce background noise on your mic',
+                  title: t.voiceVideoSettingsNoiseSuppressionTitle,
+                  subtitle: t.voiceVideoSettingsNoiseSuppressionSubtitle,
                   value: settings.noiseSuppression,
                   onChanged: (v) => _save(settings.copyWith(noiseSuppression: v)),
                 ),
+                // RNNoise-based real neural noise suppression -- Windows
+                // only for now (see package:flutter_webrtc's
+                // Helper.setDeepNoiseSuppression, a Koda-specific native
+                // patch). Hidden entirely elsewhere, matching how the
+                // EQ/boost section below already handles platform-gating
+                // in this screen, rather than shown disabled with a
+                // tooltip.
+                if (Platform.isWindows)
+                  _toggleTile(
+                    title: t.voiceVideoSettingsDeepNoiseSuppressionTitle,
+                    subtitle: t.voiceVideoSettingsDeepNoiseSuppressionSubtitle,
+                    value: settings.deepNoiseSuppression,
+                    onChanged: (v) => _save(settings.copyWith(
+                      deepNoiseSuppression: v,
+                      // Mutually exclusive with WebRTC's own built-in NS
+                      // above -- see VoiceSettings' doc comment.
+                      noiseSuppression: v ? false : settings.noiseSuppression,
+                    )),
+                  ),
                 _toggleTile(
-                  title: 'Echo Cancellation',
-                  subtitle: 'Prevent your own audio from echoing back',
+                  title: t.voiceVideoSettingsEchoCancellationTitle,
+                  subtitle: t.voiceVideoSettingsEchoCancellationSubtitle,
                   value: settings.echoCancellation,
                   onChanged: (v) => _save(settings.copyWith(echoCancellation: v)),
                 ),
                 _toggleTile(
-                  title: 'Auto Gain Control',
-                  subtitle: 'Automatically balance mic volume (loudness normalization)',
+                  title: t.voiceVideoSettingsAutoGainTitle,
+                  subtitle: t.voiceVideoSettingsAutoGainSubtitle,
                   value: settings.autoGainControl,
                   onChanged: (v) => _save(settings.copyWith(autoGainControl: v)),
                 ),
                 _toggleTile(
-                  title: 'Auto-Ducking',
-                  subtitle: "Lower other participants' volume while you're talking",
+                  title: t.voiceVideoSettingsAutoDuckingTitle,
+                  subtitle: t.voiceVideoSettingsAutoDuckingSubtitle,
                   value: settings.autoDucking,
                   onChanged: (v) => _save(settings.copyWith(autoDucking: v)),
                 ),
                 _toggleTile(
-                  title: 'High-Pass Filter',
-                  subtitle: 'Cut low-frequency rumble (fans, AC, desk bumps)',
+                  title: t.voiceVideoSettingsHighPassTitle,
+                  subtitle: t.voiceVideoSettingsHighPassSubtitle,
                   value: settings.highPassFilter,
                   onChanged: (v) => _save(settings.copyWith(highPassFilter: v)),
                 ),
                 _toggleTile(
-                  title: 'Typing Noise Detection',
-                  subtitle: 'Suppress keyboard clatter picked up by your mic',
+                  title: t.voiceVideoSettingsTypingNoiseTitle,
+                  subtitle: t.voiceVideoSettingsTypingNoiseSubtitle,
                   value: settings.typingNoiseDetection,
                   onChanged: (v) => _save(settings.copyWith(typingNoiseDetection: v)),
                 ),
                 _toggleTile(
-                  title: 'Voice Isolation',
-                  subtitle: "Focus on your voice, filtering out other people and sounds nearby",
+                  title: t.voiceVideoSettingsVoiceIsolationTitle,
+                  subtitle: t.voiceVideoSettingsVoiceIsolationSubtitle,
                   value: settings.voiceIsolation,
                   onChanged: (v) => _save(settings.copyWith(voiceIsolation: v)),
                 ),
@@ -158,16 +181,16 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                 // patches) -- hidden elsewhere rather than shown non-functional.
                 if (Platform.isWindows) ...[
                   const SizedBox(height: 24),
-                  _sectionLabel('Mic Boost'),
+                  _sectionLabel(t.voiceVideoSettingsSectionMicBoost),
                   _toggleTile(
-                    title: 'Enable Boost',
-                    subtitle: 'Preamp gain for a quiet or distant mic -- applied before EQ',
+                    title: t.voiceVideoSettingsEnableBoostTitle,
+                    subtitle: t.voiceVideoSettingsEnableBoostSubtitle,
                     value: settings.micBoostEnabled,
                     onChanged: (v) => _save(settings.copyWith(micBoostEnabled: v)),
                   ),
                   if (settings.micBoostEnabled)
                     _eqBandSlider(
-                      label: 'Boost',
+                      label: t.voiceVideoSettingsBandBoost,
                       value: settings.micBoostGain,
                       min: 0.0,
                       max: 20.0,
@@ -177,30 +200,30 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                     ),
 
                   const SizedBox(height: 24),
-                  _sectionLabel('Mic EQ'),
+                  _sectionLabel(t.voiceVideoSettingsSectionMicEq),
                   _toggleTile(
-                    title: 'Enable EQ',
-                    subtitle: 'Shape your mic before it reaches other people',
+                    title: t.voiceVideoSettingsEnableEqTitle,
+                    subtitle: t.voiceVideoSettingsEnableEqSubtitle,
                     value: settings.eqEnabled,
                     onChanged: (v) => _save(settings.copyWith(eqEnabled: v)),
                   ),
                   if (settings.eqEnabled) ...[
                     _eqBandSlider(
-                      label: 'Bass',
+                      label: t.voiceVideoSettingsBandBass,
                       value: settings.eqBassGain,
                       onChanged: (v) => ref.read(voiceSettingsProvider.notifier)
                           .update((s) => s.copyWith(eqBassGain: v)),
                       onChangeEnd: (v) => _save(settings.copyWith(eqBassGain: v)),
                     ),
                     _eqBandSlider(
-                      label: 'Mid',
+                      label: t.voiceVideoSettingsBandMid,
                       value: settings.eqMidGain,
                       onChanged: (v) => ref.read(voiceSettingsProvider.notifier)
                           .update((s) => s.copyWith(eqMidGain: v)),
                       onChangeEnd: (v) => _save(settings.copyWith(eqMidGain: v)),
                     ),
                     _eqBandSlider(
-                      label: 'Treble',
+                      label: t.voiceVideoSettingsBandTreble,
                       value: settings.eqTrebleGain,
                       onChanged: (v) => ref.read(voiceSettingsProvider.notifier)
                           .update((s) => s.copyWith(eqTrebleGain: v)),
@@ -210,10 +233,10 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                 ],
 
                 const SizedBox(height: 24),
-                _sectionLabel('Voice Activity Detection (VOX)'),
+                _sectionLabel(t.voiceVideoSettingsSectionVad),
                 _toggleTile(
-                  title: 'Enable VOX',
-                  subtitle: 'Only transmit when you\'re actually speaking',
+                  title: t.voiceVideoSettingsEnableVoxTitle,
+                  subtitle: t.voiceVideoSettingsEnableVoxSubtitle,
                   value: settings.vadEnabled,
                   onChanged: (v) => _save(settings.copyWith(vadEnabled: v)),
                 ),
@@ -221,7 +244,7 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('Sensitivity',
+                      Text(t.voiceVideoSettingsSensitivityLabel,
                           style: TextStyle(color: KodaColors.text2, fontSize: 12)),
                       Slider(
                         value: settings.vadThreshold,
@@ -234,14 +257,14 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                         onChangeEnd: (v) => _save(settings.copyWith(vadThreshold: v)),
                       ),
                       Text(
-                        'Lower = picks up quieter sounds. Higher = only louder speech triggers transmission.',
+                        t.voiceVideoSettingsVadHint,
                         style: TextStyle(color: KodaColors.text3, fontSize: 11),
                       ),
                     ]),
                   ),
 
                 const SizedBox(height: 24),
-                _sectionLabel('Push to Talk'),
+                _sectionLabel(t.voiceVideoSettingsPushToTalkLabel),
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -252,11 +275,11 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                   child: Row(children: [
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text('Bound key',
+                        Text(t.voiceVideoSettingsBoundKeyLabel,
                             style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                         const SizedBox(height: 4),
                         Text(
-                          settings.pushToTalkKey ?? 'Not set — mic stays live whenever unmuted',
+                          settings.pushToTalkKey ?? t.voiceVideoSettingsKeyNotSet,
                           style: TextStyle(color: KodaColors.text3, fontSize: 12),
                         ),
                       ]),
@@ -264,43 +287,42 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                     if (settings.pushToTalkKey != null)
                       TextButton(
                         onPressed: _clearKeybind,
-                        child: Text('Clear', style: TextStyle(color: KodaColors.accent)),
+                        child: Text(t.voiceVideoSettingsClearButton, style: TextStyle(color: KodaColors.accent)),
                       ),
                     TextButton(
                       onPressed: _captureKeybind,
-                      child: Text(settings.pushToTalkKey == null ? 'Set Key' : 'Change'),
+                      child: Text(settings.pushToTalkKey == null ? t.voiceVideoSettingsSetKeyButton : t.voiceVideoSettingsChangeButton),
                     ),
                   ]),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'When a key is bound, your mic transmits only while you hold that key down. '
-                  'This takes priority over VOX while you\'re in a voice channel.',
+                  t.voiceVideoSettingsPushToTalkExplanation,
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
                 ),
                 const SizedBox(height: 24),
-                _sectionLabel('VARM - Virtual Avatar Reactive Model'),
+                _sectionLabel(t.voiceVideoSettingsSectionVarm),
                 Text(
-                  'Upload two images that swap when you speak. Visible only to you.',
+                  t.voiceVideoSettingsVarmDescription,
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
                 ),
                 const SizedBox(height: 12),
                 Row(children: [
                   Expanded(child: _varmImageTile(
-                    label: 'Silent', url: settings.varmSilentUrl,
+                    label: t.voiceVideoSettingsVarmSilentLabel, url: settings.varmSilentUrl,
                     onPick: () => _pickVarmImage('silent'),
                     onClear: () => _save(settings.copyWith(varmSilentUrl: '')),
                   )),
                   const SizedBox(width: 12),
                   Expanded(child: _varmImageTile(
-                    label: 'Talking', url: settings.varmTalkingUrl,
+                    label: t.voiceVideoSettingsVarmTalkingLabel, url: settings.varmTalkingUrl,
                     onPick: () => _pickVarmImage('talking'),
                     onClear: () => _save(settings.copyWith(varmTalkingUrl: '')),
                   )),
                 ]),
                 if (settings.varmEnabled) ...[
                   const SizedBox(height: 10),
-                  Text('Speaking threshold',
+                  Text(t.voiceVideoSettingsSpeakingThresholdLabel,
                       style: TextStyle(color: KodaColors.text2, fontSize: 12)),
                   Slider(
                     value: settings.varmThreshold,
@@ -311,12 +333,12 @@ class _VoiceVideoSettingsScreenState extends ConsumerState<VoiceVideoSettingsScr
                         .update((s) => s.copyWith(varmThreshold: v)),
                     onChangeEnd: (v) => _save(settings.copyWith(varmThreshold: v)),
                   ),
-                  Text('Lower = switches to talking image more easily.',
+                  Text(t.voiceVideoSettingsVarmThresholdHint,
                       style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                   OutlinedButton.icon(
                     onPressed: () => _save(settings.copyWith(clearVarm: true)),
                     icon: Icon(Icons.delete_outline, size: 14, color: KodaColors.accent),
-                    label: Text('Remove VARM', style: TextStyle(color: KodaColors.accent)),
+                    label: Text(t.voiceVideoSettingsRemoveVarmButton, style: TextStyle(color: KodaColors.accent)),
                   ),
                 ],
               ],

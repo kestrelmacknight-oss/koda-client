@@ -16,6 +16,7 @@ import '../../core/api.dart';
 import '../../core/checkout.dart';
 import '../../core/theme.dart';
 import '../../core/time_utils.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/tier_badge.dart';
 import '../../shared/widgets.dart';
 
@@ -58,11 +59,12 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: Text('Koda Marketplace',
+        title: Text(t.kodaMarketplaceTitle,
             style: TextStyle(color: KodaColors.text1,
                 fontSize: 16, fontWeight: FontWeight.w700)),
         bottom: TabBar(
@@ -70,10 +72,10 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
           indicatorColor: KodaColors.koda,
           labelColor: KodaColors.text1,
           unselectedLabelColor: KodaColors.text3,
-          tabs: const [
-            Tab(text: 'Subscriptions'),
-            Tab(text: 'Boosts'),
-            Tab(text: 'Discover'),
+          tabs: [
+            Tab(text: t.kodaMarketplaceTabSubscriptions),
+            Tab(text: t.kodaMarketplaceTabBoosts),
+            Tab(text: t.kodaMarketplaceTabDiscover),
           ],
         ),
       ),
@@ -91,6 +93,7 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
   // ── Subscriptions tab ─────────────────────────────────────────────────────
 
   Widget _buildSubscriptionsTab() {
+    final t = AppLocalizations.of(context);
     if (_loadingSub) {
       return Center(
           child: CircularProgressIndicator(color: KodaColors.koda));
@@ -120,16 +123,16 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
             Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
-                tier == 'free' ? 'Free' :
-                tier == 'spark' ? 'Spark' : 'Pulse',
+                tier == 'free' ? t.kodaMarketplaceTierFreeName :
+                tier == 'spark' ? t.kodaMarketplaceTierSparkName : t.kodaMarketplaceTierPulseName,
                 style: TextStyle(color: KodaColors.text1,
                     fontSize: 18, fontWeight: FontWeight.w700),
               ),
               if (sub != null)
-                Text('Expires ${_formatDate(sub['expires_at'])}',
+                Text(t.kodaMarketplaceExpiresOn(_formatDate(sub['expires_at'])),
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
               if (tier == 'free')
-                Text('Upgrade for exclusive perks',
+                Text(t.kodaMarketplaceUpgradeForPerks,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
             ])),
           ]),
@@ -149,10 +152,10 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
               const SizedBox(width: 12),
               Expanded(child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('${_boostTokens.length} boost token${_boostTokens.length == 1 ? '' : 's'} available',
+                Text(t.kodaMarketplaceBoostTokensAvailable(_boostTokens.length),
                     style: TextStyle(color: KodaColors.text1,
                         fontSize: 14, fontWeight: FontWeight.w600)),
-                Text('Gift a token to any server you\'re in from its Server Bank tab',
+                Text(t.kodaMarketplaceGiftTokenHint,
                     style: TextStyle(color: KodaColors.text3, fontSize: 11)),
               ])),
             ]),
@@ -163,15 +166,15 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
         // Spark tier
         _buildTierCard(
           tier: 'spark',
-          name: 'Spark',
+          name: t.kodaMarketplaceTierSparkName,
           price: sparkPrice,
           color: const Color(0xFFFF6B35),
           current: tier == 'spark',
           perks: [
-            'Custom avatar frame',
-            'Spark badge on profile',
-            'Increased file upload limit (50MB)',
-            'Priority voice quality',
+            t.kodaMarketplaceSparkPerkAvatarFrame,
+            t.kodaMarketplaceSparkPerkBadge,
+            t.kodaMarketplaceSparkPerkFileLimit,
+            t.kodaMarketplaceSparkPerkVoiceQuality,
           ],
         ),
         const SizedBox(height: 12),
@@ -179,16 +182,16 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
         // Pulse tier
         _buildTierCard(
           tier: 'pulse',
-          name: 'Pulse',
+          name: t.kodaMarketplaceTierPulseName,
           price: pulsePrice,
           color: KodaColors.koda,
           current: tier == 'pulse',
           perks: [
-            'Everything in Spark',
-            'Animated avatar frame',
-            'Pulse badge on profile',
-            '100MB file upload limit',
-            '1 server boost token per month',
+            t.kodaMarketplacePulsePerkEverythingInSpark,
+            t.kodaMarketplacePulsePerkAnimatedFrame,
+            t.kodaMarketplacePulsePerkBadge,
+            t.kodaMarketplacePulsePerkFileLimit,
+            t.kodaMarketplacePulsePerkBoostToken,
           ],
         ),
       ],
@@ -203,6 +206,7 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
     required bool current,
     required List<String> perks,
   }) {
+    final t = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: KodaColors.card,
@@ -225,7 +229,7 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
             Text(name, style: TextStyle(color: color,
                 fontSize: 18, fontWeight: FontWeight.w700)),
             const Spacer(),
-            Text('\$${(price / 100).toStringAsFixed(2)}/mo',
+            Text(t.kodaMarketplacePricePerMonth('\$${(price / 100).toStringAsFixed(2)}'),
                 style: TextStyle(color: KodaColors.text1,
                     fontSize: 16, fontWeight: FontWeight.w600)),
           ]),
@@ -253,7 +257,7 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
                   color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text('Current Plan',
+                child: Text(t.kodaMarketplaceCurrentPlanLabel,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: color, fontWeight: FontWeight.w600)),
               )
@@ -266,7 +270,7 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
                       foregroundColor: Colors.black,
                     ),
                     onPressed: () => _showSubscribeDialog(tier, price, false),
-                    child: Text('Get $name'),
+                    child: Text(t.kodaMarketplaceGetTierButton(name)),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -277,7 +281,7 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
                       side: BorderSide(color: color),
                     ),
                     onPressed: () => _showSubscribeDialog(tier, price, true),
-                    child: Text('Gift $name'),
+                    child: Text(t.kodaMarketplaceGiftTierButton(name)),
                   ),
                 ),
               ]),
@@ -288,19 +292,23 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
   }
 
   Future<void> _showSubscribeDialog(String tier, int price, bool isGift) async {
+    // Captured up front -- used across several `await`s below, some of
+    // which happen after this dialog (and possibly this whole screen) may
+    // no longer be mounted.
+    final t = AppLocalizations.of(context);
     final recipientCtrl = TextEditingController();
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text(isGift ? 'Gift ${tier.toUpperCase()}' : 'Subscribe to ${tier.toUpperCase()}',
+        title: Text(isGift ? t.kodaMarketplaceGiftTierTitle(tier.toUpperCase()) : t.kodaMarketplaceSubscribeTierTitle(tier.toUpperCase()),
             style: TextStyle(color: KodaColors.text1)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
           if (isGift) ...[
-            Text('Gift username:', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+            Text(t.kodaMarketplaceGiftUsernameLabel, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
             const SizedBox(height: 4),
-            KodaTextField(controller: recipientCtrl, hintText: 'Username'),
+            KodaTextField(controller: recipientCtrl, hintText: t.kodaMarketplaceUsernameHint, autofocus: true),
             const SizedBox(height: 10),
           ],
           Container(
@@ -311,13 +319,13 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
             ),
             child: Column(children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text('Subscription', style: TextStyle(color: KodaColors.text2)),
+                Text(t.kodaMarketplaceSubscriptionRowLabel, style: TextStyle(color: KodaColors.text2)),
                 Text('\$${(price / 100).toStringAsFixed(2)}',
                     style: TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w600)),
               ]),
               Divider(color: KodaColors.border),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text('Total', style: TextStyle(
+                Text(t.kodaMarketplaceTotalLabel, style: TextStyle(
                     color: KodaColors.text1, fontWeight: FontWeight.w600)),
                 Text('\$${(price / 100).toStringAsFixed(2)}',
                     style: TextStyle(
@@ -326,18 +334,18 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
             ]),
           ),
           const SizedBox(height: 8),
-          Text('Payment processed securely by Stripe',
+          Text(t.kodaMarketplacePaymentSecureNote,
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         ]),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
+              child: Text(t.commonCancel)),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
                 backgroundColor: KodaColors.koda,
                 foregroundColor: Colors.black),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Proceed to Payment'),
+            child: Text(t.kodaMarketplaceProceedToPaymentButton),
           ),
         ],
       ),
@@ -351,7 +359,7 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
       giftedTo = user?['id'] as String?;
       if (giftedTo == null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('User not found')));
+            SnackBar(content: Text(t.kodaMarketplaceUserNotFound)));
         return;
       }
     }
@@ -370,7 +378,7 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
     if (checkoutUrl == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not start checkout. Try again in a moment.')));
+            SnackBar(content: Text(t.kodaMarketplaceCouldNotStartCheckout)));
       }
       return;
     }
@@ -385,8 +393,8 @@ class _KodaMarketplaceScreenState extends ConsumerState<KodaMarketplaceScreen>
         matches: (data) => data['payment_type'] == 'subscription');
     if (mounted) {
       messenger.showSnackBar(SnackBar(content: Text(paymentConfirmed
-          ? 'Subscription active!'
-          : 'Still waiting on that payment -- it\'ll activate once completed.')));
+          ? t.kodaMarketplaceSubscriptionActive
+          : t.kodaMarketplaceSubscriptionPending)));
       _loadData();
     }
   }
@@ -414,13 +422,16 @@ class _BoostsTabState extends ConsumerState<_BoostsTab> {
   bool _purchasing = false;
 
   Future<void> _purchase() async {
+    // Captured before the `await`s below, in case this widget is no longer
+    // mounted by the time the request comes back.
+    final t = AppLocalizations.of(context);
     setState(() => _purchasing = true);
     final checkoutUrl = await KodaApi.instance.purchaseBoost();
     if (!mounted) return;
     setState(() => _purchasing = false);
     if (checkoutUrl == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Could not start checkout. Try again in a moment.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(t.kodaMarketplaceCouldNotStartCheckout)));
       return;
     }
     final messenger = ScaffoldMessenger.of(context);
@@ -429,13 +440,14 @@ class _BoostsTabState extends ConsumerState<_BoostsTab> {
         matches: (data) => data['payment_type'] == 'boost_purchase');
     if (!mounted) return;
     messenger.showSnackBar(SnackBar(content: Text(confirmed
-        ? 'Boost purchased!'
-        : 'Still waiting on that payment -- it\'ll be ready once completed.')));
+        ? t.kodaMarketplaceBoostPurchased
+        : t.kodaMarketplaceBoostPending)));
     if (confirmed) widget.onPurchased();
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -450,10 +462,10 @@ class _BoostsTabState extends ConsumerState<_BoostsTab> {
             Icon(Icons.rocket_launch_outlined, color: KodaColors.koda, size: 28),
             const SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('${widget.tokenCount} available',
+              Text(t.kodaMarketplaceTokenCountAvailable(widget.tokenCount),
                   style: TextStyle(color: KodaColors.text1,
                       fontSize: 18, fontWeight: FontWeight.w700)),
-              Text('Gift a token to any server you\'re in from its Server Bank tab',
+              Text(t.kodaMarketplaceGiftTokenHint,
                   style: TextStyle(color: KodaColors.text3, fontSize: 12)),
             ])),
           ]),
@@ -467,12 +479,10 @@ class _BoostsTabState extends ConsumerState<_BoostsTab> {
             border: Border.all(color: KodaColors.koda),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Buy a Boost', style: TextStyle(color: KodaColors.text1,
+            Text(t.kodaMarketplaceBuyABoostTitle, style: TextStyle(color: KodaColors.text1,
                 fontSize: 16, fontWeight: FontWeight.w700)),
             const SizedBox(height: 6),
-            Text('A one-time purchase -- Pulse subscribers also get one free '
-                'token every renewal, which stays the better deal if you '
-                'boost regularly.',
+            Text(t.kodaMarketplaceBoostPurchaseExplanation,
                 style: TextStyle(color: KodaColors.text3, fontSize: 12)),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -485,7 +495,7 @@ class _BoostsTabState extends ConsumerState<_BoostsTab> {
               child: _purchasing
                   ? const SizedBox(width: 16, height: 16,
                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-                  : const Text('Buy a Boost -- \$9.99'),
+                  : Text(t.kodaMarketplaceBuyABoostButton('\$9.99')),
             ),
           ]),
         ),
@@ -528,6 +538,7 @@ class _DiscoverTabState extends State<_DiscoverTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     if (_loading) {
       return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
@@ -535,8 +546,7 @@ class _DiscoverTabState extends State<_DiscoverTab> {
       return Center(child: Padding(
         padding: const EdgeInsets.all(24),
         child: Text(
-          'No servers have opted into the Koda Marketplace yet. Server '
-          'owners can turn this on in their server\'s Customize settings.',
+          t.kodaMarketplaceDiscoverEmptyState,
           textAlign: TextAlign.center,
           style: TextStyle(color: KodaColors.text3),
         ),
@@ -547,7 +557,7 @@ class _DiscoverTabState extends State<_DiscoverTab> {
       padding: const EdgeInsets.all(16),
       children: [
         if (_featured.isNotEmpty) ...[
-          Text('FEATURED THIS WEEK', style: TextStyle(color: KodaColors.text3,
+          Text(t.kodaMarketplaceFeaturedThisWeekHeader, style: TextStyle(color: KodaColors.text3,
               fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
           const SizedBox(height: 8),
           SizedBox(
@@ -561,7 +571,7 @@ class _DiscoverTabState extends State<_DiscoverTab> {
           ),
           const SizedBox(height: 20),
         ],
-        Text('ALL LISTED SERVERS', style: TextStyle(color: KodaColors.text3,
+        Text(t.kodaMarketplaceAllListedServersHeader, style: TextStyle(color: KodaColors.text3,
             fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
         const SizedBox(height: 8),
         ..._all.map((s) => Padding(
@@ -580,8 +590,9 @@ class _MarketplaceServerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final iconUrl = server['icon_url'] as String?;
-    final name = server['name'] as String? ?? 'Server';
+    final name = server['name'] as String? ?? t.kodaMarketplaceServerFallback;
     final description = server['description'] as String?;
     final memberCount = server['member_count'] as int? ?? 0;
     final link = server['marketplace_link'] as String?;
@@ -623,7 +634,7 @@ class _MarketplaceServerCard extends StatelessWidget {
         Row(children: [
           Icon(Icons.people_outline, size: 12, color: KodaColors.text3),
           const SizedBox(width: 4),
-          Text('$memberCount members', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+          Text(t.kodaMarketplaceMemberCount(memberCount), style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           const Spacer(),
           if (link != null && link.isNotEmpty)
             GestureDetector(

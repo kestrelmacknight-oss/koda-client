@@ -10,6 +10,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../l10n/generated/app_localizations.dart';
 
 String? _badgeAssetFor(String? tier) => switch (tier) {
       'spark' => 'assets/badges/spark_badge.svg',
@@ -23,9 +24,11 @@ String? _frameAssetFor(String? tier) => switch (tier) {
       _ => null,
     };
 
-String _tierLabel(String tier) => switch (tier) {
-      'spark' => 'Spark subscriber',
-      'pulse' => 'Pulse subscriber',
+// 'spark'/'pulse' stay as fixed internal lookup keys; only the
+// display label needs to be localized, which needs a BuildContext.
+String _tierLabel(AppLocalizations t, String tier) => switch (tier) {
+      'spark' => t.tierBadgeSparkSubscriber,
+      'pulse' => t.tierBadgePulseSubscriber,
       _ => '',
     };
 
@@ -41,8 +44,9 @@ class TierBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final asset = _badgeAssetFor(tier);
     if (asset == null) return const SizedBox.shrink();
+    final t = AppLocalizations.of(context);
     return Tooltip(
-      message: _tierLabel(tier!),
+      message: _tierLabel(t, tier!),
       child: SvgPicture.asset(asset, width: size, height: size),
     );
   }

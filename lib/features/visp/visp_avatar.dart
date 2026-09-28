@@ -22,6 +22,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 const _kShowVispAvatarKey = 'koda_show_visp_avatar';
 
@@ -53,6 +54,7 @@ class VispDevBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
@@ -60,7 +62,7 @@ class VispDevBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: KodaColors.koda.withValues(alpha: 0.4)),
       ),
-      child: Text('IN DEVELOPMENT',
+      child: Text(t.vispAvatarInDevelopment,
           style: TextStyle(color: KodaColors.koda, fontSize: 9,
               fontWeight: FontWeight.w700, letterSpacing: 0.4)),
     );

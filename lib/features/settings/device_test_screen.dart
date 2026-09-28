@@ -27,6 +27,9 @@ import '../../core/api.dart';
 import '../../core/pcm_wav.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
+import '../../l10n/generated/app_localizations.dart';
+
+enum _SelfListenPhase { idle, recording, playingBack }
 
 class DeviceTestScreen extends ConsumerStatefulWidget {
   const DeviceTestScreen({super.key});
@@ -55,7 +58,15 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
   // seamless gapless audio queuing, a meaningfully harder problem).
   double _selfListenDelay = 1.5;
   bool _selfListenBusy = false;
-  String _selfListenLabel = 'Test';
+  // Localized at render time (see _selfListenLabel below) rather than
+  // stored as plain English text in state.
+  _SelfListenPhase _selfListenPhase = _SelfListenPhase.idle;
+
+  String _selfListenLabel(AppLocalizations t) => switch (_selfListenPhase) {
+        _SelfListenPhase.idle => t.deviceTestLabelTest,
+        _SelfListenPhase.recording => t.deviceTestLabelRecording,
+        _SelfListenPhase.playingBack => t.deviceTestLabelPlayingBack,
+      };
 
   @override
   void initState() {
@@ -72,10 +83,11 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
   }
 
   Future<void> _connect() async {
+    final t = AppLocalizations.of(context);
     try {
       final result = await KodaApi.instance.getSelfTestVoiceToken();
       if (result == null) {
-        if (mounted) setState(() { _connecting = false; _error = 'Could not get a test token.'; });
+        if (mounted) setState(() { _connecting = false; _error = t.deviceTestCouldNotGetToken; });
         return;
       }
 
@@ -179,8 +191,9 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
       });
     } catch (e) {
       if (mounted) {
+        final t = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not start camera: $e')));
+            SnackBar(content: Text(t.deviceTestCouldNotStartCamera('$e'))));
       }
     }
   }
@@ -199,7 +212,7 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
     final track = _room.localParticipant?.audioTrackPublications.firstOrNull?.track;
     if (track == null) return;
 
-    setState(() { _selfListenBusy = true; _selfListenLabel = 'Recording...'; });
+    setState(() { _selfListenBusy = true; _selfListenPhase = _SelfListenPhase.recording; });
 
     const sampleRate = 24000;
     const channels = 1;
@@ -224,7 +237,7 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
     if (!started) {
       await sub.cancel();
       await capture.stop();
-      if (mounted) setState(() { _selfListenBusy = false; _selfListenLabel = 'Test'; });
+      if (mounted) setState(() { _selfListenBusy = false; _selfListenPhase = _SelfListenPhase.idle; });
       return;
     }
 
@@ -238,11 +251,11 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
     await capture.stop();
 
     if (!mounted || chunks.isEmpty) {
-      if (mounted) setState(() { _selfListenBusy = false; _selfListenLabel = 'Test'; });
+      if (mounted) setState(() { _selfListenBusy = false; _selfListenPhase = _SelfListenPhase.idle; });
       return;
     }
 
-    setState(() => _selfListenLabel = 'Playing back...');
+    setState(() => _selfListenPhase = _SelfListenPhase.playingBack);
     final wav = wrapPcm16AsWav(Uint8List.fromList(chunks), sampleRate: sampleRate, channels: channels);
     final player = AudioPlayer();
     try {
@@ -255,7 +268,7 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
       await player.dispose();
     }
 
-    if (mounted) setState(() { _selfListenBusy = false; _selfListenLabel = 'Test'; });
+    if (mounted) setState(() { _selfListenBusy = false; _selfListenPhase = _SelfListenPhase.idle; });
   }
 
   @override
@@ -269,13 +282,14 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final level = _room.localParticipant?.audioLevel ?? 0.0;
 
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: Text('Test Devices', style: TextStyle(color: KodaColors.text1, fontSize: 16)),
+        title: Text(t.deviceTestTitle, style: TextStyle(color: KodaColors.text1, fontSize: 16)),
       ),
       body: _connecting
           ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
@@ -283,26 +297,26 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
-                    child: Text('Could not connect: $_error',
+                    child: Text(t.deviceTestCouldNotConnect(_error!),
                         style: TextStyle(color: KodaColors.accent), textAlign: TextAlign.center),
                   ),
                 )
               : ListView(
                   padding: const EdgeInsets.all(20),
                   children: [
-                    _sectionLabel('Microphone'),
+                    _sectionLabel(t.deviceTestMicrophoneLabel),
                     _deviceDropdown(
                       devices: _audioInputs,
                       selected: _selectedAudioInput,
                       onSelect: _selectAudioInput,
-                      placeholder: 'System default',
+                      placeholder: t.deviceTestSystemDefault,
                     ),
                     const SizedBox(height: 10),
-                    _levelMeter(level),
+                    _levelMeter(t, level),
                     const SizedBox(height: 24),
 
-                    _sectionLabel('Hear Yourself (Delayed)'),
-                    Text('Talk, then hear a ${_selfListenDelay.toStringAsFixed(1)}s clip play back',
+                    _sectionLabel(t.deviceTestHearYourselfLabel),
+                    Text(t.deviceTestHearYourselfHint(_selfListenDelay.toStringAsFixed(1)),
                         style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                     Slider(
                       value: _selfListenDelay,
@@ -310,7 +324,7 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
                       max: 5.0,
                       divisions: 9,
                       activeColor: KodaColors.koda,
-                      label: '${_selfListenDelay.toStringAsFixed(1)}s',
+                      label: t.deviceTestSecondsLabel(_selfListenDelay.toStringAsFixed(1)),
                       onChanged: _selfListenBusy
                           ? null
                           : (v) => setState(() => _selfListenDelay = v),
@@ -321,26 +335,26 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
                           ? SizedBox(width: 14, height: 14,
                               child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
                           : const Icon(Icons.hearing, size: 16),
-                      label: Text(_selfListenLabel),
+                      label: Text(_selfListenLabel(t)),
                       onPressed: _selfListenBusy ? null : _testSelfListen,
                     ),
                     const SizedBox(height: 24),
 
-                    _sectionLabel('Speaker / Output'),
+                    _sectionLabel(t.deviceTestSpeakerOutputLabel),
                     _deviceDropdown(
                       devices: _audioOutputs,
                       selected: _selectedAudioOutput,
                       onSelect: _selectAudioOutput,
-                      placeholder: 'System default',
+                      placeholder: t.deviceTestSystemDefault,
                     ),
                     const SizedBox(height: 24),
 
-                    _sectionLabel('Camera'),
+                    _sectionLabel(t.deviceTestCameraLabel),
                     _deviceDropdown(
                       devices: _videoInputs,
                       selected: _selectedVideoInput,
                       onSelect: _selectVideoInput,
-                      placeholder: 'System default',
+                      placeholder: t.deviceTestSystemDefault,
                     ),
                     const SizedBox(height: 10),
                     AspectRatio(
@@ -357,7 +371,7 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
                                 child: lk.VideoTrackRenderer(_videoTrack!),
                               )
                             : Center(
-                                child: Text('Camera preview off',
+                                child: Text(t.deviceTestCameraPreviewOff,
                                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                               ),
                       ),
@@ -366,7 +380,7 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
                     OutlinedButton.icon(
                       onPressed: _cameraTesting ? _stopCameraTest : _startCameraTest,
                       icon: Icon(_cameraTesting ? Icons.videocam_off : Icons.videocam, size: 16),
-                      label: Text(_cameraTesting ? 'Stop Camera Test' : 'Test Camera'),
+                      label: Text(_cameraTesting ? t.deviceTestStopCameraButton : t.deviceTestTestCameraButton),
                     ),
                   ],
                 ),
@@ -415,7 +429,7 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
     );
   }
 
-  Widget _levelMeter(double level) {
+  Widget _levelMeter(AppLocalizations t, double level) {
     final clamped = level.clamp(0.0, 1.0);
     Color barColor = KodaColors.mint;
     if (clamped > 0.75) {
@@ -424,7 +438,7 @@ class _DeviceTestScreenState extends ConsumerState<DeviceTestScreen> {
       barColor = KodaColors.gold;
     }
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Input level', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+      Text(t.deviceTestInputLevelLabel, style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       const SizedBox(height: 4),
       ClipRRect(
         borderRadius: BorderRadius.circular(4),

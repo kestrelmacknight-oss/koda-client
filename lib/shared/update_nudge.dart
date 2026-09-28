@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../core/theme.dart';
 import '../core/version_check.dart';
+import '../l10n/generated/app_localizations.dart';
 
 Future<void> _openDownloadPage(String url) async {
   final uri = Uri.tryParse(url);
@@ -53,13 +54,14 @@ class _UpdateDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AlertDialog(
       backgroundColor: KodaColors.card,
       title: Row(children: [
         Icon(dismissible ? Icons.system_update_outlined : Icons.error_outline,
             color: dismissible ? KodaColors.koda : KodaColors.accent, size: 20),
         const SizedBox(width: 8),
-        Text(dismissible ? 'Update Available' : 'Update Required',
+        Text(dismissible ? t.updateNudgeAvailableTitle : t.updateNudgeRequiredTitle,
             style: TextStyle(color: KodaColors.text1)),
       ]),
       content: SizedBox(
@@ -67,8 +69,8 @@ class _UpdateDialog extends StatelessWidget {
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
             dismissible
-                ? 'Koda ${result.latestVersion} is available -- you\'re on an older build.'
-                : 'This build is no longer supported. Update to Koda ${result.latestVersion} to keep using Koda.',
+                ? t.updateNudgeAvailableBody(result.latestVersion)
+                : t.updateNudgeRequiredBody(result.latestVersion),
             style: TextStyle(color: KodaColors.text2, fontSize: 13),
           ),
           if (result.releaseNotes.isNotEmpty) ...[
@@ -84,11 +86,11 @@ class _UpdateDialog extends StatelessWidget {
               await VersionCheck.dismiss(result);
               if (context.mounted) Navigator.pop(context);
             },
-            child: const Text('Later'),
+            child: Text(t.updateNudgeLaterButton),
           ),
         TextButton(
           onPressed: () => _openDownloadPage(result.downloadUrl),
-          child: const Text('Download'),
+          child: Text(t.commonDownload),
         ),
       ],
     );

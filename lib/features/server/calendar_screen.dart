@@ -12,6 +12,7 @@ import '../../core/permissions.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../core/time_utils.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 import '../visp/visp_event_dialog.dart';
 
@@ -94,6 +95,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Column(children: [
       // Header
       Container(
@@ -104,13 +106,13 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         child: Row(children: [
           Icon(Icons.calendar_month_outlined, size: 16, color: KodaColors.text3),
           const SizedBox(width: 6),
-          Text(widget.channel['name'] as String? ?? 'Calendar',
+          Text(widget.channel['name'] as String? ?? t.calendarFallbackTitle,
               style: TextStyle(
                   color: KodaColors.text1, fontWeight: FontWeight.w600)),
           const Spacer(),
           IconButton(
             icon: Icon(Icons.auto_awesome, color: KodaColors.koda, size: 20),
-            tooltip: 'Ask Visp',
+            tooltip: t.calendarAskVispTooltip,
             onPressed: () => showVispEventDialog(
               context,
               channelId: widget.channel['id'] as String,
@@ -119,7 +121,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           ),
           IconButton(
             icon: Icon(Icons.add, color: KodaColors.koda, size: 20),
-            tooltip: 'Create Event',
+            tooltip: t.calendarCreateEventTooltip,
             onPressed: () => _showEventDialog(),
           ),
         ]),
@@ -152,12 +154,13 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   }
 
   Widget _buildMonthHeader() {
+    final t = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(children: [
         IconButton(
           icon: Icon(Icons.chevron_left, color: KodaColors.text2),
-          tooltip: 'Previous month',
+          tooltip: t.calendarPreviousMonthTooltip,
           onPressed: () => _changeMonth(-1),
         ),
         Expanded(
@@ -170,7 +173,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         ),
         IconButton(
           icon: Icon(Icons.chevron_right, color: KodaColors.text2),
-          tooltip: 'Next month',
+          tooltip: t.calendarNextMonthTooltip,
           onPressed: () => _changeMonth(1),
         ),
         TextButton(
@@ -181,14 +184,18 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             });
             _loadEvents();
           },
-          child: Text('Today', style: TextStyle(color: KodaColors.koda)),
+          child: Text(t.calendarTodayButton, style: TextStyle(color: KodaColors.koda)),
         ),
       ]),
     );
   }
 
   Widget _buildWeekdayLabels() {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    final t = AppLocalizations.of(context);
+    final days = [
+      t.calendarWeekdaySun, t.calendarWeekdayMon, t.calendarWeekdayTue,
+      t.calendarWeekdayWed, t.calendarWeekdayThu, t.calendarWeekdayFri, t.calendarWeekdaySat,
+    ];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
@@ -204,6 +211,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   }
 
   Widget _buildMonthGrid() {
+    final t = AppLocalizations.of(context);
     final firstDay = DateTime(_focusedMonth.year, _focusedMonth.month, 1);
     final lastDay = DateTime(_focusedMonth.year, _focusedMonth.month + 1, 0);
     final startOffset = firstDay.weekday % 7;
@@ -232,15 +240,13 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             day.day == _selectedDay!.day;
         final dayEvents = _eventsForDay(day);
 
-        return Semantics(
-          button: true,
+        return KodaTappable(
           selected: isSelected,
-          label: '${DateFormat('MMMM d').format(day)}'
-              '${isToday ? ", today" : ""}'
-              '${dayEvents.isNotEmpty ? ", ${dayEvents.length} event${dayEvents.length == 1 ? "" : "s"}" : ""}',
-          child: GestureDetector(
+          semanticLabel: '${DateFormat('MMMM d').format(day)}'
+              '${isToday ? t.calendarTodaySuffix : ""}'
+              '${dayEvents.isNotEmpty ? t.calendarEventCountSuffix(dayEvents.length) : ""}',
+          borderRadius: BorderRadius.circular(8),
           onTap: () => setState(() => _selectedDay = day),
-          child: ExcludeSemantics(
           child: Container(
             margin: const EdgeInsets.all(2),
             decoration: BoxDecoration(
@@ -281,18 +287,17 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               ],
             ),
           ),
-          ),
-          ),
         );
       },
     );
   }
 
   Widget _buildEventPanel() {
+    final t = AppLocalizations.of(context);
     final events = _eventsForSelectedDay();
     final label = _selectedDay != null
         ? DateFormat('EEEE, MMMM d').format(_selectedDay!)
-        : 'Select a day';
+        : t.calendarSelectADay;
 
     return Column(children: [
       Padding(
@@ -304,7 +309,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       Divider(color: KodaColors.border, height: 1),
       if (events.isEmpty)
         Expanded(
-          child: Center(child: Text('No events',
+          child: Center(child: Text(t.calendarNoEvents,
               style: TextStyle(color: KodaColors.text3, fontSize: 13))),
         )
       else
@@ -318,6 +323,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     ]);
   }
 
+  // Keys are the raw values koda-server stores on an event's `recurrence`
+  // field -- display labels are localized separately since a translated
+  // string can't double as the value sent back to the API.
+  Map<String, String> _recurrenceLabels(AppLocalizations t) => {
+    'daily': t.calendarRecurrenceDaily,
+    'weekly': t.calendarRecurrenceWeekly,
+    'monthly': t.calendarRecurrenceMonthly,
+  };
+
   bool _canManageEvent(Map<String, dynamic> event) {
     final user = ref.read(authProvider).user;
     if (user == null) return false;
@@ -325,6 +339,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   }
 
   Widget _buildEventCard(Map<String, dynamic> event) {
+    final t = AppLocalizations.of(context);
     final start = parseServerTimestamp(event['start_at'] as String);
     final end = event['end_at'] != null
         ? parseServerTimestamp(event['end_at'] as String)
@@ -358,7 +373,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 color: subscribed ? KodaColors.koda : KodaColors.text3,
                 size: 16,
               ),
-              tooltip: subscribed ? 'Unsubscribe' : 'Subscribe',
+              tooltip: subscribed ? t.calendarUnsubscribeTooltip : t.calendarSubscribeTooltip,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
               onPressed: () async {
@@ -374,7 +389,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               const SizedBox(width: 6),
               IconButton(
                 icon: Icon(Icons.edit_outlined, color: KodaColors.text3, size: 16),
-                tooltip: 'Edit',
+                tooltip: t.commonEdit,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 onPressed: () => _showEventDialog(existing: event),
@@ -382,7 +397,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               const SizedBox(width: 6),
               IconButton(
                 icon: Icon(Icons.delete_outline, color: KodaColors.text3, size: 16),
-                tooltip: 'Delete',
+                tooltip: t.commonDelete,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 onPressed: () => _confirmDeleteEvent(event),
@@ -426,7 +441,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'Repeats ${event['recurrence']}',
+                    t.calendarRepeatsLabel(_recurrenceLabels(t)[event['recurrence']] ??
+                        event['recurrence'] as String),
                     style: TextStyle(color: KodaColors.text3, fontSize: 10),
                   ),
                 ),
@@ -443,8 +459,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     const SizedBox(width: 3),
                     Text(
                       hasTicket
-                          ? 'Ticket owned'
-                          : '\$${(priceCents / 100).toStringAsFixed(2)} ticket',
+                          ? t.calendarTicketOwned
+                          : t.calendarTicketPrice('\$${(priceCents / 100).toStringAsFixed(2)}'),
                       style: TextStyle(color: KodaColors.koda,
                           fontSize: 10, fontWeight: FontWeight.w600),
                     ),
@@ -458,19 +474,20 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   }
 
   Future<void> _confirmDeleteEvent(Map<String, dynamic> event) async {
+    final t = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Delete Event', style: TextStyle(color: KodaColors.text1)),
-        content: Text('Delete "${event['title']}"? This cannot be undone.',
+        title: Text(t.calendarDeleteEventTitle, style: TextStyle(color: KodaColors.text1)),
+        content: Text(t.calendarDeleteEventConfirm(event['title'] as String? ?? ''),
             style: TextStyle(color: KodaColors.text2)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+              child: Text(t.commonCancel)),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Delete', style: TextStyle(color: KodaColors.accent)),
+            child: Text(t.commonDelete, style: TextStyle(color: KodaColors.accent)),
           ),
         ],
       ),
@@ -482,6 +499,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   }
 
   Future<void> _showEventDialog({Map<String, dynamic>? existing}) async {
+    final t = AppLocalizations.of(context);
     final isEdit = existing != null;
     final titleCtrl = TextEditingController(text: existing?['title'] as String? ?? '');
     final descCtrl = TextEditingController(text: existing?['description'] as String? ?? '');
@@ -505,29 +523,28 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       builder: (_) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: Text(isEdit ? 'Edit Event' : 'Create Event',
+          title: Text(isEdit ? t.calendarEditEventTitle : t.calendarCreateEventTitle,
               style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 400,
             child: SingleChildScrollView(
               child: Column(mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start, children: [
-                KodaTextField(controller: titleCtrl, hintText: 'Event title'),
+                KodaTextField(controller: titleCtrl, hintText: t.calendarEventTitleHint, autofocus: true),
                 const SizedBox(height: 10),
-                KodaTextField(controller: descCtrl, hintText: 'Description (optional)'),
+                KodaTextField(controller: descCtrl, hintText: t.calendarDescriptionHint),
                 const SizedBox(height: 10),
-                KodaTextField(controller: locCtrl, hintText: 'Location (optional)'),
+                KodaTextField(controller: locCtrl, hintText: t.calendarLocationHint),
                 const SizedBox(height: 12),
 
                 // Start time
-                Text('Start (${DateTime.now().timeZoneName})',
+                Text(t.calendarStartLabel(DateTime.now().timeZoneName),
                   style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
-                Semantics(
-                  button: true,
-                  label: 'Start date and time, '
-                      '${DateFormat('MMM d, yyyy h:mm a').format(startAt)}',
-                  child: GestureDetector(
+                KodaTappable(
+                  semanticLabel: t.calendarStartDateTimeSemanticLabel(
+                      DateFormat('MMM d, yyyy h:mm a').format(startAt)),
+                  borderRadius: BorderRadius.circular(8),
                   onTap: () async {
                     final date = await showDatePicker(
                       context: ctx,
@@ -543,7 +560,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     setDialogState(() => startAt = DateTime(
                         date.year, date.month, date.day, time.hour, time.minute));
                   },
-                  child: ExcludeSemantics(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(
@@ -553,21 +569,18 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     child: Text(DateFormat('MMM d, yyyy h:mm a').format(startAt),
                         style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                   ),
-                  ),
-                  ),
                 ),
                 const SizedBox(height: 10),
 
                 // End time
-                Text('End — optional (${DateTime.now().timeZoneName})',
+                Text(t.calendarEndOptionalLabel(DateTime.now().timeZoneName),
                   style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
-                Semantics(
-                  button: true,
-                  label: 'End date and time, ${endAt != null
+                KodaTappable(
+                  semanticLabel: t.calendarEndDateTimeSemanticLabel(endAt != null
                       ? DateFormat('MMM d, yyyy h:mm a').format(endAt!)
-                      : "not set"}',
-                  child: GestureDetector(
+                      : t.calendarNotSetLabel),
+                  borderRadius: BorderRadius.circular(8),
                   onTap: () async {
                     final date = await showDatePicker(
                       context: ctx,
@@ -585,7 +598,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     setDialogState(() => endAt = DateTime(
                         date.year, date.month, date.day, time.hour, time.minute));
                   },
-                  child: ExcludeSemantics(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(
@@ -595,49 +607,45 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     child: Text(
                       endAt != null
                           ? DateFormat('MMM d, yyyy h:mm a').format(endAt!)
-                          : 'Tap to set end time',
+                          : t.calendarTapToSetEndTime,
                       style: TextStyle(
                           color: endAt != null ? KodaColors.text1 : KodaColors.text3,
                           fontSize: 13),
                     ),
                   ),
-                  ),
-                  ),
                 ),
                 const SizedBox(height: 12),
 
                 // Recurrence
-                Text('Recurrence', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                Text(t.calendarRecurrenceLabel, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
                 DropdownButton<String>(
                   value: recurrence,
                   dropdownColor: KodaColors.card,
                   style: TextStyle(color: KodaColors.text1, fontSize: 13),
                   onChanged: (v) => setDialogState(() => recurrence = v!),
-                  items: const [
-                    DropdownMenuItem(value: 'none', child: Text('Does not repeat')),
-                    DropdownMenuItem(value: 'daily', child: Text('Daily')),
-                    DropdownMenuItem(value: 'weekly', child: Text('Weekly')),
-                    DropdownMenuItem(value: 'monthly', child: Text('Monthly')),
+                  items: [
+                    DropdownMenuItem(value: 'none', child: Text(t.calendarRecurrenceNone)),
+                    DropdownMenuItem(value: 'daily', child: Text(t.calendarRecurrenceDaily)),
+                    DropdownMenuItem(value: 'weekly', child: Text(t.calendarRecurrenceWeekly)),
+                    DropdownMenuItem(value: 'monthly', child: Text(t.calendarRecurrenceMonthly)),
                   ],
                 ),
                 const SizedBox(height: 12),
 
                 // Color
-                Text('Color', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                Text(t.calendarColorLabel, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 6),
                 Wrap(spacing: 8, children: [
                   '#2DD4A0', '#7F77DD', '#E05C5C', '#F59E0B',
                   '#3B82F6', '#EC4899', '#10B981',
                 ].map((c) {
                   final col = Color(int.parse(c.replaceFirst('#', '0xFF')));
-                  return Semantics(
-                    button: true,
+                  return KodaTappable(
                     selected: color == c,
-                    label: 'Color $c',
-                    child: GestureDetector(
+                    semanticLabel: t.calendarColorSwatchLabel(c),
+                    borderRadius: BorderRadius.circular(999),
                     onTap: () => setDialogState(() => color = c),
-                    child: ExcludeSemantics(
                     child: Container(
                       width: 24, height: 24,
                       decoration: BoxDecoration(
@@ -648,8 +656,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                             : null,
                       ),
                     ),
-                    ),
-                    ),
                   );
                 }).toList()),
 
@@ -658,7 +664,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 // ticket, same gate as digital goods / Printful.
                 if (_canManageMarketplace) ...[
                   const SizedBox(height: 12),
-                  Text('Ticket price — optional',
+                  Text(t.calendarTicketPriceLabel,
                       style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                   const SizedBox(height: 4),
                   KodaTextField(
@@ -668,7 +674,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   ),
                   if (_stageChannels.isNotEmpty) ...[
                     const SizedBox(height: 10),
-                    Text('Link to stage channel — optional',
+                    Text(t.calendarLinkStageChannelLabel,
                         style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                     const SizedBox(height: 4),
                     DropdownButton<String?>(
@@ -678,11 +684,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       style: TextStyle(color: KodaColors.text1, fontSize: 13),
                       onChanged: (v) => setDialogState(() => stageChannelId = v),
                       items: [
-                        const DropdownMenuItem<String?>(
-                            value: null, child: Text('None')),
+                        DropdownMenuItem<String?>(
+                            value: null, child: Text(t.commonNone)),
                         ..._stageChannels.map((c) => DropdownMenuItem<String?>(
                               value: c['id'] as String,
-                              child: Text(c['name'] as String? ?? 'stage'),
+                              child: Text(c['name'] as String? ?? t.calendarStageChannelFallback),
                             )),
                       ],
                     ),
@@ -693,7 +699,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           ),
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx),
-                child: const Text('Cancel')),
+                child: Text(t.commonCancel)),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                   backgroundColor: KodaColors.koda,
@@ -725,7 +731,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   if (event != null && mounted) _loadEvents();
                 }
               },
-              child: Text(isEdit ? 'Save' : 'Create'),
+              child: Text(isEdit ? t.commonSave : t.commonCreate),
             ),
           ],
         ),

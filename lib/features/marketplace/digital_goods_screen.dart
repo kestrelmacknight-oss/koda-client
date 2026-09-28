@@ -16,6 +16,7 @@ import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../core/time_utils.dart';
 import '../../core/uploader.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 
 // Matches Koda.Upload's @digital_max_bytes server-side -- larger than
@@ -92,12 +93,13 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
         title: Text(
-          _creatorMode ? 'My Products' : 'Digital Goods',
+          _creatorMode ? t.digitalGoodsMyProductsTitle : t.digitalGoodsTitle,
           style: TextStyle(color: KodaColors.text1,
               fontSize: 16, fontWeight: FontWeight.w700),
         ),
@@ -106,13 +108,13 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
             IconButton(
               icon: Icon(_creatorMode ? Icons.storefront_outlined : Icons.inventory_2_outlined,
                   color: KodaColors.text2),
-              tooltip: _creatorMode ? 'Switch to Browse' : 'Manage this server\'s products',
+              tooltip: _creatorMode ? t.digitalGoodsSwitchToBrowseTooltip : t.digitalGoodsManageProductsTooltip,
               onPressed: _toggleCreatorMode,
             ),
           if (_creatorMode)
             IconButton(
               icon: Icon(Icons.add, color: KodaColors.koda),
-              tooltip: 'Create product',
+              tooltip: t.digitalGoodsCreateProductTooltip,
               onPressed: _showCreateProductDialog,
             ),
         ],
@@ -122,8 +124,8 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
           labelColor: KodaColors.text1,
           unselectedLabelColor: KodaColors.text3,
           tabs: [
-            Tab(text: _creatorMode ? 'My Listings' : 'Browse'),
-            const Tab(text: 'My Purchases'),
+            Tab(text: _creatorMode ? t.digitalGoodsMyListingsTab : t.digitalGoodsBrowseTab),
+            Tab(text: t.digitalGoodsMyPurchasesTab),
           ],
         ),
       ),
@@ -142,20 +144,21 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
   // ── Products tab ──────────────────────────────────────────────────────────
 
   Widget _buildProductsTab() {
+    final t = AppLocalizations.of(context);
     if (_products.isEmpty) {
       return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
         Icon(Icons.storefront_outlined, color: KodaColors.text3, size: 48),
         const SizedBox(height: 12),
         Text(
-          _creatorMode ? 'No products yet' : 'No products available',
+          _creatorMode ? t.digitalGoodsNoProductsYet : t.digitalGoodsNoProductsAvailable,
           style: TextStyle(color: KodaColors.text1, fontSize: 16,
               fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         Text(
           _creatorMode
-              ? 'Create your first product to start selling'
-              : 'Check back later for digital goods',
+              ? t.digitalGoodsCreateFirstProductHint
+              : t.digitalGoodsCheckBackLater,
           style: TextStyle(color: KodaColors.text3, fontSize: 13),
         ),
         if (_creatorMode) ...[
@@ -165,7 +168,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                 backgroundColor: KodaColors.koda,
                 foregroundColor: Colors.black),
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('Create Product'),
+            label: Text(t.digitalGoodsCreateProductButton),
             onPressed: _showCreateProductDialog,
           ),
         ],
@@ -180,6 +183,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
   }
 
   Widget _buildProductCard(Map<String, dynamic> product) {
+    final t = AppLocalizations.of(context);
     final price = (product['price_cents'] as int? ?? 0) / 100.0;
     final isFree = product['price_cents'] == 0;
     final freeForYou = product['free_for_you'] == true;
@@ -223,7 +227,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    type == 'license_key' ? 'License Key' : 'File',
+                    type == 'license_key' ? t.digitalGoodsLicenseKeyBadge : t.digitalGoodsFileBadge,
                     style: TextStyle(color: KodaColors.text3, fontSize: 10),
                   ),
                 ),
@@ -235,7 +239,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                       color: KodaColors.elevated,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: Text('All Servers',
+                    child: Text(t.digitalGoodsAllServersBadge,
                         style: TextStyle(color: KodaColors.text3, fontSize: 10)),
                   ),
                 ],
@@ -249,19 +253,19 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                     color: KodaColors.koda.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: Text('Free for you',
+                  child: Text(t.digitalGoodsFreeForYou,
                       style: TextStyle(color: KodaColors.koda,
                           fontSize: 11, fontWeight: FontWeight.w600)),
                 )
               else if (isFree)
-                Text('Free', style: TextStyle(color: KodaColors.koda,
+                Text(t.digitalGoodsFreeLabel, style: TextStyle(color: KodaColors.koda,
                     fontSize: 15, fontWeight: FontWeight.w700))
               else
                 Text('\$${price.toStringAsFixed(2)}',
                     style: TextStyle(color: KodaColors.text1,
                         fontSize: 15, fontWeight: FontWeight.w700)),
               if (product['purchase_count'] != null)
-                Text('${product['purchase_count']} sold',
+                Text(t.digitalGoodsSoldCount(product['purchase_count'] as int),
                     style: TextStyle(color: KodaColors.text3, fontSize: 11)),
             ]),
           ]),
@@ -285,7 +289,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                     side: BorderSide(color: KodaColors.border),
                   ),
                   icon: const Icon(Icons.edit_outlined, size: 14),
-                  label: const Text('Edit'),
+                  label: Text(t.commonEdit),
                   onPressed: () => _showEditProductDialog(product),
                 ),
               ),
@@ -297,7 +301,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                     side: BorderSide(color: KodaColors.koda),
                   ),
                   icon: const Icon(Icons.key_outlined, size: 14),
-                  label: const Text('Keys'),
+                  label: Text(t.digitalGoodsKeysButton),
                   onPressed: () => _showLicenseKeysDialog(product),
                 ),
             ] else ...[
@@ -309,7 +313,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                       foregroundColor: KodaColors.koda,
                     ),
                     icon: const Icon(Icons.download_outlined, size: 16),
-                    label: const Text('Download'),
+                    label: Text(t.commonDownload),
                     onPressed: () => _downloadPurchase(product['id'] as String),
                   ),
                 )
@@ -323,8 +327,8 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                     onPressed: () => _purchaseProduct(product),
                     child: Text(
                       isFree || freeForYou
-                          ? 'Get for Free'
-                          : 'Buy for \$${price.toStringAsFixed(2)}',
+                          ? t.digitalGoodsGetForFree
+                          : t.digitalGoodsBuyForPrice('\$${price.toStringAsFixed(2)}'),
                     ),
                   ),
                 ),
@@ -338,8 +342,9 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
   // ── Purchases tab ─────────────────────────────────────────────────────────
 
   Widget _buildPurchasesTab() {
+    final t = AppLocalizations.of(context);
     if (_myPurchases.isEmpty) {
-      return Center(child: Text('No purchases yet',
+      return Center(child: Text(t.digitalGoodsNoPurchasesYet,
           style: TextStyle(color: KodaColors.text3)));
     }
 
@@ -362,11 +367,11 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
             border: Border.all(color: KodaColors.border),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(product?['title'] as String? ?? 'Unknown Product',
+            Text(product?['title'] as String? ?? t.digitalGoodsUnknownProduct,
                 style: TextStyle(color: KodaColors.text1,
                     fontWeight: FontWeight.w600, fontSize: 13)),
             const SizedBox(height: 4),
-            Text('Purchased on ${_formatDate(purchase['purchased_at'])}',
+            Text(t.digitalGoodsPurchasedOn(_formatDate(purchase['purchased_at'])),
                 style: TextStyle(color: KodaColors.text3, fontSize: 11)),
 
             if (key != null) ...[
@@ -388,13 +393,13 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                   IconButton(
                     icon: Icon(Icons.copy_outlined, size: 14,
                         color: KodaColors.text3),
-                    tooltip: 'Copy key',
+                    tooltip: t.digitalGoodsCopyKeyTooltip,
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: key));
                       ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('License key copied')));
+                          SnackBar(content: Text(t.digitalGoodsLicenseKeyCopied)));
                     },
                   ),
                 ]),
@@ -411,13 +416,13 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                       foregroundColor: Colors.black,
                     ),
                     icon: const Icon(Icons.download_outlined, size: 16),
-                    label: const Text('Download'),
+                    label: Text(t.commonDownload),
                     onPressed: () => _downloadWithToken(token),
                   ),
                 ),
                 if (expires != null) ...[
                   const SizedBox(width: 8),
-                  Text('Expires ${_formatDate(expires)}',
+                  Text(t.digitalGoodsExpiresOn(_formatDate(expires)),
                       style: TextStyle(color: KodaColors.text3, fontSize: 10)),
                 ],
               ]),
@@ -434,6 +439,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
     final result = await KodaApi.instance.purchaseProduct(
         product['id'] as String);
     if (result == null || !mounted) return;
+    final t = AppLocalizations.of(context);
 
     if (result['free'] == true) {
       // Free — got download token directly
@@ -444,7 +450,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
           context: context,
           builder: (_) => AlertDialog(
             backgroundColor: KodaColors.card,
-            title: Text('Your License Key',
+            title: Text(t.digitalGoodsYourLicenseKeyTitle,
                 style: TextStyle(color: KodaColors.text1)),
             content: Column(mainAxisSize: MainAxisSize.min, children: [
               Container(
@@ -460,7 +466,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
             ]),
             actions: [
               TextButton(onPressed: () => Navigator.pop(context),
-                  child: const Text('Close')),
+                  child: Text(t.commonClose)),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     backgroundColor: KodaColors.koda,
@@ -469,9 +475,9 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                   Clipboard.setData(ClipboardData(text: key));
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('License key copied!')));
+                      SnackBar(content: Text(t.digitalGoodsLicenseKeyCopied)));
                 },
-                child: const Text('Copy Key'),
+                child: Text(t.digitalGoodsCopyKeyButton),
               ),
             ],
           ),
@@ -484,8 +490,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
       final checkoutUrl = result['checkout_url'] as String?;
       if (checkoutUrl == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text(
-                'Could not start checkout -- this creator may not have connected Stripe yet.')));
+            SnackBar(content: Text(t.digitalGoodsCheckoutStripeNotConnected)));
         return;
       }
 
@@ -497,8 +502,8 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
               data['payment_type'] == 'digital_product' && data['product_id'] == productId);
       if (mounted) {
         messenger.showSnackBar(SnackBar(content: Text(confirmed
-            ? 'Purchase complete! Find it under My Purchases.'
-            : 'Still waiting on that payment -- it\'ll show up under My Purchases once completed.')));
+            ? t.digitalGoodsPurchaseComplete
+            : t.digitalGoodsPurchasePending)));
         if (confirmed) _load();
       }
     }
@@ -529,6 +534,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
   }
 
   Future<void> _showProductDialog(Map<String, dynamic>? existing) async {
+    final t = AppLocalizations.of(context);
     final titleCtrl = TextEditingController(text: existing?['title'] ?? '');
     final descCtrl = TextEditingController(text: existing?['description'] ?? '');
     final priceCtrl = TextEditingController(
@@ -547,23 +553,23 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
       builder: (_) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: Text(existing == null ? 'Create Product' : 'Edit Product',
+          title: Text(existing == null ? t.digitalGoodsCreateProductTitle : t.digitalGoodsEditProductTitle,
               style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 380,
             child: SingleChildScrollView(
               child: Column(mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start, children: [
-                KodaTextField(controller: titleCtrl, hintText: 'Product title'),
+                KodaTextField(controller: titleCtrl, hintText: t.digitalGoodsProductTitleHint, autofocus: true),
                 const SizedBox(height: 10),
                 KodaTextField(controller: descCtrl,
-                    hintText: 'Description (optional)'),
+                    hintText: t.digitalGoodsDescriptionHint),
                 const SizedBox(height: 10),
                 KodaTextField(controller: priceCtrl,
-                    hintText: 'Price in USD (leave empty for free)'),
+                    hintText: t.digitalGoodsPriceHint),
                 const SizedBox(height: 12),
 
-                Text('Product type',
+                Text(t.digitalGoodsProductTypeLabel,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
                 DropdownButton<String>(
@@ -571,15 +577,15 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                   dropdownColor: KodaColors.card,
                   style: TextStyle(color: KodaColors.text1, fontSize: 13),
                   onChanged: (v) => setDialogState(() => type = v!),
-                  items: const [
-                    DropdownMenuItem(value: 'file', child: Text('File download')),
+                  items: [
+                    DropdownMenuItem(value: 'file', child: Text(t.digitalGoodsFileDownloadOption)),
                     DropdownMenuItem(value: 'license_key',
-                        child: Text('License key')),
+                        child: Text(t.digitalGoodsLicenseKeyOption)),
                   ],
                 ),
                 const SizedBox(height: 8),
 
-                Text('Availability',
+                Text(t.digitalGoodsAvailabilityLabel,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
                 DropdownButton<String>(
@@ -587,24 +593,24 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                   dropdownColor: KodaColors.card,
                   style: TextStyle(color: KodaColors.text1, fontSize: 13),
                   onChanged: (v) => setDialogState(() => scope = v!),
-                  items: const [
+                  items: [
                     DropdownMenuItem(value: 'server',
-                        child: Text('This server only')),
+                        child: Text(t.digitalGoodsThisServerOnlyOption)),
                     DropdownMenuItem(value: 'creator',
-                        child: Text('All Koda servers')),
+                        child: Text(t.digitalGoodsAllKodaServersOption)),
                   ],
                 ),
 
                 if (type == 'license_key') ...[
                   const SizedBox(height: 8),
                   Text(
-                    'After creating, use the "Keys" button to upload your license keys.',
+                    t.digitalGoodsAfterCreatingKeysHint,
                     style: TextStyle(color: KodaColors.text3, fontSize: 11),
                   ),
                 ],
                 if (type == 'file') ...[
                   const SizedBox(height: 8),
-                  Text('Product file',
+                  Text(t.digitalGoodsProductFileLabel,
                       style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                   const SizedBox(height: 4),
                   if (fileName != null)
@@ -621,7 +627,8 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                         Expanded(
                           child: Text(
                             fileSizeBytes != null
-                                ? '$fileName (${(fileSizeBytes! / (1024 * 1024)).toStringAsFixed(1)}MB)'
+                                ? t.digitalGoodsFileWithSize(fileName!,
+                                    (fileSizeBytes! / (1024 * 1024)).toStringAsFixed(1))
                                 : fileName!,
                             style: TextStyle(color: KodaColors.text1, fontSize: 12),
                             overflow: TextOverflow.ellipsis,
@@ -629,7 +636,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                         ),
                         IconButton(
                           icon: Icon(Icons.close, size: 14, color: KodaColors.text3),
-                          tooltip: 'Remove file',
+                          tooltip: t.digitalGoodsRemoveFileTooltip,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                           onPressed: () => setDialogState(() {
@@ -650,8 +657,8 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
                             child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
                         : const Icon(Icons.upload_file_outlined, size: 16),
                     label: Text(uploadingFile
-                        ? 'Uploading...'
-                        : (fileName == null ? 'Choose File' : 'Replace File')),
+                        ? t.digitalGoodsUploadingLabel
+                        : (fileName == null ? t.digitalGoodsChooseFileButton : t.digitalGoodsReplaceFileButton)),
                     onPressed: uploadingFile ? null : () async {
                       final result = await FilePicker.platform.pickFiles(withData: false);
                       final path = result?.files.single.path;
@@ -686,13 +693,13 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
           ),
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Cancel')),
+                child: Text(t.commonCancel)),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                   backgroundColor: KodaColors.koda,
                   foregroundColor: Colors.black),
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text(existing == null ? 'Create' : 'Save'),
+              child: Text(existing == null ? t.commonCreate : t.commonSave),
             ),
           ],
         ),
@@ -702,8 +709,8 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
     if (saved != true || titleCtrl.text.trim().isEmpty) return;
     if (type == 'file' && fileUrl == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Choose a file for this product before saving.')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(t.digitalGoodsChooseFileBeforeSaving)));
       }
       return;
     }
@@ -743,18 +750,19 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
   }
 
   Future<void> _showLicenseKeysDialog(Map<String, dynamic> product) async {
+    final t = AppLocalizations.of(context);
     final ctrl = TextEditingController();
     await showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Upload License Keys',
+        title: Text(t.digitalGoodsUploadLicenseKeysTitle,
             style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 380,
           child: Column(mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Paste one key per line:',
+            Text(t.digitalGoodsPasteKeysHint,
                 style: TextStyle(color: KodaColors.text3, fontSize: 12)),
             const SizedBox(height: 8),
             TextField(
@@ -765,7 +773,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
               decoration: InputDecoration(
                 filled: true,
                 fillColor: KodaColors.elevated,
-                hintText: 'KEY-XXXX-XXXX\nKEY-YYYY-YYYY\n...',
+                hintText: t.digitalGoodsKeyExampleHint,
                 hintStyle: TextStyle(color: KodaColors.text3),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -777,7 +785,7 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
+              child: Text(t.commonCancel)),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
                 backgroundColor: KodaColors.koda,
@@ -789,10 +797,10 @@ class _DigitalGoodsScreenState extends ConsumerState<DigitalGoodsScreen>
               if (ok && mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('License keys uploaded!')));
+                    SnackBar(content: Text(t.digitalGoodsLicenseKeysUploaded)));
               }
             },
-            child: const Text('Upload Keys'),
+            child: Text(t.digitalGoodsUploadKeysButton),
           ),
         ],
       ),

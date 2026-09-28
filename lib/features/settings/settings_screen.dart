@@ -7,6 +7,9 @@ import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/accessibility_prefs.dart';
+import '../../core/language_prefs.dart';
+import '../../core/language_options.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../core/config.dart';
 import '../../core/api.dart';
 import '../../core/push_notifications.dart';
@@ -55,23 +58,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final Map<String, bool> _loadingStreaming = {'twitch': true, 'youtube': true};
   final Map<String, bool> _connectingStreaming = {'twitch': false, 'youtube': false};
 
-  static const _sections = [
-    ('My Account', Icons.person_outline),
-    ('Security',   Icons.security_outlined),
-    ('Accessibility', Icons.accessibility_new_outlined),
-    ('Billing',    Icons.payments_outlined),
-    ('Family',     Icons.family_restroom_outlined),
-    ('Voice & Video', Icons.mic_outlined),
-    ('Desktop',    Icons.desktop_windows_outlined),
-    ('About',      Icons.info_outlined),
+  // Not static const -- section labels are localized, which needs a
+  // BuildContext (see AppLocalizations.of(context) below).
+  List<(String, IconData)> _sections(AppLocalizations t) => [
+    (t.settingsSectionMyAccount, Icons.person_outline),
+    (t.settingsSectionSecurity,   Icons.security_outlined),
+    (t.settingsSectionAccessibility, Icons.accessibility_new_outlined),
+    (t.settingsLanguageSection,   Icons.language_outlined),
+    (t.settingsSectionBilling,    Icons.payments_outlined),
+    (t.settingsSectionFamily,     Icons.family_restroom_outlined),
+    (t.settingsSectionVoiceVideo, Icons.mic_outlined),
+    (t.settingsSectionDesktop,    Icons.desktop_windows_outlined),
+    (t.settingsSectionAbout,      Icons.info_outlined),
   ];
 
   static const _statuses = ['online', 'away', 'dnd', 'offline'];
-  static const _statusLabels = {
-    'online':  'Online',
-    'away':    'Away',
-    'dnd':     'Do Not Disturb',
-    'offline': 'Invisible',
+  Map<String, String> _statusLabels(AppLocalizations t) => {
+    'online':  t.statusOnline,
+    'away':    t.statusAway,
+    'dnd':     t.statusDnd,
+    'offline': t.statusInvisible,
   };
   // A getter, not a static const/final -- re-evaluated on each access
   // so it always reflects the currently-active palette (a cached final
@@ -126,17 +132,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         : await KodaApi.instance.connectYoutube();
     if (!mounted) return;
     setState(() => _connectingStreaming[platform] = false);
+    final t = AppLocalizations.of(context);
     if (url == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not start ${_platformLabel(platform)} connection.')));
+          SnackBar(content: Text(t.settingsStreamingConnectError(_platformLabel(platform)))));
       return;
     }
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
-          'Finish connecting in your browser, then come back and refresh.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+          t.settingsStreamingFinishInBrowser)));
     }
   }
 
@@ -260,6 +267,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authProvider).user;
+    final t = AppLocalizations.of(context);
+    final sections = _sections(t);
 
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
@@ -274,21 +283,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 decoration: BoxDecoration(
                     border: Border(bottom: BorderSide(color: KodaColors.border))),
                 child: Row(children: [
-                  Text('Settings',
+                  Text(t.settingsTitle,
                       style: TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w700)),
                   const Spacer(),
                   IconButton(
                       icon: Icon(Icons.close, size: 18, color: KodaColors.text3),
-                      tooltip: 'Close',
+                      tooltip: t.commonClose,
                       onPressed: () => Navigator.pop(context)),
                 ]),
               ),
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                  itemCount: _sections.length,
+                  itemCount: sections.length,
                   itemBuilder: (_, i) {
-                    final (label, icon) = _sections[i];
+                    final (label, icon) = sections[i];
                     final selected = i == _section;
                     return ListTile(
                       dense: true,
@@ -313,7 +322,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 padding: const EdgeInsets.all(12),
                 child: OutlinedButton.icon(
                   icon: Icon(Icons.logout, size: 14, color: KodaColors.accent),
-                  label: Text('Sign out',
+                  label: Text(t.settingsSignOut,
                       style: TextStyle(color: KodaColors.accent, fontSize: 12)),
                   onPressed: _signOut,
                   style: OutlinedButton.styleFrom(
@@ -330,29 +339,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _buildSection(int index, KodaUser? user) {
+    final t = AppLocalizations.of(context);
     switch (index) {
       case 0:
-        return _shell('My Account', _editingProfile
+        return _shell(t.settingsSectionMyAccount, _editingProfile
             ? _buildProfileEditor(user)
             : _buildProfileView(user));
       case 1:
         final currentUser = ref.watch(authProvider).user;
         final friendsOnlyDms = currentUser?.friendsOnlyDms ?? false;
-        return _shell('Security', Column(children: [
-          _tile(Icons.phone_android_outlined, 'Two-Factor Authentication',
-              'Add an authenticator app for extra security',
+        return _shell(t.settingsSectionSecurity, Column(children: [
+          _tile(Icons.phone_android_outlined, t.settingsTwoFactorTitle,
+              t.settingsTwoFactorSubtitle,
               () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const TotpSetupScreen()))),
-          _tile(Icons.devices_outlined, 'Linked Devices',
-              'See and remove devices signed into this account',
+          _tile(Icons.devices_outlined, t.settingsLinkedDevicesTitle,
+              t.settingsLinkedDevicesSubtitle,
               () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const DevicesScreen()))),
           // Child accounts have labeled channels hard-blocked server-side
           // and don't get a personal filter preference to configure --
           // see content_filters_screen.dart's doc comment.
           if (currentUser != null && !currentUser.isChild)
-            _tile(Icons.visibility_off_outlined, 'Content Filters',
-                'Choose how you want labeled content to appear',
+            _tile(Icons.visibility_off_outlined, t.settingsContentFiltersTitle,
+                t.settingsContentFiltersSubtitle,
                 () => Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const ContentFiltersScreen()))),
           Container(
@@ -362,9 +372,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 border: Border.all(color: KodaColors.border)),
             child: SwitchListTile(
               secondary: Icon(Icons.mail_lock_outlined, color: KodaColors.text3, size: 18),
-              title: Text('Only allow DMs from friends',
+              title: Text(t.settingsDmFriendsOnlyTitle,
                   style: TextStyle(color: KodaColors.text1, fontSize: 13)),
-              subtitle: Text('Non-friends cannot start a new conversation with you',
+              subtitle: Text(t.settingsDmFriendsOnlySubtitle,
                   style: TextStyle(color: KodaColors.text3, fontSize: 11)),
               activeThumbColor: KodaColors.koda,
               value: friendsOnlyDms,
@@ -375,7 +385,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ref.read(authProvider.notifier).setFriendsOnlyDms(!v);
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Could not update DM privacy.')));
+                        SnackBar(content: Text(t.settingsDmPrivacyError)));
                   }
                 }
               },
@@ -388,9 +398,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 border: Border.all(color: KodaColors.border)),
             child: SwitchListTile(
               secondary: Icon(Icons.auto_awesome, color: KodaColors.text3, size: 18),
-              title: Text('Show Visp\'s avatar',
+              title: Text(t.settingsShowVispAvatarTitle,
                   style: TextStyle(color: KodaColors.text1, fontSize: 13)),
-              subtitle: Text('Shows Visp\'s face and mood in its setup/event/advisor dialogs',
+              subtitle: Text(t.settingsShowVispAvatarSubtitle,
                   style: TextStyle(color: KodaColors.text3, fontSize: 11)),
               activeThumbColor: KodaColors.koda,
               value: _showVispAvatar,
@@ -404,23 +414,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       case 2:
         return _buildAccessibilitySection();
       case 3:
+        return _buildLanguageSection();
+      case 4:
         // Account-level only -- Server Bank/Digital Goods/Merch/Revenue
         // are all server-scoped (see MarketplaceScreen.accountOnly's doc
         // comment) and belong on the relevant server instead, not here.
         return const MarketplaceScreen(embedded: true, accountOnly: true);
-      case 4:
+      case 5:
         if (user?.isChild == true) {
-          return _shell('Family', Text(
-              'Parental controls aren\'t available on a supervised account.',
+          return _shell(t.settingsSectionFamily, Text(
+              t.settingsFamilyNotAvailable,
               style: TextStyle(color: KodaColors.text3, fontSize: 13)));
         }
         return const ParentalDashboardScreen(embedded: true);
-      case 5:
-        return const VoiceVideoSettingsScreen();
       case 6:
-        return _buildDesktopSection();
+        return const VoiceVideoSettingsScreen();
       case 7:
-        return _shell('About Koda', Column(crossAxisAlignment: CrossAxisAlignment.start,
+        return _buildDesktopSection();
+      case 8:
+        return _shell(t.settingsAboutTitle, Column(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
           Container(
             padding: const EdgeInsets.all(20),
@@ -442,7 +454,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(KodaConfig.appName, style: TextStyle(
                     color: KodaColors.text1, fontWeight: FontWeight.w700)),
-                Text('${KodaConfig.buildLabel} v${KodaConfig.appVersion}',
+                Text(t.settingsAboutBuildLabel(KodaConfig.buildLabel, KodaConfig.appVersion),
                     style: TextStyle(color: KodaColors.gold, fontSize: 12)),
                 Text(KodaConfig.company,
                     style: TextStyle(color: KodaColors.text3, fontSize: 11)),
@@ -450,13 +462,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ]),
           ),
           const SizedBox(height: 20),
-          _tile(Icons.gavel_outlined, 'Terms & Conditions', 'koda.fyi/terms.html',
+          _tile(Icons.gavel_outlined, t.settingsTermsTitle, 'koda.fyi/terms.html',
               () => _openUrl(KodaConfig.termsUrl)),
-          _tile(Icons.privacy_tip_outlined, 'Privacy Policy', 'koda.fyi/privacy.html',
+          _tile(Icons.privacy_tip_outlined, t.settingsPrivacyTitle, 'koda.fyi/privacy.html',
               () => _openUrl(KodaConfig.privacyUrl)),
-          _tile(Icons.support_agent_outlined, 'Support', KodaConfig.supportEmail,
+          _tile(Icons.support_agent_outlined, t.settingsSupportTitle, KodaConfig.supportEmail,
               () => _openUrl('mailto:${KodaConfig.supportEmail}')),
-          _tile(Icons.security_outlined, 'Report a Security Issue', KodaConfig.securityEmail,
+          _tile(Icons.security_outlined, t.settingsReportSecurityTitle, KodaConfig.securityEmail,
               () => _openUrl('mailto:${KodaConfig.securityEmail}')),
         ]));
       default:
@@ -465,25 +477,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _buildDesktopSection() {
+    final t = AppLocalizations.of(context);
     if (!isDesktop) {
-      return _shell('Desktop', Text(
-          'These are desktop-only settings -- there\'s no window or system '
-          'tray on this platform.',
+      return _shell(t.settingsSectionDesktop, Text(
+          t.settingsDesktopNotAvailable,
           style: TextStyle(color: KodaColors.text3, fontSize: 13)));
     }
-    return _shell('Desktop', Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    return _shell(t.settingsSectionDesktop, Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
         decoration: BoxDecoration(
             color: KodaColors.card, borderRadius: BorderRadius.circular(10),
             border: Border.all(color: KodaColors.border)),
         child: SwitchListTile(
           secondary: Icon(Icons.close_fullscreen_outlined, color: KodaColors.text3, size: 18),
-          title: Text('Close to system tray',
+          title: Text(t.settingsCloseToTrayTitle,
               style: TextStyle(color: KodaColors.text1, fontSize: 13)),
-          subtitle: Text(
-              'Closing the window keeps Koda running in the background so you '
-              'still get notifications -- turn this off to make closing the '
-              'window actually quit.',
+          subtitle: Text(t.settingsCloseToTraySubtitle,
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           activeThumbColor: KodaColors.koda,
           value: _closeToTray,
@@ -499,8 +508,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget _buildAccessibilitySection() {
     final a11y = ref.watch(accessibilityPrefsProvider);
     final notifier = ref.read(accessibilityPrefsProvider.notifier);
+    final t = AppLocalizations.of(context);
 
-    return _shell('Accessibility', Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    return _shell(t.settingsSectionAccessibility, Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
         margin: const EdgeInsets.only(bottom: 6),
         decoration: BoxDecoration(
@@ -508,11 +518,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             border: Border.all(color: KodaColors.border)),
         child: SwitchListTile(
           secondary: Icon(Icons.contrast_outlined, color: KodaColors.text3, size: 18),
-          title: Text('High Contrast',
+          title: Text(t.settingsHighContrastTitle,
               style: TextStyle(color: KodaColors.text1, fontSize: 13)),
-          subtitle: Text(
-              'Pure black/white, high-contrast colors app-wide -- switching '
-              'briefly reloads the current screen.',
+          subtitle: Text(t.settingsHighContrastSubtitle,
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           activeThumbColor: KodaColors.koda,
           value: a11y.highContrast,
@@ -526,9 +534,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             border: Border.all(color: KodaColors.border)),
         child: SwitchListTile(
           secondary: Icon(Icons.font_download_outlined, color: KodaColors.text3, size: 18),
-          title: Text('Dyslexia-friendly font',
+          title: Text(t.settingsDyslexiaFontTitle,
               style: TextStyle(color: KodaColors.text1, fontSize: 13)),
-          subtitle: Text('Switches body text to OpenDyslexic app-wide',
+          subtitle: Text(t.settingsDyslexiaFontSubtitle,
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           activeThumbColor: KodaColors.koda,
           value: a11y.dyslexiaFont,
@@ -545,11 +553,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           Row(children: [
             Icon(Icons.text_fields, color: KodaColors.text3, size: 18),
             SizedBox(width: 10),
-            Text('Font size', style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+            Text(t.settingsFontSizeTitle, style: TextStyle(color: KodaColors.text1, fontSize: 13)),
           ]),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Text('The quick brown fox jumps over the lazy dog',
+            child: Text(t.settingsFontSizeSample,
                 style: TextStyle(color: KodaColors.text2, fontSize: 14 * a11y.textScale)),
           ),
           Slider(
@@ -573,19 +581,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           Row(children: [
             Icon(Icons.density_medium, color: KodaColors.text3, size: 18),
             SizedBox(width: 10),
-            Text('Density', style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+            Text(t.settingsDensityTitle, style: TextStyle(color: KodaColors.text1, fontSize: 13)),
           ]),
           const SizedBox(height: 4),
-          Text(
-              'Affects spacing on standard controls -- buttons, toggles, '
-              'dialogs -- not every custom layout.',
+          Text(t.settingsDensityDescription,
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           const SizedBox(height: 12),
           SegmentedButton<String>(
-            segments: const [
-              ButtonSegment(value: 'compact', label: Text('Compact')),
-              ButtonSegment(value: 'standard', label: Text('Standard')),
-              ButtonSegment(value: 'comfortable', label: Text('Comfortable')),
+            segments: [
+              ButtonSegment(value: 'compact', label: Text(t.settingsDensityCompact)),
+              ButtonSegment(value: 'standard', label: Text(t.settingsDensityStandard)),
+              ButtonSegment(value: 'comfortable', label: Text(t.settingsDensityComfortable)),
             ],
             selected: {a11y.density},
             onSelectionChanged: (s) => notifier.setDensity(s.first),
@@ -596,9 +602,45 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     ]));
   }
 
+  Widget _buildLanguageSection() {
+    final languagePrefs = ref.watch(languagePrefsProvider);
+    final notifier = ref.read(languagePrefsProvider.notifier);
+
+    final t = AppLocalizations.of(context);
+    return _shell(t.settingsLanguageSection, Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+            color: KodaColors.card, borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: KodaColors.border)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(t.settingsLanguageTitle, style: TextStyle(
+              color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
+          Text(t.settingsLanguageDescription,
+              style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+          const SizedBox(height: 10),
+          DropdownButton<String?>(
+            value: languagePrefs.uiLocale,
+            dropdownColor: KodaColors.card,
+            style: TextStyle(color: KodaColors.text1, fontSize: 13),
+            onChanged: notifier.setUiLocale,
+            items: [
+              DropdownMenuItem(value: null, child: Text(t.settingsLanguageSystemDefault)),
+              ...kodaLanguageOptions.map((l) => DropdownMenuItem(
+                    value: l.code,
+                    child: Text(l.nativeName),
+                  )),
+            ],
+          ),
+        ]),
+      ),
+    ]));
+  }
+
   // -- Profile view (read-only) -----------------------------------------------
 
   Widget _buildProfileView(KodaUser? user) {
+    final t = AppLocalizations.of(context);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
         padding: const EdgeInsets.all(20),
@@ -642,7 +684,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       color: KodaColors.gold.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(99),
                       border: Border.all(color: KodaColors.gold.withValues(alpha: 0.3))),
-                  child: Text('Alpha v0.34',
+                  child: Text(t.settingsAboutBuildLabel(KodaConfig.buildLabel, KodaConfig.appVersion),
                       style: TextStyle(color: KodaColors.gold, fontSize: 10)),
                 ),
                 const SizedBox(width: 8),
@@ -651,7 +693,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   decoration: BoxDecoration(
                       color: (_statusColors[_status] ?? KodaColors.mint).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(99)),
-                  child: Text(_statusLabels[_status] ?? 'Online',
+                  child: Text(_statusLabels(t)[_status] ?? t.statusOnline,
                       style: TextStyle(
                           color: _statusColors[_status] ?? KodaColors.mint,
                           fontSize: 10)),
@@ -662,7 +704,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           TextButton.icon(
             onPressed: _startEditing,
             icon: const Icon(Icons.edit_outlined, size: 14),
-            label: const Text('Edit'),
+            label: Text(t.commonEdit),
           ),
         ]),
       ),
@@ -674,6 +716,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _buildStreamingCard() {
+    final t = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -683,14 +726,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         Row(children: [
           Icon(Icons.live_tv_outlined, size: 16, color: KodaColors.accent),
           SizedBox(width: 8),
-          Text('Streaming Accounts',
+          Text(t.settingsStreamingTitle,
               style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w600)),
         ]),
         const SizedBox(height: 6),
-        Text(
-            'Connect Twitch/YouTube so servers where you have the "Announce When '
-            'Live" permission can automatically post when you go live or post a '
-            'new video.',
+        Text(t.settingsStreamingDescription,
             style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         const SizedBox(height: 12),
         _buildStreamingRow('twitch'),
@@ -701,6 +741,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _buildStreamingRow(String platform) {
+    final t = AppLocalizations.of(context);
     if (_loadingStreaming[platform] == true) {
       return Center(child: SizedBox(width: 18, height: 18,
           child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda)));
@@ -709,7 +750,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final connected = status?['connected'] == true;
     final connecting = _connectingStreaming[platform] == true;
     final label = _platformLabel(platform);
-    final liveOrNew = platform == 'twitch' ? 'live now' : 'a new upload';
+    final liveSuffix = platform == 'twitch'
+        ? t.settingsStreamingLiveSuffixTwitch
+        : t.settingsStreamingLiveSuffixYoutube;
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
@@ -719,20 +762,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         Expanded(
           child: Text(
               connected
-                  ? '$label connected as ${status?['external_username'] ?? ''}'
-                      '${status?['is_live'] == true ? ' -- $liveOrNew' : ''}'
-                  : '$label not connected',
+                  ? t.settingsStreamingConnected(label, status?['external_username'] ?? '',
+                      status?['is_live'] == true ? liveSuffix : '')
+                  : t.settingsStreamingNotConnected(label),
               style: TextStyle(color: KodaColors.text1, fontSize: 13)),
         ),
         if (connected)
-          TextButton(onPressed: () => _disconnectStreaming(platform), child: const Text('Disconnect'))
+          TextButton(onPressed: () => _disconnectStreaming(platform), child: Text(t.commonDisconnect))
         else
           TextButton.icon(
             icon: connecting
                 ? SizedBox(width: 12, height: 12,
                     child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
                 : const Icon(Icons.link, size: 14),
-            label: Text(connecting ? 'Connecting...' : 'Connect'),
+            label: Text(connecting ? t.settingsStreamingConnecting : t.settingsStreamingConnect),
             onPressed: connecting ? null : () => _connectStreaming(platform),
           ),
       ]),
@@ -741,7 +784,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           dense: true,
           contentPadding: EdgeInsets.zero,
           controlAffinity: ListTileControlAffinity.leading,
-          title: Text(platform == 'twitch' ? 'Announce when I go live' : 'Announce live streams and new uploads',
+          title: Text(platform == 'twitch' ? t.settingsAnnounceLiveTwitch : t.settingsAnnounceLiveYoutube,
               style: TextStyle(color: KodaColors.text1, fontSize: 13)),
           value: status?['announce_enabled'] == true,
           activeColor: KodaColors.koda,
@@ -750,13 +793,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       else
         TextButton(
           onPressed: () => _loadStreamingStatus(platform),
-          child: Text('Already connected in your browser? Refresh status',
+          child: Text(t.settingsRefreshStatus,
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         ),
     ]);
   }
 
   Widget _buildThroneCard() {
+    final t = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -766,20 +810,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         Row(children: [
           Icon(Icons.card_giftcard_outlined, size: 16, color: KodaColors.gold),
           SizedBox(width: 8),
-          Text('Throne Webhook',
+          Text(t.settingsThroneTitle,
               style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w600)),
         ]),
         const SizedBox(height: 6),
-        Text(
-            'Paste this URL into your Throne.com webhook settings to get notified '
-            'in Koda whenever someone sends you a gift.',
+        Text(t.settingsThroneDescription,
             style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         const SizedBox(height: 12),
         if (_loadingThroneUrl)
           Center(child: SizedBox(width: 18, height: 18,
               child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda)))
         else if (_throneWebhookUrl == null)
-          TextButton(onPressed: _loadThroneWebhookUrl, child: const Text('Get my webhook URL'))
+          TextButton(onPressed: _loadThroneWebhookUrl, child: Text(t.settingsThroneGetUrl))
         else
           Row(children: [
             Expanded(
@@ -794,16 +836,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             IconButton(
               icon: Icon(Icons.copy, size: 16, color: KodaColors.text3),
-              tooltip: 'Copy',
+              tooltip: t.settingsThroneCopyTooltip,
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: _throneWebhookUrl!));
                 ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Copied to clipboard')));
+                    SnackBar(content: Text(t.settingsThroneCopiedToast)));
               },
             ),
             IconButton(
               icon: Icon(Icons.refresh, size: 16, color: KodaColors.text3),
-              tooltip: 'Regenerate (invalidates the old URL)',
+              tooltip: t.settingsThroneRegenerateTooltip,
               onPressed: _regenerateThroneWebhookUrl,
             ),
           ]),
@@ -818,18 +860,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _regenerateThroneWebhookUrl() async {
+    final t = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Regenerate webhook URL?',
+        title: Text(t.settingsThroneRegenerateConfirmTitle,
             style: TextStyle(color: KodaColors.text1)),
         content: Text(
-            'Your old URL will stop working, so update it in Throne.com afterward.',
+            t.settingsThroneRegenerateConfirmBody,
             style: TextStyle(color: KodaColors.text3)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Regenerate')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.commonCancel)),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text(t.settingsThroneRegenerate)),
         ],
       ),
     );
@@ -842,6 +885,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   // -- Profile editor ---------------------------------------------------------
 
   Widget _buildProfileEditor(KodaUser? user) {
+    final t = AppLocalizations.of(context);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       // Avatar
       Center(
@@ -865,10 +909,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           OutlinedButton.icon(
             onPressed: _uploadingAvatar ? null : _pickAvatar,
             icon: const Icon(Icons.upload_outlined, size: 14),
-            label: const Text('Upload Photo'),
+            label: Text(t.settingsUploadPhoto),
           ),
           const SizedBox(height: 4),
-          Text('or paste a URL below',
+          Text(t.settingsOrPasteUrl,
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         ]),
       ),
@@ -877,41 +921,41 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       // Avatar URL input (fallback / manual)
       KodaTextField(
         controller: _avatarUrlCtrl,
-        hintText: 'https://example.com/avatar.jpg',
+        hintText: t.settingsAvatarUrlHint,
       ),
       const SizedBox(height: 6),
-      Text('Image upload requires Cloudflare R2 — URL paste always works.',
+      Text(t.settingsAvatarUploadNote,
           style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       const SizedBox(height: 20),
 
       // Display name
-      Text('DISPLAY NAME',
+      Text(t.settingsDisplayNameLabel,
           style: TextStyle(color: KodaColors.text3, fontSize: 11,
               fontWeight: FontWeight.w700, letterSpacing: 1)),
       const SizedBox(height: 8),
-      KodaTextField(controller: _displayNameCtrl, hintText: 'Display name'),
+      KodaTextField(controller: _displayNameCtrl, hintText: t.settingsDisplayNameHint),
       const SizedBox(height: 20),
 
       // Bio
-      Text('BIO',
+      Text(t.settingsBioLabel,
           style: TextStyle(color: KodaColors.text3, fontSize: 11,
               fontWeight: FontWeight.w700, letterSpacing: 1)),
       const SizedBox(height: 8),
-      KodaTextField(controller: _bioCtrl, hintText: 'Tell people a little about yourself'),
+      KodaTextField(controller: _bioCtrl, hintText: t.settingsBioHint),
       const SizedBox(height: 20),
 
       // Pronouns
-      Text('PRONOUNS',
+      Text(t.settingsPronounsLabel,
           style: TextStyle(color: KodaColors.text3, fontSize: 11,
               fontWeight: FontWeight.w700, letterSpacing: 1)),
       const SizedBox(height: 8),
-      KodaTextField(controller: _pronounsCtrl, hintText: 'e.g. they/them'),
+      KodaTextField(controller: _pronounsCtrl, hintText: t.settingsPronounsHint),
       const SizedBox(height: 8),
       SwitchListTile(
         contentPadding: EdgeInsets.zero,
-        title: Text('Show my pronouns to others',
+        title: Text(t.settingsShowPronounsTitle,
             style: TextStyle(color: KodaColors.text1, fontSize: 13)),
-        subtitle: Text('Shown next to your name in chat, member lists, and voice',
+        subtitle: Text(t.settingsShowPronounsSubtitle,
             style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         value: _showPronouns,
         activeThumbColor: KodaColors.koda,
@@ -920,7 +964,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       const SizedBox(height: 20),
 
       // Status
-      Text('STATUS',
+      Text(t.settingsStatusLabel,
           style: TextStyle(color: KodaColors.text3, fontSize: 11,
               fontWeight: FontWeight.w700, letterSpacing: 1)),
       const SizedBox(height: 8),
@@ -945,7 +989,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       color: _statusColors[s], shape: BoxShape.circle),
                 ),
                 const SizedBox(width: 8),
-                Text(_statusLabels[s] ?? s,
+                Text(_statusLabels(t)[s] ?? s,
                     style: TextStyle(color: KodaColors.text1, fontSize: 13)),
               ]),
             )).toList(),
@@ -960,7 +1004,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         Expanded(
           child: OutlinedButton(
             onPressed: _savingProfile ? null : _cancelEditing,
-            child: const Text('Cancel'),
+            child: Text(t.commonCancel),
           ),
         ),
         const SizedBox(width: 12),
@@ -971,7 +1015,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             child: _savingProfile
                 ? const SizedBox(width: 16, height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                : const Text('Save', style: TextStyle(color: Colors.white)),
+                : Text(t.commonSave, style: TextStyle(color: Colors.white)),
           ),
         ),
       ]),

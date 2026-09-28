@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import '../core/theme.dart';
+import '../l10n/generated/app_localizations.dart';
 import 'widgets.dart';
 
 /// Owns its own controllers and reports the current (possibly
@@ -75,29 +76,30 @@ class _ShippingAddressFormState extends State<ShippingAddressForm> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      KodaTextField(controller: _name, hintText: 'Full name'),
+      KodaTextField(controller: _name, hintText: t.shippingAddressFullNameHint),
       const SizedBox(height: 8),
-      KodaTextField(controller: _address1, hintText: 'Address line 1'),
+      KodaTextField(controller: _address1, hintText: t.shippingAddressLine1Hint),
       const SizedBox(height: 8),
-      KodaTextField(controller: _address2, hintText: 'Address line 2 (optional)'),
+      KodaTextField(controller: _address2, hintText: t.shippingAddressLine2Hint),
       const SizedBox(height: 8),
-      KodaTextField(controller: _city, hintText: 'City'),
+      KodaTextField(controller: _city, hintText: t.shippingAddressCityHint),
       const SizedBox(height: 8),
       Row(children: [
-        Expanded(child: KodaTextField(controller: _stateCode, hintText: 'State')),
+        Expanded(child: KodaTextField(controller: _stateCode, hintText: t.shippingAddressStateHint)),
         const SizedBox(width: 8),
-        Expanded(child: KodaTextField(controller: _zip, hintText: 'ZIP / postal code')),
+        Expanded(child: KodaTextField(controller: _zip, hintText: t.shippingAddressZipHint)),
       ]),
       const SizedBox(height: 8),
       Row(children: [
-        Expanded(child: KodaTextField(controller: _countryCode, hintText: 'Country code (e.g. US)')),
+        Expanded(child: KodaTextField(controller: _countryCode, hintText: t.shippingAddressCountryCodeHint)),
         const SizedBox(width: 8),
-        Expanded(child: KodaTextField(controller: _phone, hintText: 'Phone (optional)')),
+        Expanded(child: KodaTextField(controller: _phone, hintText: t.shippingAddressPhoneHint)),
       ]),
       const SizedBox(height: 4),
       Text(
-        'Used only to ship this order -- see Printful\'s own privacy policy for how they handle it once the order is placed.',
+        t.shippingAddressPrivacyNote,
         style: TextStyle(color: KodaColors.text3, fontSize: 11),
       ),
     ]);

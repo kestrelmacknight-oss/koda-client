@@ -9,6 +9,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 
 class GifPickerDialog extends StatefulWidget {
@@ -38,6 +39,7 @@ class _GifPickerDialogState extends State<GifPickerDialog> {
   }
 
   Future<void> _load({bool trending = false}) async {
+    final t = AppLocalizations.of(context);
     setState(() { _loading = true; _error = null; });
     final query = _queryCtrl.text.trim();
     final result = trending || query.isEmpty
@@ -52,7 +54,7 @@ class _GifPickerDialogState extends State<GifPickerDialog> {
       // generic "no results" message that looks identical to a real
       // empty search -- that ambiguity was the whole reason this was
       // hard to diagnose before.
-      _error = _gifs.isEmpty ? (result.errorCode ?? 'No GIFs found') : null;
+      _error = _gifs.isEmpty ? (result.errorCode ?? t.gifPickerNoGifsFound) : null;
     });
   }
 
@@ -63,6 +65,7 @@ class _GifPickerDialogState extends State<GifPickerDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Dialog(
       backgroundColor: KodaColors.card,
       child: SizedBox(
@@ -73,7 +76,7 @@ class _GifPickerDialogState extends State<GifPickerDialog> {
             padding: const EdgeInsets.all(16),
             child: KodaTextField(
               controller: _queryCtrl,
-              hintText: 'Search GIFs...',
+              hintText: t.gifPickerSearchHint,
               onChanged: _onQueryChanged,
               onSubmitted: (_) => _load(),
             ),
@@ -83,7 +86,7 @@ class _GifPickerDialogState extends State<GifPickerDialog> {
             child: _loading
                 ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
                 : _gifs.isEmpty
-                    ? Center(child: Text(_error ?? 'No GIFs found',
+                    ? Center(child: Text(_error ?? t.gifPickerNoGifsFound,
                         textAlign: TextAlign.center,
                         style: TextStyle(color: KodaColors.text3, fontSize: 12)))
                     : GridView.builder(

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
 import '../features/settings/content_filters_screen.dart' show kContentLabels, kContentLabelNames;
+import '../l10n/generated/app_localizations.dart';
 import 'widgets.dart';
 
 Future<void> showChannelEditDialog(
@@ -32,32 +33,36 @@ Future<void> showChannelEditDialog(
   final announcementRoleIds = List<String>.from(existing?['announcement_role_ids'] ?? []);
   final selectedLabels = List<String>.from(existing?['content_labels'] ?? []);
 
+  // Captured before the dialog's own await so we don't touch a
+  // possibly-unmounted outer context afterward.
+  final t = AppLocalizations.of(context);
+
   final saved = await showDialog<bool>(
     context: context,
     builder: (ctx) => StatefulBuilder(
       builder: (ctx, setDialogState) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text(existing == null ? 'New Channel' : 'Edit Channel',
+        title: Text(existing == null ? t.channelEditDialogNewTitle : t.channelEditDialogEditTitle,
             style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 340,
           height: 400,
           child: SingleChildScrollView(
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              KodaTextField(controller: nameController, hintText: 'Channel name'),
+              KodaTextField(controller: nameController, hintText: t.channelEditDialogNameHint, autofocus: true),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: type,
                 dropdownColor: KodaColors.card,
-                decoration: const InputDecoration(labelText: 'Type'),
-                items: const [
-                  DropdownMenuItem(value: 'text', child: Text('Text')),
-                  DropdownMenuItem(value: 'voice', child: Text('Voice')),
-                  DropdownMenuItem(value: 'gallery', child: Text('Gallery')),
-                  DropdownMenuItem(value: 'stage', child: Text('Stage')),
-                  DropdownMenuItem(value: 'rules', child: Text('Rules')),
-                  DropdownMenuItem(value: 'role-select', child: Text('Role Selection')),
-                  DropdownMenuItem(value: 'calendar', child: Text('Calendar')),
+                decoration: InputDecoration(labelText: t.channelEditDialogTypeLabel),
+                items: [
+                  DropdownMenuItem(value: 'text', child: Text(t.channelEditDialogTypeText)),
+                  DropdownMenuItem(value: 'voice', child: Text(t.channelEditDialogTypeVoice)),
+                  DropdownMenuItem(value: 'gallery', child: Text(t.channelEditDialogTypeGallery)),
+                  DropdownMenuItem(value: 'stage', child: Text(t.channelEditDialogTypeStage)),
+                  DropdownMenuItem(value: 'rules', child: Text(t.channelEditDialogTypeRules)),
+                  DropdownMenuItem(value: 'role-select', child: Text(t.channelEditDialogTypeRoleSelection)),
+                  DropdownMenuItem(value: 'calendar', child: Text(t.channelEditDialogTypeCalendar)),
                 ],
                 onChanged: (v) => setDialogState(() => type = v ?? 'text'),
               ),
@@ -66,9 +71,9 @@ Future<void> showChannelEditDialog(
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                   controlAffinity: ListTileControlAffinity.leading,
-                  title: Text('Announcement channel',
+                  title: Text(t.channelEditDialogAnnouncementTitle,
                       style: TextStyle(color: KodaColors.text1, fontSize: 13)),
-                  subtitle: Text('Only members who can manage messages may post',
+                  subtitle: Text(t.channelEditDialogAnnouncementSubtitle,
                       style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                   value: isReadOnly,
                   activeColor: KodaColors.koda,
@@ -79,18 +84,17 @@ Future<void> showChannelEditDialog(
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                     controlAffinity: ListTileControlAffinity.leading,
-                    title: Text('Post live-stream & upload announcements here',
+                    title: Text(t.channelEditDialogLiveAnnouncementsTitle,
                         style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                     subtitle: Text(
-                        'Auto-posts when a member with the "Announce when live" '
-                        'permission goes live on Twitch, or posts a new YouTube video',
+                        t.channelEditDialogLiveAnnouncementsSubtitle,
                         style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                     value: liveAnnouncements,
                     activeColor: KodaColors.koda,
                     onChanged: (v) => setDialogState(() => liveAnnouncements = v ?? false),
                   ),
                 if (isReadOnly && roles.isNotEmpty) ...[
-                  Text('Notify these roles when posted (optional)',
+                  Text(t.channelEditDialogNotifyRolesLabel,
                       style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                   const SizedBox(height: 4),
                   ...roles.where((r) => r['is_default'] != true).map((role) {
@@ -119,9 +123,9 @@ Future<void> showChannelEditDialog(
               DropdownButtonFormField<String?>(
                 initialValue: selectedCategoryId,
                 dropdownColor: KodaColors.card,
-                decoration: const InputDecoration(labelText: 'Category'),
+                decoration: InputDecoration(labelText: t.channelEditDialogCategoryLabel),
                 items: [
-                  const DropdownMenuItem(value: null, child: Text('No category')),
+                  DropdownMenuItem(value: null, child: Text(t.channelEditDialogNoCategory)),
                   ...categories.map((c) => DropdownMenuItem(
                       value: c['id'] as String, child: Text(c['name']))),
                 ],
@@ -129,7 +133,7 @@ Future<void> showChannelEditDialog(
               ),
               if (roles.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                Text('Role Access (leave empty for all)',
+                Text(t.channelEditDialogRoleAccessLabel,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 6),
                 ...roles.where((r) => r['is_default'] != true).map((role) {
@@ -156,11 +160,11 @@ Future<void> showChannelEditDialog(
                 const SizedBox(height: 12),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Content Labels',
+                  child: Text(t.channelEditDialogContentLabelsLabel,
                       style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 ),
                 Text(
-                  'Flags this channel for members\' content filters; hard-blocked for supervised accounts',
+                  t.channelEditDialogContentLabelsDescription,
                   style: TextStyle(color: KodaColors.text3, fontSize: 10),
                 ),
                 const SizedBox(height: 4),
@@ -188,8 +192,8 @@ Future<void> showChannelEditDialog(
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t.commonCancel)),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(t.commonSave)),
         ],
       ),
     ),

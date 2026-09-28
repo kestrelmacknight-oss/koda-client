@@ -11,6 +11,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 import '../../core/api.dart';
+import '../../core/language_options.dart';
+import '../../core/language_prefs.dart';
+import '../../core/message_language.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../core/socket.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
@@ -146,7 +150,10 @@ class _DmScreenState extends ConsumerState<DmScreen>
   /// their own row id, exactly as before multi-device existed.
   Future<Map<String, dynamic>> _decryptForDisplay(
       Map<String, dynamic> message, String conversationId) async {
-    if (message['encrypted'] != true) return message;
+    if (message['encrypted'] != true) {
+      final lang = detectMessageLanguage(message['content'] as String? ?? '');
+      return lang == null ? message : {...message, '_detectedLang': lang};
+    }
     final cacheKey = (message['message_group_id'] as String?) ?? message['id'] as String;
 
     final cached = await SecureStorage.getCachedDecryptedContent(cacheKey);
@@ -192,10 +199,12 @@ class _DmScreenState extends ConsumerState<DmScreen>
   /// so old history keeps rendering correctly.
   Map<String, dynamic> _applyPayload(Map<String, dynamic> message, String raw) {
     final payload = decodeDmPayload(raw);
+    final lang = detectMessageLanguage(payload.text);
     return {
       ...message,
       'content': payload.text,
       if (payload.attachment != null) '_attachment': payload.attachment,
+      if (lang != null) '_detectedLang': lang,
     };
   }
 
@@ -292,9 +301,10 @@ class _DmScreenState extends ConsumerState<DmScreen>
     final attachment = _pendingAttachment;
     if (convo == null || peerUserId == null) return;
     if (text.isEmpty && attachment == null) return;
+    final t = AppLocalizations.of(context);
     if (_safetyNumberChanged) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
-          "This conversation's safety number changed -- verify it before sending.")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+          t.dmSafetyNumberChangedWarning)));
       return;
     }
     _msgCtrl.clear();
@@ -346,20 +356,20 @@ class _DmScreenState extends ConsumerState<DmScreen>
         });
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Message not sent.')));
+            SnackBar(content: Text(t.dmMessageNotSent)));
       }
     } on SafetyNumberChanged {
       if (mounted) {
         setState(() => _safetyNumberChanged = true);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
-            "This conversation's safety number changed -- verify it before sending.")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+            t.dmSafetyNumberChangedWarning)));
       }
     } catch (e) {
       // Fail closed: never send plaintext when encryption couldn't
       // complete. Surface the failure instead.
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not encrypt message: $e')));
+            SnackBar(content: Text(t.dmEncryptMessageError('$e'))));
       }
     }
   }
@@ -402,7 +412,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
       if (meta == null) {
         setState(() => _uploadingAttachment = false);
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Attachment upload failed.')));
+            SnackBar(content: Text(AppLocalizations.of(context).dmAttachmentUploadFailed)));
         return;
       }
       setState(() {
@@ -413,7 +423,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
       if (mounted) {
         setState(() => _uploadingAttachment = false);
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not encrypt attachment: $e')));
+            SnackBar(content: Text(AppLocalizations.of(context).dmEncryptAttachmentError('$e'))));
       }
     }
   }
@@ -459,13 +469,50 @@ class _DmScreenState extends ConsumerState<DmScreen>
     } catch (_) { return ''; }
   }
 
+  /// There's no "server" to compare a DM message's detected language
+  /// against (see message_language.dart) -- the meaningful baseline
+  /// here is the viewer's own UI language instead, explicit override
+  /// or resolved system locale either way.
+  String _myUiLanguage(BuildContext context) {
+    final override = ref.read(languagePrefsProvider).uiLocale;
+    return override ?? Localizations.localeOf(context).languageCode;
+  }
+
+  /// Shared by the message row's right-click handler and its visible
+  /// "more actions" trigger button (keyboard/Tab-reachable -- see
+  /// accessibility Phase 4) so both paths show the exact same menu.
+  Future<void> _showDmMessageMenu(Offset position, Map<String, dynamic> m) async {
+    final t = AppLocalizations.of(context);
+    final action = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(position.dx, position.dy, position.dx, position.dy),
+      color: KodaColors.card,
+      items: [
+        PopupMenuItem(value: 'report',
+            child: Text(t.dmReportMessage, style: TextStyle(color: KodaColors.accent))),
+      ],
+    );
+    if (action == 'report' && mounted) {
+      final submitted = await showReportDmMessageDialog(
+        context,
+        messageId: m['id'] as String? ?? '',
+        disclosedContent: m['content'] as String? ?? '',
+      );
+      if (submitted && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(t.dmReportSubmitted)));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: Text('Messages',
+        title: Text(t.dmTitle,
             style: TextStyle(color: KodaColors.text1, fontSize: 16,
                 fontWeight: FontWeight.w700)),
         bottom: TabBar(
@@ -496,7 +543,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
   Widget _buildAllTab() {
     return Row(children: [
       // Conversation list
-      Container(
+      FocusTraversalGroup(child: Container(
         width: 260,
         color: KodaColors.bg2,
         child: Column(children: [
@@ -510,7 +557,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
               ),
               onPressed: _showNewDmDialog,
               icon: const Icon(Icons.add, size: 16),
-              label: const Text('New Message'),
+              label: Text(AppLocalizations.of(context).dmNewMessage),
             ),
           ),
           Expanded(
@@ -518,7 +565,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                 ? Center(child: CircularProgressIndicator(
                     color: KodaColors.koda))
                 : _conversations.isEmpty
-                    ? Center(child: Text('No conversations yet',
+                    ? Center(child: Text(AppLocalizations.of(context).dmNoConversationsYet,
                         style: TextStyle(color: KodaColors.text3,
                             fontSize: 13)))
                     : ListView.builder(
@@ -561,21 +608,22 @@ class _DmScreenState extends ConsumerState<DmScreen>
                       ),
           ),
         ]),
-      ),
+      )),
 
       // Chat area
-      Expanded(
+      FocusTraversalGroup(child: Expanded(
         child: _activeConversation == null
-            ? Center(child: Text('Select a conversation',
+            ? Center(child: Text(AppLocalizations.of(context).dmSelectConversation,
                 style: TextStyle(color: KodaColors.text3)))
             : _buildChatArea(),
-      ),
+      )),
     ]);
   }
 
   Widget _buildChatArea() {
+    final t = AppLocalizations.of(context);
     final peer = _activeConversation?['user'] as Map<String, dynamic>?;
-    final peerName = peer?['username'] as String? ?? 'Unknown';
+    final peerName = peer?['username'] as String? ?? t.dmUnknownUser;
     final peerId = peer?['id'] as String?;
     final peerTier = peer?['koda_tier'] as String?;
 
@@ -592,14 +640,14 @@ class _DmScreenState extends ConsumerState<DmScreen>
           TierBadge(tier: peerTier, size: 13),
           const SizedBox(width: 8),
           Tooltip(
-            message: 'End-to-end encrypted',
+            message: t.dmEndToEndEncryptedTooltip,
             child: Icon(Icons.lock_outline, size: 13, color: KodaColors.mint),
           ),
           const Spacer(),
           if (peerId != null)
             IconButton(
               icon: Icon(Icons.verified_user_outlined, size: 18, color: KodaColors.text3),
-              tooltip: 'Verify Safety Number',
+              tooltip: t.dmVerifySafetyNumberTooltip,
               onPressed: () async {
                 final confirmed = await Navigator.push<bool>(context, MaterialPageRoute(
                   builder: (_) => SafetyNumberScreen(peerUserId: peerId, peerName: peerName),
@@ -637,29 +685,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                       ['username'] as String? ?? 'Unknown';
                   final canReport = !isMe && m['_undecryptable'] == null;
                   return GestureDetector(
-                    onSecondaryTapUp: !canReport ? null : (d) async {
-                      final action = await showMenu<String>(
-                        context: context,
-                        position: RelativeRect.fromLTRB(d.globalPosition.dx,
-                            d.globalPosition.dy, d.globalPosition.dx, d.globalPosition.dy),
-                        color: KodaColors.card,
-                        items: [
-                          PopupMenuItem(value: 'report',
-                              child: Text('Report Message', style: TextStyle(color: KodaColors.accent))),
-                        ],
-                      );
-                      if (action == 'report' && mounted) {
-                        final submitted = await showReportDmMessageDialog(
-                          context,
-                          messageId: m['id'] as String? ?? '',
-                          disclosedContent: m['content'] as String? ?? '',
-                        );
-                        if (submitted && mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Report submitted.')));
-                        }
-                      }
-                    },
+                    onSecondaryTapUp: !canReport ? null : (d) => _showDmMessageMenu(d.globalPosition, m),
                     child: Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Row(
@@ -729,18 +755,41 @@ class _DmScreenState extends ConsumerState<DmScreen>
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 2, left: 2, right: 2),
-                                child: Text(_formatTime(m['inserted_at']),
-                                    style: TextStyle(color: KodaColors.text3, fontSize: 10)),
+                                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                  Text(_formatTime(m['inserted_at']),
+                                      style: TextStyle(color: KodaColors.text3, fontSize: 10)),
+                                  if (m['_detectedLang'] != null &&
+                                      m['_detectedLang'] != _myUiLanguage(context)) ...[
+                                    const SizedBox(width: 6),
+                                    Tooltip(
+                                      message: kodaLanguageName(m['_detectedLang'] as String),
+                                      child: Text((m['_detectedLang'] as String).toUpperCase(),
+                                          style: TextStyle(color: KodaColors.text3, fontSize: 9,
+                                              fontWeight: FontWeight.w600, letterSpacing: 0.3)),
+                                    ),
+                                  ],
+                                ]),
                               ),
                               if (isMe && i == _messages.length - 1 && _seenByPeer(m))
                                 Padding(
                                   padding: EdgeInsets.only(top: 2, right: 2),
-                                  child: Text('Seen',
+                                  child: Text(t.dmSeenLabel,
                                       style: TextStyle(color: KodaColors.text3, fontSize: 10)),
                                 ),
                             ],
                           ),
                         ),
+                        if (canReport)
+                          Builder(builder: (buttonContext) => IconButton(
+                            icon: Icon(Icons.more_vert, size: 15, color: KodaColors.text3),
+                            tooltip: t.dmMessageActionsTooltip,
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () {
+                              final box = buttonContext.findRenderObject() as RenderBox;
+                              final position = box.localToGlobal(box.size.center(Offset.zero));
+                              _showDmMessageMenu(position, m);
+                            },
+                          )),
                         if (isMe) const SizedBox(width: 8),
                       ],
                     ),
@@ -766,7 +815,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                 ),
                 IconButton(
                   icon: Icon(Icons.close, size: 14, color: KodaColors.text3),
-                  tooltip: 'Remove attachment',
+                  tooltip: t.dmRemoveAttachmentTooltip,
                   onPressed: () => setState(() => _pendingAttachment = null),
                   constraints: const BoxConstraints(),
                   padding: const EdgeInsets.only(left: 6),
@@ -781,20 +830,20 @@ class _DmScreenState extends ConsumerState<DmScreen>
                       width: 16, height: 16,
                       child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
                   : Icon(Icons.attach_file, color: KodaColors.text3),
-              tooltip: 'Attach file',
+              tooltip: t.dmAttachFileTooltip,
               onPressed: _uploadingAttachment ? null : _pickAndEncryptAttachment,
             ),
             Expanded(
               child: KodaTextField(
                 controller: _msgCtrl,
-                hintText: 'Message...',
+                hintText: t.dmMessageHint,
                 onSubmitted: (_) => _sendMessage(),
               ),
             ),
             const SizedBox(width: 10),
             IconButton(
               icon: Icon(Icons.send, color: KodaColors.koda),
-              tooltip: 'Send message',
+              tooltip: t.dmSendMessageTooltip,
               onPressed: _sendMessage,
             ),
           ]),
@@ -806,12 +855,13 @@ class _DmScreenState extends ConsumerState<DmScreen>
   // ── Friends tab ───────────────────────────────────────────────────────────
 
   Widget _buildFriendsTab() {
+    final t = AppLocalizations.of(context);
     if (_loadingFriends) {
       return Center(child: CircularProgressIndicator(
           color: KodaColors.koda));
     }
     if (_friends.isEmpty) {
-      return Center(child: Text('No friends yet.\nSend a friend request to get started.',
+      return Center(child: Text(t.dmNoFriendsYet,
           textAlign: TextAlign.center,
           style: TextStyle(color: KodaColors.text3, fontSize: 13)));
     }
@@ -820,7 +870,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
       itemCount: _friends.length,
       itemBuilder: (_, i) {
         final f = _friends[i];
-        final name = f['username'] as String? ?? 'Unknown';
+        final name = f['username'] as String? ?? t.dmUnknownUser;
         return Container(
           margin: const EdgeInsets.only(bottom: 8),
           decoration: BoxDecoration(
@@ -844,13 +894,13 @@ class _DmScreenState extends ConsumerState<DmScreen>
               IconButton(
                 icon: Icon(Icons.message_outlined,
                     color: KodaColors.koda, size: 18),
-                tooltip: 'Send message',
+                tooltip: t.dmSendMessageTooltip,
                 onPressed: () => _startDm(f),
               ),
               IconButton(
                 icon: Icon(Icons.person_remove_outlined,
                     color: KodaColors.text3, size: 18),
-                tooltip: 'Unfriend',
+                tooltip: t.dmUnfriendTooltip,
                 onPressed: () async {
                   final ok = await KodaApi.instance.unfriend(
                       f['id'] as String);
@@ -871,21 +921,22 @@ class _DmScreenState extends ConsumerState<DmScreen>
       return Center(child: CircularProgressIndicator(
           color: KodaColors.koda));
     }
+    final t = AppLocalizations.of(context);
     if (_receivedRequests.isEmpty && _sentRequests.isEmpty) {
-      return Center(child: Text('No pending friend requests.',
+      return Center(child: Text(t.dmNoPendingRequests,
           style: TextStyle(color: KodaColors.text3, fontSize: 13)));
     }
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         if (_receivedRequests.isNotEmpty) ...[
-          Text('INCOMING', style: TextStyle(color: KodaColors.text3,
+          Text(t.dmIncomingRequestsLabel, style: TextStyle(color: KodaColors.text3,
               fontSize: 11, fontWeight: FontWeight.w700,
               letterSpacing: 0.8)),
           const SizedBox(height: 8),
           ..._receivedRequests.map((req) {
             final user = req['user'] as Map<String, dynamic>?;
-            final name = user?['username'] as String? ?? 'Unknown';
+            final name = user?['username'] as String? ?? t.dmUnknownUser;
             final msg = req['message'] as String?;
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
@@ -911,13 +962,13 @@ class _DmScreenState extends ConsumerState<DmScreen>
                 IconButton(
                   icon: Icon(Icons.check_circle_outline,
                       color: KodaColors.koda, size: 22),
-                  tooltip: 'Accept',
+                  tooltip: t.dmAcceptTooltip,
                   onPressed: () => _acceptRequest(req),
                 ),
                 IconButton(
                   icon: Icon(Icons.cancel_outlined,
                       color: KodaColors.accent, size: 22),
-                  tooltip: 'Decline',
+                  tooltip: t.dmDeclineTooltip,
                   onPressed: () => _declineRequest(req),
                 ),
               ]),
@@ -926,13 +977,13 @@ class _DmScreenState extends ConsumerState<DmScreen>
           const SizedBox(height: 16),
         ],
         if (_sentRequests.isNotEmpty) ...[
-          Text('SENT', style: TextStyle(color: KodaColors.text3,
+          Text(t.dmSentRequestsLabel, style: TextStyle(color: KodaColors.text3,
               fontSize: 11, fontWeight: FontWeight.w700,
               letterSpacing: 0.8)),
           const SizedBox(height: 8),
           ..._sentRequests.map((req) {
             final user = req['user'] as Map<String, dynamic>?;
-            final name = user?['username'] as String? ?? 'Unknown';
+            final name = user?['username'] as String? ?? t.dmUnknownUser;
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.symmetric(
@@ -948,7 +999,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                 const SizedBox(width: 10),
                 Expanded(child: Text(name, style: TextStyle(
                     color: KodaColors.text1, fontWeight: FontWeight.w500))),
-                Text('Pending', style: TextStyle(
+                Text(t.dmPendingLabel, style: TextStyle(
                     color: KodaColors.text3, fontSize: 12)),
               ]),
             );
@@ -961,20 +1012,21 @@ class _DmScreenState extends ConsumerState<DmScreen>
   // ── New DM dialog ─────────────────────────────────────────────────────────
 
   Future<void> _showNewDmDialog() async {
+    final t = AppLocalizations.of(context);
     final ctrl = TextEditingController();
     final username = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('New Message',
+        title: Text(t.dmNewMessageDialogTitle,
             style: TextStyle(color: KodaColors.text1)),
         content: KodaTextField(controller: ctrl,
-            hintText: 'Enter username'),
+            hintText: t.dmEnterUsernameHint, autofocus: true),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
+              child: Text(t.commonCancel)),
           TextButton(onPressed: () => Navigator.pop(context,
-              ctrl.text.trim()), child: const Text('Open')),
+              ctrl.text.trim()), child: Text(t.dmOpenButton)),
         ],
       ),
     );
@@ -1013,7 +1065,7 @@ class _EncryptedAttachmentState extends State<_EncryptedAttachment> {
     await File(path).writeAsBytes(bytes);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Saved ${widget.meta.fileName}')));
+          SnackBar(content: Text(AppLocalizations.of(context).dmSavedAttachment(widget.meta.fileName))));
     }
   }
 

@@ -15,6 +15,7 @@
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import 'visp_avatar.dart';
 
 const _kDefaultQuestion = 'How is my boosting and marketplace revenue doing?';
@@ -66,11 +67,12 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
       messages: _messages,
     );
     if (!mounted) return;
+    final t = AppLocalizations.of(context);
 
     final narrative = result?['narrative'] as String?;
     if (result?['error'] != null || narrative == null) {
       setState(() {
-        _error = result?['error'] as String? ?? 'Visp could not put together an answer.';
+        _error = result?['error'] as String? ?? t.vispBoostAdvisorCouldNotAnswer;
         _loading = false;
       });
       return;
@@ -93,6 +95,7 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final advice = _lastAdvice;
     final recommendations = List<String>.from(advice?['recommendations'] ?? []);
     final sources = List<String>.from(advice?['sources'] ?? []);
@@ -110,7 +113,7 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
               ? VispAvatar(size: 40, mood: _mood)
               : Icon(Icons.auto_awesome, size: 16, color: KodaColors.koda),
           const SizedBox(width: 8),
-          Text('Ask Visp: Boost ROI Advisor',
+          Text(t.vispBoostAdvisorTitle,
               style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w700)),
           const SizedBox(width: 8),
           const VispDevBadge(),
@@ -161,7 +164,7 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
 
           if (sources.isNotEmpty) ...[
             const SizedBox(height: 10),
-            _sourcesRow(sources),
+            _sourcesRow(t, sources),
           ],
         ],
 
@@ -172,9 +175,9 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
               controller: _followUpCtrl,
               enabled: !_loading,
               style: TextStyle(color: KodaColors.text1, fontSize: 13),
-              decoration: const InputDecoration(
-                hintText: 'Ask a follow-up...',
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: InputDecoration(
+                hintText: t.vispBoostAdvisorFollowUpHint,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               ),
               onSubmitted: (_) => _submitFollowUp(),
             ),
@@ -185,7 +188,7 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
                 ? SizedBox(width: 16, height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
                 : Icon(Icons.send, size: 18, color: KodaColors.koda),
-            tooltip: 'Send',
+            tooltip: t.vispBoostAdvisorSendTooltip,
             onPressed: _loading ? null : _submitFollowUp,
           ),
         ]),
@@ -195,10 +198,10 @@ class _VispBoostAdvisorPanelState extends State<VispBoostAdvisorPanel> {
 
   // Same "Based on: ..." chip treatment as visp_setup_dialog.dart/
   // visp_event_dialog.dart's citation rows.
-  Widget _sourcesRow(List<String> sources) {
+  Widget _sourcesRow(AppLocalizations t, List<String> sources) {
     return Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
       Icon(Icons.menu_book_outlined, size: 12, color: KodaColors.text3),
-      Text('Based on:', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+      Text(t.vispBoostAdvisorBasedOn, style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       ...sources.map((title) => Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(

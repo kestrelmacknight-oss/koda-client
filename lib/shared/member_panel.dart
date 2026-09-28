@@ -9,8 +9,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
 import '../core/providers.dart';
+import '../l10n/generated/app_localizations.dart';
 import 'pronoun_label.dart';
 import 'tier_badge.dart';
+import 'widgets.dart';
 
 class MemberPanel extends ConsumerStatefulWidget {
   final Map<String, dynamic> server;
@@ -55,7 +57,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
 
   // Build grouped member list
   // Groups: each role (online members), then Offline
-  List<_MemberGroup> _buildGroups() {
+  List<_MemberGroup> _buildGroups(AppLocalizations t) {
     final online = _presence.where((m) => m['online'] == true).toList();
     final offline = _presence.where((m) => m['online'] != true).toList();
 
@@ -66,7 +68,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
     for (final m in online) {
       final roles = m['roles'] as List? ?? [];
       if (roles.isEmpty) {
-        roleMap['__no_role'] = {'id': '__no_role', 'name': 'Members', 'color': '#6b7280'};
+        roleMap['__no_role'] = {'id': '__no_role', 'name': t.serverTabMembers, 'color': '#6b7280'};
         membersByRole.putIfAbsent('__no_role', () => []).add(m);
       } else {
         // Use highest role (first in list)
@@ -82,7 +84,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
       final role = roleMap[entry.key]!;
       groups.add(_MemberGroup(
         id: entry.key,
-        name: role['name'] as String? ?? 'Members',
+        name: role['name'] as String? ?? t.serverTabMembers,
         color: role['color'] as String? ?? '#6b7280',
         members: entry.value,
         isOffline: false,
@@ -92,7 +94,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
     if (offline.isNotEmpty) {
       groups.add(_MemberGroup(
         id: '__offline',
-        name: 'Offline',
+        name: t.memberPanelOfflineLabel,
         color: '#6b7280',
         members: offline,
         isOffline: true,
@@ -104,6 +106,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     if (_loading) {
       return Container(
         width: 240,
@@ -113,7 +116,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
       );
     }
 
-    final groups = _buildGroups();
+    final groups = _buildGroups(t);
     final totalOnline = _presence.where((m) => m['online'] == true).length;
 
     return Container(
@@ -129,23 +132,18 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
             Icon(Icons.people_outlined,
                 color: KodaColors.text3, size: 15),
             const SizedBox(width: 6),
-            Text('Members — $totalOnline online',
+            Text(t.memberPanelHeaderLabel(totalOnline),
                 style: TextStyle(
                     color: KodaColors.text3,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5)),
             const Spacer(),
-            Semantics(
-              button: true,
-              label: 'Refresh member list',
-              child: GestureDetector(
-                onTap: _load,
-                child: ExcludeSemantics(
-                  child: Icon(Icons.refresh_outlined,
-                      color: KodaColors.text3, size: 14),
-                ),
-              ),
+            KodaTappable(
+              onTap: _load,
+              semanticLabel: t.memberPanelRefreshTooltip,
+              child: Icon(Icons.refresh_outlined,
+                  color: KodaColors.text3, size: 14),
             ),
           ]),
         ),
@@ -155,14 +153,14 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(vertical: 8),
             itemCount: groups.length,
-            itemBuilder: (_, i) => _buildGroup(groups[i]),
+            itemBuilder: (_, i) => _buildGroup(groups[i], t),
           ),
         ),
       ]),
     );
   }
 
-  Widget _buildGroup(_MemberGroup group) {
+  Widget _buildGroup(_MemberGroup group, AppLocalizations t) {
     final collapsed = _collapsedRoles.contains(group.id);
     final color = _parseColor(group.color);
 
@@ -170,52 +168,47 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Role header
-        Semantics(
-          button: true,
-          label: '${group.name}, ${group.members.length} members, '
-              '${collapsed ? "collapsed" : "expanded"}',
-          child: GestureDetector(
-            onTap: () => setState(() {
-              if (collapsed) {
-                _collapsedRoles.remove(group.id);
-              } else {
-                _collapsedRoles.add(group.id);
-              }
-            }),
-            child: ExcludeSemantics(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 14, 10, 4),
-                child: Row(children: [
-                  Icon(
-                    collapsed ? Icons.chevron_right : Icons.expand_more,
-                    size: 14,
-                    color: KodaColors.text3,
-                  ),
-                  const SizedBox(width: 2),
-                  Text(
-                    '${group.name.toUpperCase()} — ${group.members.length}',
-                    style: TextStyle(
-                      color: group.isOffline ? KodaColors.text3 : color,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ]),
+        KodaTappable(
+          onTap: () => setState(() {
+            if (collapsed) {
+              _collapsedRoles.remove(group.id);
+            } else {
+              _collapsedRoles.add(group.id);
+            }
+          }),
+          semanticLabel: '${group.name}, ${t.memberPanelMemberCount(group.members.length)}, '
+              '${collapsed ? t.serverCollapsedLabel : t.serverExpandedLabel}',
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 14, 10, 4),
+            child: Row(children: [
+              Icon(
+                collapsed ? Icons.chevron_right : Icons.expand_more,
+                size: 14,
+                color: KodaColors.text3,
               ),
-            ),
+              const SizedBox(width: 2),
+              Text(
+                '${group.name.toUpperCase()} — ${group.members.length}',
+                style: TextStyle(
+                  color: group.isOffline ? KodaColors.text3 : color,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ]),
           ),
         ),
 
         // Members
         if (!collapsed)
-          ...group.members.map((m) => _buildMemberTile(m, group.isOffline)),
+          ...group.members.map((m) => _buildMemberTile(m, group.isOffline, t)),
       ],
     );
   }
 
-  Widget _buildMemberTile(Map<String, dynamic> member, bool isOffline) {
-    final username = member['username'] as String? ?? 'Unknown';
+  Widget _buildMemberTile(Map<String, dynamic> member, bool isOffline, AppLocalizations t) {
+    final username = member['username'] as String? ?? t.memberPanelUnknownUser;
     final avatarUrl = member['avatar_url'] as String?;
     final tier = member['koda_tier'] as String?;
     final roles = member['roles'] as List? ?? [];
@@ -226,8 +219,8 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
         ? _parseColor(topRole['color'] as String? ?? '#e2e4f0')
         : KodaColors.text2;
 
-    final statusLabel = isOffline ? 'Offline' : 'Online';
-    final tierLabel = tier != null && tier != 'free' ? ', $tier tier' : '';
+    final statusLabel = isOffline ? t.memberPanelOfflineLabel : t.statusOnline;
+    final tierLabel = tier != null && tier != 'free' ? t.memberPanelTierSuffix(tier) : '';
 
     return Semantics(
       button: true,
@@ -294,6 +287,20 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
               ),
             ),
             TierBadge(tier: tier, size: 13),
+            if ((widget.canKick || widget.canBan) &&
+                member['user_id'] != ref.read(authProvider).user?.id)
+              Builder(builder: (buttonContext) => IconButton(
+                icon: Icon(Icons.more_vert, size: 14, color: KodaColors.text3),
+                tooltip: t.memberPanelModerationActionsTooltip,
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                onPressed: () {
+                  final box = buttonContext.findRenderObject() as RenderBox;
+                  final position = box.localToGlobal(box.size.center(Offset.zero));
+                  _showModerationMenu(member, position);
+                },
+              )),
           ]),
           ),
         ),
@@ -307,22 +314,26 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
     if (member['user_id'] == me?.id) return; // can't moderate yourself
     if (!widget.canKick && !widget.canBan) return;
 
+    // Captured before the awaits below, so we don't touch a
+    // possibly-unmounted context afterward.
+    final t = AppLocalizations.of(context);
+
     final action = await showMenu<String>(
       context: context,
       position: RelativeRect.fromLTRB(position.dx, position.dy, position.dx, position.dy),
       color: KodaColors.card,
       items: [
         if (widget.canKick)
-          const PopupMenuItem(value: 'kick', child: Text('Kick')),
+          PopupMenuItem(value: 'kick', child: Text(t.serverKick)),
         if (widget.canBan)
           PopupMenuItem(value: 'ban',
-              child: Text('Ban', style: TextStyle(color: KodaColors.accent))),
+              child: Text(t.serverBan, style: TextStyle(color: KodaColors.accent))),
       ],
     );
     if (!mounted || action == null) return;
     final serverId = widget.server['id'] as String;
     final userId = member['user_id'] as String;
-    final username = member['username'] as String? ?? 'this member';
+    final username = member['username'] as String? ?? t.serverMemberFallbackGeneric;
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -330,14 +341,14 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
         backgroundColor: KodaColors.card,
         content: Text(
             action == 'ban'
-                ? 'Ban $username from ${widget.server['name']}? They will not be able to rejoin without being unbanned.'
-                : 'Kick $username from ${widget.server['name']}? They can rejoin with an invite.',
+                ? t.serverBanConfirm(username, widget.server['name'] as String? ?? '')
+                : t.serverKickConfirm(username, widget.server['name'] as String? ?? ''),
             style: TextStyle(color: KodaColors.text1)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t.commonCancel)),
           TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text(action == 'ban' ? 'Ban' : 'Kick',
+              child: Text(action == 'ban' ? t.serverBan : t.serverKick,
                   style: TextStyle(color: KodaColors.accent))),
         ],
       ),
@@ -352,7 +363,8 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
         _load();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not ${action == 'ban' ? 'ban' : 'kick'} $username.')));
+            SnackBar(content: Text(t.serverCouldNotModerateMember(
+                (action == 'ban' ? t.serverBan : t.serverKick).toLowerCase(), username))));
       }
     }
   }

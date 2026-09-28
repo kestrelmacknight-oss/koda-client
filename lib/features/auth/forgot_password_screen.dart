@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -22,8 +23,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   String? _info;
 
   Future<void> _requestCode() async {
+    // Captured before the await below, so we don't touch a
+    // possibly-unmounted context afterward.
+    final t = AppLocalizations.of(context);
     if (_email.text.trim().isEmpty) {
-      setState(() => _error = 'Enter your email address.');
+      setState(() => _error = t.forgotPasswordEnterEmailError);
       return;
     }
     setState(() { _busy = true; _error = null; });
@@ -32,13 +36,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     setState(() {
       _busy = false;
       _codeSent = true;
-      _info = 'If that account exists, a reset code has been sent.';
+      _info = t.forgotPasswordCodeSentInfo;
     });
   }
 
   Future<void> _confirmReset() async {
+    // Captured before the await below, so we don't touch a
+    // possibly-unmounted context afterward.
+    final t = AppLocalizations.of(context);
     if (_code.text.trim().isEmpty || _newPassword.text.length < 8) {
-      setState(() => _error = 'Enter the code and a password of at least 8 characters.');
+      setState(() => _error = t.forgotPasswordEnterCodeError);
       return;
     }
     setState(() { _busy = true; _error = null; });
@@ -55,16 +62,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     if (ok) {
       Navigator.pop(context);
     } else {
-      setState(() => _error = 'Invalid or expired code.');
+      setState(() => _error = t.forgotPasswordInvalidCode);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(backgroundColor: KodaColors.voidBg, elevation: 0,
-          title: const Text('Reset password')),
+          title: Text(t.forgotPasswordTitle)),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 380),
@@ -78,17 +86,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   child: Text(_info!,
                       style: TextStyle(color: KodaColors.mint, fontSize: 12)),
                 ),
-              KodaTextField(controller: _email, hintText: 'Email address',
+              KodaTextField(controller: _email, hintText: t.forgotPasswordEmailHint,
                   keyboardType: TextInputType.emailAddress),
               const SizedBox(height: 14),
               if (!_codeSent)
-                KodaPrimaryButton(label: 'Send reset code', onPressed: _requestCode, busy: _busy)
+                KodaPrimaryButton(label: t.forgotPasswordSendCodeButton, onPressed: _requestCode, busy: _busy)
               else ...[
-                KodaTextField(controller: _code, hintText: '6-digit code'),
+                KodaTextField(controller: _code, hintText: t.forgotPasswordCodeHint),
                 const SizedBox(height: 10),
-                KodaTextField(controller: _newPassword, hintText: 'New password', obscureText: true),
+                KodaTextField(controller: _newPassword, hintText: t.forgotPasswordNewPasswordHint, obscureText: true),
                 const SizedBox(height: 14),
-                KodaPrimaryButton(label: 'Set new password', onPressed: _confirmReset, busy: _busy),
+                KodaPrimaryButton(label: t.forgotPasswordSetNewPasswordButton, onPressed: _confirmReset, busy: _busy),
               ],
             ]),
           ),

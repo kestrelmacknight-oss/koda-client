@@ -9,6 +9,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
+import '../../core/language_options.dart';
+import '../../l10n/generated/app_localizations.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -62,23 +64,25 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     'view_channels', 'send_messages', 'connect_voice', 'manage_server',
     'manage_channels', 'manage_roles', 'manage_messages',
     'kick_members', 'ban_members', 'mute_members', 'mention_everyone', 'manage_marketplace',
-    'announce_live',
+    'announce_live', 'move_members',
   ];
 
-  static const Map<String, String> _permissionLabels = {
-    'view_channels':    'View Channels',
-    'send_messages':    'Send Messages',
-    'connect_voice':    'Connect to Voice',
-    'manage_server':    'Manage Server',
-    'manage_channels':  'Manage Channels',
-    'manage_roles':     'Manage Roles',
-    'manage_messages':  'Manage Messages',
-    'kick_members':     'Kick Members',
-    'ban_members':      'Ban Members',
-    'mute_members':     'Mute Members',
-    'mention_everyone': 'Mention @everyone',
-    'manage_marketplace': 'Manage Marketplace',
-    'announce_live':    'Announce When Live',
+  // Not static const -- labels are localized, which needs a BuildContext.
+  Map<String, String> _permissionLabels(AppLocalizations t) => {
+    'view_channels':    t.permViewChannels,
+    'send_messages':    t.permSendMessages,
+    'connect_voice':    t.permConnectVoice,
+    'manage_server':    t.permManageServer,
+    'manage_channels':  t.permManageChannels,
+    'manage_roles':     t.permManageRoles,
+    'manage_messages':  t.permManageMessages,
+    'kick_members':     t.permKickMembers,
+    'ban_members':      t.permBanMembers,
+    'mute_members':     t.permMuteMembers,
+    'mention_everyone': t.permMentionEveryone,
+    'manage_marketplace': t.permManageMarketplace,
+    'announce_live':    t.permAnnounceLive,
+    'move_members':     t.permMoveMembers,
   };
 
   static const List<String> _colorSwatches = [
@@ -134,34 +138,36 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     final url = await KodaApi.instance.connectPrintful(_serverId);
     if (!mounted) return;
     setState(() => _connectingPrintful = false);
+    final t = AppLocalizations.of(context);
     if (url == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not start Printful connection.')));
+          SnackBar(content: Text(t.serverConnectError('Printful'))));
       return;
     }
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
-          'Finish connecting in your browser, then come back and refresh.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+          t.settingsStreamingFinishInBrowser)));
     }
   }
 
   Future<void> _disconnectPrintful() async {
+    final t = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Disconnect Printful?', style: TextStyle(color: KodaColors.text1)),
+        title: Text(t.serverDisconnectPrintfulTitle, style: TextStyle(color: KodaColors.text1)),
         content: Text(
-            'This server will no longer be able to fulfill merch orders until reconnected.',
+            t.serverDisconnectPrintfulBody,
             style: TextStyle(color: KodaColors.text2)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.commonCancel)),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Disconnect', style: TextStyle(color: KodaColors.accent)),
+            child: Text(t.commonDisconnect, style: TextStyle(color: KodaColors.accent)),
           ),
         ],
       ),
@@ -190,17 +196,18 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     final url = await KodaApi.instance.connectTiltify(_serverId);
     if (!mounted) return;
     setState(() => _connectingTiltify = false);
+    final t = AppLocalizations.of(context);
     if (url == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not start Tiltify connection.')));
+          SnackBar(content: Text(t.serverConnectError('Tiltify'))));
       return;
     }
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
-          'Finish connecting in your browser, then come back and refresh.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+          t.settingsStreamingFinishInBrowser)));
     }
   }
 
@@ -217,19 +224,20 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   }
 
   Future<void> _disconnectTiltify() async {
+    final t = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Disconnect Tiltify?', style: TextStyle(color: KodaColors.text1)),
+        title: Text(t.serverDisconnectTiltifyTitle, style: TextStyle(color: KodaColors.text1)),
         content: Text(
-            'This server will stop showing its charity campaign\'s progress until reconnected.',
+            t.serverDisconnectTiltifyBody,
             style: TextStyle(color: KodaColors.text2)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.commonCancel)),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Disconnect', style: TextStyle(color: KodaColors.accent)),
+            child: Text(t.commonDisconnect, style: TextStyle(color: KodaColors.accent)),
           ),
         ],
       ),
@@ -288,15 +296,16 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   }
 
   Future<bool> _confirm(String message) async {
+    final t = AppLocalizations.of(context);
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: KodaColors.card,
         content: Text(message, style: TextStyle(color: KodaColors.text1)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t.commonCancel)),
           TextButton(onPressed: () => Navigator.pop(ctx, true),
-              child: Text('Delete', style: TextStyle(color: KodaColors.accent))),
+              child: Text(t.commonDelete, style: TextStyle(color: KodaColors.accent))),
         ],
       ),
     );
@@ -368,6 +377,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   // -- Role editor ------------------------------------------------------------
 
   Future<void> _showRoleEditor({Map<String, dynamic>? existing}) async {
+    final t = AppLocalizations.of(context);
     final nameController = TextEditingController(text: existing?['name'] ?? '');
     String color = (existing?['color'] as String?) ?? _colorSwatches.first;
     final permissions = <String, bool>{};
@@ -382,43 +392,39 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: Text(existing == null ? 'New Role' : 'Edit Role',
+          title: Text(existing == null ? t.serverNewRoleTitle : t.serverEditRoleTitle,
               style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 360,
             child: SingleChildScrollView(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                KodaTextField(controller: nameController, hintText: 'Role name'),
+                KodaTextField(controller: nameController, hintText: t.serverRoleNameHint, autofocus: true),
                 const SizedBox(height: 14),
-                Text('Color', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                Text(t.serverColorLabel, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 6),
                 Wrap(spacing: 8, runSpacing: 8, children: _colorSwatches.map((hex) {
                   final selected = color == hex;
-                  return Semantics(
-                    button: true,
+                  return KodaTappable(
                     selected: selected,
-                    label: 'Color $hex',
-                    child: GestureDetector(
-                      onTap: () => setDialogState(() => color = hex),
-                      child: ExcludeSemantics(
-                        child: Container(
-                          width: 28, height: 28,
-                          decoration: BoxDecoration(
-                            color: _parseColor(hex),
-                            shape: BoxShape.circle,
-                            border: selected ? Border.all(color: Colors.white, width: 2) : null,
-                          ),
-                        ),
+                    semanticLabel: t.serverColorSwatchLabel(hex),
+                    borderRadius: BorderRadius.circular(999),
+                    onTap: () => setDialogState(() => color = hex),
+                    child: Container(
+                      width: 28, height: 28,
+                      decoration: BoxDecoration(
+                        color: _parseColor(hex),
+                        shape: BoxShape.circle,
+                        border: selected ? Border.all(color: Colors.white, width: 2) : null,
                       ),
                     ),
                   );
                 }).toList()),
                 const SizedBox(height: 16),
-                Text('Permissions', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                Text(t.serverPermissionsLabel, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 ..._permissionKeys.map((key) => CheckboxListTile(
                       dense: true,
                       contentPadding: EdgeInsets.zero,
-                      title: Text(_permissionLabels[key] ?? key,
+                      title: Text(_permissionLabels(t)[key] ?? key,
                           style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                       value: permissions[key],
                       activeColor: KodaColors.koda,
@@ -427,9 +433,9 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                 const SizedBox(height: 12),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: Text('Self-assignable',
+                  title: Text(t.serverSelfAssignableTitle,
                       style: TextStyle(color: KodaColors.text1, fontSize: 13)),
-                  subtitle: Text('Members can assign this role themselves',
+                  subtitle: Text(t.serverSelfAssignableSubtitle,
                       style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                   value: selfAssignable,
                   activeThumbColor: KodaColors.koda,
@@ -439,8 +445,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-            TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t.commonCancel)),
+            TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(t.commonSave)),
           ],
         ),
       ),
@@ -462,17 +468,18 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   }
 
   Future<void> _deleteRole(Map<String, dynamic> role) async {
+    final t = AppLocalizations.of(context);
     if (role['is_default'] == true) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('The default role cannot be deleted.')));
+          SnackBar(content: Text(t.serverDefaultRoleUndeletable)));
       return;
     }
-    final confirmed = await _confirm('Delete role "${role['name']}"?');
+    final confirmed = await _confirm(t.serverDeleteRoleConfirm(role['name'] as String? ?? ''));
     if (!confirmed) return;
     final ok = await KodaApi.instance.deleteRole(role['id']);
     if (!ok && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not delete that role.')));
+          SnackBar(content: Text(t.serverCouldNotDeleteRole)));
     }
     _loadAll();
   }
@@ -480,6 +487,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   // -- Member role assignment --------------------------------------------------
 
   Future<void> _showMemberRolesDialog(Map<String, dynamic> member) async {
+    final t = AppLocalizations.of(context);
     final memberRoleIds = <String>{
       for (final r in (member['roles'] as List? ?? [])) r['id'] as String,
     };
@@ -489,13 +497,13 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: Text(member['username'] ?? 'Member',
+          title: Text(member['username'] ?? t.serverMemberFallback,
               style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 320,
             height: 400,
             child: _roles.isEmpty
-                ? Text('No roles yet.', style: TextStyle(color: KodaColors.text3))
+                ? Text(t.serverNoRolesYet, style: TextStyle(color: KodaColors.text3))
                 : SingleChildScrollView(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -524,7 +532,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           ),
 
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Done')),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(t.commonDone)),
           ],
         ),
       ),
@@ -537,38 +545,35 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   @override
   Widget build(BuildContext context) {
     final server = ref.watch(selectedServerProvider);
+    final t = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
         title: Row(children: [
-          Semantics(
-            button: true,
-            label: 'Change server icon',
-            child: GestureDetector(
-              onTap: () => _uploadServerIcon(server),
-              child: ExcludeSemantics(
-                child: Container(
-                  width: 36, height: 36,
-                  decoration: BoxDecoration(
-                    color: KodaColors.elevated,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: KodaColors.border),
-                  ),
-                  child: server?['icon_url'] != null && (server!['icon_url'] as String).isNotEmpty
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.network(server['icon_url'] as String,
-                              width: 36, height: 36, fit: BoxFit.cover))
-                      : Icon(Icons.add_photo_alternate_outlined,
-                          color: KodaColors.text3, size: 18),
-                ),
+          KodaTappable(
+            semanticLabel: t.serverChangeIconLabel,
+            borderRadius: BorderRadius.circular(10),
+            onTap: () => _uploadServerIcon(server),
+            child: Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(
+                color: KodaColors.elevated,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: KodaColors.border),
               ),
+              child: server?['icon_url'] != null && (server!['icon_url'] as String).isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.network(server['icon_url'] as String,
+                          width: 36, height: 36, fit: BoxFit.cover))
+                  : Icon(Icons.add_photo_alternate_outlined,
+                      color: KodaColors.text3, size: 18),
             ),
           ),
           const SizedBox(width: 10),
-          Text('${server?['name'] ?? 'Server'} Settings',
+          Text(t.serverSettingsTitle(server?['name'] as String? ?? t.serverFallbackName),
               style: TextStyle(color: KodaColors.text1, fontSize: 16)),
         ]),
         bottom: TabBar(
@@ -577,18 +582,18 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           labelColor: KodaColors.text1,
           unselectedLabelColor: KodaColors.text3,
           isScrollable: true,
-          tabs: const [
-            Tab(text: 'Channels'),
-            Tab(text: 'Roles'),
-            Tab(text: 'Members'),
-            Tab(text: 'Invites'),
-            Tab(text: 'Merch'),
-            Tab(text: 'Emoji'),
-            Tab(text: 'Customize'),
-            Tab(text: 'Audit Log'),
-            Tab(text: 'Reports'),
-            Tab(text: 'Threshold Mod'),
-            Tab(text: 'Charity'),
+          tabs: [
+            Tab(text: t.serverTabChannels),
+            Tab(text: t.serverTabRoles),
+            Tab(text: t.serverTabMembers),
+            Tab(text: t.serverTabInvites),
+            Tab(text: t.serverTabMerch),
+            Tab(text: t.serverTabEmoji),
+            Tab(text: t.serverTabCustomize),
+            Tab(text: t.serverTabAuditLog),
+            Tab(text: t.serverTabReports),
+            Tab(text: t.serverTabThresholdMod),
+            Tab(text: t.serverTabCharity),
           ],
         ),
       ),
@@ -609,6 +614,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     if (_loadingPrintful) {
       return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
+    final t = AppLocalizations.of(context);
     return Column(children: [
       Padding(
         padding: const EdgeInsets.all(20),
@@ -624,14 +630,13 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
               Icon(_printfulConnected ? Icons.check_circle : Icons.storefront_outlined,
                   color: _printfulConnected ? KodaColors.mint : KodaColors.text3, size: 22),
               const SizedBox(width: 10),
-              Text(_printfulConnected ? 'Printful Connected' : 'Printful Not Connected',
+              Text(_printfulConnected ? t.serverPrintfulConnected : t.serverPrintfulNotConnected,
                   style: TextStyle(color: KodaColors.text1,
                       fontSize: 15, fontWeight: FontWeight.w600)),
             ]),
             const SizedBox(height: 8),
             Text(
-              'Connect this server\'s Printful account to fulfill merch orders '
-              'placed through Koda. Each server connects its own store.',
+              t.serverPrintfulDescription,
               style: TextStyle(color: KodaColors.text3, fontSize: 12, height: 1.5),
             ),
             const SizedBox(height: 14),
@@ -643,7 +648,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                   minimumSize: const Size(double.infinity, 40),
                 ),
                 onPressed: _disconnectPrintful,
-                child: const Text('Disconnect'),
+                child: Text(t.commonDisconnect),
               )
             else
               ElevatedButton.icon(
@@ -656,14 +661,14 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                     ? const SizedBox(width: 14, height: 14,
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
                     : const Icon(Icons.link, size: 16),
-                label: Text(_connectingPrintful ? 'Connecting...' : 'Connect Printful'),
+                label: Text(_connectingPrintful ? t.serverConnecting : t.serverConnectPrintful),
                 onPressed: _connectingPrintful ? null : _connectPrintful,
               ),
             if (!_printfulConnected) ...[
               const SizedBox(height: 8),
               TextButton(
                 onPressed: _loadPrintfulStatus,
-                child: Text('Already connected in your browser? Refresh status',
+                child: Text(t.serverRefreshStatus,
                     style: TextStyle(color: KodaColors.text3, fontSize: 11)),
               ),
             ],
@@ -686,6 +691,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     if (_loadingTiltify) {
       return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
+    final t = AppLocalizations.of(context);
     final connected = _tiltifyStatus?['connected'] == true;
     final campaignId = _tiltifyStatus?['campaign_id'] as String?;
 
@@ -702,15 +708,13 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             Icon(connected ? Icons.check_circle : Icons.favorite_outline,
                 color: connected ? KodaColors.mint : KodaColors.text3, size: 22),
             const SizedBox(width: 10),
-            Text(connected ? 'Tiltify Connected' : 'Tiltify Not Connected',
+            Text(connected ? t.serverTiltifyConnected : t.serverTiltifyNotConnected,
                 style: TextStyle(color: KodaColors.text1,
                     fontSize: 15, fontWeight: FontWeight.w600)),
           ]),
           const SizedBox(height: 8),
           Text(
-            'Connect this server\'s Tiltify account to show a charity '
-            'campaign\'s live progress to every member. Read-only -- Koda '
-            'never posts or changes anything on Tiltify\'s side.',
+            t.serverTiltifyDescription,
             style: TextStyle(color: KodaColors.text3, fontSize: 12, height: 1.5),
           ),
           const SizedBox(height: 14),
@@ -722,7 +726,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                 minimumSize: const Size(double.infinity, 40),
               ),
               onPressed: _disconnectTiltify,
-              child: const Text('Disconnect'),
+              child: Text(t.commonDisconnect),
             )
           else
             ElevatedButton.icon(
@@ -735,14 +739,14 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                   ? const SizedBox(width: 14, height: 14,
                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
                   : const Icon(Icons.link, size: 16),
-              label: Text(_connectingTiltify ? 'Connecting...' : 'Connect Tiltify'),
+              label: Text(_connectingTiltify ? t.serverConnecting : t.serverConnectTiltify),
               onPressed: _connectingTiltify ? null : _connectTiltify,
             ),
           if (!connected) ...[
             const SizedBox(height: 8),
             TextButton(
               onPressed: _loadTiltifyStatus,
-              child: Text('Already connected in your browser? Refresh status',
+              child: Text(t.serverRefreshStatus,
                   style: TextStyle(color: KodaColors.text3, fontSize: 11)),
             ),
           ],
@@ -763,13 +767,14 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     if (_loadingTiltifyCampaigns) {
       return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
+    final t = AppLocalizations.of(context);
     final campaigns = _tiltifyCampaigns ?? [];
     if (campaigns.isEmpty) {
       return Column(children: [
-        Text('No campaigns found on this Tiltify account.',
+        Text(t.serverNoTiltifyCampaigns,
             style: TextStyle(color: KodaColors.text3, fontSize: 12)),
         const SizedBox(height: 8),
-        TextButton(onPressed: _loadTiltifyCampaigns, child: const Text('Retry')),
+        TextButton(onPressed: _loadTiltifyCampaigns, child: Text(t.commonRetry)),
       ]);
     }
     return Container(
@@ -780,12 +785,12 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         border: Border.all(color: KodaColors.border),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Pick which campaign to display',
+        Text(t.serverPickCampaign,
             style: TextStyle(color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
         ...campaigns.map((c) => ListTile(
               contentPadding: EdgeInsets.zero,
-              title: Text(c['title'] as String? ?? 'Untitled campaign',
+              title: Text(c['title'] as String? ?? t.serverUntitledCampaign,
                   style: TextStyle(color: KodaColors.text1, fontSize: 13)),
               trailing: Icon(Icons.chevron_right, color: KodaColors.text3, size: 18),
               onTap: () => _selectTiltifyCampaign(c['id'] as String),
@@ -795,7 +800,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   }
 
   Widget _buildTiltifyCampaignCard() {
-    final title = _tiltifyStatus?['campaign_title'] as String? ?? 'Untitled campaign';
+    final t = AppLocalizations.of(context);
+    final title = _tiltifyStatus?['campaign_title'] as String? ?? t.serverUntitledCampaign;
     final url = _tiltifyStatus?['campaign_url'] as String?;
     final raised = double.tryParse('${_tiltifyStatus?['raised_amount'] ?? 0}') ?? 0;
     final goal = double.tryParse('${_tiltifyStatus?['goal_amount'] ?? 0}') ?? 0;
@@ -822,7 +828,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           ),
         ),
         const SizedBox(height: 8),
-        Text('$currency ${raised.toStringAsFixed(2)} raised of ${goal.toStringAsFixed(2)} goal',
+        Text(t.serverCampaignProgress(currency, raised.toStringAsFixed(2), goal.toStringAsFixed(2)),
             style: TextStyle(color: KodaColors.text3, fontSize: 12)),
         const SizedBox(height: 12),
         Row(children: [
@@ -832,12 +838,12 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                 final uri = Uri.parse(url);
                 if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
               },
-              child: const Text('View campaign'),
+              child: Text(t.serverViewCampaign),
             ),
           const Spacer(),
           TextButton(
             onPressed: _loadTiltifyStatus,
-            child: Text('Refresh', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+            child: Text(t.serverRefreshButton, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
           ),
         ]),
       ]),
@@ -850,6 +856,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     if (_loadingEmoji) {
       return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
+    final t = AppLocalizations.of(context);
     final limit = _boostStatus?['emoji_slot_limit'] as int? ?? 10;
     final level = _boostStatus?['level'] as int? ?? 0;
     final full = _emoji.length >= limit;
@@ -863,7 +870,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
               color: full ? KodaColors.accent : KodaColors.koda),
           const SizedBox(width: 10),
           Expanded(
-            child: Text('${_emoji.length} / $limit slots used -- boost level $level',
+            child: Text(t.serverEmojiSlotsUsed(_emoji.length, limit, level),
                 style: TextStyle(color: KodaColors.text2, fontSize: 12)),
           ),
           ElevatedButton.icon(
@@ -873,14 +880,14 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                 ? const SizedBox(width: 14, height: 14,
                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
                 : const Icon(Icons.add, size: 16),
-            label: const Text('Upload'),
+            label: Text(t.serverUploadButton),
             onPressed: (_uploadingEmoji || full) ? null : _uploadEmoji,
           ),
         ]),
       ),
       Expanded(
         child: _emoji.isEmpty
-            ? Center(child: Text('No custom emoji yet.',
+            ? Center(child: Text(t.serverNoCustomEmoji,
                 style: TextStyle(color: KodaColors.text3, fontSize: 13)))
             : GridView.builder(
                 padding: const EdgeInsets.all(16),
@@ -905,7 +912,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                           style: TextStyle(color: KodaColors.text2, fontSize: 10)),
                       IconButton(
                         icon: Icon(Icons.delete_outline, size: 14, color: KodaColors.accent),
-                        tooltip: 'Delete emoji',
+                        tooltip: t.serverDeleteEmojiTooltip,
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                         onPressed: () => _deleteEmoji(e['id'] as String),
@@ -919,17 +926,18 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   }
 
   Future<void> _uploadEmoji() async {
+    final t = AppLocalizations.of(context);
     final nameCtrl = TextEditingController();
     final name = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Upload Emoji', style: TextStyle(color: KodaColors.text1)),
-        content: KodaTextField(controller: nameCtrl, hintText: 'name (letters, numbers, _)'),
+        title: Text(t.serverUploadEmojiTitle, style: TextStyle(color: KodaColors.text1)),
+        content: KodaTextField(controller: nameCtrl, hintText: t.serverEmojiNameHint, autofocus: true),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(t.commonCancel)),
           TextButton(onPressed: () => Navigator.pop(ctx, nameCtrl.text.trim()),
-              child: const Text('Choose Image')),
+              child: Text(t.serverChooseImage)),
         ],
       ),
     );
@@ -979,6 +987,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   // -- Customize (boost-level-gated cosmetics) -------------------------------
 
   Widget _buildCustomizeTab() {
+    final t = AppLocalizations.of(context);
     final level = _boostStatus?['level'] as int? ?? 0;
     final cosmeticsUnlocked = _boostStatus?['cosmetics_unlocked'] as bool? ?? false;
     final iconBorderUnlocked = _boostStatus?['icon_border_unlocked'] as bool? ?? false;
@@ -988,15 +997,14 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     return ListView(padding: const EdgeInsets.all(20), children: [
       Padding(
         padding: const EdgeInsets.only(bottom: 12),
-        child: Text('Current boost level: $level',
+        child: Text(t.serverCurrentBoostLevel(level),
             style: TextStyle(color: KodaColors.text2, fontSize: 12, fontWeight: FontWeight.w600)),
       ),
       _customizeCard(
-        title: 'Server Background',
-        description: 'A custom background shown behind the channel view to '
-            'everyone in this server.',
+        title: t.serverBackgroundTitle,
+        description: t.serverBackgroundDescription,
         unlocked: cosmeticsUnlocked,
-        lockedHint: 'Reach boost level 4 to unlock a custom background.',
+        lockedHint: t.serverBackgroundLockedHint,
         child: cosmeticsUnlocked
             ? Row(children: [
                 if ((cosmetics['background_url'] as String?)?.isNotEmpty == true)
@@ -1013,7 +1021,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                       ? const SizedBox(width: 14, height: 14,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
                       : const Icon(Icons.image_outlined, size: 16),
-                  label: const Text('Choose Image'),
+                  label: Text(t.serverChooseImage),
                   onPressed: _uploadingBackground ? null : _pickBackground,
                 ),
               ])
@@ -1021,29 +1029,24 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       ),
       const SizedBox(height: 16),
       _customizeCard(
-        title: 'Server Icon Border',
-        description: "An accent border around this server's icon in every "
-            "member's server list.",
+        title: t.serverIconBorderTitle,
+        description: t.serverIconBorderDescription,
         unlocked: iconBorderUnlocked,
-        lockedHint: 'Reach boost level 5 to unlock a custom icon border.',
+        lockedHint: t.serverIconBorderLockedHint,
         child: iconBorderUnlocked
             ? Wrap(spacing: 8, runSpacing: 8, children: _colorSwatches.map((hex) {
                 final selected = cosmetics['icon_border_color'] == hex;
-                return Semantics(
-                  button: true,
+                return KodaTappable(
                   selected: selected,
-                  label: 'Color $hex',
-                  child: GestureDetector(
-                    onTap: () => _setIconBorderColor(hex),
-                    child: ExcludeSemantics(
-                      child: Container(
-                        width: 32, height: 32,
-                        decoration: BoxDecoration(
-                          color: _parseColor(hex),
-                          shape: BoxShape.circle,
-                          border: selected ? Border.all(color: Colors.white, width: 2) : null,
-                        ),
-                      ),
+                  semanticLabel: t.serverColorSwatchLabel(hex),
+                  borderRadius: BorderRadius.circular(999),
+                  onTap: () => _setIconBorderColor(hex),
+                  child: Container(
+                    width: 32, height: 32,
+                    decoration: BoxDecoration(
+                      color: _parseColor(hex),
+                      shape: BoxShape.circle,
+                      border: selected ? Border.all(color: Colors.white, width: 2) : null,
                     ),
                   ),
                 );
@@ -1052,11 +1055,11 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       ),
       if (!cosmeticsUnlocked || !iconBorderUnlocked) ...[
         const SizedBox(height: 16),
-        Text('Boost this server from the Server Bank in Marketplace to raise its level.',
+        Text(t.serverBoostFromBank,
             style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       ],
       const SizedBox(height: 24),
-      Text('MARKETPLACE LISTING', style: TextStyle(color: KodaColors.text3,
+      Text(t.serverMarketplaceListingLabel, style: TextStyle(color: KodaColors.text3,
           fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
       const SizedBox(height: 8),
       Container(
@@ -1069,11 +1072,9 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('List in Koda Marketplace', style: TextStyle(
+              Text(t.serverListInMarketplace, style: TextStyle(
                   color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
-              Text('Opts this server into the platform-wide Discover tab, '
-                  'and a chance at the weekly featured rotation. Separate '
-                  'from general server-join discoverability.',
+              Text(t.serverListInMarketplaceDescription,
                   style: TextStyle(color: KodaColors.text3, fontSize: 11)),
             ])),
             Switch(
@@ -1084,24 +1085,24 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           ]),
           if (server?['marketplace_discoverable'] == true) ...[
             const SizedBox(height: 12),
-            Text('Social / Invite Link (optional)',
+            Text(t.serverSocialLinkLabel,
                 style: TextStyle(color: KodaColors.text3, fontSize: 12)),
             const SizedBox(height: 4),
             KodaTextField(
               controller: _marketplaceLinkCtrl,
-              hintText: 'https://...',
+              hintText: t.serverSocialLinkHint,
               onSubmitted: (_) => _saveMarketplaceLink(),
             ),
             const SizedBox(height: 4),
             TextButton(
               onPressed: _saveMarketplaceLink,
-              child: const Text('Save Link'),
+              child: Text(t.serverSaveLinkButton),
             ),
           ],
         ]),
       ),
       const SizedBox(height: 16),
-      Text('PRICING', style: TextStyle(color: KodaColors.text3,
+      Text(t.serverPricingLabel, style: TextStyle(color: KodaColors.text3,
           fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
       const SizedBox(height: 8),
       Container(
@@ -1112,10 +1113,9 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           border: Border.all(color: KodaColors.border),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Primary Currency', style: TextStyle(
+          Text(t.serverPrimaryCurrencyLabel, style: TextStyle(
               color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
-          Text('Applies to Server Subscription tiers and Digital Goods prices '
-              'you set for this server.',
+          Text(t.serverPrimaryCurrencyDescription,
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           const SizedBox(height: 10),
           DropdownButton<String>(
@@ -1126,6 +1126,32 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             items: _currencyOptions.map((c) => DropdownMenuItem(
                   value: c,
                   child: Text(c),
+                )).toList(),
+          ),
+        ]),
+      ),
+      const SizedBox(height: 16),
+      Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: KodaColors.card,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: KodaColors.border),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(t.serverPrimaryLanguageLabel, style: TextStyle(
+              color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
+          Text(t.serverPrimaryLanguageDescription,
+              style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+          const SizedBox(height: 10),
+          DropdownButton<String>(
+            value: server?['primary_language'] as String? ?? 'en',
+            dropdownColor: KodaColors.card,
+            style: TextStyle(color: KodaColors.text1, fontSize: 13),
+            onChanged: (v) { if (v != null) _setPrimaryLanguage(v); },
+            items: kodaLanguageOptions.map((l) => DropdownMenuItem(
+                  value: l.code,
+                  child: Text(l.nativeName),
                 )).toList(),
           ),
         ]),
@@ -1154,13 +1180,21 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     if (updated != null && mounted) {
       ref.read(selectedServerProvider.notifier).state = updated;
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Marketplace link saved.')));
+          SnackBar(content: Text(AppLocalizations.of(context).serverMarketplaceLinkSaved)));
     }
   }
 
   Future<void> _setPrimaryCurrency(String currency) async {
     final updated = await KodaApi.instance.updateServer(
         _serverId, {'primary_currency': currency});
+    if (updated != null && mounted) {
+      ref.read(selectedServerProvider.notifier).state = updated;
+    }
+  }
+
+  Future<void> _setPrimaryLanguage(String language) async {
+    final updated = await KodaApi.instance.updateServer(
+        _serverId, {'primary_language': language});
     if (updated != null && mounted) {
       ref.read(selectedServerProvider.notifier).state = updated;
     }
@@ -1262,7 +1296,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         ref.read(selectedServerProvider.notifier).state = {
           ...server, 'icon_url': uploaded.cdnUrl};
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Server icon updated!')));
+            SnackBar(content: Text(AppLocalizations.of(context).serverIconUpdated)));
       }
     } on UploadException catch (e) {
       if (mounted) {
@@ -1273,6 +1307,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   }
 
   Widget _buildChannelsTab() {
+    final t = AppLocalizations.of(context);
     final uncategorized = _channels.where((c) => c['category_id'] == null).toList();
 
     return ListView(
@@ -1292,13 +1327,13 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                     onImported: () {
                       _loadAll();
                       ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Template imported!')));
+                          SnackBar(content: Text(t.serverTemplateImported)));
                     },
                   ),
                 );
               },
               icon: Icon(Icons.download_outlined, size: 16, color: KodaColors.text3),
-              label: Text('Import from Discord',
+              label: Text(t.serverImportFromDiscord,
                   style: TextStyle(color: KodaColors.text3)),
             ),
             TextButton.icon(
@@ -1309,17 +1344,17 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                   onApplied: (_) {
                     _loadAll();
                     ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Visp\'s plan is live!')));
+                        SnackBar(content: Text(t.serverVispPlanLive)));
                   },
                 );
               },
               icon: Icon(Icons.auto_awesome, size: 16, color: KodaColors.koda),
-              label: Text('Ask Visp', style: TextStyle(color: KodaColors.koda)),
+              label: Text(t.serverAskVisp, style: TextStyle(color: KodaColors.koda)),
             ),
             TextButton.icon(
               onPressed: () => _showCategoryDialog(),
               icon: Icon(Icons.add, size: 16, color: KodaColors.koda),
-              label: Text('Add Category', style: TextStyle(color: KodaColors.koda)),
+              label: Text(t.serverAddCategoryButton, style: TextStyle(color: KodaColors.koda)),
             ),
           ],
         ),
@@ -1341,7 +1376,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                 trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                   IconButton(
                     icon: Icon(Icons.add, size: 16, color: KodaColors.text3),
-                    tooltip: 'Add channel here',
+                    tooltip: t.serverAddChannelHereTooltip,
                     onPressed: () => _showChannelDialog(categoryId: cat['id'] as String),
                   ),
                   PopupMenuButton<String>(
@@ -1349,9 +1384,9 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                     color: KodaColors.card,
                     onSelected: (v) =>
                         v == 'rename' ? _showCategoryDialog(existing: cat) : _deleteCategory(cat),
-                    itemBuilder: (_) => const [
-                      PopupMenuItem(value: 'rename', child: Text('Rename')),
-                      PopupMenuItem(value: 'delete', child: Text('Delete')),
+                    itemBuilder: (_) => [
+                      PopupMenuItem(value: 'rename', child: Text(t.serverRename)),
+                      PopupMenuItem(value: 'delete', child: Text(t.commonDelete)),
                     ],
                   ),
                 ]),
@@ -1363,7 +1398,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         if (uncategorized.isNotEmpty) ...[
           Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
-            child: Text('UNCATEGORIZED',
+            child: Text(t.serverUncategorized,
                 style: TextStyle(color: KodaColors.text3, fontSize: 12, fontWeight: FontWeight.w700)),
           ),
           ...uncategorized.map(_channelTile),
@@ -1372,13 +1407,14 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         OutlinedButton.icon(
           onPressed: () => _showChannelDialog(),
           icon: const Icon(Icons.add, size: 16),
-          label: const Text('Add Channel'),
+          label: Text(t.serverAddChannel),
         ),
       ],
     );
   }
 
   Widget _channelTile(Map<String, dynamic> ch) {
+    final t = AppLocalizations.of(context);
     final type = ch['type'] as String? ?? 'text';
     final icon = switch (type) {
       'voice'       => Icons.volume_up,
@@ -1405,11 +1441,11 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           }
         },
         itemBuilder: (_) => [
-          const PopupMenuItem(value: 'edit', child: Text('Edit')),
+          PopupMenuItem(value: 'edit', child: Text(t.commonEdit)),
           if (type == 'rules')
-            const PopupMenuItem(value: 'edit_rules',
-                child: Text('Edit Rules Content')),
-          const PopupMenuItem(value: 'delete', child: Text('Delete')),
+            PopupMenuItem(value: 'edit_rules',
+                child: Text(t.serverEditRulesContent)),
+          PopupMenuItem(value: 'delete', child: Text(t.commonDelete)),
         ],
       ),
     );
@@ -1419,13 +1455,14 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   Future<void> _showRulesContentDialog(Map<String, dynamic> ch) async {
     final server = ref.read(selectedServerProvider);
     if (server == null) return;
+    final t = AppLocalizations.of(context);
     final contentController = TextEditingController(
         text: ch['rules_content'] as String? ?? '');
     final saved = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Edit Rules Content',
+        title: Text(t.serverEditRulesContent,
             style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 480,
@@ -1435,7 +1472,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             maxLines: 12,
             style: TextStyle(color: KodaColors.text1, fontSize: 13),
             decoration: InputDecoration(
-              hintText: 'Enter your server rules here...',
+              hintText: t.serverRulesContentHint,
               contentPadding: const EdgeInsets.all(12),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -1446,9 +1483,9 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+              child: Text(t.commonCancel)),
           TextButton(onPressed: () => Navigator.pop(ctx, true),
-              child: Text('Save',
+              child: Text(t.commonSave,
                   style: TextStyle(color: KodaColors.koda))),
         ],
       ),
@@ -1458,11 +1495,12 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         server['id'] as String, contentController.text.trim());
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Rules updated!')));
+        SnackBar(content: Text(t.serverRulesUpdated)));
     _loadAll();
   }
 
   Widget _buildRolesTab() {
+    final t = AppLocalizations.of(context);
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -1471,7 +1509,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           child: TextButton.icon(
             onPressed: () => _showRoleEditor(),
             icon: Icon(Icons.add, size: 16, color: KodaColors.koda),
-            label: Text('Add Role', style: TextStyle(color: KodaColors.koda)),
+            label: Text(t.serverAddRole, style: TextStyle(color: KodaColors.koda)),
           ),
         ),
         ..._roles.map((role) {
@@ -1489,16 +1527,16 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                   decoration: BoxDecoration(color: roleColor, shape: BoxShape.circle)),
               title: Text(role['name'], style: TextStyle(color: KodaColors.text1, fontSize: 13)),
               subtitle: role['is_default'] == true
-                  ? Text('Default role', style: TextStyle(color: KodaColors.text3, fontSize: 11))
+                  ? Text(t.serverDefaultRoleLabel, style: TextStyle(color: KodaColors.text3, fontSize: 11))
                   : null,
               trailing: PopupMenuButton<String>(
                 icon: Icon(Icons.more_vert, size: 16, color: KodaColors.text3),
                 color: KodaColors.card,
                 onSelected: (v) => v == 'edit' ? _showRoleEditor(existing: role) : _deleteRole(role),
                 itemBuilder: (_) => [
-                  const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                  PopupMenuItem(value: 'edit', child: Text(t.commonEdit)),
                   if (role['is_default'] != true)
-                    const PopupMenuItem(value: 'delete', child: Text('Delete')),
+                    PopupMenuItem(value: 'delete', child: Text(t.commonDelete)),
                 ],
               ),
               onTap: () => _showRoleEditor(existing: role),
@@ -1510,6 +1548,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   }
 
   Widget _buildMembersTab() {
+    final t = AppLocalizations.of(context);
     final me = ref.read(authProvider).user;
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -1548,14 +1587,14 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 IconButton(
                   icon: Icon(Icons.edit, size: 16, color: KodaColors.text3),
-                  tooltip: 'Manage Roles',
+                  tooltip: t.serverManageRolesTooltip,
                   onPressed: () => _showMemberRolesDialog(m),
                 ),
                 if (_isCurrentlyMuted(m))
                   Padding(
                     padding: EdgeInsets.only(right: 4),
                     child: Semantics(
-                      label: 'Muted',
+                      label: t.serverMutedLabel,
                       child: Icon(Icons.volume_off, size: 14, color: KodaColors.gold),
                     ),
                   ),
@@ -1565,12 +1604,12 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                     color: KodaColors.card,
                     itemBuilder: (_) => [
                       if (_isCurrentlyMuted(m))
-                        const PopupMenuItem(value: 'unmute', child: Text('Unmute'))
+                        PopupMenuItem(value: 'unmute', child: Text(t.serverUnmute))
                       else
-                        const PopupMenuItem(value: 'mute', child: Text('Mute')),
-                      const PopupMenuItem(value: 'kick', child: Text('Kick')),
+                        PopupMenuItem(value: 'mute', child: Text(t.serverMute)),
+                      PopupMenuItem(value: 'kick', child: Text(t.serverKick)),
                       PopupMenuItem(value: 'ban',
-                          child: Text('Ban', style: TextStyle(color: KodaColors.accent))),
+                          child: Text(t.serverBan, style: TextStyle(color: KodaColors.accent))),
                     ],
                     onSelected: (action) => action == 'mute'
                         ? _muteMember(m)
@@ -1586,7 +1625,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         const SizedBox(height: 8),
         MergeSemantics(
           child: Semantics(
-            label: _showBans ? 'expanded' : 'collapsed',
+            label: _showBans ? t.serverExpandedLabel : t.serverCollapsedLabel,
             child: InkWell(
           onTap: () => setState(() => _showBans = !_showBans),
           child: Padding(
@@ -1595,7 +1634,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
               Icon(_showBans ? Icons.expand_more : Icons.chevron_right,
                   size: 16, color: KodaColors.text3),
               const SizedBox(width: 4),
-              Text('BANNED USERS — ${_bans.length}',
+              Text(t.serverBannedUsersLabel(_bans.length),
                   style: TextStyle(color: KodaColors.text3, fontSize: 11,
                       fontWeight: FontWeight.w700, letterSpacing: 0.5)),
             ]),
@@ -1607,7 +1646,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           if (_bans.isEmpty)
             Padding(
               padding: EdgeInsets.symmetric(vertical: 8),
-              child: Text('No banned users.', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+              child: Text(t.serverNoBannedUsers, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
             )
           else
             ..._bans.map((b) => Container(
@@ -1627,7 +1666,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                             .unbanMember(_serverId, b['user_id'] as String);
                         if (ok) _loadAll();
                       },
-                      child: const Text('Unban'),
+                      child: Text(t.serverUnban),
                     ),
                   ),
                 )),
@@ -1637,21 +1676,22 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
 
   Future<void> _kickOrBanMember(Map<String, dynamic> member, String action) async {
     final server = ref.read(selectedServerProvider);
-    final username = member['username'] as String? ?? 'this member';
+    final t = AppLocalizations.of(context);
+    final username = member['username'] as String? ?? t.serverMemberFallbackGeneric;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: KodaColors.card,
         content: Text(
             action == 'ban'
-                ? 'Ban $username from ${server?['name']}? They will not be able to rejoin without being unbanned.'
-                : 'Kick $username from ${server?['name']}? They can rejoin with an invite.',
+                ? t.serverBanConfirm(username, server?['name'] as String? ?? '')
+                : t.serverKickConfirm(username, server?['name'] as String? ?? ''),
             style: TextStyle(color: KodaColors.text1)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t.commonCancel)),
           TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text(action == 'ban' ? 'Ban' : 'Kick',
+              child: Text(action == 'ban' ? t.serverBan : t.serverKick,
                   style: TextStyle(color: KodaColors.accent))),
         ],
       ),
@@ -1669,8 +1709,13 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       // opportunistic top-up covers anything that doesn't land here.
       final myUserId = ref.read(authProvider).user?.id;
       if (myUserId != null) {
+        // Voice channels now carry real encrypted chat (see
+        // ChannelChatPanel) using this same epoch-key mechanism -- a
+        // departed member must lose read access there too, not just in
+        // text channels, or their device keeps a live key and can keep
+        // decrypting new voice-channel chat after removal.
         for (final channel in _channels) {
-          if (channel['type'] == 'text') {
+          if (channel['type'] == 'text' || channel['type'] == 'voice') {
             ChannelKeyManager.instance.rotateAfterDeparture(
                 channel['id'] as String, myUserId: myUserId, serverId: _serverId);
           }
@@ -1679,7 +1724,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       _loadAll();
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not ${action == 'ban' ? 'ban' : 'kick'} $username.')));
+          SnackBar(content: Text(t.serverCouldNotModerateMember(
+              (action == 'ban' ? t.serverBan : t.serverKick).toLowerCase(), username))));
     }
   }
 
@@ -1690,24 +1736,39 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     return until != null && until.isAfter(DateTime.now().toUtc());
   }
 
+  // Keys are stable identifiers (also used to look up the mute duration
+  // in seconds) -- display labels are localized separately in
+  // _muteDurationLabels, since a translated string can't double as a
+  // lookup key the way the English word could.
   static const _muteDurations = <String, int>{
-    '60 seconds': 60,
-    '5 minutes': 300,
-    '10 minutes': 600,
-    '1 hour': 3600,
-    '1 day': 86400,
-    '1 week': 604800,
+    'sec60': 60,
+    'min5': 300,
+    'min10': 600,
+    'hour1': 3600,
+    'day1': 86400,
+    'week1': 604800,
+  };
+
+  Map<String, String> _muteDurationLabels(AppLocalizations t) => {
+    'sec60': t.serverMuteDuration60Sec,
+    'min5': t.serverMuteDuration5Min,
+    'min10': t.serverMuteDuration10Min,
+    'hour1': t.serverMuteDuration1Hour,
+    'day1': t.serverMuteDuration1Day,
+    'week1': t.serverMuteDuration1Week,
   };
 
   Future<void> _muteMember(Map<String, dynamic> member) async {
-    final username = member['username'] as String? ?? 'this member';
-    var selected = '10 minutes';
+    final t = AppLocalizations.of(context);
+    final username = member['username'] as String? ?? t.serverMemberFallbackGeneric;
+    var selected = 'min10';
+    final labels = _muteDurationLabels(t);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: Text('Mute $username', style: TextStyle(color: KodaColors.text1)),
+          title: Text(t.serverMuteUserTitle(username), style: TextStyle(color: KodaColors.text1)),
           content: Column(mainAxisSize: MainAxisSize.min, children: [
             DropdownButton<String>(
               value: selected,
@@ -1716,15 +1777,15 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
               style: TextStyle(color: KodaColors.text1, fontSize: 13),
               onChanged: (v) => setDialogState(() => selected = v!),
               items: _muteDurations.keys
-                  .map((k) => DropdownMenuItem(value: k, child: Text(k)))
+                  .map((k) => DropdownMenuItem(value: k, child: Text(labels[k] ?? k)))
                   .toList(),
             ),
           ]),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t.commonCancel)),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text('Mute', style: TextStyle(color: KodaColors.gold)),
+              child: Text(t.serverMute, style: TextStyle(color: KodaColors.gold)),
             ),
           ],
         ),
@@ -1738,7 +1799,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       _loadAll();
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not mute $username.')));
+          SnackBar(content: Text(t.serverCouldNotMuteMember(username))));
     }
   }
 
@@ -1753,35 +1814,36 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         (m) => m?['user_id'] == userId, orElse: () => null)?['username'] as String?;
   }
 
-  static const Map<String, String> _actionLabels = {
-    'kick': 'kicked', 'ban': 'banned', 'unban': 'unbanned',
-    'mute': 'muted', 'unmute': 'unmuted',
-    'flood_detected': 'auto-muted for flooding',
-    'raid_lockdown_enabled': 'locked invites (raid protection)',
-    'raid_lockdown_disabled': 'unlocked invites',
+  Map<String, String> _actionLabels(AppLocalizations t) => {
+    'kick': t.serverActionKicked, 'ban': t.serverActionBanned, 'unban': t.serverActionUnbanned,
+    'mute': t.serverActionMuted, 'unmute': t.serverActionUnmuted,
+    'flood_detected': t.serverActionFloodDetected,
+    'raid_lockdown_enabled': t.serverActionRaidLockdownEnabled,
+    'raid_lockdown_disabled': t.serverActionRaidLockdownDisabled,
+    'voice_moved': t.serverActionMoved,
   };
 
   Widget _buildAuditLogTab() {
+    final t = AppLocalizations.of(context);
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         Row(children: [
           Expanded(
             child: Text(
-              'Tier 1 moderation activity -- kicks, bans, mutes, and automated '
-              'flood/raid protection. Metadata only; never message content.',
+              t.serverAuditLogDescription,
               style: TextStyle(color: KodaColors.text3, fontSize: 12),
             ),
           ),
           const SizedBox(width: 8),
           OutlinedButton.icon(
             icon: const Icon(Icons.lock_open, size: 14),
-            label: const Text('Unlock Invites'),
+            label: Text(t.serverUnlockInvites),
             onPressed: () async {
               final ok = await KodaApi.instance.unlockInvites(_serverId);
               if (ok && mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Invites unlocked.')));
+                    SnackBar(content: Text(t.serverInvitesUnlocked)));
                 _loadAll();
               }
             },
@@ -1791,14 +1853,14 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         if (_auditActions.isEmpty)
           Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
-            child: Text('No moderation activity yet.',
+            child: Text(t.serverNoModerationActivity,
                 style: TextStyle(color: KodaColors.text3, fontSize: 13)),
           )
         else
           ..._auditActions.map((a) {
-            final actor = _usernameFor(a['actor_id'] as String?) ?? 'System';
+            final actor = _usernameFor(a['actor_id'] as String?) ?? t.serverSystemActor;
             final target = _usernameFor(a['target_user_id'] as String?);
-            final label = _actionLabels[a['action']] ?? a['action'] as String? ?? 'unknown action';
+            final label = _actionLabels(t)[a['action']] ?? a['action'] as String? ?? t.serverUnknownAction;
             final reason = a['reason'] as String?;
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 6),
@@ -1837,6 +1899,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   // belong to and go to a separate platform-admin queue instead (see
   // Koda.Reports.list_dm_reports's doc comment).
   Widget _buildReportsTab() {
+    final t = AppLocalizations.of(context);
     final pending = _reports.where((r) => r['status'] == 'pending').toList();
     final resolved = _reports.where((r) => r['status'] != 'pending').toList();
 
@@ -1844,22 +1907,21 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       padding: const EdgeInsets.all(16),
       children: [
         Text(
-          'Messages reported by members of this server -- the reporter\'s own '
-          'already-decrypted copy, disclosed by reporting.',
+          t.serverReportsDescription,
           style: TextStyle(color: KodaColors.text3, fontSize: 12),
         ),
         const SizedBox(height: 16),
         if (pending.isEmpty)
           Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
-            child: Text('No pending reports.',
+            child: Text(t.serverNoPendingReports,
                 style: TextStyle(color: KodaColors.text3, fontSize: 13)),
           )
         else
           ...pending.map(_buildReportCard),
         if (resolved.isNotEmpty) ...[
           const SizedBox(height: 20),
-          Text('RESOLVED', style: TextStyle(
+          Text(t.serverResolvedLabel, style: TextStyle(
               color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
           const SizedBox(height: 8),
           ...resolved.map(_buildReportCard),
@@ -1869,8 +1931,9 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   }
 
   Widget _buildReportCard(Map<String, dynamic> r) {
-    final reporter = _usernameFor(r['reporter_id'] as String?) ?? 'Unknown';
-    final target = _usernameFor(r['target_user_id'] as String?) ?? 'Unknown';
+    final t = AppLocalizations.of(context);
+    final reporter = _usernameFor(r['reporter_id'] as String?) ?? t.dmUnknownUser;
+    final target = _usernameFor(r['target_user_id'] as String?) ?? t.dmUnknownUser;
     final status = r['status'] as String? ?? 'pending';
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -1882,14 +1945,14 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text(r['reason'] as String? ?? 'other',
+          Text(r['reason'] as String? ?? t.serverReportReasonOther,
               style: TextStyle(color: KodaColors.koda, fontSize: 11, fontWeight: FontWeight.w700)),
           const Spacer(),
           Text(_formatAuditTime(r['inserted_at'] as String?),
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         ]),
         const SizedBox(height: 6),
-        Text('Reported by $reporter -- sent by $target',
+        Text(t.serverReportedBy(reporter, target),
             style: TextStyle(color: KodaColors.text2, fontSize: 12)),
         const SizedBox(height: 6),
         Container(
@@ -1902,7 +1965,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         ),
         if ((r['note'] as String?)?.isNotEmpty ?? false) ...[
           const SizedBox(height: 6),
-          Text('Note: ${r['note']}',
+          Text(t.serverReportNote(r['note'] as String? ?? ''),
               style: TextStyle(color: KodaColors.text3, fontSize: 11, fontStyle: FontStyle.italic)),
         ],
         if (status == 'pending') ...[
@@ -1910,18 +1973,18 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           Row(children: [
             TextButton(
               onPressed: () => _resolveReport(r['id'] as String, 'dismissed'),
-              child: const Text('Dismiss'),
+              child: Text(t.serverDismissButton),
             ),
             const SizedBox(width: 4),
             TextButton(
               onPressed: () => _resolveReport(r['id'] as String, 'actioned'),
-              child: Text('Mark Actioned', style: TextStyle(color: KodaColors.accent)),
+              child: Text(t.serverMarkActioned, style: TextStyle(color: KodaColors.accent)),
             ),
           ]),
         ] else
           Padding(
             padding: const EdgeInsets.only(top: 6),
-            child: Text(status == 'actioned' ? 'Actioned' : 'Dismissed',
+            child: Text(status == 'actioned' ? t.serverReportStatusActioned : t.serverReportStatusDismissed,
                 style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           ),
       ]),
@@ -1946,6 +2009,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     if (server == null) return const SizedBox();
     final serverId = server['id'] as String;
 
+    final t = AppLocalizations.of(context);
     return FutureBuilder<List<Map<String, dynamic>>>(
       future: KodaApi.instance.listInvites(serverId),
       builder: (context, snapshot) {
@@ -1958,7 +2022,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(backgroundColor: KodaColors.koda),
                 icon: const Icon(Icons.add_link, size: 16, color: Colors.white),
-                label: const Text('Create Invite', style: TextStyle(color: Colors.white)),
+                label: Text(t.serverCreateInvite, style: TextStyle(color: Colors.white)),
                 onPressed: () async {
                   final invite = await KodaApi.instance.createInvite(serverId);
                   if (invite != null && context.mounted) {
@@ -1968,14 +2032,14 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                       context: context,
                       builder: (_) => AlertDialog(
                         backgroundColor: KodaColors.card,
-                        title: Text('Invite Created',
+                        title: Text(t.serverInviteCreatedTitle,
                             style: TextStyle(color: KodaColors.text1)),
                         content: SelectableText(url,
                             style: TextStyle(color: KodaColors.koda)),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: const Text('Done')),
+                            child: Text(t.commonDone)),
                         ],
                       ),
                     );
@@ -1985,7 +2049,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             ),
             const SizedBox(height: 16),
             if (invites.isEmpty)
-              Center(child: Text('No active invites',
+              Center(child: Text(t.serverNoActiveInvites,
                   style: TextStyle(color: KodaColors.text3)))
             else
               ...invites.map((inv) {
@@ -2007,13 +2071,13 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                           inv['url'] as String? ?? '',
                           style: TextStyle(color: KodaColors.koda, fontSize: 13),
                         ),
-                        Text('Uses: $usesStr',
+                        Text(t.serverUsesLabel(usesStr),
                           style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                       ]),
                     ),
                     IconButton(
                       icon: Icon(Icons.delete_outline, size: 16, color: KodaColors.accent),
-                      tooltip: 'Delete invite',
+                      tooltip: t.serverDeleteInviteTooltip,
                       onPressed: () async {
                         await KodaApi.instance.deleteInvite(
                             serverId, inv['code'] as String);

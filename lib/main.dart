@@ -7,8 +7,14 @@ import 'package:audio_session/audio_session.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_langdetect/flutter_langdetect.dart' as langdetect;
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
 import 'core/accessibility_prefs.dart';
+import 'core/language_prefs.dart';
+import 'core/language_options.dart';
 import 'core/api.dart';
+import 'l10n/generated/app_localizations.dart';
 import 'core/crypto/dm_session_manager.dart';
 import 'core/platform.dart';
 import 'core/providers.dart';
@@ -57,6 +63,20 @@ void main(List<String> args) async {
     await TrayService.instance.init();
   }
 
+  if (isAndroid) {
+    // Documented flutter_webrtc lever for devices whose OEM hardware
+    // AEC/NS is unreliable -- forces WebRTC's own software audio
+    // processing chain instead of deferring to the platform's, at zero
+    // engineering cost. See VoiceSettings in core/providers.dart for the
+    // noise-suppression/echo-cancellation toggles this complements.
+    await rtc.WebRTC.initialize(options: {'androidUseHardwareAudioProcessing': false});
+  }
+
+  // Message language auto-detection (see core/message_language.dart) --
+  // pure in-memory n-gram profiles, no asset loading, cheap enough to
+  // do once here alongside everything else that inits before runApp.
+  await langdetect.initLangDetect();
+
   try {
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration(
@@ -78,6 +98,8 @@ class KodaApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final a11y = ref.watch(accessibilityPrefsProvider);
+    final languagePrefs = ref.watch(languagePrefsProvider);
+    final uiLocale = languagePrefs.uiLocale;
 
     // A deliberate side effect during build, not a widget/State mutation
     // -- KodaColors is a plain static palette selector (see theme.dart),
@@ -89,6 +111,14 @@ class KodaApp extends ConsumerWidget {
     return MaterialApp(
       title: 'Koda',
       debugShowCheckedModeBanner: false,
+      locale: uiLocale != null ? _localeFromCode(uiLocale) : null,
+      supportedLocales: kodaLanguageOptions.map((l) => _localeFromCode(l.code)),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: kodaTheme(
         dyslexiaFont: a11y.dyslexiaFont,
         visualDensity: _visualDensity(a11y.density),
@@ -111,7 +141,7 @@ class KodaApp extends ConsumerWidget {
       // High Contrast toggle's subtitle for the same trade-off spelled
       // out to the user.
       home: KeyedSubtree(
-        key: ValueKey('root-${a11y.highContrast}'),
+        key: ValueKey('root-${a11y.highContrast}-$uiLocale'),
         child: const AuthGate(),
       ),
     );
@@ -123,6 +153,14 @@ class KodaApp extends ConsumerWidget {
       case 'comfortable': return VisualDensity.comfortable;
       default:            return VisualDensity.standard;
     }
+  }
+
+  Locale _localeFromCode(String code) {
+    // Only zh_Hant (Traditional Chinese) needs a script subtag today --
+    // see language_options.dart. Every other code is a plain ISO 639-1
+    // language code.
+    if (code == 'zh_Hant') return const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant');
+    return Locale(code);
   }
 }
 
@@ -236,8 +274,10 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       final hasUser = next.user != null;
       if (!hadUser && hasUser) {
         ref.read(accessibilityPrefsProvider.notifier).load();
+        ref.read(languagePrefsProvider.notifier).load();
       } else if (hadUser && !hasUser) {
         ref.read(accessibilityPrefsProvider.notifier).reset();
+        ref.read(languagePrefsProvider.notifier).reset();
       }
     });
     final auth = ref.watch(authProvider);

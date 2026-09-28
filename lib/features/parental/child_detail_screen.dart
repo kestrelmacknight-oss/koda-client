@@ -7,11 +7,22 @@
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 
-const _weekdays = [
-  ('mon', 'Monday'), ('tue', 'Tuesday'), ('wed', 'Wednesday'),
-  ('thu', 'Thursday'), ('fri', 'Friday'), ('sat', 'Saturday'), ('sun', 'Sunday'),
+// Internal lookup keys only (stable, sent to the API) -- display labels
+// are localized separately via _weekdayLabels(t) below, since those need
+// a BuildContext.
+const _weekdayKeys = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+List<(String, String)> _weekdayLabels(AppLocalizations t) => [
+  ('mon', t.childDetailMonday),
+  ('tue', t.childDetailTuesday),
+  ('wed', t.childDetailWednesday),
+  ('thu', t.childDetailThursday),
+  ('fri', t.childDetailFriday),
+  ('sat', t.childDetailSaturday),
+  ('sun', t.childDetailSunday),
 ];
 
 // A small curated list rather than a full IANA picker -- good enough to
@@ -46,22 +57,23 @@ class _ChildDetailScreenState extends State<ChildDetailScreen>
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: Text(widget.child['username'] as String? ?? 'Child account',
+        title: Text(widget.child['username'] as String? ?? t.childDetailFallbackTitle,
             style: TextStyle(color: KodaColors.text1, fontSize: 16, fontWeight: FontWeight.w700)),
         bottom: TabBar(
           controller: _tabs,
           indicatorColor: KodaColors.koda,
           labelColor: KodaColors.text1,
           unselectedLabelColor: KodaColors.text3,
-          tabs: const [
-            Tab(text: 'Friends'),
-            Tab(text: 'Servers'),
-            Tab(text: 'Schedule'),
-            Tab(text: 'Override'),
+          tabs: [
+            Tab(text: t.childDetailTabFriends),
+            Tab(text: t.childDetailTabServers),
+            Tab(text: t.childDetailTabSchedule),
+            Tab(text: t.childDetailTabOverride),
           ],
         ),
       ),
@@ -108,9 +120,10 @@ class _ChildFriendsTabState extends State<_ChildFriendsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     if (_loading) return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     if (_friends.isEmpty) {
-      return Center(child: Text('No friends.', style: TextStyle(color: KodaColors.text3)));
+      return Center(child: Text(t.childDetailNoFriends, style: TextStyle(color: KodaColors.text3)));
     }
     return ListView.builder(
       padding: const EdgeInsets.all(16),
@@ -120,11 +133,11 @@ class _ChildFriendsTabState extends State<_ChildFriendsTab> {
         return ListTile(
           leading: KodaAvatar(username: f['username'] as String? ?? '?',
               avatarUrl: f['avatar_url'] as String?, size: 32),
-          title: Text(f['username'] as String? ?? 'Unknown',
+          title: Text(f['username'] as String? ?? t.childDetailUnknownUser,
               style: TextStyle(color: KodaColors.text1)),
           trailing: IconButton(
             icon: Icon(Icons.person_remove_outlined, color: KodaColors.accent, size: 18),
-            tooltip: 'Remove friend',
+            tooltip: t.childDetailRemoveFriendTooltip,
             onPressed: () => _remove(f),
           ),
         );
@@ -166,9 +179,10 @@ class _ChildServersTabState extends State<_ChildServersTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     if (_loading) return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     if (_servers.isEmpty) {
-      return Center(child: Text('Not in any servers.', style: TextStyle(color: KodaColors.text3)));
+      return Center(child: Text(t.childDetailNoServers, style: TextStyle(color: KodaColors.text3)));
     }
     return ListView.builder(
       padding: const EdgeInsets.all(16),
@@ -185,13 +199,13 @@ class _ChildServersTabState extends State<_ChildServersTab> {
                     style: TextStyle(color: KodaColors.text1))
                 : null,
           ),
-          title: Text(s['name'] as String? ?? 'Unknown',
+          title: Text(s['name'] as String? ?? t.childDetailUnknownUser,
               style: TextStyle(color: KodaColors.text1)),
-          subtitle: Text('${s['member_count'] ?? 0} members',
+          subtitle: Text(t.childDetailMemberCount(s['member_count'] as int? ?? 0),
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           trailing: IconButton(
             icon: Icon(Icons.exit_to_app, color: KodaColors.accent, size: 18),
-            tooltip: 'Remove from server',
+            tooltip: t.childDetailRemoveServerTooltip,
             onPressed: () => _remove(s),
           ),
         );
@@ -216,7 +230,7 @@ class _ChildScheduleTabState extends State<_ChildScheduleTab> {
   String _timezone = 'UTC';
   // One optional [start, end] window per weekday, in minutes since midnight.
   final Map<String, ({TimeOfDay start, TimeOfDay end})?> _windows = {
-    for (final (key, _) in _weekdays) key: null,
+    for (final key in _weekdayKeys) key: null,
   };
 
   @override
@@ -233,7 +247,7 @@ class _ChildScheduleTabState extends State<_ChildScheduleTab> {
         _restricted = true;
         _timezone = schedule['timezone'] as String? ?? 'UTC';
         final windows = Map<String, dynamic>.from(schedule['windows'] as Map? ?? {});
-        for (final (key, _) in _weekdays) {
+        for (final key in _weekdayKeys) {
           final dayWindows = windows[key] as List?;
           if (dayWindows != null && dayWindows.isNotEmpty) {
             final w = List<int>.from(dayWindows.first as List);
@@ -266,8 +280,9 @@ class _ChildScheduleTabState extends State<_ChildScheduleTab> {
     }
     if (!mounted) return;
     setState(() => _saving = false);
+    final t = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Schedule saved.')));
+        SnackBar(content: Text(t.childDetailScheduleSaved)));
   }
 
   Future<void> _pickTime(String day, bool isStart) async {
@@ -285,6 +300,7 @@ class _ChildScheduleTabState extends State<_ChildScheduleTab> {
   @override
   Widget build(BuildContext context) {
     if (_loading) return Center(child: CircularProgressIndicator(color: KodaColors.koda));
+    final t = AppLocalizations.of(context);
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -297,9 +313,9 @@ class _ChildScheduleTabState extends State<_ChildScheduleTab> {
           ),
           child: SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: Text('Restrict access to set hours',
+            title: Text(t.childDetailRestrictAccessTitle,
                 style: TextStyle(color: KodaColors.text1, fontSize: 13)),
-            subtitle: Text('Off means unrestricted access at any time',
+            subtitle: Text(t.childDetailRestrictAccessSubtitle,
                 style: TextStyle(color: KodaColors.text3, fontSize: 11)),
             activeThumbColor: KodaColors.koda,
             value: _restricted,
@@ -312,14 +328,14 @@ class _ChildScheduleTabState extends State<_ChildScheduleTab> {
             initialValue: _timezones.contains(_timezone) ? _timezone : 'UTC',
             dropdownColor: KodaColors.card,
             style: TextStyle(color: KodaColors.text1),
-            decoration: const InputDecoration(labelText: 'Timezone'),
+            decoration: InputDecoration(labelText: t.childDetailTimezoneLabel),
             items: _timezones
                 .map((tz) => DropdownMenuItem(value: tz, child: Text(tz)))
                 .toList(),
             onChanged: (v) => setState(() => _timezone = v ?? 'UTC'),
           ),
           const SizedBox(height: 12),
-          for (final (key, label) in _weekdays) _buildDayRow(key, label),
+          for (final (key, label) in _weekdayLabels(t)) _buildDayRow(key, label, t),
         ],
         const SizedBox(height: 16),
         ElevatedButton(
@@ -329,13 +345,13 @@ class _ChildScheduleTabState extends State<_ChildScheduleTab> {
             minimumSize: const Size(double.infinity, 44),
           ),
           onPressed: _saving ? null : _save,
-          child: Text(_saving ? 'Saving...' : 'Save Schedule'),
+          child: Text(_saving ? t.childDetailSavingLabel : t.childDetailSaveScheduleButton),
         ),
       ],
     );
   }
 
-  Widget _buildDayRow(String key, String label) {
+  Widget _buildDayRow(String key, String label, AppLocalizations t) {
     final window = _windows[key];
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
@@ -350,14 +366,14 @@ class _ChildScheduleTabState extends State<_ChildScheduleTab> {
             style: TextStyle(color: KodaColors.text1, fontSize: 13))),
         Expanded(
           child: window == null
-              ? Text('No access', style: TextStyle(color: KodaColors.text3, fontSize: 12))
+              ? Text(t.childDetailNoAccessLabel, style: TextStyle(color: KodaColors.text3, fontSize: 12))
               : Row(children: [
                   TextButton(
                     onPressed: () => _pickTime(key, true),
                     child: Text(window.start.format(context),
                         style: TextStyle(color: KodaColors.koda, fontSize: 12)),
                   ),
-                  Text('to', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                  Text(t.childDetailToLabel, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                   TextButton(
                     onPressed: () => _pickTime(key, false),
                     child: Text(window.end.format(context),
@@ -406,8 +422,9 @@ class _ChildOverrideTabState extends State<_ChildOverrideTab> {
     if (!mounted) return;
     setState(() => _busy = false);
     if (override != null) {
+      final t = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Temporary access granted.')));
+          SnackBar(content: Text(t.childDetailAccessGranted)));
     }
   }
 
@@ -416,28 +433,31 @@ class _ChildOverrideTabState extends State<_ChildOverrideTab> {
     await KodaApi.instance.deleteOverride(widget.childId);
     if (!mounted) return;
     setState(() => _busy = false);
+    final t = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Override revoked.')));
+        SnackBar(content: Text(t.childDetailOverrideRevoked)));
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         Text(
-          'Grant temporary access outside the normal schedule -- useful for '
-          'a one-off exception without changing the weekly schedule.',
+          t.childDetailOverrideExplanation,
           style: TextStyle(color: KodaColors.text3, fontSize: 12, height: 1.5),
         ),
         const SizedBox(height: 16),
-        KodaTextField(controller: _reasonCtrl, hintText: 'Reason (optional)'),
+        KodaTextField(controller: _reasonCtrl, hintText: t.childDetailReasonHint),
         const SizedBox(height: 12),
         Wrap(spacing: 8, runSpacing: 8, children: [
           for (final minutes in [15, 30, 60, 120])
             OutlinedButton(
               onPressed: _busy ? null : () => _grant(minutes),
-              child: Text(minutes < 60 ? '+$minutes min' : '+${minutes ~/ 60}h'),
+              child: Text(minutes < 60
+                  ? t.childDetailPlusMinutes(minutes)
+                  : t.childDetailPlusHours(minutes ~/ 60)),
             ),
         ]),
         const SizedBox(height: 20),
@@ -448,7 +468,7 @@ class _ChildOverrideTabState extends State<_ChildOverrideTab> {
             minimumSize: const Size(double.infinity, 40),
           ),
           onPressed: _busy ? null : _revoke,
-          child: const Text('Revoke Active Override'),
+          child: Text(t.childDetailRevokeOverrideButton),
         ),
       ],
     );

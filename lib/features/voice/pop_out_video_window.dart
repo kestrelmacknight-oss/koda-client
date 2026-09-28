@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:livekit_client/livekit_client.dart' as lk;
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 
 // Shared name both windows agree on -- see voice_session.dart's
@@ -47,10 +48,11 @@ class _PopOutVideoWindowState extends State<PopOutVideoWindow> {
   }
 
   Future<void> _connect() async {
+    final t = AppLocalizations.of(context);
     final token = _args['token'] as String?;
     final url = _args['url'] as String?;
     if (token == null || url == null) {
-      setState(() { _error = 'Missing token or URL'; _connecting = false; });
+      setState(() { _error = t.popOutVideoMissingTokenError; _connecting = false; });
       return;
     }
     debugPrint('[PopOut] Connecting to: $url');
@@ -63,7 +65,7 @@ class _PopOutVideoWindowState extends State<PopOutVideoWindow> {
         ),
       );
       await room.connect(url, token).timeout(const Duration(seconds: 15), onTimeout: () {
-        throw Exception('Connection timed out after 15 seconds');
+        throw Exception(t.popOutVideoConnectionTimedOut);
       });
 
       final listener = room.createListener()
@@ -126,7 +128,8 @@ class _PopOutVideoWindowState extends State<PopOutVideoWindow> {
 
   @override
   Widget build(BuildContext context) {
-    final channelName = _args['channel_name'] as String? ?? 'Voice';
+    final t = AppLocalizations.of(context);
+    final channelName = _args['channel_name'] as String? ?? t.popOutVideoFallbackTitle;
     final room = _room;
     // This window connects as a subscribe-only "viewer" -- its own local
     // participant never publishes, so only show the real call participants.
@@ -148,7 +151,7 @@ class _PopOutVideoWindowState extends State<PopOutVideoWindow> {
           actions: [
             TextButton.icon(
               icon: Icon(Icons.call_end, color: KodaColors.accent, size: 16),
-              label: Text('Leave', style: TextStyle(color: KodaColors.accent)),
+              label: Text(t.homeLeaveButton, style: TextStyle(color: KodaColors.accent)),
               onPressed: () async {
                 // This window's own connection is a subscribe-only
                 // viewer, not the real session -- tell the main window's
@@ -165,10 +168,10 @@ class _PopOutVideoWindowState extends State<PopOutVideoWindow> {
         body: _connecting
             ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
             : _error != null
-                ? Center(child: Text('Error: $_error',
+                ? Center(child: Text(t.popOutVideoErrorLabel(_error!),
                     style: TextStyle(color: KodaColors.accent)))
                 : participants.isEmpty
-                    ? Center(child: Text('No participants',
+                    ? Center(child: Text(t.popOutVideoNoParticipants,
                         style: TextStyle(color: KodaColors.text3)))
                     : GridView.builder(
                         padding: const EdgeInsets.all(16),

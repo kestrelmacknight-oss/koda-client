@@ -5,12 +5,16 @@ import 'dart:io' show File;
 import 'package:file_picker/file_picker.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/api.dart';
+import '../../core/language_options.dart';
 import '../../core/last_channel_prefs.dart';
+import '../../core/message_language.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../core/platform.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
@@ -55,6 +59,15 @@ import 'gif_picker_dialog.dart';
 import '../visp/visp_setup_dialog.dart';
 
 const _kQuickReactions = ['👍', '❤️', '😂', '😮', '😢', '😡'];
+
+/// Escape -- cancels an active reply, or closes the member panel.
+/// Neither is a modal Dialog, so neither gets Flutter's automatic
+/// Escape-to-dismiss the way every real dialog in the app already
+/// gets for free. Accessibility Phase 4 (keyboard navigation).
+class _EscapeIntent extends Intent {
+  const _EscapeIntent();
+}
+
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
   @override
@@ -136,7 +149,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       await _subscribeToUserNotifications();
       if (_channels.isNotEmpty) _subscribeVoicePresence();
       final activeChannel = ref.read(selectedChannelProvider);
-      if (activeChannel != null && activeChannel['type'] == 'text') {
+      if (activeChannel != null &&
+          (activeChannel['type'] == 'text' || activeChannel['type'] == 'voice')) {
         _selectChannel(activeChannel);
       }
     }
@@ -279,9 +293,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     final user = ref.read(authProvider).user;
     if (user == null) return;
     final ch = await KodaSocket.instance.channelAsync('user:${user.id}');
-    ch?.messages.listen((msg) {
+    ch?.messages.listen((msg) async {
       if (!mounted) return;
-      if (msg.event == const PhoenixChannelEvent.custom('notification')) {
+      if (msg.event == const PhoenixChannelEvent.custom('voice_moved')) {
+        // A moderator forced us into a different voice channel (see
+        // ModerationController.move_voice_member/2 server-side). The
+        // payload already carries a ready-to-use token/url for the
+        // destination, so just reconnect -- VoiceSession.join() leaves
+        // whatever room we're currently in first, and no-ops that step
+        // if we weren't in a call at all.
+        final payload = msg.payload as Map<String, dynamic>?;
+        final channelId   = payload?['channel_id'] as String?;
+        final channelName = payload?['channel_name'] as String?;
+        final serverId     = payload?['server_id'] as String?;
+        final token        = payload?['token'] as String?;
+        final url          = payload?['url'] as String?;
+        if (channelId == null || serverId == null || token == null || url == null) return;
+        final t = AppLocalizations.of(context);
+        final ok = await ref.read(voiceSessionProvider.notifier).join(
+          url: url, token: token, channelId: channelId, channelName: channelName ?? '', serverId: serverId,
+        );
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+            ok ? t.homeMovedToVoiceChannel(channelName ?? '') : t.homeCouldNotConnectVoice)));
+      } else if (msg.event == const PhoenixChannelEvent.custom('notification')) {
         final payload = msg.payload as Map<String, dynamic>?;
         if (payload != null) {
           ref.read(notificationsProvider.notifier).addNotification(payload);
@@ -533,6 +568,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   }
 
   Future<bool?> _showContentWarningDialog(Map<String, dynamic> channel) {
+    final t = AppLocalizations.of(context);
     final labels = List<String>.from(channel['content_labels'] as List? ?? []);
     final names = labels.map((l) => kContentLabelNames[l] ?? l).join(', ');
     return showDialog<bool>(
@@ -542,17 +578,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         title: Row(children: [
           Icon(Icons.warning_amber_rounded, color: KodaColors.gold, size: 20),
           SizedBox(width: 8),
-          Text('Content Warning', style: TextStyle(color: KodaColors.text1)),
+          Text(t.homeContentWarningTitle, style: TextStyle(color: KodaColors.text1)),
         ]),
         content: Text(
-          'This channel is flagged for: $names.\n\nChange this in Settings > Security > Content Filters.',
+          t.homeContentWarningBody(names),
           style: TextStyle(color: KodaColors.text2, fontSize: 13),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.commonCancel)),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('View Anyway', style: TextStyle(color: KodaColors.koda)),
+            child: Text(t.homeViewAnyway, style: TextStyle(color: KodaColors.koda)),
           ),
         ],
       ),
@@ -646,7 +682,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       return;
     }
 
-    if (channel['type'] == 'text') {
+    if (channel['type'] == 'text' || channel['type'] == 'voice') {
       final myUserId = ref.read(authProvider).user?.id;
       if (myUserId == null) return;
 
@@ -830,7 +866,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     final msg = result.data;
     if (msg != null && mounted) {
       await SecureStorage.cacheDecryptedContent(msg['id'] as String, text);
-      setState(() => _messages.add({...msg, 'content': text}));
+      final lang = detectMessageLanguage(text);
+      setState(() => _messages.add({...msg, 'content': text,
+          if (lang != null) '_detectedLang': lang}));
       Future.delayed(const Duration(milliseconds: 50), () {
         if (_scroll.hasClients) {
           _scroll.animateTo(_scroll.position.maxScrollExtent,
@@ -944,33 +982,132 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   Future<void> _joinVoice(Map<String, dynamic> channel) async {
     final result = await KodaApi.instance.getVoiceToken(channel['id']);
     if (!mounted) return;
+    final t = AppLocalizations.of(context);
     if (result == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not connect to voice.')));
+          SnackBar(content: Text(t.homeCouldNotConnectVoice)));
       return;
     }
+    final serverId = ref.read(selectedServerProvider)?['id'] as String? ?? '';
     final ok = await ref.read(voiceSessionProvider.notifier).join(
       url:         result['url'] as String,
       token:       result['token'] as String,
       channelId:   channel['id'] as String,
       channelName: channel['name'] as String,
+      serverId:    serverId,
     );
     if (!ok && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not connect to voice.')));
+          SnackBar(content: Text(t.homeCouldNotConnectVoice)));
     }
   }
 
+  Future<void> _moveVoiceMember(
+      Map<String, dynamic> participant, String fromChannelId, Map<String, dynamic> toChannel) async {
+    final t = AppLocalizations.of(context);
+    final serverId = ref.read(selectedServerProvider)?['id'] as String?;
+    final userId = participant['user_id'] as String?;
+    final toChannelId = toChannel['id'] as String?;
+    if (serverId == null || userId == null || toChannelId == null) return;
+    final ok = await KodaApi.instance.moveVoiceMember(serverId, userId,
+        fromChannelId: fromChannelId, toChannelId: toChannelId);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+        ok ? t.homeMoveVoiceMemberSuccess(participant['username'] as String? ?? '', toChannel['name'] as String? ?? '')
+           : t.homeMoveVoiceMemberError(participant['username'] as String? ?? ''))));
+  }
+
+  // Right-click alternative to dragging an occupant chip onto another
+  // voice channel -- Flutter's showMenu doesn't nest submenus well, so
+  // this is a single menu item that opens a small picker dialog instead
+  // of a true submenu.
+  Future<void> _showMoveVoiceMemberMenu(
+      Map<String, dynamic> participant, String fromChannelId, Offset position) async {
+    final t = AppLocalizations.of(context);
+    final action = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(position.dx, position.dy, position.dx, position.dy),
+      color: KodaColors.card,
+      items: [PopupMenuItem(value: 'move', child: Text(t.homeMoveToVoiceChannel))],
+    );
+    if (action != 'move' || !mounted) return;
+    final otherVoiceChannels =
+        _channels.where((c) => c['type'] == 'voice' && c['id'] != fromChannelId).toList();
+    final target = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: Text(t.homeMoveVoiceChannelDialogTitle, style: TextStyle(color: KodaColors.text1)),
+        content: SizedBox(
+          width: 320,
+          child: otherVoiceChannels.isEmpty
+              ? Text(t.homeNoOtherVoiceChannels, style: TextStyle(color: KodaColors.text3))
+              : ListView(
+                  shrinkWrap: true,
+                  children: otherVoiceChannels.map((c) => ListTile(
+                        leading: Icon(Icons.volume_up, size: 16, color: KodaColors.text3),
+                        title: Text(c['name'] as String? ?? '', style: TextStyle(color: KodaColors.text1)),
+                        onTap: () => Navigator.pop(ctx, c),
+                      )).toList(),
+                ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, null), child: Text(t.commonCancel)),
+        ],
+      ),
+    );
+    if (target == null || !mounted) return;
+    await _moveVoiceMember(participant, fromChannelId, target);
+  }
+
+  Widget _buildVoiceOccupantChip(
+      Map<String, dynamic> participant, String channelId, bool isLast) {
+    final username = participant['username'] as String? ?? '?';
+    final myUserId = ref.read(authProvider).user?.id;
+    final canMove = _can('move_members') && participant['user_id'] != myUserId;
+    final label = Text(isLast ? username : '$username,',
+        style: TextStyle(color: KodaColors.text3, fontSize: 11));
+
+    if (!canMove) return label;
+
+    final dragData = {
+      'user_id': participant['user_id'],
+      'username': participant['username'],
+      'from_channel_id': channelId,
+    };
+
+    return LongPressDraggable<Map<String, dynamic>>(
+      data: dragData,
+      feedback: Material(
+        color: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+              color: KodaColors.card,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: KodaColors.koda)),
+          child: Text(username, style: TextStyle(color: KodaColors.text1, fontSize: 11)),
+        ),
+      ),
+      childWhenDragging: Opacity(opacity: 0.4, child: label),
+      child: GestureDetector(
+        onSecondaryTapUp: (d) => _showMoveVoiceMemberMenu(participant, channelId, d.globalPosition),
+        child: label,
+      ),
+    );
+  }
+
   Future<void> _showAddServerMenu() async {
+    final t = AppLocalizations.of(context);
     final action = await showMenu<String>(
       context: context,
       position: RelativeRect.fromLTRB(72, MediaQuery.of(context).size.height - 120,
           72, 120),
       color: KodaColors.card,
-      items: const [
-        PopupMenuItem(value: 'create', child: Text('Create Server')),
-        PopupMenuItem(value: 'join',   child: Text('Join Server')),
-        PopupMenuItem(value: 'redeem', child: Text('Redeem Code')),
+      items: [
+        PopupMenuItem(value: 'create', child: Text(t.homeCreateServer)),
+        PopupMenuItem(value: 'join',   child: Text(t.homeJoinServer)),
+        PopupMenuItem(value: 'redeem', child: Text(t.homeRedeemCode)),
       ],
     );
     if (action == 'create') _showCreateServerDialog();
@@ -979,20 +1116,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   }
 
   Future<void> _showJoinServerDialog() async {
+    final t = AppLocalizations.of(context);
     final ctrl = TextEditingController();
     await showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Join Server', style: TextStyle(color: KodaColors.text1)),
+        title: Text(t.homeJoinServerDialogTitle, style: TextStyle(color: KodaColors.text1)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text('Enter an invite code or URL:',
+          Text(t.homeEnterInviteCode,
               style: TextStyle(color: KodaColors.text3, fontSize: 12)),
           const SizedBox(height: 10),
-          KodaTextField(controller: ctrl, hintText: 'e.g. XK9MP2'),
+          KodaTextField(controller: ctrl, hintText: t.homeInviteCodeHint),
         ]),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.commonCancel)),
           TextButton(
             onPressed: () async {
               final raw = ctrl.text.trim();
@@ -1005,15 +1143,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               final result = await KodaApi.instance.redeemInvite(code);
               if (!mounted) return;
               if (result != null && result['ok'] == true) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Joined!')));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(t.homeJoined)));
                 _loadServers();
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Invalid or expired invite code.')));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(t.homeInvalidInvite)));
               }
             },
-            child: const Text('Join'),
+            child: Text(t.homeJoinButton),
           ),
         ],
       ),
@@ -1021,20 +1159,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   }
 
   Future<void> _showRedeemCodeDialog() async {
+    final t = AppLocalizations.of(context);
     final ctrl = TextEditingController();
     await showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Redeem Code', style: TextStyle(color: KodaColors.text1)),
+        title: Text(t.homeRedeemCodeDialogTitle, style: TextStyle(color: KodaColors.text1)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text('Enter your backer or reward code:',
+          Text(t.homeEnterBackerCode,
               style: TextStyle(color: KodaColors.text3, fontSize: 12)),
           const SizedBox(height: 10),
-          KodaTextField(controller: ctrl, hintText: 'Reward code'),
+          KodaTextField(controller: ctrl, hintText: t.homeRewardCodeHint),
         ]),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.commonCancel)),
           TextButton(
             onPressed: () async {
               final code = ctrl.text.trim().toUpperCase();
@@ -1043,14 +1182,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               final result = await KodaApi.instance.redeemBackerCode(code);
               if (!mounted) return;
               if (result != null && result['ok'] == true) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Code redeemed! Your rewards have been applied.')));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(t.homeCodeRedeemed)));
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Invalid, expired, or already redeemed code.')));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(t.homeInvalidRedeemCode)));
               }
             },
-            child: const Text('Redeem'),
+            child: Text(t.homeRedeemButton),
           ),
         ],
       ),
@@ -1062,7 +1201,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     final me = ref.read(authProvider).user;
     final userId = author['id'] as String? ?? '';
     if (userId == me?.id) return; // don't show profile for self
-    final username = author['username'] as String? ?? 'Unknown';
+    final t = AppLocalizations.of(context);
+    final username = author['username'] as String? ?? t.dmUnknownUser;
     final avatarUrl = author['avatar_url'] as String?;
 
     // Check friendship status
@@ -1084,7 +1224,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: 16),
             if (isFriend)
-              Text('You are friends',
+              Text(t.homeAreFriends,
                   style: TextStyle(color: KodaColors.koda, fontSize: 12)),
             const SizedBox(height: 12),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -1095,13 +1235,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     foregroundColor: Colors.black,
                   ),
                   icon: const Icon(Icons.person_add_outlined, size: 16),
-                  label: const Text('Add Friend'),
+                  label: Text(t.homeAddFriend),
                   onPressed: () async {
                     Navigator.pop(context);
                     final ok = await KodaApi.instance.sendFriendRequest(userId);
                     if (ok && context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Friend request sent to $username!')));
+                          SnackBar(content: Text(t.homeFriendRequestSent(username))));
                     }
                   },
                 ),
@@ -1112,7 +1252,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     foregroundColor: KodaColors.text1,
                   ),
                   icon: const Icon(Icons.message_outlined, size: 16),
-                  label: const Text('Message'),
+                  label: Text(t.homeMessageButton),
                   onPressed: () async {
                     Navigator.pop(context);
                     final convo = await KodaApi.instance.getOrCreateConversation(userId);
@@ -1131,7 +1271,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 side: BorderSide(color: KodaColors.koda),
               ),
               icon: const Icon(Icons.volunteer_activism, size: 16),
-              label: const Text('Send Tip'),
+              label: Text(t.homeSendTip),
               onPressed: () {
                 Navigator.pop(context);
                 final server = ref.read(selectedServerProvider);
@@ -1148,7 +1288,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context),
-              child: const Text('Close')),
+              child: Text(t.commonClose)),
         ],
       ),
     );
@@ -1156,6 +1296,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
 
   Future<void> _showServerContextMenu(
       Map<String, dynamic> server, Offset position) async {
+    final t = AppLocalizations.of(context);
     final user = ref.read(authProvider).user;
     final isOwner = server['owner_id'] == user?.id || (user?.isAdmin ?? false);
     // Permissions are only known for the currently-selected server (see
@@ -1171,15 +1312,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           position.dx, position.dy, position.dx, position.dy),
       color: KodaColors.card,
       items: [
-        const PopupMenuItem(value: 'select',
-            child: Text('Switch to Server')),
-        const PopupMenuItem(value: 'invite',
-            child: Text('Invite People')),
+        PopupMenuItem(value: 'select',
+            child: Text(t.homeSwitchToServer)),
+        PopupMenuItem(value: 'invite',
+            child: Text(t.homeInvitePeople)),
         if (canModerate)
-          const PopupMenuItem(value: 'settings',
-              child: Text('Server Settings')),
+          PopupMenuItem(value: 'settings',
+              child: Text(t.homeServerSettingsMenuItem)),
         PopupMenuItem(value: 'leave',
-            child: Text('Leave Server',
+            child: Text(t.homeLeaveServerMenuItem,
                 style: TextStyle(color: KodaColors.accent))),
       ],
     );
@@ -1201,13 +1342,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           context: context,
           builder: (_) => AlertDialog(
             backgroundColor: KodaColors.card,
-            content: Text('Leave ${server['name']}? You can rejoin with an invite.',
+            content: Text(t.homeLeaveServerConfirm(server['name'] as String? ?? ''),
                 style: TextStyle(color: KodaColors.text1)),
             actions: [
               TextButton(onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Cancel')),
+                  child: Text(t.commonCancel)),
               TextButton(onPressed: () => Navigator.pop(context, true),
-                  child: Text('Leave',
+                  child: Text(t.homeLeaveButton,
                       style: TextStyle(color: KodaColors.accent))),
             ],
           ),
@@ -1229,15 +1370,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   }
 
   Future<void> _showCreateServerDialog() async {
+    final t = AppLocalizations.of(context);
     final nameController = TextEditingController();
     await showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Create a server',
+        title: Text(t.homeCreateAServer,
             style: TextStyle(color: KodaColors.text1)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
-          KodaTextField(controller: nameController, hintText: 'Server name'),
+          KodaTextField(controller: nameController, hintText: t.homeServerNameHint),
           const SizedBox(height: 10),
           Align(
             alignment: Alignment.centerLeft,
@@ -1248,7 +1390,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 showVispSetupDialog(context, onApplied: (_) => _loadServers());
               },
               icon: Icon(Icons.auto_awesome, size: 14, color: KodaColors.koda),
-              label: Text('Describe it to Visp instead',
+              label: Text(t.homeDescribeToVisp,
                   style: TextStyle(color: KodaColors.koda, fontSize: 12)),
             ),
           ),
@@ -1256,7 +1398,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
+              child: Text(t.commonCancel)),
           TextButton(
             onPressed: () async {
               if (nameController.text.trim().isEmpty) return;
@@ -1267,7 +1409,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 _loadServers();
               }
             },
-            child: const Text('Create'),
+            child: Text(t.commonCreate),
           ),
         ],
       ),
@@ -1294,6 +1436,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
 
   Future<void> _showChannelContextMenu(
       Map<String, dynamic> channel, Offset position) async {
+    final t = AppLocalizations.of(context);
     final canManage = _can('manage_channels');
     final hasUnread = (_channelUnread[channel['id']] ?? 0) > 0;
     final action = await showMenu<String>(
@@ -1303,11 +1446,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       color: KodaColors.card,
       items: [
         if (hasUnread)
-          const PopupMenuItem(value: 'mark_read', child: Text('Mark as Read')),
+          PopupMenuItem(value: 'mark_read', child: Text(t.homeMarkAsRead)),
         if (canManage) ...[
-          const PopupMenuItem(value: 'edit', child: Text('Edit Channel')),
+          PopupMenuItem(value: 'edit', child: Text(t.homeEditChannel)),
           PopupMenuItem(value: 'delete',
-              child: Text('Delete Channel', style: TextStyle(color: KodaColors.accent))),
+              child: Text(t.homeDeleteChannel, style: TextStyle(color: KodaColors.accent))),
         ],
       ],
     );
@@ -1342,15 +1485,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           context: context,
           builder: (ctx) => AlertDialog(
             backgroundColor: KodaColors.card,
-            content: Text('Delete #${channel['name']}? This cannot be undone.',
+            content: Text(t.homeDeleteChannelConfirm(channel['name'] as String? ?? ''),
                 style: TextStyle(color: KodaColors.text1)),
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('Cancel')),
+                  child: Text(t.commonCancel)),
               TextButton(
                   onPressed: () => Navigator.pop(ctx, true),
-                  child: Text('Delete',
+                  child: Text(t.homeDeleteButton,
                       style: TextStyle(color: KodaColors.accent))),
             ],
           ),
@@ -1366,16 +1509,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   Future<void> _showCategoryContextMenu(
       Map<String, dynamic> category, Offset position) async {
     if (!_can('manage_channels')) return;
+    final t = AppLocalizations.of(context);
     final action = await showMenu<String>(
       context: context,
       position: RelativeRect.fromLTRB(
           position.dx, position.dy, position.dx, position.dy),
       color: KodaColors.card,
       items: [
-        PopupMenuItem(value: 'create_channel', child: Text('Create Channel Here')),
-        PopupMenuItem(value: 'edit', child: Text('Edit Category')),
+        PopupMenuItem(value: 'create_channel', child: Text(t.homeCreateChannelHere)),
+        PopupMenuItem(value: 'edit', child: Text(t.homeEditCategory)),
         PopupMenuItem(value: 'delete',
-            child: Text('Delete Category', style: TextStyle(color: KodaColors.accent))),
+            child: Text(t.homeDeleteCategory, style: TextStyle(color: KodaColors.accent))),
       ],
     );
     if (!mounted || action == null) return;
@@ -1414,13 +1558,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           builder: (ctx) => AlertDialog(
             backgroundColor: KodaColors.card,
             content: Text(
-                'Delete "${category['name']}"? Channels inside will become uncategorized.',
+                t.homeDeleteCategoryConfirm(category['name'] as String? ?? ''),
                 style: TextStyle(color: KodaColors.text1)),
             actions: [
               TextButton(onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('Cancel')),
+                  child: Text(t.commonCancel)),
               TextButton(onPressed: () => Navigator.pop(ctx, true),
-                  child: Text('Delete', style: TextStyle(color: KodaColors.accent))),
+                  child: Text(t.homeDeleteButton, style: TextStyle(color: KodaColors.accent))),
             ],
           ),
         );
@@ -1446,7 +1590,69 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     return ref.watch(serverEmojiProvider(serverId)).value ?? const [];
   }
 
+  /// Shared by the message row's right-click handler and its visible
+  /// "more actions" trigger button (keyboard/Tab-reachable -- see
+  /// accessibility Phase 4) so both paths show the exact same menu.
+  Future<void> _showMessageActionMenu(Offset position, Map<String, dynamic> m, String channelId,
+      {required bool isMine, required bool isPinned, required bool canDelete}) async {
+    final t = AppLocalizations.of(context);
+    final action = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(position.dx, position.dy, position.dx, position.dy),
+      color: KodaColors.card,
+      items: [
+        PopupMenuItem(value: 'reply', child: Text(t.homeReplyAction)),
+        PopupMenuItem(value: 'thread', child: Text(t.homeCreateThreadAction)),
+        if (isMine && m['encrypted'] != true)
+          PopupMenuItem(value: 'edit', child: Text(t.homeEditMessageAction)),
+        PopupMenuItem(value: isPinned ? 'unpin' : 'pin',
+            child: Text(isPinned ? t.homeUnpinMessageAction : t.homePinMessageAction)),
+        if (canDelete) PopupMenuItem(
+            value: 'delete', child: Text(t.homeDeleteMessageAction)),
+        if (!isMine)
+          PopupMenuItem(value: 'report',
+              child: Text(t.homeReportMessageAction, style: TextStyle(color: KodaColors.accent))),
+      ],
+    );
+    if (action == 'reply' && mounted) {
+      setState(() => _replyingTo = m);
+    }
+    if (action == 'thread' && mounted) {
+      _showCreateThreadDialog(m);
+    }
+    if (action == 'edit' && mounted) {
+      _editMessage(channelId, m);
+    }
+    if (action == 'pin' && mounted) {
+      final ok = await KodaApi.instance.pinMessage(channelId, m['id'] as String? ?? '');
+      if (ok) setState(() => m['pinned_at'] = DateTime.now().toIso8601String());
+    }
+    if (action == 'unpin' && mounted) {
+      final ok = await KodaApi.instance.unpinMessage(channelId, m['id'] as String? ?? '');
+      if (ok) setState(() => m['pinned_at'] = null);
+    }
+    if (action == 'delete' && mounted) {
+      final ok = await KodaApi.instance.deleteMessage(channelId,
+        m['id'] as String? ?? '',
+      );
+      if (ok) setState(() => _messages.remove(m));
+    }
+    if (action == 'report' && mounted) {
+      final submitted = await showReportChannelMessageDialog(
+        context,
+        channelId: channelId,
+        messageId: m['id'] as String? ?? '',
+        disclosedContent: m['content'] as String? ?? '',
+      );
+      if (submitted && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(t.homeReportSubmitted)));
+      }
+    }
+  }
+
   Widget _buildReactions(Map<String, dynamic> m) {
+    final t = AppLocalizations.of(context);
     final reactions = m['reactions'] as List? ?? [];
     final me = ref.read(authProvider).user;
     final serverEmoji = _currentServerEmoji();
@@ -1461,19 +1667,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             final count = r['count'] as int;
             final userIds = List<String>.from(r['user_ids'] ?? []);
             final reacted = me != null && userIds.contains(me.id);
-            final emojiName = emoji.startsWith(kCustomEmojiPrefix) ? 'custom emoji' : emoji;
-            return Semantics(
-              button: true,
-              label: '$emojiName, $count reaction${count == 1 ? "" : "s"}'
-                  '${reacted ? ", you reacted, double tap to remove" : ", double tap to add"}',
-              child: GestureDetector(
+            final emojiName = emoji.startsWith(kCustomEmojiPrefix) ? t.homeCustomEmojiFallback : emoji;
+            return KodaTappable(
+              semanticLabel: '$emojiName, ${t.homeReactionCount(count)}'
+                  '${reacted ? t.homeReactionYouReacted : t.homeReactionActivateToAdd}',
+              borderRadius: BorderRadius.circular(12),
               onTap: () async {
                 final updated = reacted
                     ? await KodaApi.instance.removeReaction(m['id'] as String, emoji)
                     : await KodaApi.instance.addReaction(m['id'] as String, emoji);
                 if (updated != null && mounted) setState(() => m['reactions'] = updated);
               },
-              child: ExcludeSemantics(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -1488,26 +1692,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   Text('$count', style: const TextStyle(fontSize: 12)),
                 ]),
               ),
-              ),
-              ),
             );
           }),
-          Semantics(
-            button: true,
-            label: 'Add reaction',
-            child: GestureDetector(
-              onTap: () => _showReactionPicker(m),
-              child: ExcludeSemantics(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: KodaColors.elevated,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: KodaColors.border),
-                  ),
-                  child: const Text('+ :)', style: TextStyle(fontSize: 12)),
-                ),
+          KodaTappable(
+            semanticLabel: t.homeAddReactionLabel,
+            borderRadius: BorderRadius.circular(12),
+            onTap: () => _showReactionPicker(m),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: KodaColors.elevated,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: KodaColors.border),
               ),
+              child: const Text('+ :)', style: TextStyle(fontSize: 12)),
             ),
           ),
         ],
@@ -1521,7 +1719,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Add Reaction',
+        title: Text(AppLocalizations.of(context).homeAddReactionTitle,
             style: TextStyle(color: KodaColors.text1, fontSize: 14)),
         content: SingleChildScrollView(
           child: Wrap(
@@ -1746,6 +1944,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     await KodaApi.instance.reorderChannels(server['id'] as String, order);
   }
   List<Widget> _buildChannelList(Map<String, dynamic>? selectedChannel) {
+    // Named loc, not t, to avoid shadowing the `t` used below as a
+    // per-thread loop variable.
+    final loc = AppLocalizations.of(context);
     // "Hide" is a personal preference applied purely client-side here --
     // a child account never sees a labeled channel in _channels to begin
     // with, since the server already omits those for them.
@@ -1766,7 +1967,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             _expandedThreads.contains(c['id'])
                 ? Icons.expand_less : Icons.expand_more,
             size: 14, color: KodaColors.text3),
-          title: Text('${cThreads.length} thread${cThreads.length == 1 ? '' : 's'}',
+          title: Text(loc.homeThreadCount(cThreads.length),
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           onTap: () => setState(() {
             if (_expandedThreads.contains(c['id'])) {
@@ -1785,26 +1986,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     for (final cat in _categories) {
       final catChannels = regular.where((c) => c['category_id'] == cat['id']).toList();
       if (catChannels.isEmpty) continue;
-      // Edit/Delete Category is currently only reachable via the
-      // right-click menu this GestureDetector opens -- a keyboard/
-      // screen-reader entry point for that belongs with the keyboard
-      // navigation phase, not here. This just identifies the label
-      // itself as a heading rather than leaving it entirely mute.
+      // Edit/Delete Category: right-click, or the visible kebab button
+      // below (Tab-reachable, unlike right-click alone).
       result.add(Semantics(
         header: true,
         label: cat['name'] as String? ?? 'Category',
-        child: GestureDetector(
-        onSecondaryTapUp: (d) => _showCategoryContextMenu(cat, d.globalPosition),
         child: ExcludeSemantics(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 2),
-          child: Text(
-            (cat['name'] as String? ?? '').toUpperCase(),
-            style: TextStyle(color: KodaColors.text3, fontSize: 10,
-                fontWeight: FontWeight.w700, letterSpacing: 1),
+          child: GestureDetector(
+            onSecondaryTapUp: (d) => _showCategoryContextMenu(cat, d.globalPosition),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 6, 2),
+              child: Row(children: [
+                Expanded(
+                  child: Text(
+                    (cat['name'] as String? ?? '').toUpperCase(),
+                    style: TextStyle(color: KodaColors.text3, fontSize: 10,
+                        fontWeight: FontWeight.w700, letterSpacing: 1),
+                  ),
+                ),
+                Builder(builder: (buttonContext) => IconButton(
+                  icon: Icon(Icons.more_vert, size: 13, color: KodaColors.text3),
+                  tooltip: loc.homeCategoryOptionsTooltip,
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  onPressed: () {
+                    final box = buttonContext.findRenderObject() as RenderBox;
+                    final position = box.localToGlobal(box.size.center(Offset.zero));
+                    _showCategoryContextMenu(cat, position);
+                  },
+                )),
+              ]),
+            ),
           ),
-        ),
-        ),
         ),
       ));
       result.addAll(catChannels.map((c) => _buildChannelTile(c, selectedChannel)));
@@ -1817,6 +2031,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   // Keeping this as a method rather than inline in build() avoids the
   // "if statement as positional argument" Dart restriction entirely.
   Widget _buildChannelTile(Map<String, dynamic> c, Map<String, dynamic>? selectedChannel) {
+    final t = AppLocalizations.of(context);
     final selected = selectedChannel?['id'] == c['id'];
     final isVoice = c['type'] == 'voice';
     final isThread = c['is_thread'] == true;
@@ -1854,45 +2069,81 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           if (labelSetting == 'warn') ...[
             const SizedBox(width: 4),
             Tooltip(
-              message: 'Content warning',
+              message: t.homeContentWarningBadge,
               child: Icon(Icons.warning_amber_rounded, size: 12, color: KodaColors.gold),
             ),
           ],
         ]),
-        subtitle: occupants.isEmpty ? null : Text(
-            occupants.map((p) => p['username'] as String? ?? '?').join(', '),
-            style: TextStyle(color: KodaColors.text3, fontSize: 11),
-            maxLines: 1, overflow: TextOverflow.ellipsis),
-        trailing: unread > 0
-            ? Tooltip(
-                message: hasMention ? 'Unread mention' : 'Unread messages',
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                  decoration: BoxDecoration(
-                      // Mentions get the same red used for kick/ban/danger
-                      // actions elsewhere -- deliberately distinct from
-                      // plain unread's violet, matching Discord's
-                      // red-for-mention convention.
-                      color: hasMention ? KodaColors.accent : KodaColors.koda,
-                      borderRadius: BorderRadius.circular(99)),
-                  child: Text(unread > 99 ? '99+' : '$unread',
-                      style: const TextStyle(color: Colors.white,
-                          fontSize: 10, fontWeight: FontWeight.w700)),
-                ),
-              )
-            : null,
+        subtitle: occupants.isEmpty ? null : Wrap(
+            spacing: 2, runSpacing: 0,
+            children: [
+              for (var i = 0; i < occupants.length; i++)
+                _buildVoiceOccupantChip(occupants[i], c['id'] as String, i == occupants.length - 1),
+            ]),
+        trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+          if (unread > 0)
+            Tooltip(
+              message: hasMention ? 'Unread mention' : 'Unread messages',
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(
+                    // Mentions get the same red used for kick/ban/danger
+                    // actions elsewhere -- deliberately distinct from
+                    // plain unread's violet, matching Discord's
+                    // red-for-mention convention.
+                    color: hasMention ? KodaColors.accent : KodaColors.koda,
+                    borderRadius: BorderRadius.circular(99)),
+                child: Text(unread > 99 ? '99+' : '$unread',
+                    style: const TextStyle(color: Colors.white,
+                        fontSize: 10, fontWeight: FontWeight.w700)),
+              ),
+            ),
+          if (isVoice)
+            IconButton(
+              icon: Icon(Icons.chat_bubble_outline, size: 14, color: KodaColors.text3),
+              tooltip: t.homeOpenVoiceChatTooltip,
+              visualDensity: VisualDensity.compact,
+              onPressed: () => _selectChannel(c),
+            ),
+          Builder(builder: (buttonContext) => IconButton(
+            icon: Icon(Icons.more_vert, size: 14, color: KodaColors.text3),
+            tooltip: t.homeChannelOptionsTooltip,
+            visualDensity: VisualDensity.compact,
+            onPressed: () {
+              final box = buttonContext.findRenderObject() as RenderBox;
+              final position = box.localToGlobal(box.size.center(Offset.zero));
+              _showChannelContextMenu(c, position);
+            },
+          )),
+        ]),
         selected: selected,
         selectedTileColor: KodaColors.koda.withValues(alpha: 0.1),
         onTap: () => _openChannel(c),
       ),
     );
+    Widget result = tile;
+    if (isVoice && _can('move_members')) {
+      final channelId = c['id'] as String;
+      result = DragTarget<Map<String, dynamic>>(
+        onWillAcceptWithDetails: (details) => details.data['from_channel_id'] != channelId,
+        onAcceptWithDetails: (details) => _moveVoiceMember(details.data, details.data['from_channel_id'] as String, c),
+        builder: (context, candidateData, rejectedData) => candidateData.isEmpty
+            ? tile
+            : Container(
+                decoration: BoxDecoration(
+                    color: KodaColors.koda.withValues(alpha: 0.15),
+                    border: Border.all(color: KodaColors.koda)),
+                child: tile,
+              ),
+      );
+    }
     if (isThread) {
       return Padding(
         padding: const EdgeInsets.only(left: 16),
-        child: tile,
+        child: result,
       );
     }
-    return tile;
+    return result;
   }
 
   /// Slim, read-only progress banner for a server's connected Tiltify
@@ -1962,6 +2213,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   }
 
   Widget _buildContentArea(Map<String, dynamic>? selectedChannel) {
+    final t = AppLocalizations.of(context);
+    final serverPrimaryLang = ref.watch(selectedServerProvider)?['primary_language'] as String? ?? 'en';
     if (_showingMarketplace) {
       return Column(children: [
         Container(
@@ -1972,7 +2225,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           child: Row(children: [
             Icon(Icons.storefront_outlined, size: 16, color: KodaColors.text3),
             SizedBox(width: 6),
-            Text('Marketplace',
+            Text(t.homeMarketplaceLabel,
                 style: TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w600)),
           ]),
         ),
@@ -1982,7 +2235,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
 
     if (selectedChannel == null) {
       return Center(
-          child: Text('Select a channel',
+          child: Text(t.homeSelectChannelPrompt,
               style: TextStyle(color: KodaColors.text3)));
     }
 
@@ -2028,12 +2281,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           const Spacer(),
           IconButton(
             icon: Icon(Icons.search, color: KodaColors.text3, size: 18),
-            tooltip: 'Search',
+            tooltip: t.homeSearchTooltip,
             onPressed: () => _searchChannel(selectedChannel['id'] as String),
           ),
           IconButton(
             icon: Icon(Icons.push_pin_outlined, color: KodaColors.text3, size: 18),
-            tooltip: 'Pinned Messages',
+            tooltip: t.homePinnedMessagesTooltip,
             onPressed: () => _showPinnedMessages(selectedChannel['id'] as String),
           ),
           const NotificationBell(),
@@ -2052,6 +2305,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           ),
         ]),
       ),
+      if (type == 'voice' &&
+          ref.watch(voiceSessionProvider)?.channelId != selectedChannel['id'])
+        Container(
+          color: KodaColors.elevated,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          child: Row(children: [
+            Icon(Icons.volume_up, size: 16, color: KodaColors.text3),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                  t.homeJoinVoiceToTalkBanner(selectedChannel['name'] as String? ?? ''),
+                  style: TextStyle(color: KodaColors.text3, fontSize: 13)),
+            ),
+            ElevatedButton(
+              onPressed: () => _joinVoice(selectedChannel),
+              child: Text(t.homeJoinButton),
+            ),
+          ]),
+        ),
       Expanded(
         child: ListView.builder(
           controller: _scroll,
@@ -2068,81 +2340,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             final isMine = m['sender_id'] == ref.read(authProvider).user?.id;
             final isPinned = m['pinned_at'] != null;
             final isEdited = m['edited_at'] != null;
+            final messageChannelId = m['channel_id'] as String? ?? selectedChannel['id'] as String;
             return GestureDetector(
-              onSecondaryTapUp: (d) async {
-                final channelId = m['channel_id'] as String? ?? selectedChannel['id'] as String;
-                final action = await showMenu<String>(
-                  context: context,
-                  position: RelativeRect.fromLTRB(d.globalPosition.dx,
-                      d.globalPosition.dy, d.globalPosition.dx, d.globalPosition.dy),
-                  color: KodaColors.card,
-                  items: [
-                    const PopupMenuItem(value: 'reply', child: Text('Reply')),
-                    const PopupMenuItem(value: 'thread', child: Text('Create Thread')),
-                    if (isMine && m['encrypted'] != true)
-                      const PopupMenuItem(value: 'edit', child: Text('Edit Message')),
-                    PopupMenuItem(value: isPinned ? 'unpin' : 'pin',
-                        child: Text(isPinned ? 'Unpin Message' : 'Pin Message')),
-                    if (canDelete) const PopupMenuItem(
-                        value: 'delete', child: Text('Delete Message')),
-                    if (!isMine)
-                      PopupMenuItem(value: 'report',
-                          child: Text('Report Message', style: TextStyle(color: KodaColors.accent))),
-                  ],
-                );
-                if (action == 'reply' && mounted) {
-                  setState(() => _replyingTo = m);
-                }
-                if (action == 'thread' && mounted) {
-                  _showCreateThreadDialog(m);
-                }
-                if (action == 'edit' && mounted) {
-                  _editMessage(channelId, m);
-                }
-                if (action == 'pin' && mounted) {
-                  final ok = await KodaApi.instance.pinMessage(channelId, m['id'] as String? ?? '');
-                  if (ok) setState(() => m['pinned_at'] = DateTime.now().toIso8601String());
-                }
-                if (action == 'unpin' && mounted) {
-                  final ok = await KodaApi.instance.unpinMessage(channelId, m['id'] as String? ?? '');
-                  if (ok) setState(() => m['pinned_at'] = null);
-                }
-                if (action == 'delete' && mounted) {
-                  final ok = await KodaApi.instance.deleteMessage(channelId,
-                    m['id'] as String? ?? '',
-                  );
-                  if (ok) setState(() => _messages.remove(m));
-                }
-                if (action == 'report' && mounted) {
-                  final submitted = await showReportChannelMessageDialog(
-                    context,
-                    channelId: channelId,
-                    messageId: m['id'] as String? ?? '',
-                    disclosedContent: m['content'] as String? ?? '',
-                  );
-                  if (submitted && mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Report submitted.')));
-                  }
-                }
-              },
+              onSecondaryTapUp: (d) => _showMessageActionMenu(
+                  d.globalPosition, m, messageChannelId, isMine: isMine, isPinned: isPinned, canDelete: canDelete),
               child: Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                Semantics(
-                  button: true,
-                  label: "View $author's profile",
-                  child: GestureDetector(
-                    onTap: () => _showUserProfile(context, m['author'] as Map<String, dynamic>?),
-                    child: ExcludeSemantics(
-                      child: KodaAvatar(
-                      username: author,
-                      size: 34,
-                      avatarUrl: (m['author'] as Map<String, dynamic>?)?['avatar_url'] as String?,
-                      ),
-                    ),
+                KodaTappable(
+                  semanticLabel: t.homeViewProfile(author),
+                  borderRadius: BorderRadius.circular(17),
+                  onTap: () => _showUserProfile(context, m['author'] as Map<String, dynamic>?),
+                  child: KodaAvatar(
+                    username: author,
+                    size: 34,
+                    avatarUrl: (m['author'] as Map<String, dynamic>?)?['avatar_url'] as String?,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -2174,6 +2388,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                           const SizedBox(width: 6),
                           Icon(Icons.push_pin, size: 11, color: KodaColors.gold),
                         ],
+                        if (m['_detectedLang'] != null && m['_detectedLang'] != serverPrimaryLang) ...[
+                          const SizedBox(width: 6),
+                          Tooltip(
+                            message: kodaLanguageName(m['_detectedLang'] as String),
+                            child: Text((m['_detectedLang'] as String).toUpperCase(),
+                                style: TextStyle(color: KodaColors.text3, fontSize: 9,
+                                    fontWeight: FontWeight.w600, letterSpacing: 0.3)),
+                          ),
+                        ],
                       ],
                     ),
 
@@ -2181,11 +2404,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     if (m['reply_to'] != null)
                       _buildReplyPreview(m['reply_to'] as Map<String, dynamic>),
                     if (m['_decryptPending'] == true)
-                      Text('Waiting for the encryption key to arrive...',
+                      Text(t.homeWaitingForKey,
                           style: TextStyle(color: KodaColors.text3,
                               fontSize: 13, fontStyle: FontStyle.italic))
                     else if (m['_decryptFailed'] == true)
-                      Text('Unable to decrypt this message.',
+                      Text(t.homeUnableToDecrypt,
                           style: TextStyle(color: KodaColors.accent,
                               fontSize: 13, fontStyle: FontStyle.italic))
                     else if ((m['content'] as String? ?? '').isNotEmpty)
@@ -2203,6 +2426,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                       _buildReactions(m),
                   ]),
                 ),
+                Builder(builder: (buttonContext) => IconButton(
+                  icon: Icon(Icons.more_vert, size: 16, color: KodaColors.text3),
+                  tooltip: t.homeMessageActionsTooltip,
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () {
+                    final box = buttonContext.findRenderObject() as RenderBox;
+                    final position = box.localToGlobal(box.size.center(Offset.zero));
+                    _showMessageActionMenu(position, m, messageChannelId,
+                        isMine: isMine, isPinned: isPinned, canDelete: canDelete);
+                  },
+                )),
               ]),
             ),
             );
@@ -2218,14 +2452,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             const SizedBox(width: 6),
             Expanded(
               child: Text(
-                'Replying to ${(_replyingTo!['author'] as Map<String, dynamic>?)?['username'] ?? 'Unknown'}',
+                t.homeReplyingTo((_replyingTo!['author'] as Map<String, dynamic>?)?['username'] ?? t.dmUnknownUser),
                 style: TextStyle(color: KodaColors.text3, fontSize: 12),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             IconButton(
               icon: Icon(Icons.close, size: 14, color: KodaColors.text3),
-              tooltip: 'Cancel reply',
+              tooltip: t.homeCancelReplyTooltip,
               onPressed: () => setState(() => _replyingTo = null),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
@@ -2240,13 +2474,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             Icon(Icons.attach_file, size: 14, color: KodaColors.koda),
             const SizedBox(width: 6),
             Expanded(
-              child: Text(_pendingAttachment!['fileName'] ?? 'Attachment',
+              child: Text(_pendingAttachment!['fileName'] ?? t.homeAttachmentFallback,
                   style: TextStyle(color: KodaColors.text3, fontSize: 12),
                   overflow: TextOverflow.ellipsis),
             ),
             IconButton(
               icon: Icon(Icons.close, size: 14, color: KodaColors.text3),
-              tooltip: 'Remove attachment',
+              tooltip: t.homeRemoveAttachmentTooltip,
               onPressed: () => setState(() => _pendingAttachment = null),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
@@ -2289,18 +2523,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 ? SizedBox(width: 18, height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
                 : Icon(Icons.attach_file, color: KodaColors.text2),
-            tooltip: 'Attach file',
+            tooltip: t.homeAttachFileTooltip,
             onPressed: _uploadingAttachment ? null : _pickAttachment,
           ),
           IconButton(
             icon: Icon(Icons.gif_box_outlined, color: KodaColors.text2),
-            tooltip: 'GIF',
+            tooltip: t.homeGifTooltip,
             onPressed: _pickGif,
           ),
           Expanded(
             child: KodaTextField(
               controller: _messageController,
-              hintText: 'Message #${selectedChannel['name']}',
+              hintText: t.homeMessageHint(selectedChannel['name'] as String? ?? ''),
               onChanged: (text) {
                 final channel = ref.read(selectedChannelProvider);
                 if (channel != null) {
@@ -2319,7 +2553,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           const SizedBox(width: 10),
           IconButton(
             icon: Icon(Icons.send, color: KodaColors.koda),
-            tooltip: 'Send message',
+            tooltip: t.homeSendMessageTooltip,
             onPressed: _sendMessage,
           ),
         ]),
@@ -2328,18 +2562,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   }
 
   Future<void> _editMessage(String channelId, Map<String, dynamic> message) async {
+    final t = AppLocalizations.of(context);
     final ctrl = TextEditingController(text: message['content'] as String? ?? '');
     final content = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Edit Message', style: TextStyle(color: KodaColors.text1)),
-        content: KodaTextField(controller: ctrl, hintText: 'Message'),
+        title: Text(t.homeEditMessageTitle, style: TextStyle(color: KodaColors.text1)),
+        content: KodaTextField(controller: ctrl, hintText: t.homeMessageLabel, autofocus: true),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
+              child: Text(t.commonCancel)),
           TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()),
-              child: const Text('Save')),
+              child: Text(t.commonSave)),
         ],
       ),
     );
@@ -2405,16 +2640,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   Future<void> _showPinnedMessages(String channelId) async {
     final pins = await KodaApi.instance.getPinnedMessages(channelId);
     if (!mounted) return;
+    final t = AppLocalizations.of(context);
     await showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Pinned Messages', style: TextStyle(color: KodaColors.text1)),
+        title: Text(t.homePinnedMessagesTitle, style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 360,
           height: 400,
           child: pins.isEmpty
-              ? Center(child: Text('No pinned messages',
+              ? Center(child: Text(t.homeNoPinnedMessages,
                   style: TextStyle(color: KodaColors.text3)))
               : ListView.separated(
                   itemCount: pins.length,
@@ -2422,7 +2658,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   itemBuilder: (_, i) {
                     final p = pins[i];
                     final author = (p['author'] as Map<String, dynamic>?)?['username']
-                        as String? ?? 'Unknown';
+                        as String? ?? t.dmUnknownUser;
                     return ListTile(
                       dense: true,
                       title: Text(author, style: TextStyle(
@@ -2431,7 +2667,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                           style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                       trailing: IconButton(
                         icon: Icon(Icons.push_pin, size: 16, color: KodaColors.gold),
-                        tooltip: 'Unpin',
+                        tooltip: t.homeUnpinTooltip,
                         onPressed: () async {
                           final ok = await KodaApi.instance.unpinMessage(
                               channelId, p['id'] as String? ?? '');
@@ -2449,7 +2685,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.commonClose)),
         ],
       ),
     );
@@ -2458,19 +2694,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   Future<void> _showCreateThreadDialog(Map<String, dynamic> message) async {
     final channel = ref.read(selectedChannelProvider);
     if (channel == null) return;
+    final t = AppLocalizations.of(context);
     final ctrl = TextEditingController();
     final name = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Create Thread',
+        title: Text(t.homeCreateThreadTitle,
             style: TextStyle(color: KodaColors.text1)),
-        content: KodaTextField(controller: ctrl, hintText: 'Thread name'),
+        content: KodaTextField(controller: ctrl, hintText: t.homeThreadNameHint, autofocus: true),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
+              child: Text(t.commonCancel)),
           TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()),
-              child: const Text('Create')),
+              child: Text(t.commonCreate)),
         ],
       ),
     );
@@ -2482,7 +2719,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     );
     if (thread != null && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Thread "$name" created!')));
+          SnackBar(content: Text(t.homeThreadCreated(name))));
       final server = ref.read(selectedServerProvider);
       if (server != null) _selectServer(server);
     }
@@ -2493,12 +2730,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     final selectedServer  = ref.watch(selectedServerProvider);
     final selectedChannel = ref.watch(selectedChannelProvider);
     final user = ref.watch(authProvider).user;
+    final t = AppLocalizations.of(context);
 
-    return Scaffold(
+    return Shortcuts(
+      shortcuts: const {SingleActivator(LogicalKeyboardKey.escape): _EscapeIntent()},
+      child: Actions(
+        actions: {
+          _EscapeIntent: CallbackAction<_EscapeIntent>(onInvoke: (_) {
+            // Neither of these is a modal Dialog, so neither gets
+            // Escape-to-dismiss for free the way every real dialog in
+            // the app already does -- this is the deliberate exception.
+            if (_replyingTo != null) {
+              setState(() => _replyingTo = null);
+            } else if (_showMemberPanel) {
+              setState(() => _showMemberPanel = false);
+            }
+            return null;
+          }),
+        },
+        child: Scaffold(
       backgroundColor: KodaColors.voidBg,
       body: Row(children: [
         // ── Server rail ──────────────────────────────────────────────
-        Container(
+        FocusTraversalGroup(child: Container(
           width: 72,
           color: KodaColors.bg2,
           child: Column(children: [
@@ -2508,8 +2762,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
               child: Tooltip(
-                message: 'Direct Messages',
-                child: GestureDetector(
+                message: t.homeDirectMessagesTooltip,
+                child: KodaTappable(
+                  selected: _showingDms,
+                  semanticLabel: t.homeDirectMessagesTooltip,
+                  borderRadius: BorderRadius.circular(_showingDms ? 14 : 24),
                   onTap: () => setState(() {
                     _showingDms = true;
                     _showingMarketplace = false;
@@ -2552,16 +2809,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                         final serverName = s['name'] as String? ?? 'Server';
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: Semantics(
-                            button: true,
+                          child: KodaTappable(
                             selected: selected,
-                            label: '$serverName'
+                            semanticLabel: '$serverName'
                                 '${borderHex != null ? ", boosted" : ""}',
-                            child: GestureDetector(
+                            borderRadius: BorderRadius.circular(selected ? 14 : 24),
                             onTap: () => _selectServer(s),
                             onSecondaryTapUp: (d) => _showServerContextMenu(s, d.globalPosition),
-
-                            child: ExcludeSemantics(
                             child: Container(
                               width: 48, height: 48,
                               margin: const EdgeInsets.symmetric(horizontal: 12),
@@ -2599,8 +2853,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                                         fontWeight: FontWeight.w700),
                                   ),
                             ),
-                            ),
-                            ),
                           ),
                         );
                       }).toList(),
@@ -2608,12 +2860,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             ),
             IconButton(
               icon: Icon(Icons.add, color: KodaColors.text2),
-              tooltip: 'Create or Join',
+              tooltip: t.homeCreateOrJoinTooltip,
               onPressed: () => _showAddServerMenu(),
             ),
             IconButton(
               icon: Icon(Icons.storefront_outlined, color: KodaColors.text2),
-              tooltip: 'Koda Marketplace',
+              tooltip: t.homeKodaMarketplaceTooltip,
               onPressed: () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const KodaMarketplaceScreen())),
             ),
@@ -2621,13 +2873,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               IconButton(
                 icon: Icon(Icons.admin_panel_settings_outlined,
                     color: KodaColors.koda),
-                tooltip: 'Admin Panel',
+                tooltip: t.homeAdminPanelTooltip,
                 onPressed: () => Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const AdminScreen())),
               ),
             const SizedBox(height: 10),
           ]),
-        ),
+        )),
 
         // ── Main content ─────────────────────────────────────────────
         if (_showingDms)
@@ -2638,7 +2890,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           ))
         else ...[
           // Channel list
-          Container(
+          FocusTraversalGroup(child: Container(
             width: 220,
             color: KodaColors.card,
             child: Column(children: [
@@ -2650,7 +2902,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                         Border(bottom: BorderSide(color: KodaColors.border))),
                 child: Row(children: [
                   Expanded(
-                    child: Text(selectedServer?['name'] ?? 'Koda',
+                    child: Text(selectedServer?['name'] ?? t.appTitle,
                         style: TextStyle(
                             color: KodaColors.text1,
                             fontWeight: FontWeight.w700),
@@ -2660,7 +2912,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     IconButton(
                       icon: Icon(Icons.settings_outlined,
                           size: 16, color: KodaColors.text3),
-                      tooltip: 'Server Settings',
+                      tooltip: t.homeServerSettingsTooltip,
                       onPressed: () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -2676,7 +2928,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   dense: true,
                   leading: Icon(Icons.storefront_outlined, size: 16,
                       color: _showingMarketplace ? KodaColors.text1 : KodaColors.text3),
-                  title: Text('Marketplace',
+                  title: Text(t.homeMarketplaceLabel,
                       style: TextStyle(fontSize: 13,
                           color: _showingMarketplace ? KodaColors.text1 : KodaColors.text3,
                           fontWeight: _showingMarketplace ? FontWeight.w600 : FontWeight.w400)),
@@ -2721,7 +2973,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   IconButton(
                     icon: Icon(Icons.settings_outlined,
                         size: 16, color: KodaColors.text3),
-                    tooltip: 'Settings',
+                    tooltip: t.homeSettingsTooltip,
                     onPressed: () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -2730,20 +2982,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 ]),
               ),
             ]),
-          ),
+          )),
 
           // Content area -- delegates to _buildContentArea which handles
           // gallery, text chat, and the "nothing selected" empty state.
           // Content area + optional member panel
           Expanded(child: Row(children: [
-            Expanded(child: Column(children: [
+            FocusTraversalGroup(child: Expanded(child: Column(children: [
               if (selectedServer?['tiltify']?['connected'] == true)
                 _buildTiltifyBanner(selectedServer!['tiltify'] as Map<String, dynamic>),
               Expanded(child: _buildBackgroundedContent(selectedServer, selectedChannel)),
               const VoiceBar(),
-            ])),
+            ]))),
             if (_showMemberPanel && selectedServer != null)
-              MemberPanel(
+              FocusTraversalGroup(child: MemberPanel(
                 server: selectedServer,
                 canKick: _can('kick_members'),
                 canBan: _can('ban_members'),
@@ -2752,10 +3004,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   'username': member['username'],
                   'avatar_url': member['avatar_url'],
                 }),
-              ),
+              )),
           ])),  // closes content Row
         ],      // closes outer Row children
       ]),
-    );
+    )));
   }
 }

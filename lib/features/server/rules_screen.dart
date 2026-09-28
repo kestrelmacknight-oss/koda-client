@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class RulesScreen extends StatefulWidget {
   final String serverId;
@@ -63,12 +64,13 @@ class _RulesScreenState extends State<RulesScreen> {
     setState(() => _loading = true);
     final ok = await KodaApi.instance.acceptRules(widget.serverId);
     if (!mounted) return;
+    final t = AppLocalizations.of(context);
     if (ok) {
       widget.onAccepted();
     } else {
       setState(() => _loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not accept rules. Try again.')));
+          SnackBar(content: Text(t.rulesScreenAcceptError)));
     if (widget.alreadyAccepted) {
       Navigator.pop(context);
       return;
@@ -80,6 +82,7 @@ class _RulesScreenState extends State<RulesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
@@ -89,7 +92,7 @@ class _RulesScreenState extends State<RulesScreen> {
           Text(widget.serverName,
               style: TextStyle(color: KodaColors.text1,
                   fontSize: 15, fontWeight: FontWeight.w700)),
-          Text('Server Rules',
+          Text(t.rulesScreenSubtitle,
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         ]),
       ),
@@ -120,7 +123,7 @@ class _RulesScreenState extends State<RulesScreen> {
                 if (!_scrolledToBottom) ...[
                   const SizedBox(height: 12),
                   Center(
-                    child: Text('Scroll down to read all rules',
+                    child: Text(t.rulesScreenScrollToRead,
                         style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                   ),
                 ],
@@ -136,7 +139,7 @@ class _RulesScreenState extends State<RulesScreen> {
               border: Border(top: BorderSide(color: KodaColors.border))),
           child: Column(children: [
             Text(
-              'By clicking Accept, you agree to follow these rules.\nViolations may result in removal from the server.',
+              t.rulesScreenAcceptDisclaimer,
               textAlign: TextAlign.center,
               style: TextStyle(color: KodaColors.text3, fontSize: 11),
             ),
@@ -159,8 +162,8 @@ class _RulesScreenState extends State<RulesScreen> {
                             strokeWidth: 2, color: Colors.white))
                     : Text(
                         _scrolledToBottom
-                          ? (widget.alreadyAccepted ? 'Close' : 'I Accept the Rules')
-                          : 'Read all rules to continue',
+                          ? (widget.alreadyAccepted ? t.commonClose : t.rulesScreenAcceptButton)
+                          : t.rulesScreenReadAllToContinue,
                         style: TextStyle(
                             color: _scrolledToBottom
                                 ? Colors.black

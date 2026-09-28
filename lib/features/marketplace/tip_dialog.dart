@@ -9,6 +9,7 @@ import '../../core/api.dart';
 import '../../core/checkout.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 
 class TipDialog extends ConsumerStatefulWidget {
@@ -54,6 +55,9 @@ class _TipDialogState extends ConsumerState<TipDialog> {
   }
 
   Future<void> _sendTip() async {
+    // Captured before any `await` below pops this dialog or otherwise
+    // invalidates this widget's own `context`.
+    final t = AppLocalizations.of(context);
     setState(() => _sending = true);
     final server = ref.read(selectedServerProvider);
     final result = await KodaApi.instance.createTip(
@@ -68,7 +72,7 @@ class _TipDialogState extends ConsumerState<TipDialog> {
     if (result == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to send tip. Creator may not be connected to Stripe.')));
+          SnackBar(content: Text(t.tipDialogFailedToSendTip)));
       }
       return;
     }
@@ -78,7 +82,7 @@ class _TipDialogState extends ConsumerState<TipDialog> {
     if (checkoutUrl == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not start checkout. Try again in a moment.')));
+          SnackBar(content: Text(t.tipDialogCouldNotStartCheckout)));
       }
       return;
     }
@@ -97,26 +101,27 @@ class _TipDialogState extends ConsumerState<TipDialog> {
         matches: (data) =>
             data['payment_type'] == 'tip' && data['tip_id'] == tipId);
     messenger.showSnackBar(SnackBar(content: Text(
-        confirmed ? 'Tip sent!' : 'Still waiting on that payment -- it\'ll go through once completed.')));
+        confirmed ? t.tipDialogTipSent : t.tipDialogTipPending)));
   }
 
   @override
   Widget build(BuildContext context) {
-    final username = widget.recipient['username'] as String? ?? 'Unknown';
+    final t = AppLocalizations.of(context);
+    final username = widget.recipient['username'] as String? ?? t.tipDialogUnknownUser;
 
     return AlertDialog(
       backgroundColor: KodaColors.card,
       title: Row(children: [
         Icon(Icons.volunteer_activism, color: KodaColors.koda, size: 20),
         const SizedBox(width: 8),
-        Text('Tip $username',
+        Text(t.tipDialogTipUsernameTitle(username),
             style: TextStyle(color: KodaColors.text1, fontSize: 16)),
       ]),
       content: SizedBox(
         width: 340,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           // Amount selector
-          Text('Select amount',
+          Text(t.tipDialogSelectAmountLabel,
               style: TextStyle(color: KodaColors.text3, fontSize: 12)),
           const SizedBox(height: 8),
           Row(children: _amounts.map((a) {
@@ -158,7 +163,7 @@ class _TipDialogState extends ConsumerState<TipDialog> {
           // Message
           KodaTextField(
             controller: _messageCtrl,
-            hintText: 'Add a message (optional)',
+            hintText: t.tipDialogMessageHint,
           ),
           const SizedBox(height: 12),
 
@@ -174,10 +179,10 @@ class _TipDialogState extends ConsumerState<TipDialog> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(children: [
-                _previewRow('You pay',
+                _previewRow(t.tipDialogYouPayLabel,
                     '\$${(_selectedAmount / 100).toStringAsFixed(2)}'),
                 const SizedBox(height: 4),
-                _previewRow('$username receives',
+                _previewRow(t.tipDialogUserReceivesLabel(username),
                     '\$${((_preview!['creator_amount_cents'] as int) / 100).toStringAsFixed(2)}'),
               ]),
             ),
@@ -185,7 +190,7 @@ class _TipDialogState extends ConsumerState<TipDialog> {
       ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel')),
+            child: Text(t.commonCancel)),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
               backgroundColor: KodaColors.koda,
@@ -195,7 +200,7 @@ class _TipDialogState extends ConsumerState<TipDialog> {
               ? const SizedBox(width: 16, height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2,
                       color: Colors.black))
-              : const Text('Send Tip'),
+              : Text(t.tipDialogSendTipButton),
         ),
       ],
     );

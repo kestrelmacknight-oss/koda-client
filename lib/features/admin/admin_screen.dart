@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import '../../../core/api.dart';
 import '../../../core/theme.dart';
 import '../../../shared/widgets.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
@@ -37,6 +38,7 @@ class _AdminScreenState extends State<AdminScreen>
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
@@ -45,7 +47,7 @@ class _AdminScreenState extends State<AdminScreen>
           Icon(Icons.admin_panel_settings_outlined,
               size: 18, color: KodaColors.koda),
           SizedBox(width: 8),
-          Text('Admin Panel',
+          Text(t.adminPanelTitle,
               style: TextStyle(color: KodaColors.text1, fontSize: 16)),
         ]),
         bottom: TabBar(
@@ -53,13 +55,13 @@ class _AdminScreenState extends State<AdminScreen>
           indicatorColor: KodaColors.koda,
           labelColor: KodaColors.text1,
           unselectedLabelColor: KodaColors.text3,
-          tabs: const [
-            Tab(text: 'Backer Codes'),
-            Tab(text: 'Users'),
-            Tab(text: 'DM Reports'),
-            Tab(text: 'Spam Flags'),
-            Tab(text: 'Wiki'),
-            Tab(text: 'Boosts'),
+          tabs: [
+            Tab(text: t.adminTabBackerCodes),
+            Tab(text: t.adminTabUsers),
+            Tab(text: t.adminTabDmReports),
+            Tab(text: t.adminTabSpamFlags),
+            Tab(text: t.adminTabWiki),
+            Tab(text: t.adminTabBoosts),
           ],
         ),
       ),
@@ -103,6 +105,7 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
   }
 
   Future<void> _showCreateDialog() async {
+    final t = AppLocalizations.of(context);
     final codeCtrl  = TextEditingController();
     final noteCtrl  = TextEditingController();
     final flagCtrl  = TextEditingController();
@@ -112,29 +115,29 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Create Backer Code',
+        title: Text(t.adminCreateBackerCodeTitle,
             style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 400,
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             KodaTextField(controller: codeCtrl,
-                hintText: 'Code (leave blank to auto-generate)'),
+                hintText: t.adminCodeHint, autofocus: true),
             const SizedBox(height: 8),
             KodaTextField(controller: noteCtrl,
-                hintText: 'Note (e.g. "Kickstarter Tier 2")'),
+                hintText: t.adminNoteHint),
             const SizedBox(height: 8),
             KodaTextField(controller: flagCtrl,
-                hintText: 'Flags as JSON (e.g. {"backer_tier":"founding"})'),
+                hintText: t.adminFlagsJsonHint),
             const SizedBox(height: 8),
             KodaTextField(controller: maxCtrl,
-                hintText: 'Max uses (leave blank = unlimited)',
+                hintText: t.adminMaxUsesHint,
                 keyboardType: TextInputType.number),
           ]),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
+              child: Text(t.commonCancel)),
           TextButton(
             onPressed: () async {
               Map<String, dynamic> flags = {};
@@ -166,12 +169,12 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
                   context: context,
                   builder: (_) => AlertDialog(
                     backgroundColor: KodaColors.card,
-                    title: Text('Code Created',
+                    title: Text(t.adminCodeCreatedTitle,
                         style: TextStyle(color: KodaColors.text1)),
                     content: Column(mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                      Text('Code:',
+                      Text(t.adminCodeLabel,
                           style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                       const SizedBox(height: 4),
                       Row(children: [
@@ -183,26 +186,26 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
                         IconButton(
                           icon: Icon(Icons.copy, size: 16,
                               color: KodaColors.text3),
-                          tooltip: 'Copy code',
+                          tooltip: t.adminCopyCodeTooltip,
                           onPressed: () =>
                               Clipboard.setData(ClipboardData(text: code)),
                         ),
                       ]),
                       const SizedBox(height: 8),
-                      Text('Flags: ${result['flags']}',
+                      Text(t.adminFlagsValue('${result['flags']}'),
                           style: TextStyle(
                               color: KodaColors.text3, fontSize: 12)),
                     ]),
                     actions: [
                       TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: const Text('Done')),
+                          child: Text(t.commonDone)),
                     ],
                   ),
                 );
               }
             },
-            child: const Text('Create'),
+            child: Text(t.commonCreate),
           ),
         ],
       ),
@@ -226,18 +229,19 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Column(children: [
       Padding(
         padding: const EdgeInsets.all(16),
         child: Row(children: [
-          Text('Backer & Reward Codes',
+          Text(t.adminBackerCodesHeader,
               style: TextStyle(color: KodaColors.text1,
                   fontSize: 15, fontWeight: FontWeight.w700)),
           const Spacer(),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(backgroundColor: KodaColors.koda),
             icon: const Icon(Icons.add, size: 16, color: Colors.white),
-            label: const Text('New Code',
+            label: Text(t.adminNewCodeButton,
                 style: TextStyle(color: Colors.white)),
             onPressed: _showCreateDialog,
           ),
@@ -249,7 +253,7 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
             ? Center(child: CircularProgressIndicator(
                 color: KodaColors.koda))
             : _codes.isEmpty
-                ? Center(child: Text('No codes yet',
+                ? Center(child: Text(t.adminNoCodesYet,
                     style: TextStyle(color: KodaColors.text3)))
                 : ListView.builder(
                     padding: const EdgeInsets.all(12),
@@ -259,8 +263,8 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
                       final uses    = c['uses'] as int? ?? 0;
                       final maxUses = c['max_uses'] as int?;
                       final usesStr = maxUses != null
-                          ? '$uses / $maxUses'
-                          : '$uses uses';
+                          ? t.adminUsesOfMax(uses, maxUses)
+                          : t.adminUsesCount(uses);
                       return Container(
                         margin: const EdgeInsets.only(bottom: 8),
                         padding: const EdgeInsets.all(14),
@@ -288,7 +292,7 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
                                 constraints: const BoxConstraints(),
                                 icon: Icon(Icons.copy, size: 14,
                                     color: KodaColors.text3),
-                                tooltip: 'Copy code',
+                                tooltip: t.adminCopyCodeTooltip,
                                 onPressed: () => Clipboard.setData(
                                     ClipboardData(text: c['code'] as String)),
                               ),
@@ -298,7 +302,7 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
                                   style: TextStyle(
                                       color: KodaColors.text2, fontSize: 12)),
                             const SizedBox(height: 4),
-                            Text('Flags: ${c['flags']}',
+                            Text(t.adminFlagsValue('${c['flags']}'),
                                 style: TextStyle(
                                     color: KodaColors.text3, fontSize: 11)),
                             Text(usesStr,
@@ -343,12 +347,13 @@ class _UsersTabState extends State<_UsersTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Column(children: [
       Padding(
         padding: const EdgeInsets.all(16),
         child: KodaTextField(
           controller: _searchCtrl,
-          hintText: 'Search users by username...',
+          hintText: t.adminSearchUsersHint,
           onSubmitted: _search,
         ),
       ),
@@ -358,7 +363,7 @@ class _UsersTabState extends State<_UsersTab> {
             ? Center(child: CircularProgressIndicator(
                 color: KodaColors.koda))
             : _members.isEmpty
-                ? Center(child: Text('Search for a user above',
+                ? Center(child: Text(t.adminSearchUsersPrompt,
                     style: TextStyle(color: KodaColors.text3)))
                 : ListView.builder(
                     padding: const EdgeInsets.all(12),
@@ -392,7 +397,7 @@ class _UsersTabState extends State<_UsersTab> {
                                     color: KodaColors.text3, fontSize: 12)),
                             if (m['flags'] != null &&
                                 (m['flags'] as Map).isNotEmpty)
-                              Text('Flags: ${m['flags']}',
+                              Text(t.adminFlagsValue('${m['flags']}'),
                                   style: TextStyle(
                                       color: KodaColors.gold, fontSize: 11)),
                           ])),
@@ -442,6 +447,7 @@ class _DmReportsTabState extends State<_DmReportsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final pending = _reports.where((r) => r['status'] == 'pending').toList();
     final resolved = _reports.where((r) => r['status'] != 'pending').toList();
 
@@ -453,21 +459,21 @@ class _DmReportsTabState extends State<_DmReportsTab> {
               if (pending.isEmpty && resolved.isEmpty)
                 Center(child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Text('No DM reports.', style: TextStyle(color: KodaColors.text3)),
+                  child: Text(t.adminNoDmReports, style: TextStyle(color: KodaColors.text3)),
                 )),
-              ...pending.map((r) => _reportCard(r)),
+              ...pending.map((r) => _reportCard(r, t)),
               if (resolved.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                Text('RESOLVED', style: TextStyle(
+                Text(t.adminResolvedLabel, style: TextStyle(
                     color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
                 const SizedBox(height: 8),
-                ...resolved.map((r) => _reportCard(r)),
+                ...resolved.map((r) => _reportCard(r, t)),
               ],
             ],
           );
   }
 
-  Widget _reportCard(Map<String, dynamic> r) {
+  Widget _reportCard(Map<String, dynamic> r, AppLocalizations t) {
     final status = r['status'] as String? ?? 'pending';
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -478,10 +484,10 @@ class _DmReportsTabState extends State<_DmReportsTab> {
         border: Border.all(color: KodaColors.border),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(r['reason'] as String? ?? 'other',
+        Text(r['reason'] as String? ?? t.adminReasonOther,
             style: TextStyle(color: KodaColors.koda, fontSize: 11, fontWeight: FontWeight.w700)),
         const SizedBox(height: 6),
-        Text('Reporter: ${r['reporter_id']}\nRevealed sender: ${r['target_user_id']}',
+        Text(t.adminDmReportDetails('${r['reporter_id']}', '${r['target_user_id']}'),
             style: TextStyle(color: KodaColors.text2, fontSize: 12)),
         const SizedBox(height: 6),
         Container(
@@ -494,7 +500,7 @@ class _DmReportsTabState extends State<_DmReportsTab> {
         ),
         if ((r['note'] as String?)?.isNotEmpty ?? false) ...[
           const SizedBox(height: 6),
-          Text('Note: ${r['note']}',
+          Text(t.adminNoteValue('${r['note']}'),
               style: TextStyle(color: KodaColors.text3, fontSize: 11, fontStyle: FontStyle.italic)),
         ],
         if (status == 'pending') ...[
@@ -502,18 +508,18 @@ class _DmReportsTabState extends State<_DmReportsTab> {
           Row(children: [
             TextButton(
               onPressed: () => _resolve(r['id'] as String, 'dismissed'),
-              child: const Text('Dismiss'),
+              child: Text(t.adminDismissButton),
             ),
             const SizedBox(width: 4),
             TextButton(
               onPressed: () => _resolve(r['id'] as String, 'actioned'),
-              child: Text('Mark Actioned', style: TextStyle(color: KodaColors.accent)),
+              child: Text(t.adminMarkActionedButton, style: TextStyle(color: KodaColors.accent)),
             ),
           ]),
         ] else
           Padding(
             padding: const EdgeInsets.only(top: 6),
-            child: Text(status == 'actioned' ? 'Actioned' : 'Dismissed',
+            child: Text(status == 'actioned' ? t.adminStatusActioned : t.adminStatusDismissed,
                 style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           ),
       ]),
@@ -560,12 +566,12 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
     if (ok && mounted) _load();
   }
 
-  String _flagLabel(String type) {
+  String _flagLabel(String type, AppLocalizations t) {
     switch (type) {
-      case 'dm_fanout': return 'Mass-DM spam';
-      case 'raid_lockdown': return 'Raid lockdown';
-      case 'bot_behavior': return 'Bot-like behavior';
-      default: return 'Channel flooding';
+      case 'dm_fanout': return t.adminFlagMassDmSpam;
+      case 'raid_lockdown': return t.adminFlagRaidLockdown;
+      case 'bot_behavior': return t.adminFlagBotBehavior;
+      default: return t.adminFlagChannelFlooding;
     }
   }
 
@@ -580,6 +586,7 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final pending = _flags.where((f) => f['status'] == 'pending').toList();
     final resolved = _flags.where((f) => f['status'] != 'pending').toList();
 
@@ -591,34 +598,34 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
               if (pending.isEmpty && resolved.isEmpty)
                 Center(child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Text('No spam flags.', style: TextStyle(color: KodaColors.text3)),
+                  child: Text(t.adminNoSpamFlags, style: TextStyle(color: KodaColors.text3)),
                 )),
-              ...pending.map((f) => _flagCard(f)),
+              ...pending.map((f) => _flagCard(f, t)),
               if (resolved.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                Text('RESOLVED', style: TextStyle(
+                Text(t.adminResolvedLabel, style: TextStyle(
                     color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
                 const SizedBox(height: 8),
-                ...resolved.map((f) => _flagCard(f)),
+                ...resolved.map((f) => _flagCard(f, t)),
               ],
             ],
           );
   }
 
-  String _restrictionLabel(String type, Map<String, dynamic> restriction) {
+  String _restrictionLabel(String type, Map<String, dynamic> restriction, AppLocalizations t) {
     if (type == 'raid_lockdown') {
       final mutedCount = restriction['muted_count'] as int? ?? 0;
       final totalJoiners = restriction['total_joiners'] as int? ?? 0;
       return mutedCount > 0
-          ? '$mutedCount of $totalJoiners joiners still muted'
-          : 'No joiners currently muted';
+          ? t.adminMutedJoiners(mutedCount, totalJoiners)
+          : t.adminNoJoinersMuted;
     }
     final until = restriction['until'] as String?;
     if (restriction['active'] == true && until != null) {
       final local = DateTime.parse(until).toLocal().toString().split('.').first;
-      return 'Currently restricted until $local';
+      return t.adminRestrictedUntil(local);
     }
-    return 'Not currently restricted';
+    return t.adminNotCurrentlyRestricted;
   }
 
   Color _confidenceColor(String? label) {
@@ -629,7 +636,7 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
     }
   }
 
-  Widget _flagCard(Map<String, dynamic> f) {
+  Widget _flagCard(Map<String, dynamic> f, AppLocalizations t) {
     final status = f['status'] as String? ?? 'pending';
     final type = f['flag_type'] as String? ?? 'dm_fanout';
     final details = Map<String, dynamic>.from(f['details'] ?? {});
@@ -652,24 +659,24 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
         Row(children: [
           Icon(_flagIcon(type), size: 14, color: KodaColors.koda),
           const SizedBox(width: 6),
-          Text(_flagLabel(type),
+          Text(_flagLabel(type, t),
               style: TextStyle(color: KodaColors.koda, fontSize: 11, fontWeight: FontWeight.w700)),
           if (autoEscalated) ...[
             const SizedBox(width: 6),
-            Text('AUTO-ESCALATED',
+            Text(t.adminAutoEscalatedBadge,
                 style: TextStyle(color: KodaColors.accent, fontSize: 10, fontWeight: FontWeight.w700)),
           ],
           const Spacer(),
           if (confidence['score'] != null)
-            Text('Confidence: ${confidence['score']}% (${confidence['label']})',
+            Text(t.adminConfidenceLabel('${confidence['score']}', '${confidence['label']}'),
                 style: TextStyle(
                     color: _confidenceColor(confidence['label'] as String?),
                     fontSize: 10, fontWeight: FontWeight.w600)),
         ]),
         const SizedBox(height: 6),
         Text([
-          if (f['user_id'] != null) 'User: ${f['user_id']}',
-          if (f['server_id'] != null) 'Server: ${f['server_id']}',
+          if (f['user_id'] != null) t.adminFlagUserLine('${f['user_id']}'),
+          if (f['server_id'] != null) t.adminFlagServerLine('${f['server_id']}'),
         ].join('\n'), style: TextStyle(color: KodaColors.text2, fontSize: 12)),
         if (details.isNotEmpty) ...[
           const SizedBox(height: 6),
@@ -683,7 +690,7 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
           ),
         ],
         const SizedBox(height: 6),
-        Text(_restrictionLabel(type, restriction),
+        Text(_restrictionLabel(type, restriction, t),
             style: TextStyle(
                 color: restriction['active'] == true ? KodaColors.accent : KodaColors.text3,
                 fontSize: 11, fontStyle: FontStyle.italic)),
@@ -692,18 +699,18 @@ class _SpamFlagsTabState extends State<_SpamFlagsTab> {
           Row(children: [
             TextButton(
               onPressed: () => _resolve(f['id'] as String, 'dismissed'),
-              child: const Text('Dismiss & Undo'),
+              child: Text(t.adminDismissUndoButton),
             ),
             const SizedBox(width: 4),
             TextButton(
               onPressed: () => _resolve(f['id'] as String, 'actioned'),
-              child: Text('Confirm & Restrict', style: TextStyle(color: KodaColors.accent)),
+              child: Text(t.adminConfirmRestrictButton, style: TextStyle(color: KodaColors.accent)),
             ),
           ]),
         ] else
           Padding(
             padding: const EdgeInsets.only(top: 6),
-            child: Text(status == 'actioned' ? 'Actioned' : 'Dismissed',
+            child: Text(status == 'actioned' ? t.adminStatusActioned : t.adminStatusDismissed,
                 style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           ),
       ]),
@@ -748,18 +755,19 @@ class _WikiTabState extends State<_WikiTab> {
   }
 
   Future<void> _delete(Map<String, dynamic> article) async {
+    final t = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Delete article?', style: TextStyle(color: KodaColors.text1)),
-        content: Text('"${article['title']}" will be removed from Visp\'s knowledge base.',
+        title: Text(t.adminDeleteArticleTitle, style: TextStyle(color: KodaColors.text1)),
+        content: Text(t.adminDeleteArticleBody('${article['title']}'),
             style: TextStyle(color: KodaColors.text3)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.commonCancel)),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Delete', style: TextStyle(color: KodaColors.accent)),
+            child: Text(t.commonDelete, style: TextStyle(color: KodaColors.accent)),
           ),
         ],
       ),
@@ -771,6 +779,7 @@ class _WikiTabState extends State<_WikiTab> {
   }
 
   Future<void> _showEditor({Map<String, dynamic>? article}) async {
+    final t = AppLocalizations.of(context);
     final titleCtrl = TextEditingController(text: article?['title'] as String? ?? '');
     final contentCtrl = TextEditingController(text: article?['content'] as String? ?? '');
     String category = article?['category'] as String? ?? _wikiCategories.first;
@@ -780,12 +789,12 @@ class _WikiTabState extends State<_WikiTab> {
       builder: (_) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: Text(article == null ? 'New Article' : 'Edit Article',
+          title: Text(article == null ? t.adminNewArticleTitle : t.adminEditArticleTitle,
               style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 480,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              KodaTextField(controller: titleCtrl, hintText: 'Title'),
+              KodaTextField(controller: titleCtrl, hintText: t.adminArticleTitleHint, autofocus: true),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
                 initialValue: category,
@@ -805,18 +814,18 @@ class _WikiTabState extends State<_WikiTab> {
                 maxLines: 10,
                 minLines: 6,
                 style: TextStyle(color: KodaColors.text1, fontSize: 13),
-                decoration: const InputDecoration(
-                  hintText: 'Article content (markdown)',
-                  contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: InputDecoration(
+                  hintText: t.adminArticleContentHint,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 ),
               ),
             ]),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.commonCancel)),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: Text(article == null ? 'Create' : 'Save'),
+              child: Text(article == null ? t.commonCreate : t.commonSave),
             ),
           ],
         ),
@@ -838,17 +847,18 @@ class _WikiTabState extends State<_WikiTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Column(children: [
       Padding(
         padding: const EdgeInsets.all(16),
         child: Row(children: [
-          Text('Wiki Articles',
+          Text(t.adminWikiArticlesHeader,
               style: TextStyle(color: KodaColors.text1, fontSize: 15, fontWeight: FontWeight.w700)),
           const Spacer(),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(backgroundColor: KodaColors.koda),
             icon: const Icon(Icons.add, size: 16, color: Colors.white),
-            label: const Text('New Article', style: TextStyle(color: Colors.white)),
+            label: Text(t.adminNewArticleTitle, style: TextStyle(color: Colors.white)),
             onPressed: () => _showEditor(),
           ),
         ]),
@@ -858,7 +868,7 @@ class _WikiTabState extends State<_WikiTab> {
         child: _loading
             ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
             : _articles.isEmpty
-                ? Center(child: Text('No articles yet', style: TextStyle(color: KodaColors.text3)))
+                ? Center(child: Text(t.adminNoArticlesYet, style: TextStyle(color: KodaColors.text3)))
                 : ListView.builder(
                     padding: const EdgeInsets.all(12),
                     itemCount: _articles.length,
@@ -885,12 +895,12 @@ class _WikiTabState extends State<_WikiTab> {
                           ])),
                           IconButton(
                             icon: Icon(Icons.edit_outlined, size: 18, color: KodaColors.text3),
-                            tooltip: 'Edit article',
+                            tooltip: t.adminEditArticleTooltip,
                             onPressed: () => _showEditor(article: a),
                           ),
                           IconButton(
                             icon: Icon(Icons.delete_outline, size: 18, color: KodaColors.text3),
-                            tooltip: 'Delete article',
+                            tooltip: t.adminDeleteArticleTooltip,
                             onPressed: () => _delete(a),
                           ),
                         ]),
@@ -928,27 +938,29 @@ class _BoostsTabState extends State<_BoostsTab> {
   }
 
   Future<void> _grant(Map<String, dynamic> server) async {
+    final t = AppLocalizations.of(context);
     final countText = await showDialog<String>(
       context: context,
       builder: (context) {
         final ctrl = TextEditingController(text: '1');
         return AlertDialog(
           backgroundColor: KodaColors.card,
-          title: Text('Grant boosts to ${server['name']}',
+          title: Text(t.adminGrantBoostsTitle('${server['name']}'),
               style: TextStyle(color: KodaColors.text1)),
           content: KodaTextField(
             controller: ctrl,
-            hintText: 'Number of boosts',
+            hintText: t.adminNumBoostsHint,
             keyboardType: TextInputType.number,
+            autofocus: true,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: TextStyle(color: KodaColors.text3)),
+              child: Text(t.commonCancel, style: TextStyle(color: KodaColors.text3)),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, ctrl.text),
-              child: Text('Grant', style: TextStyle(color: KodaColors.koda)),
+              child: Text(t.adminGrantButton, style: TextStyle(color: KodaColors.koda)),
             ),
           ],
         );
@@ -958,7 +970,7 @@ class _BoostsTabState extends State<_BoostsTab> {
     final count = int.tryParse(countText.trim());
     if (count == null || count <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Enter a positive whole number.')));
+          SnackBar(content: Text(t.adminPositiveNumberError)));
       return;
     }
 
@@ -969,12 +981,12 @@ class _BoostsTabState extends State<_BoostsTab> {
 
     if (status == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to grant boosts.')));
+          SnackBar(content: Text(t.adminGrantBoostsFailed)));
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
-        'Granted $count boost${count == 1 ? '' : 's'} to ${server['name']} '
-        '-- now level ${status['level']} (${status['count']} active).')));
+        t.adminBoostsGranted(count, '${server['name']}',
+            status['level'] as int? ?? 0, status['count'] as int? ?? 0))));
   }
 
   @override
@@ -985,12 +997,13 @@ class _BoostsTabState extends State<_BoostsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Column(children: [
       Padding(
         padding: const EdgeInsets.all(16),
         child: KodaTextField(
           controller: _searchCtrl,
-          hintText: 'Search servers by name...',
+          hintText: t.adminSearchServersHint,
           onSubmitted: _search,
         ),
       ),
@@ -999,7 +1012,7 @@ class _BoostsTabState extends State<_BoostsTab> {
         child: _loading
             ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
             : _results.isEmpty
-                ? Center(child: Text('Search for a server above',
+                ? Center(child: Text(t.adminSearchServersPrompt,
                     style: TextStyle(color: KodaColors.text3)))
                 : ListView.builder(
                     padding: const EdgeInsets.all(12),
@@ -1034,7 +1047,7 @@ class _BoostsTabState extends State<_BoostsTab> {
                               children: [
                             Text(s['name'] as String? ?? '',
                                 style: TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w600)),
-                            Text('${s['member_count'] ?? 0} members',
+                            Text(t.adminMemberCountLabel(s['member_count'] as int? ?? 0),
                                 style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                           ])),
                           const SizedBox(width: 8),
@@ -1044,7 +1057,7 @@ class _BoostsTabState extends State<_BoostsTab> {
                               : TextButton.icon(
                                   onPressed: () => _grant(s),
                                   icon: Icon(Icons.bolt, size: 16, color: KodaColors.koda),
-                                  label: Text('Grant Boosts', style: TextStyle(color: KodaColors.koda)),
+                                  label: Text(t.adminGrantBoostsButtonLabel, style: TextStyle(color: KodaColors.koda)),
                                 ),
                         ]),
                       );

@@ -11,19 +11,29 @@
 import 'package:flutter/material.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
+import '../l10n/generated/app_localizations.dart';
 
 class _ReasonOption {
   final String value;
-  final String label;
-  const _ReasonOption(this.value, this.label);
+  // Internal lookup value stays fixed; the display label is looked up
+  // from AppLocalizations per-build (see _reasonLabels below) since it
+  // needs a BuildContext to localize.
+  const _ReasonOption(this.value);
 }
 
 const _reasons = [
-  _ReasonOption('spam', 'Spam'),
-  _ReasonOption('harassment', 'Harassment or abuse'),
-  _ReasonOption('illegal', 'Illegal content'),
-  _ReasonOption('other', 'Other'),
+  _ReasonOption('spam'),
+  _ReasonOption('harassment'),
+  _ReasonOption('illegal'),
+  _ReasonOption('other'),
 ];
+
+Map<String, String> _reasonLabels(AppLocalizations t) => {
+      'spam': t.reportDialogReasonSpam,
+      'harassment': t.reportDialogReasonHarassment,
+      'illegal': t.reportDialogReasonIllegal,
+      'other': t.reportDialogReasonOther,
+    };
 
 /// Shows the report dialog for a channel message. [disclosedContent] must
 /// be the caller's own already-decrypted copy of the message -- never
@@ -80,27 +90,35 @@ class _ReportDialogState extends State<_ReportDialog> {
   }
 
   Future<void> _submit() async {
+    // Captured before the await below, so we don't touch a
+    // possibly-unmounted context afterward.
+    final t = AppLocalizations.of(context);
     setState(() { _submitting = true; _error = null; });
     final result = await widget.onSubmit(_reason, _noteCtrl.text.trim().isEmpty ? null : _noteCtrl.text.trim());
     if (!mounted) return;
     if (result != null) {
       Navigator.pop(context, true);
     } else {
-      setState(() { _submitting = false; _error = 'Could not submit report.'; });
+      setState(() { _submitting = false; _error = t.reportDialogSubmitError; });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final reasonLabels = _reasonLabels(t);
     return AlertDialog(
       backgroundColor: KodaColors.card,
-      title: Text('Report Message', style: TextStyle(color: KodaColors.text1)),
+      // Reuses the home/dm "Report Message" action's own key -- this
+      // dialog is shared between both message-actions menus and shows
+      // the exact same title text either way.
+      title: Text(t.homeReportMessageAction, style: TextStyle(color: KodaColors.text1)),
       content: SizedBox(
         width: 320,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: Text('Reason', style: TextStyle(color: KodaColors.text2, fontSize: 12)),
+            child: Text(t.reportDialogReasonLabel, style: TextStyle(color: KodaColors.text2, fontSize: 12)),
           ),
           const SizedBox(height: 6),
           ..._reasons.map((r) {
@@ -117,7 +135,7 @@ class _ReportDialogState extends State<_ReportDialog> {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: selected ? KodaColors.koda : KodaColors.border),
                   ),
-                  child: Text(r.label,
+                  child: Text(reasonLabels[r.value] ?? r.value,
                       style: TextStyle(
                           color: selected ? KodaColors.koda : KodaColors.text1, fontSize: 13)),
                 ),
@@ -130,13 +148,13 @@ class _ReportDialogState extends State<_ReportDialog> {
             maxLines: 3,
             style: TextStyle(color: KodaColors.text1, fontSize: 13),
             decoration: InputDecoration(
-              hintText: 'Anything else moderators should know? (optional)',
+              hintText: t.reportDialogNoteHint,
               hintStyle: TextStyle(color: KodaColors.text3, fontSize: 12),
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'The message content shown to you and who sent it will be shared with this server\'s moderators.',
+            t.reportDialogDisclosureNote,
             style: TextStyle(color: KodaColors.text3, fontSize: 11),
           ),
           if (_error != null) ...[
@@ -148,7 +166,7 @@ class _ReportDialogState extends State<_ReportDialog> {
       actions: [
         TextButton(
           onPressed: _submitting ? null : () => Navigator.pop(context, false),
-          child: const Text('Cancel'),
+          child: Text(t.commonCancel),
         ),
         TextButton(
           onPressed: _submitting ? null : _submit,
@@ -156,7 +174,7 @@ class _ReportDialogState extends State<_ReportDialog> {
               ? SizedBox(
                   width: 16, height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
-              : const Text('Submit Report'),
+              : Text(t.reportDialogSubmitButton),
         ),
       ],
     );

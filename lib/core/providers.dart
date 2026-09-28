@@ -110,6 +110,14 @@ final serverEmojiProvider =
 
 class VoiceSettings {
   final bool noiseSuppression;
+  // RNNoise-based real-time neural noise suppression -- Windows only for
+  // now, see package:flutter_webrtc's Helper.setDeepNoiseSuppression (a
+  // Koda-specific native patch, not an upstream feature). Mutually
+  // exclusive with noiseSuppression above (WebRTC's own built-in NS runs
+  // upstream of this hook in the capture chain, so stacking both is
+  // redundant at best -- enforced in the settings UI and defensively
+  // again in audioCaptureOptionsFor below).
+  final bool deepNoiseSuppression;
   final bool echoCancellation;
   final bool autoGainControl;
   // Real WebRTC capture constraints (see AudioCaptureOptions in
@@ -145,12 +153,13 @@ class VoiceSettings {
   final double varmThreshold;
 
   const VoiceSettings({
-    this.noiseSuppression = false,
+    this.noiseSuppression = true,
+    this.deepNoiseSuppression = false,
     this.echoCancellation = true,
     this.autoGainControl = true,
-    this.highPassFilter = false,
+    this.highPassFilter = true,
     this.typingNoiseDetection = true,
-    this.voiceIsolation = false,
+    this.voiceIsolation = true,
     this.autoDucking = false,
     this.eqEnabled = false,
     this.eqBassGain = 0.0,
@@ -172,12 +181,13 @@ class VoiceSettings {
   bool get varmEnabled => varmSilentUrl != null && varmTalkingUrl != null;
 
   factory VoiceSettings.fromJson(Map<String, dynamic> j) => VoiceSettings(
-        noiseSuppression:      j['noise_suppression'] as bool? ?? false,
+        noiseSuppression:      j['noise_suppression'] as bool? ?? true,
+        deepNoiseSuppression:  j['deep_noise_suppression'] as bool? ?? false,
         echoCancellation:      j['echo_cancellation'] as bool? ?? true,
         autoGainControl:       j['auto_gain_control'] as bool? ?? true,
-        highPassFilter:        j['high_pass_filter'] as bool? ?? false,
+        highPassFilter:        j['high_pass_filter'] as bool? ?? true,
         typingNoiseDetection:  j['typing_noise_detection'] as bool? ?? true,
-        voiceIsolation:        j['voice_isolation'] as bool? ?? false,
+        voiceIsolation:        j['voice_isolation'] as bool? ?? true,
         autoDucking:           j['auto_ducking'] as bool? ?? false,
         eqEnabled:             j['eq_enabled'] as bool? ?? false,
         eqBassGain:            (j['eq_bass_gain'] as num?)?.toDouble() ?? 0.0,
@@ -198,6 +208,7 @@ class VoiceSettings {
 
   Map<String, dynamic> toJson() => {
         'noise_suppression':      noiseSuppression,
+        'deep_noise_suppression': deepNoiseSuppression,
         'echo_cancellation':      echoCancellation,
         'auto_gain_control':      autoGainControl,
         'high_pass_filter':       highPassFilter,
@@ -223,6 +234,7 @@ class VoiceSettings {
 
   VoiceSettings copyWith({
     bool? noiseSuppression,
+    bool? deepNoiseSuppression,
     bool? echoCancellation,
     bool? autoGainControl,
     bool? highPassFilter,
@@ -248,6 +260,7 @@ class VoiceSettings {
     bool clearVarm = false,
   }) => VoiceSettings(
         noiseSuppression:     noiseSuppression ?? this.noiseSuppression,
+        deepNoiseSuppression: deepNoiseSuppression ?? this.deepNoiseSuppression,
         echoCancellation:     echoCancellation ?? this.echoCancellation,
         autoGainControl:      autoGainControl ?? this.autoGainControl,
         highPassFilter:       highPassFilter ?? this.highPassFilter,

@@ -14,6 +14,7 @@ import '../../core/crypto/channel_epoch.dart';
 import '../../core/crypto/threshold_moderation_manager.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class ThresholdModerationTab extends ConsumerStatefulWidget {
   final String serverId;
@@ -61,6 +62,7 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
   }
 
   Future<void> _showConfigDialog() async {
+    final t = AppLocalizations.of(context);
     final selected = <String>{...((_config?['moderator_ids'] as List?) ?? const []).cast<String>()};
     var threshold = _config?['threshold'] as int? ?? 2;
 
@@ -69,14 +71,12 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: Text('Configure Threshold Moderation', style: TextStyle(color: KodaColors.text1)),
+          title: Text(t.thresholdModConfigureTitle, style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 360,
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
-                'Pick trusted moderators and how many of them must agree before any '
-                'of them can decrypt one epoch of a channel\'s history. Not even you '
-                'get a unilateral key -- you\'re only exempt if you\'re also in this list.',
+                t.thresholdModConfigureExplanation,
                 style: TextStyle(color: KodaColors.text3, fontSize: 12),
               ),
               const SizedBox(height: 12),
@@ -105,27 +105,27 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
               ),
               const SizedBox(height: 8),
               Row(children: [
-                Text('Threshold:', style: TextStyle(color: KodaColors.text2, fontSize: 13)),
+                Text(t.thresholdModThresholdLabel, style: TextStyle(color: KodaColors.text2, fontSize: 13)),
                 const SizedBox(width: 12),
                 IconButton(
                   icon: Icon(Icons.remove_circle_outline, size: 20, color: KodaColors.text3),
-                  tooltip: 'Decrease threshold',
+                  tooltip: t.thresholdModDecreaseThresholdTooltip,
                   onPressed: threshold > 2 ? () => setDialogState(() => threshold--) : null,
                 ),
                 Text('$threshold', style: TextStyle(color: KodaColors.text1, fontSize: 15, fontWeight: FontWeight.w700)),
                 IconButton(
                   icon: Icon(Icons.add_circle_outline, size: 20, color: KodaColors.text3),
-                  tooltip: 'Increase threshold',
+                  tooltip: t.thresholdModIncreaseThresholdTooltip,
                   onPressed: threshold < selected.length ? () => setDialogState(() => threshold++) : null,
                 ),
                 const Spacer(),
-                Text('of ${selected.length} moderators',
+                Text(t.thresholdModOfModeratorsCount(selected.length),
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
               ]),
             ]),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(t.commonCancel)),
             TextButton(
               onPressed: selected.length < 2 || threshold > selected.length
                   ? null
@@ -138,7 +138,7 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
                         _load();
                       }
                     },
-              child: const Text('Save'),
+              child: Text(t.commonSave),
             ),
           ],
         ),
@@ -147,6 +147,7 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
   }
 
   Future<void> _showRequestDialog() async {
+    final t = AppLocalizations.of(context);
     final textChannels = widget.channels.where((c) => c['type'] == 'text').toList();
     if (textChannels.isEmpty) return;
     Map<String, dynamic>? selectedChannel = textChannels.first;
@@ -157,11 +158,11 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: Text('Request Threshold Decrypt', style: TextStyle(color: KodaColors.text1)),
+          title: Text(t.thresholdModRequestDecryptTitle, style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 320,
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Channel', style: TextStyle(color: KodaColors.text2, fontSize: 12)),
+              Text(t.thresholdModChannelLabel, style: TextStyle(color: KodaColors.text2, fontSize: 12)),
               DropdownButton<Map<String, dynamic>>(
                 value: selectedChannel,
                 isExpanded: true,
@@ -176,12 +177,12 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
                 controller: reasonCtrl,
                 maxLines: 2,
                 style: TextStyle(color: KodaColors.text1, fontSize: 13),
-                decoration: const InputDecoration(hintText: 'Reason -- shown to every designated moderator'),
+                decoration: InputDecoration(hintText: t.thresholdModReasonHint),
               ),
             ]),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(t.commonCancel)),
             TextButton(
               onPressed: reasonCtrl.text.trim().isEmpty
                   ? null
@@ -194,7 +195,7 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
                       if (ctx.mounted) Navigator.pop(ctx);
                       if (mounted) _load();
                     },
-              child: const Text('Request'),
+              child: Text(t.thresholdModRequestButton),
             ),
           ],
         ),
@@ -216,8 +217,9 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
   Future<void> _relay(Map<String, dynamic> request) async {
     await ThresholdModerationManager.instance.relayShareIfApproved(request: request, myUserId: _myUserId!);
     if (mounted) {
+      final t = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Share relayed to the requester.')));
+          SnackBar(content: Text(t.thresholdModShareRelayed)));
     }
   }
 
@@ -227,9 +229,10 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
     final key = await ThresholdModerationManager.instance.tryReconstruct(
         request: request, myUserId: _myUserId!, threshold: threshold);
     if (!mounted) return;
+    final t = AppLocalizations.of(context);
     if (key == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Not enough shares relayed yet -- try again once more moderators have relayed theirs.')));
+          SnackBar(content: Text(t.thresholdModNotEnoughShares)));
       return;
     }
     _showDecryptedEpoch(request, key);
@@ -257,17 +260,18 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
     }
 
     if (!mounted) return;
+    final t = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Epoch $epoch -- ${decrypted.length} messages',
+        title: Text(t.thresholdModEpochMessagesTitle(epoch, decrypted.length),
             style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 360,
           height: 400,
           child: decrypted.isEmpty
-              ? Center(child: Text('No decryptable messages in this epoch.',
+              ? Center(child: Text(t.thresholdModNoDecryptableMessages,
                   style: TextStyle(color: KodaColors.text3)))
               : ListView.builder(
                   itemCount: decrypted.length,
@@ -283,10 +287,18 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
                   ),
                 ),
         ),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))],
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text(t.commonClose))],
       ),
     );
   }
+
+  // Not static const -- labels are localized, which needs a BuildContext.
+  // Only covers the statuses this tab renders a distinct label for; an
+  // unrecognized status falls back to the raw server value.
+  Map<String, String> _statusLabels(AppLocalizations t) => {
+    'pending': t.thresholdModStatusPending,
+    'approved': t.thresholdModStatusApproved,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -294,16 +306,14 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
       return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
 
+    final t = AppLocalizations.of(context);
     final enabled = _config?['enabled'] == true;
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         Text(
-          'Real decryption of a channel\'s history, gated on multiple designated '
-          'moderators actively agreeing -- never one person alone, not even the '
-          'server owner. Only ever unlocks one whole epoch (everything sent since '
-          'the last membership change), never a single message.',
+          t.thresholdModExplanation,
           style: TextStyle(color: KodaColors.text3, fontSize: 12),
         ),
         const SizedBox(height: 16),
@@ -312,36 +322,38 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
             Expanded(
               child: Text(
                 enabled
-                    ? 'Enabled -- ${(_config!['moderator_ids'] as List).length} moderators, threshold ${_config!['threshold']}'
-                    : 'Not configured',
+                    ? t.thresholdModEnabledStatus(
+                        (_config!['moderator_ids'] as List).length, _config!['threshold'] as int)
+                    : t.thresholdModNotConfigured,
                 style: TextStyle(color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600),
               ),
             ),
-            OutlinedButton(onPressed: _showConfigDialog, child: Text(enabled ? 'Reconfigure' : 'Enable')),
+            OutlinedButton(onPressed: _showConfigDialog,
+                child: Text(enabled ? t.thresholdModReconfigureButton : t.thresholdModEnableButton)),
           ]),
           const SizedBox(height: 20),
         ],
         if (!enabled && !_isOwner)
-          Text('Threshold moderation is not enabled for this server.',
+          Text(t.thresholdModNotEnabledForServer,
               style: TextStyle(color: KodaColors.text3, fontSize: 13)),
         if (enabled && !_isDesignatedModerator)
-          Text('Enabled for this server. You are not one of the designated moderators.',
+          Text(t.thresholdModEnabledNotDesignated,
               style: TextStyle(color: KodaColors.text3, fontSize: 13)),
         if (_isDesignatedModerator) ...[
           Row(children: [
-            Text('Requests', style: TextStyle(
+            Text(t.thresholdModRequestsLabel, style: TextStyle(
                 color: KodaColors.text3, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
             const Spacer(),
             TextButton.icon(
               onPressed: _showRequestDialog,
               icon: const Icon(Icons.add, size: 16),
-              label: const Text('Request Decrypt'),
+              label: Text(t.thresholdModRequestDecryptButton),
             ),
           ]),
           if (_requests.isEmpty)
             Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
-              child: Text('No active requests.', style: TextStyle(color: KodaColors.text3, fontSize: 13)),
+              child: Text(t.thresholdModNoActiveRequests, style: TextStyle(color: KodaColors.text3, fontSize: 13)),
             )
           else
             ..._requests.map((r) {
@@ -358,18 +370,19 @@ class _ThresholdModerationTabState extends ConsumerState<ThresholdModerationTab>
                   border: Border.all(color: KodaColors.border),
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('#${channel?['name'] ?? '?'} -- epoch ${r['epoch']} -- $status',
+                  Text(t.thresholdModRequestRowLabel(channel?['name'] as String? ?? '?',
+                          r['epoch'] as int, _statusLabels(t)[status] ?? status),
                       style: TextStyle(color: KodaColors.koda, fontSize: 12, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 4),
                   Text(r['reason'] as String? ?? '', style: TextStyle(color: KodaColors.text2, fontSize: 12)),
                   const SizedBox(height: 8),
                   Wrap(spacing: 8, children: [
                     if (status == 'pending')
-                      TextButton(onPressed: () => _approve(r), child: const Text('Approve')),
+                      TextButton(onPressed: () => _approve(r), child: Text(t.thresholdModApproveButton)),
                     if (status == 'approved' && !isMine)
-                      TextButton(onPressed: () => _relay(r), child: const Text('Relay My Share')),
+                      TextButton(onPressed: () => _relay(r), child: Text(t.thresholdModRelayShareButton)),
                     if (status == 'approved' && isMine)
-                      TextButton(onPressed: () => _tryReconstruct(r), child: const Text('Try Reconstruct')),
+                      TextButton(onPressed: () => _tryReconstruct(r), child: Text(t.thresholdModTryReconstructButton)),
                   ]),
                 ]),
               );

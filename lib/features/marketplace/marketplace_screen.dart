@@ -16,6 +16,7 @@ import '../../core/permissions.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../core/time_utils.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../visp/visp_boost_advisor_panel.dart';
 import 'digital_goods_screen.dart';
 import 'printful_merch_screen.dart';
@@ -85,6 +86,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     if (widget.accountOnly) {
       // The only thing left here now -- no tab chrome needed for one tab.
       final content = _buildCreatorTab();
@@ -93,7 +95,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
         backgroundColor: KodaColors.voidBg,
         appBar: AppBar(
           backgroundColor: KodaColors.bg2,
-          title: Text('Creator Payouts',
+          title: Text(t.marketplaceCreatorPayoutsTitle,
               style: TextStyle(color: KodaColors.text1,
                   fontSize: 16, fontWeight: FontWeight.w700)),
         ),
@@ -107,12 +109,12 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
       labelColor: KodaColors.text1,
       unselectedLabelColor: KodaColors.text3,
       isScrollable: true,
-      tabs: const [
-        Tab(text: 'Server Bank'),
-        Tab(text: 'Digital Goods'),
-        Tab(text: 'Merch'),
-        Tab(text: 'Subscription'),
-        Tab(text: 'Revenue'),
+      tabs: [
+        Tab(text: t.marketplaceTabServerBank),
+        Tab(text: t.marketplaceTabDigitalGoods),
+        Tab(text: t.marketplaceTabMerch),
+        Tab(text: t.marketplaceTabSubscription),
+        Tab(text: t.marketplaceTabRevenue),
       ],
     );
     final tabViews = TabBarView(
@@ -142,7 +144,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: Text('Marketplace',
+        title: Text(t.marketplaceTitle,
             style: TextStyle(color: KodaColors.text1,
                 fontSize: 16, fontWeight: FontWeight.w700)),
         bottom: tabBar,
@@ -156,9 +158,10 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   // ── Subscription tab (server-scoped tier, not the account-wide Spark/Pulse) ──
 
   Widget _buildSubscriptionTab() {
+    final t = AppLocalizations.of(context);
     final server = ref.watch(selectedServerProvider);
     if (server == null) {
-      return Center(child: Text('Select a server to view its subscription',
+      return Center(child: Text(t.marketplaceSelectServerSubscription,
           style: TextStyle(color: KodaColors.text3)));
     }
     return ServerSubscriptionScreen(server: server, isOwner: _canManageMarketplace);
@@ -167,6 +170,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   // ── Creator tab ───────────────────────────────────────────────────────────
 
   Widget _buildCreatorTab() {
+    final t = AppLocalizations.of(context);
     if (_loadingConnect) {
       return Center(
           child: CircularProgressIndicator(color: KodaColors.koda));
@@ -200,21 +204,21 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
               const SizedBox(width: 12),
               Expanded(child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Creator Payouts',
+                Text(t.marketplaceCreatorPayoutsTitle,
                     style: TextStyle(color: KodaColors.text1,
                         fontSize: 16, fontWeight: FontWeight.w700)),
-                Text('Receive tips directly via Stripe',
+                Text(t.marketplaceReceiveTipsSubtitle,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
               ])),
             ]),
             const SizedBox(height: 20),
 
             // Status indicator
-            _buildStatusRow('Stripe account', connected),
+            _buildStatusRow(t.marketplaceStripeAccountStatus, connected),
             const SizedBox(height: 8),
-            _buildStatusRow('Onboarding complete', onboarded),
+            _buildStatusRow(t.marketplaceOnboardingCompleteStatus, onboarded),
             const SizedBox(height: 8),
-            _buildStatusRow('Accepting payments', chargesEnabled),
+            _buildStatusRow(t.marketplaceAcceptingPaymentsStatus, chargesEnabled),
 
             const SizedBox(height: 20),
 
@@ -226,7 +230,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
                   minimumSize: const Size(double.infinity, 44),
                 ),
                 icon: const Icon(Icons.add_card, size: 18),
-                label: const Text('Connect Stripe Account'),
+                label: Text(t.marketplaceConnectStripeButton),
                 onPressed: _connectStripe,
               )
             else if (!onboarded || !chargesEnabled)
@@ -238,7 +242,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
                     minimumSize: const Size(double.infinity, 44),
                   ),
                   icon: const Icon(Icons.open_in_new, size: 18),
-                  label: const Text('Complete Stripe Onboarding'),
+                  label: Text(t.marketplaceCompleteStripeOnboardingButton),
                   onPressed: _openOnboarding,
                 ),
                 const SizedBox(height: 8),
@@ -249,7 +253,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
                     minimumSize: const Size(double.infinity, 44),
                   ),
                   icon: const Icon(Icons.refresh, size: 18),
-                  label: const Text('Refresh Status'),
+                  label: Text(t.marketplaceRefreshStatusButton),
                   onPressed: _syncAccount,
                 ),
               ])
@@ -264,7 +268,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
                 child: Row(children: [
                   Icon(Icons.check_circle, color: KodaColors.koda, size: 18),
                   SizedBox(width: 8),
-                  Text('You\'re ready to receive tips!',
+                  Text(t.marketplaceReadyToReceiveTips,
                       style: TextStyle(color: KodaColors.koda,
                           fontWeight: FontWeight.w500)),
                 ]),
@@ -283,15 +287,15 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
             border: Border.all(color: KodaColors.border),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('How it works',
+            Text(t.marketplaceHowItWorksTitle,
                 style: TextStyle(color: KodaColors.text1,
                     fontWeight: FontWeight.w600, fontSize: 14)),
             const SizedBox(height: 12),
-            _buildHowItWorksRow('1', 'Connect your Stripe account'),
-            _buildHowItWorksRow('2', 'Complete identity verification'),
-            _buildHowItWorksRow('3', 'Receive tips directly to your bank'),
+            _buildHowItWorksRow('1', t.marketplaceHowItWorksStep1),
+            _buildHowItWorksRow('2', t.marketplaceHowItWorksStep2),
+            _buildHowItWorksRow('3', t.marketplaceHowItWorksStep3),
             const SizedBox(height: 8),
-            Text('Koda charges a 5% processing fee. The fee goes to your server\'s bank as points.',
+            Text(t.marketplaceProcessingFeeNote,
                 style: TextStyle(color: KodaColors.text3, fontSize: 11)),
           ]),
         ),
@@ -360,9 +364,10 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   // ── Server bank tab ───────────────────────────────────────────────────────
 
   Widget _buildServerBankTab() {
+    final t = AppLocalizations.of(context);
     final server = ref.watch(selectedServerProvider);
     if (server == null) {
-      return Center(child: Text('Select a server to view its bank',
+      return Center(child: Text(t.marketplaceSelectServerBank,
           style: TextStyle(color: KodaColors.text3)));
     }
     // Financial balance/boost management -- owner or a manage_marketplace
@@ -373,8 +378,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
       return Center(child: Padding(
         padding: const EdgeInsets.all(24),
         child: Text(
-          'Only the server owner or someone with the Manage Marketplace '
-          'permission can view the Server Bank.',
+          t.marketplaceOnlyManagersCanViewBank,
           textAlign: TextAlign.center,
           style: TextStyle(color: KodaColors.text3),
         ),
@@ -402,9 +406,10 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   // ── Revenue tab ──────────────────────────────────────────────────────────
 
   Widget _buildRevenueTab() {
+    final t = AppLocalizations.of(context);
     final server = ref.watch(selectedServerProvider);
     if (server == null) {
-      return Center(child: Text('Select a server to view its revenue',
+      return Center(child: Text(t.marketplaceSelectServerRevenue,
           style: TextStyle(color: KodaColors.text3)));
     }
     return _RevenueDashboardView(server: server);
@@ -450,6 +455,9 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
   }
 
   Future<void> _boost() async {
+    // Captured before the `await` below, in case this widget is no longer
+    // mounted by the time the request comes back.
+    final t = AppLocalizations.of(context);
     setState(() => _boosting = true);
     final error = await KodaApi.instance.boostServer(widget.server['id'] as String);
     if (!mounted) return;
@@ -459,7 +467,7 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${widget.server['name']} boosted!')));
+        SnackBar(content: Text(t.marketplaceServerBoosted(widget.server['name'] as String? ?? t.marketplaceServerFallback))));
     _load();
   }
 
@@ -468,27 +476,28 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
   // here; the server is the actual source of truth for the level.
   static const _levelThresholds = {0: 1, 1: 3, 2: 6, 3: 10, 4: 15};
 
-  String get _emojiSlotText {
+  String _emojiSlotText(AppLocalizations t) {
     final limit = _boostStatus?['emoji_slot_limit'] as int? ?? 10;
-    return '$limit custom emoji slots';
+    return t.marketplaceEmojiSlotsText(limit);
   }
 
-  String? get _nextLevelHint {
+  String? _nextLevelHint(AppLocalizations t) {
     final level = _boostStatus?['level'] as int? ?? 0;
     final count = _boostStatus?['count'] as int? ?? 0;
     final needed = _levelThresholds[level];
     if (needed == null) return null; // already at the top level
     final more = needed - count;
     final unlock = switch (level) {
-      3 => ' and unlock a custom server background',
-      4 => ' and unlock a custom server icon border',
+      3 => t.marketplaceUnlockBackgroundSuffix,
+      4 => t.marketplaceUnlockIconBorderSuffix,
       _ => '',
     };
-    return '$more more boost${more == 1 ? '' : 's'} to reach level ${level + 1}$unlock';
+    return t.marketplaceMoreBoostsToReachLevel(more, level + 1) + unlock;
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     if (_loading) {
       return Center(
           child: CircularProgressIndicator(color: KodaColors.koda));
@@ -496,6 +505,7 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
 
     final balance = _bank?['balance'] as int? ?? 0;
     final balanceUsd = _bank?['balance_usd'] as double? ?? 0.0;
+    final nextLevelHint = _nextLevelHint(t);
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -519,18 +529,18 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
               Icon(Icons.account_balance_outlined,
                   color: KodaColors.koda, size: 20),
               const SizedBox(width: 8),
-              Text(widget.server['name'] as String? ?? 'Server',
+              Text(widget.server['name'] as String? ?? t.marketplaceServerFallback,
                   style: TextStyle(color: KodaColors.text2, fontSize: 13)),
             ]),
             const SizedBox(height: 16),
-            Text('$balance pts',
+            Text(t.marketplacePointsBalance(balance),
                 style: TextStyle(color: KodaColors.text1,
                     fontSize: 36, fontWeight: FontWeight.w800)),
-            Text('\$${balanceUsd.toStringAsFixed(2)} in activity',
+            Text(t.marketplaceInActivity('\$${balanceUsd.toStringAsFixed(2)}'),
                 style: TextStyle(color: KodaColors.text3, fontSize: 13)),
             const SizedBox(height: 16),
             Text(
-              'Points are earned from the 5% processing fee on tips and subscriptions in this server. Use points to unlock server upgrades.',
+              t.marketplacePointsEarnedExplanation,
               style: TextStyle(color: KodaColors.text3, fontSize: 11),
             ),
           ]),
@@ -550,28 +560,28 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
             Row(children: [
               Icon(Icons.rocket_launch_outlined, color: KodaColors.koda, size: 20),
               const SizedBox(width: 8),
-              Text('Server Boosts',
+              Text(t.marketplaceServerBoostsTitle,
                   style: TextStyle(color: KodaColors.text1,
                       fontWeight: FontWeight.w600, fontSize: 14)),
               const Spacer(),
-              Text('Level ${_boostStatus?['level'] ?? 0}',
+              Text(t.marketplaceLevelLabel(_boostStatus?['level'] as int? ?? 0),
                   style: TextStyle(color: KodaColors.koda,
                       fontWeight: FontWeight.w700, fontSize: 13)),
             ]),
             const SizedBox(height: 4),
-            Text('${_boostStatus?['count'] ?? 0} active boost${(_boostStatus?['count'] ?? 0) == 1 ? '' : 's'}'
-                ' -- $_emojiSlotText',
+            Text(t.marketplaceActiveBoostsSummary(
+                    _boostStatus?['count'] as int? ?? 0, _emojiSlotText(t)),
                 style: TextStyle(color: KodaColors.text3, fontSize: 12)),
-            if (_nextLevelHint != null) ...[
+            if (nextLevelHint != null) ...[
               const SizedBox(height: 4),
-              Text(_nextLevelHint!,
+              Text(nextLevelHint,
                   style: TextStyle(color: KodaColors.koda, fontSize: 11)),
             ],
             const SizedBox(height: 12),
             Text(
               _myTokenCount > 0
-                  ? 'You have $_myTokenCount boost token${_myTokenCount == 1 ? '' : 's'} available.'
-                  : 'Boost tokens come from a Pulse subscription (1/month). Subscribe on the Subscriptions tab to earn one.',
+                  ? t.marketplaceYouHaveBoostTokens(_myTokenCount)
+                  : t.marketplaceBoostTokensFromPulse,
               style: TextStyle(color: KodaColors.text3, fontSize: 11),
             ),
             const SizedBox(height: 12),
@@ -585,7 +595,7 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
                   ? const SizedBox(width: 14, height: 14,
                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
                   : const Icon(Icons.rocket_launch_outlined, size: 16),
-              label: Text(_boosting ? 'Boosting...' : 'Boost This Server'),
+              label: Text(_boosting ? t.marketplaceBoostingLabel : t.marketplaceBoostThisServerButton),
               onPressed: (_myTokenCount == 0 || _boosting) ? null : _boost,
             ),
           ]),
@@ -602,11 +612,11 @@ class _ServerBankViewState extends ConsumerState<_ServerBankView> {
             border: Border.all(color: KodaColors.border),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Coming soon — Server upgrades',
+            Text(t.marketplaceComingSoonUpgradesTitle,
                 style: TextStyle(color: KodaColors.text1,
                     fontWeight: FontWeight.w600, fontSize: 14)),
             SizedBox(height: 8),
-            Text('Spend server bank points on:\n• Custom server domain\n• Increased member limit\n• Priority support\n• Exclusive server badge',
+            Text(t.marketplaceSpendPointsList,
                 style: TextStyle(color: KodaColors.text3, fontSize: 13, height: 1.6)),
           ]),
         ),
@@ -675,14 +685,14 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
     });
   }
 
-  String _sourceLabel(String type) {
+  String _sourceLabel(AppLocalizations t, String type) {
     switch (type) {
-      case 'tip': return 'Tips';
-      case 'subscription': return 'Koda Subscriptions';
-      case 'server_subscription': return 'Server Subscriptions';
-      case 'digital_product': return 'Digital Goods';
-      case 'stage_ticket': return 'Stage Tickets';
-      case 'printful_order': return 'Merch Orders';
+      case 'tip': return t.marketplaceSourceTip;
+      case 'subscription': return t.marketplaceSourceSubscription;
+      case 'server_subscription': return t.marketplaceSourceServerSubscription;
+      case 'digital_product': return t.marketplaceSourceDigitalProduct;
+      case 'stage_ticket': return t.marketplaceSourceStageTicket;
+      case 'printful_order': return t.marketplaceSourcePrintfulOrder;
       default: return type;
     }
   }
@@ -699,20 +709,23 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
     }
   }
 
-  String _relativeDate(String iso) {
+  String _relativeDate(AppLocalizations t, String iso) {
     try {
       final dt = parseServerTimestamp(iso);
       final diff = DateTime.now().difference(dt);
-      if (diff.inMinutes < 1) return 'just now';
-      if (diff.inHours < 1) return '${diff.inMinutes}m ago';
-      if (diff.inDays < 1) return '${diff.inHours}h ago';
-      if (diff.inDays < 7) return '${diff.inDays}d ago';
+      if (diff.inMinutes < 1) return t.marketplaceJustNow;
+      if (diff.inHours < 1) return t.marketplaceMinutesAgo(diff.inMinutes);
+      if (diff.inDays < 1) return t.marketplaceHoursAgo(diff.inHours);
+      if (diff.inDays < 7) return t.marketplaceDaysAgo(diff.inDays);
       return '${dt.month}/${dt.day}/${dt.year}';
     } catch (_) { return ''; }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Named `loc` rather than the usual `t` -- this method already uses
+    // `t` as the loop variable for each transaction map below.
+    final loc = AppLocalizations.of(context);
     if (_loading) {
       return Center(
           child: CircularProgressIndicator(color: KodaColors.koda));
@@ -723,7 +736,7 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
         child: Padding(
           padding: EdgeInsets.all(24),
           child: Text(
-            'Only members who can manage the marketplace can view this server\'s revenue.',
+            loc.marketplaceOnlyManagersCanViewRevenue,
             textAlign: TextAlign.center,
             style: TextStyle(color: KodaColors.text3, fontSize: 13),
           ),
@@ -740,27 +753,27 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
       padding: const EdgeInsets.all(16),
       children: [
         Row(children: [
-          Expanded(child: _statCard('Balance', balance, KodaColors.koda)),
+          Expanded(child: _statCard(loc.marketplaceBalanceLabel, balance, KodaColors.koda)),
           const SizedBox(width: 12),
-          Expanded(child: _statCard('Lifetime Earned', lifetime, KodaColors.mint)),
+          Expanded(child: _statCard(loc.marketplaceLifetimeEarnedLabel, lifetime, KodaColors.mint)),
         ]),
 
         const SizedBox(height: 16),
-        Text('Last 30 Days',
+        Text(loc.marketplaceLast30DaysTitle,
             style: TextStyle(color: KodaColors.text1,
                 fontWeight: FontWeight.w600, fontSize: 14)),
         const SizedBox(height: 10),
         _RevenueBarChart(points: _points),
 
         const SizedBox(height: 20),
-        Text('Revenue by Source',
+        Text(loc.marketplaceRevenueBySourceTitle,
             style: TextStyle(color: KodaColors.text1,
                 fontWeight: FontWeight.w600, fontSize: 14)),
         const SizedBox(height: 10),
         if (breakdown.isEmpty)
           Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
-            child: Text('No revenue yet.',
+            child: Text(loc.marketplaceNoRevenueYet,
                 style: TextStyle(color: KodaColors.text3, fontSize: 13)),
           )
         else
@@ -782,10 +795,10 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(_sourceLabel(type),
+                    Text(_sourceLabel(loc, type),
                         style: TextStyle(color: KodaColors.text1,
                             fontSize: 13, fontWeight: FontWeight.w600)),
-                    Text('$count transaction${count == 1 ? '' : 's'}',
+                    Text(loc.marketplaceTransactionCount(count),
                         style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                   ]),
                 ),
@@ -801,14 +814,14 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
           }),
 
         const SizedBox(height: 20),
-        Text('Recent Transactions',
+        Text(loc.marketplaceRecentTransactionsTitle,
             style: TextStyle(color: KodaColors.text1,
                 fontWeight: FontWeight.w600, fontSize: 14)),
         const SizedBox(height: 10),
         if (_transactions.isEmpty)
           Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
-            child: Text('No transactions yet.',
+            child: Text(loc.marketplaceNoTransactionsYet,
                 style: TextStyle(color: KodaColors.text3, fontSize: 13)),
           )
         else
@@ -821,14 +834,14 @@ class _RevenueDashboardViewState extends ConsumerState<_RevenueDashboardView> {
                 Icon(_sourceIcon(type), size: 14, color: KodaColors.text3),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(_sourceLabel(type),
+                  child: Text(_sourceLabel(loc, type),
                       style: TextStyle(color: KodaColors.text2, fontSize: 12)),
                 ),
                 Text('+\$${(amount / 100).toStringAsFixed(2)}',
                     style: TextStyle(color: KodaColors.mint,
                         fontSize: 12, fontWeight: FontWeight.w600)),
                 const SizedBox(width: 10),
-                Text(_relativeDate(t['inserted_at'] as String? ?? ''),
+                Text(_relativeDate(loc, t['inserted_at'] as String? ?? ''),
                     style: TextStyle(color: KodaColors.text3, fontSize: 11)),
               ]),
             );
@@ -868,10 +881,11 @@ class _RevenueBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     if (points.isEmpty) {
       return SizedBox(
         height: 120,
-        child: Center(child: Text('No activity yet',
+        child: Center(child: Text(t.marketplaceNoActivityYet,
             style: TextStyle(color: KodaColors.text3, fontSize: 12))),
       );
     }
@@ -896,7 +910,7 @@ class _RevenueBarChart extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 2),
               child: Tooltip(
                 message: total > 0
-                    ? '$date: \$${(total / 100).toStringAsFixed(2)}'
+                    ? t.marketplaceBarTooltipWithAmount(date, '\$${(total / 100).toStringAsFixed(2)}')
                     : date,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,

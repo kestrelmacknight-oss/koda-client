@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
+import '../l10n/generated/app_localizations.dart';
 
 /// Returns true if the user ended up joining the server, false otherwise
 /// (cancelled, invalid code, or already a member and just dismissed it).
@@ -40,6 +41,7 @@ class _InvitePreviewDialogState extends State<_InvitePreviewDialog> {
   }
 
   Future<void> _load() async {
+    final t = AppLocalizations.of(context);
     final result = await KodaApi.instance.getInvitePreview(widget.code);
     if (!mounted) return;
     setState(() {
@@ -47,12 +49,15 @@ class _InvitePreviewDialogState extends State<_InvitePreviewDialog> {
       if (result != null && result['valid'] == true) {
         _server = result['server'] as Map<String, dynamic>;
       } else {
-        _error = result?['error'] as String? ?? 'Invalid or expired invite.';
+        _error = result?['error'] as String? ?? t.invitePreviewInvalidOrExpired;
       }
     });
   }
 
   Future<void> _join() async {
+    // Captured before the await below, so we don't touch a
+    // possibly-unmounted context afterward.
+    final t = AppLocalizations.of(context);
     setState(() => _joining = true);
     final result = await KodaApi.instance.redeemInvite(widget.code);
     if (!mounted) return;
@@ -61,16 +66,17 @@ class _InvitePreviewDialogState extends State<_InvitePreviewDialog> {
     } else {
       setState(() {
         _joining = false;
-        _error = result?['error'] as String? ?? 'Could not join server.';
+        _error = result?['error'] as String? ?? t.invitePreviewCouldNotJoin;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AlertDialog(
       backgroundColor: KodaColors.card,
-      title: Text('Server Invite', style: TextStyle(color: KodaColors.text1)),
+      title: Text(t.invitePreviewTitle, style: TextStyle(color: KodaColors.text1)),
       content: SizedBox(
         width: 320,
         child: _loading
@@ -79,14 +85,14 @@ class _InvitePreviewDialogState extends State<_InvitePreviewDialog> {
                 child: Center(child: CircularProgressIndicator(color: KodaColors.koda)),
               )
             : _server != null
-                ? _buildPreview(_server!)
-                : Text(_error ?? 'Invalid or expired invite.',
+                ? _buildPreview(_server!, t)
+                : Text(_error ?? t.invitePreviewInvalidOrExpired,
                     style: TextStyle(color: KodaColors.text2)),
       ),
       actions: [
         TextButton(
           onPressed: _joining ? null : () => Navigator.pop(context, false),
-          child: Text(_server != null ? 'Cancel' : 'Close'),
+          child: Text(_server != null ? t.commonCancel : t.commonClose),
         ),
         if (_server != null)
           TextButton(
@@ -95,14 +101,14 @@ class _InvitePreviewDialogState extends State<_InvitePreviewDialog> {
                 ? SizedBox(
                     width: 16, height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
-                : const Text('Join'),
+                : Text(t.commonJoin),
           ),
       ],
     );
   }
 
-  Widget _buildPreview(Map<String, dynamic> server) {
-    final name = server['name'] as String? ?? 'Unknown server';
+  Widget _buildPreview(Map<String, dynamic> server, AppLocalizations t) {
+    final name = server['name'] as String? ?? t.invitePreviewUnknownServer;
     final iconUrl = server['icon_url'] as String?;
     final description = server['description'] as String?;
     final memberCount = server['member_count'] as int? ?? 0;
@@ -132,7 +138,9 @@ class _InvitePreviewDialogState extends State<_InvitePreviewDialog> {
             overflow: TextOverflow.ellipsis),
       ],
       const SizedBox(height: 10),
-      Text('$memberCount ${memberCount == 1 ? 'member' : 'members'}',
+      // Reuses the Koda Marketplace's member-count plural -- identical
+      // "N member(s)" pattern, no need for a second copy of the same ICU rule.
+      Text(t.kodaMarketplaceMemberCount(memberCount),
           style: TextStyle(color: KodaColors.text3, fontSize: 12)),
       if (_error != null) ...[
         const SizedBox(height: 10),

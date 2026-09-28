@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
+import '../l10n/generated/app_localizations.dart';
 import 'widgets.dart';
 
 Future<void> showCategoryEditDialog(
@@ -19,22 +20,26 @@ Future<void> showCategoryEditDialog(
   final controller = TextEditingController(text: existing?['name'] ?? '');
   final selectedRoleIds = List<String>.from(existing?['allowed_role_ids'] ?? []);
 
+  // Captured before the dialog's own await so we don't touch a
+  // possibly-unmounted outer context afterward.
+  final t = AppLocalizations.of(context);
+
   final saved = await showDialog<bool>(
     context: context,
     builder: (ctx) => StatefulBuilder(
       builder: (ctx, setDialogState) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text(existing == null ? 'New Category' : 'Edit Category',
+        title: Text(existing == null ? t.categoryEditDialogNewTitle : t.categoryEditDialogEditTitle,
             style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 340,
           height: 360,
           child: SingleChildScrollView(
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              KodaTextField(controller: controller, hintText: 'Category name'),
+              KodaTextField(controller: controller, hintText: t.categoryEditDialogNameHint, autofocus: true),
               if (roles.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                Text('Role Access (leave empty for all)',
+                Text(t.categoryEditDialogRoleAccessLabel,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 6),
                 ...roles.where((r) => r['is_default'] != true).map((role) {
@@ -61,8 +66,8 @@ Future<void> showCategoryEditDialog(
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t.commonCancel)),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(t.commonSave)),
         ],
       ),
     ),

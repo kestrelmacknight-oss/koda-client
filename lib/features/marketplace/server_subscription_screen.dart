@@ -11,6 +11,7 @@ import '../../core/api.dart';
 import '../../core/checkout.dart';
 import '../../core/theme.dart';
 import '../../core/time_utils.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 
 // Per-device display preference, off by default -- not every owner wants
@@ -87,14 +88,15 @@ class _ServerSubscriptionScreenState
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
         title: Text(
           widget.isOwner
-              ? 'Manage Subscriptions'
-              : '${widget.server['name']} Subscriptions',
+              ? t.serverSubscriptionManageTitle
+              : t.serverSubscriptionMemberTitle(widget.server['name'] as String? ?? ''),
           style: TextStyle(color: KodaColors.text1,
               fontSize: 16, fontWeight: FontWeight.w700),
         ),
@@ -102,7 +104,7 @@ class _ServerSubscriptionScreenState
           if (widget.isOwner && _tiers.length < 3)
             IconButton(
               icon: Icon(Icons.add, color: KodaColors.koda),
-              tooltip: 'Add tier',
+              tooltip: t.serverSubscriptionAddTierTooltip,
               onPressed: _showCreateTierDialog,
             ),
         ],
@@ -118,17 +120,18 @@ class _ServerSubscriptionScreenState
   // ── Owner view ────────────────────────────────────────────────────────────
 
   Widget _buildOwnerView() {
+    final t = AppLocalizations.of(context);
     if (_tiers.isEmpty) {
       return Center(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Icon(Icons.subscriptions_outlined,
               color: KodaColors.text3, size: 48),
           const SizedBox(height: 12),
-          Text('No subscription tiers yet',
+          Text(t.serverSubscriptionNoTiersYet,
               style: TextStyle(color: KodaColors.text1, fontSize: 16,
                   fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
-          Text('Create up to 3 tiers for your community',
+          Text(t.serverSubscriptionCreateUpTo3Tiers,
               style: TextStyle(color: KodaColors.text3, fontSize: 13)),
           const SizedBox(height: 20),
           ElevatedButton.icon(
@@ -136,7 +139,7 @@ class _ServerSubscriptionScreenState
                 backgroundColor: KodaColors.koda,
                 foregroundColor: Colors.black),
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('Create First Tier'),
+            label: Text(t.serverSubscriptionCreateFirstTierButton),
             onPressed: _showCreateTierDialog,
           ),
         ]),
@@ -152,7 +155,7 @@ class _ServerSubscriptionScreenState
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(children: [
               Expanded(
-                child: Text('Show subscriber counts',
+                child: Text(t.serverSubscriptionShowSubscriberCounts,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
               ),
               Switch(
@@ -169,6 +172,7 @@ class _ServerSubscriptionScreenState
   }
 
   Widget _buildOwnerTierCard(Map<String, dynamic> tier) {
+    final t = AppLocalizations.of(context);
     final price = (tier['price_cents'] as int? ?? 0) / 100.0;
     final discount = tier['marketplace_discount_percent'] as int? ?? 0;
     final position = tier['position'] as int? ?? 1;
@@ -206,7 +210,7 @@ class _ServerSubscriptionScreenState
                   style: TextStyle(color: KodaColors.text1,
                       fontSize: 15, fontWeight: FontWeight.w700)),
             ),
-            Text('\$${price.toStringAsFixed(2)}/mo',
+            Text(t.serverSubscriptionPricePerMonth('\$${price.toStringAsFixed(2)}'),
                 style: TextStyle(color: KodaColors.koda,
                     fontWeight: FontWeight.w600)),
           ]),
@@ -226,7 +230,7 @@ class _ServerSubscriptionScreenState
               Row(children: [
                 Icon(Icons.people_outline, size: 14, color: KodaColors.text3),
                 const SizedBox(width: 4),
-                Text('$subscriberCount active subscriber${subscriberCount == 1 ? '' : 's'}',
+                Text(t.serverSubscriptionActiveSubscriberCount(subscriberCount),
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
               ]),
               const SizedBox(height: 8),
@@ -235,7 +239,7 @@ class _ServerSubscriptionScreenState
               if (tier['role_id'] != null) ...[
                 Icon(Icons.badge_outlined, size: 14, color: KodaColors.text3),
                 const SizedBox(width: 4),
-                Text('Role auto-assigned',
+                Text(t.serverSubscriptionRoleAutoAssigned,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(width: 12),
               ],
@@ -243,7 +247,7 @@ class _ServerSubscriptionScreenState
                 Icon(Icons.local_offer_outlined,
                     size: 14, color: KodaColors.text3),
                 const SizedBox(width: 4),
-                Text('$discount% marketplace discount',
+                Text(t.serverSubscriptionDiscountPercent(discount),
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
               ],
             ]),
@@ -256,7 +260,7 @@ class _ServerSubscriptionScreenState
                     side: BorderSide(color: KodaColors.border),
                   ),
                   icon: const Icon(Icons.edit_outlined, size: 14),
-                  label: const Text('Edit'),
+                  label: Text(t.commonEdit),
                   onPressed: () => _showEditTierDialog(tier),
                 ),
               ),
@@ -267,7 +271,7 @@ class _ServerSubscriptionScreenState
                   side: BorderSide(color: KodaColors.accent),
                 ),
                 icon: const Icon(Icons.delete_outline, size: 14),
-                label: const Text('Delete'),
+                label: Text(t.commonDelete),
                 onPressed: () => _deleteTier(tier),
               ),
             ]),
@@ -280,8 +284,9 @@ class _ServerSubscriptionScreenState
   // ── Member view ───────────────────────────────────────────────────────────
 
   Widget _buildMemberView() {
+    final t = AppLocalizations.of(context);
     if (_tiers.isEmpty) {
-      return Center(child: Text('This server has no subscription tiers',
+      return Center(child: Text(t.serverSubscriptionNoTiersMember,
           style: TextStyle(color: KodaColors.text3)));
     }
 
@@ -303,10 +308,10 @@ class _ServerSubscriptionScreenState
               const SizedBox(width: 10),
               Expanded(child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Active Subscriber',
+                Text(t.serverSubscriptionActiveSubscriberBadge,
                     style: TextStyle(color: KodaColors.koda,
                         fontWeight: FontWeight.w600)),
-                Text('Expires ${_formatDate(_mySubscription!['expires_at'])}',
+                Text(t.serverSubscriptionExpiresOn(_formatDate(_mySubscription!['expires_at'])),
                     style: TextStyle(
                         color: KodaColors.text3, fontSize: 12)),
               ])),
@@ -321,6 +326,7 @@ class _ServerSubscriptionScreenState
   }
 
   Widget _buildMemberTierCard(Map<String, dynamic> tier) {
+    final t = AppLocalizations.of(context);
     final price = (tier['price_cents'] as int? ?? 0) / 100.0;
     final discount = tier['marketplace_discount_percent'] as int? ?? 0;
     final isSubscribed = _mySubscription?['tier_id'] == tier['id'];
@@ -344,7 +350,7 @@ class _ServerSubscriptionScreenState
                   style: TextStyle(color: KodaColors.text1,
                       fontSize: 16, fontWeight: FontWeight.w700)),
             ),
-            Text('\$${price.toStringAsFixed(2)}/mo',
+            Text(t.serverSubscriptionPricePerMonth('\$${price.toStringAsFixed(2)}'),
                 style: TextStyle(color: KodaColors.koda,
                     fontSize: 16, fontWeight: FontWeight.w700)),
           ]),
@@ -358,11 +364,11 @@ class _ServerSubscriptionScreenState
 
           // Perks
           if (tier['role_id'] != null)
-            _perkRow(Icons.badge_outlined, 'Exclusive subscriber role'),
+            _perkRow(Icons.badge_outlined, t.serverSubscriptionExclusiveRolePerk),
           if (discount > 0)
             _perkRow(Icons.local_offer_outlined,
-                '$discount% off marketplace purchases'),
-          _perkRow(Icons.lock_open_outlined, 'Subscriber-only channels'),
+                t.serverSubscriptionDiscountPerk(discount)),
+          _perkRow(Icons.lock_open_outlined, t.serverSubscriptionSubscriberOnlyChannelsPerk),
 
           const SizedBox(height: 14),
 
@@ -374,7 +380,7 @@ class _ServerSubscriptionScreenState
                 color: KodaColors.koda.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text('Currently Subscribed',
+              child: Text(t.serverSubscriptionCurrentlySubscribed,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: KodaColors.koda,
                       fontWeight: FontWeight.w600)),
@@ -387,7 +393,7 @@ class _ServerSubscriptionScreenState
                 minimumSize: const Size(double.infinity, 44),
               ),
               onPressed: () => _showSubscribeDialog(tier),
-              child: Text('Subscribe for \$${price.toStringAsFixed(2)}/mo'),
+              child: Text(t.serverSubscriptionSubscribeForPrice('\$${price.toStringAsFixed(2)}')),
             ),
         ]),
       ),
@@ -416,6 +422,7 @@ class _ServerSubscriptionScreenState
   }
 
   Future<void> _showTierDialog(Map<String, dynamic>? existing) async {
+    final t = AppLocalizations.of(context);
     final nameCtrl = TextEditingController(text: existing?['name'] ?? '');
     final descCtrl = TextEditingController(text: existing?['description'] ?? '');
     final priceCtrl = TextEditingController(
@@ -431,20 +438,20 @@ class _ServerSubscriptionScreenState
       builder: (_) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: Text(existing == null ? 'Create Tier' : 'Edit Tier',
+          title: Text(existing == null ? t.serverSubscriptionCreateTierTitle : t.serverSubscriptionEditTierTitle,
               style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 360,
             child: SingleChildScrollView(
               child: Column(mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start, children: [
-                KodaTextField(controller: nameCtrl, hintText: 'Tier name (e.g. Fan, Supporter, VIP)'),
+                KodaTextField(controller: nameCtrl, hintText: t.serverSubscriptionTierNameHint, autofocus: true),
                 const SizedBox(height: 10),
-                KodaTextField(controller: descCtrl, hintText: 'Description (optional)'),
+                KodaTextField(controller: descCtrl, hintText: t.serverSubscriptionDescriptionHint),
                 const SizedBox(height: 10),
-                KodaTextField(controller: priceCtrl, hintText: 'Price per month (USD)'),
+                KodaTextField(controller: priceCtrl, hintText: t.serverSubscriptionPriceHint),
                 const SizedBox(height: 12),
-                Text('Marketplace discount %',
+                Text(t.serverSubscriptionDiscountLabel,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
                 Row(children: [
@@ -461,7 +468,7 @@ class _ServerSubscriptionScreenState
                           fontWeight: FontWeight.w600)),
                 ]),
                 const SizedBox(height: 8),
-                Text('Position',
+                Text(t.serverSubscriptionPositionLabel,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
                 DropdownButton<int>(
@@ -471,11 +478,11 @@ class _ServerSubscriptionScreenState
                   onChanged: (v) => setDialogState(() => position = v!),
                   items: [1, 2, 3].map((p) => DropdownMenuItem(
                     value: p,
-                    child: Text('Tier $p'),
+                    child: Text(t.serverSubscriptionTierOption(p)),
                   )).toList(),
                 ),
                 const SizedBox(height: 12),
-                Text('Grants role on subscribe — optional',
+                Text(t.serverSubscriptionGrantsRoleLabel,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 4),
                 DropdownButton<String?>(
@@ -485,17 +492,16 @@ class _ServerSubscriptionScreenState
                   style: TextStyle(color: KodaColors.text1, fontSize: 13),
                   onChanged: (v) => setDialogState(() => selectedRoleId = v),
                   items: [
-                    const DropdownMenuItem<String?>(value: null, child: Text('None')),
+                    DropdownMenuItem<String?>(value: null, child: Text(t.commonNone)),
                     ..._roles.map((r) => DropdownMenuItem<String?>(
                           value: r['id'] as String,
-                          child: Text(r['name'] as String? ?? 'role'),
+                          child: Text(r['name'] as String? ?? t.serverSubscriptionRoleFallback),
                         )),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Automatically given to a member the moment they subscribe, '
-                  'and taken away the moment their subscription expires.',
+                  t.serverSubscriptionRoleAutoAssignExplanation,
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
                 ),
               ]),
@@ -503,13 +509,13 @@ class _ServerSubscriptionScreenState
           ),
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Cancel')),
+                child: Text(t.commonCancel)),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                   backgroundColor: KodaColors.koda,
                   foregroundColor: Colors.black),
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text(existing == null ? 'Create' : 'Save'),
+              child: Text(existing == null ? t.commonCreate : t.commonSave),
             ),
           ],
         ),
@@ -536,10 +542,9 @@ class _ServerSubscriptionScreenState
       if (result != null && mounted) {
         _load();
         if (result['owner_payable'] != true) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text(
-                  'Tier created -- connect Stripe under Marketplace → Creator before members can subscribe to it.'),
-              duration: Duration(seconds: 6)));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(t.serverSubscriptionTierCreatedConnectStripe),
+              duration: const Duration(seconds: 6)));
         }
       }
     } else {
@@ -559,20 +564,21 @@ class _ServerSubscriptionScreenState
   }
 
   Future<void> _deleteTier(Map<String, dynamic> tier) async {
+    final t = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Delete Tier',
+        title: Text(t.serverSubscriptionDeleteTierTitle,
             style: TextStyle(color: KodaColors.text1)),
-        content: Text('Delete "${tier['name']}"? Existing subscribers will keep access until expiry.',
+        content: Text(t.serverSubscriptionDeleteTierConfirm(tier['name'] as String? ?? ''),
             style: TextStyle(color: KodaColors.text2)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
+              child: Text(t.commonCancel)),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Delete',
+            child: Text(t.commonDelete,
                 style: TextStyle(color: KodaColors.accent)),
           ),
         ],
@@ -585,12 +591,13 @@ class _ServerSubscriptionScreenState
   }
 
   Future<void> _showSubscribeDialog(Map<String, dynamic> tier) async {
+    final t = AppLocalizations.of(context);
     final price = (tier['price_cents'] as int? ?? 0) / 100.0;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Subscribe to ${tier['name']}',
+        title: Text(t.serverSubscriptionSubscribeToTierTitle(tier['name'] as String? ?? ''),
             style: TextStyle(color: KodaColors.text1)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
           Container(
@@ -601,7 +608,7 @@ class _ServerSubscriptionScreenState
             ),
             child: Column(children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text('Monthly subscription',
+                Text(t.serverSubscriptionMonthlySubscriptionLabel,
                     style: TextStyle(color: KodaColors.text2)),
                 Text('\$${price.toStringAsFixed(2)}',
                     style: TextStyle(color: KodaColors.text1,
@@ -609,26 +616,26 @@ class _ServerSubscriptionScreenState
               ]),
               Divider(color: KodaColors.border, height: 16),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text('Server bank earns',
+                Text(t.serverSubscriptionServerBankEarnsLabel,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
-                Text('${((tier['price_cents'] as int) * 0.05).round()} pts',
+                Text(t.serverSubscriptionPointsLabel(((tier['price_cents'] as int) * 0.05).round()),
                     style: TextStyle(color: KodaColors.koda, fontSize: 12)),
               ]),
             ]),
           ),
           const SizedBox(height: 10),
-          Text('Payment processed securely by Stripe',
+          Text(t.serverSubscriptionPaymentSecureNote,
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         ]),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
+              child: Text(t.commonCancel)),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
                 backgroundColor: KodaColors.koda,
                 foregroundColor: Colors.black),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Subscribe'),
+            child: Text(t.serverSubscriptionSubscribeButton),
           ),
         ],
       ),
@@ -642,8 +649,7 @@ class _ServerSubscriptionScreenState
     if (checkoutUrl == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text(
-                "Could not start checkout -- this server's owner may not have connected Stripe yet.")));
+            SnackBar(content: Text(t.serverSubscriptionCheckoutStripeNotConnected)));
       }
       return;
     }
@@ -659,8 +665,8 @@ class _ServerSubscriptionScreenState
             data['payment_type'] == 'server_subscription');
     if (mounted) {
       messenger.showSnackBar(SnackBar(content: Text(paymentConfirmed
-          ? 'Subscribed!'
-          : 'Still waiting on that payment -- it\'ll activate once completed.')));
+          ? t.serverSubscriptionSubscribed
+          : t.serverSubscriptionSubscriptionPending)));
       _load();
     }
   }

@@ -19,6 +19,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart' as lk;
+import '../../l10n/generated/app_localizations.dart';
 
 class VarmWidget extends StatefulWidget {
   final lk.Participant? participant;
@@ -66,6 +67,7 @@ class _VarmWidgetState extends State<VarmWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final url = _talking ? widget.talkingUrl : widget.silentUrl;
 
     final content = Stack(fit: StackFit.expand, children: [
@@ -108,8 +110,8 @@ class _VarmWidgetState extends State<VarmWidget> {
               color: Colors.black54,
               borderRadius: BorderRadius.circular(99),
             ),
-            child: const Text(
-              'VARM',
+            child: Text(
+              t.varmWidgetLabel,
               style: TextStyle(color: Colors.white70, fontSize: 9),
             ),
           ),

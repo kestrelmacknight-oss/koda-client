@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme.dart';
 import '../../../core/voice_session.dart';
+import '../../../l10n/generated/app_localizations.dart';
+import '../../../shared/widgets.dart';
 import 'voice_screen.dart';
 
 class VoiceBar extends ConsumerWidget {
@@ -17,6 +19,7 @@ class VoiceBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = AppLocalizations.of(context);
     final session = ref.watch(voiceSessionProvider);
     if (session == null) return const SizedBox.shrink();
 
@@ -60,44 +63,41 @@ class VoiceBar extends ConsumerWidget {
           // action so the "tap to expand" hint stays true for a screen
           // reader too, not just visually.
           Expanded(
-            child: Semantics(
-              button: true,
-              label: '${session.channelName}, $participantCount connected'
-                  '${isSpeaking ? ", you are speaking" : ""}',
+            child: KodaTappable(
               onTap: openVoiceScreen,
-              child: ExcludeSemantics(
-                child: Row(children: [
-                  Container(
-                    width: 8, height: 8,
-                    decoration: BoxDecoration(
-                      color: isSpeaking ? KodaColors.mint : KodaColors.text3,
-                      shape: BoxShape.circle,
-                    ),
+              semanticLabel: t.voiceBarConnectedSemanticLabel(session.channelName, participantCount)
+                  + (isSpeaking ? t.voiceBarSpeakingSuffix : ""),
+              child: Row(children: [
+                Container(
+                  width: 8, height: 8,
+                  decoration: BoxDecoration(
+                    color: isSpeaking ? KodaColors.mint : KodaColors.text3,
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          session.channelName,
-                          style: TextStyle(
-                              color: KodaColors.text1,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          '$participantCount connected · tap to expand',
-                          style: TextStyle(
-                              color: KodaColors.text3, fontSize: 10),
-                        ),
-                      ],
-                    ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        session.channelName,
+                        style: TextStyle(
+                            color: KodaColors.text1,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        t.voiceBarConnectedTapToExpand(participantCount),
+                        style: TextStyle(
+                            color: KodaColors.text3, fontSize: 10),
+                      ),
+                    ],
                   ),
-                ]),
-              ),
+                ),
+              ]),
             ),
           ),
 
@@ -109,7 +109,7 @@ class VoiceBar extends ConsumerWidget {
               color: session.muted ? KodaColors.accent : KodaColors.text2,
             ),
             onPressed: () => ref.read(voiceSessionProvider.notifier).toggleMute(),
-            tooltip: session.muted ? 'Unmute' : 'Mute',
+            tooltip: session.muted ? t.serverUnmute : t.serverMute,
           ),
 
           // Camera toggle
@@ -120,7 +120,7 @@ class VoiceBar extends ConsumerWidget {
               color: session.cameraOn ? KodaColors.mint : KodaColors.text2,
             ),
             onPressed: () => ref.read(voiceSessionProvider.notifier).toggleCamera(),
-            tooltip: session.cameraOn ? 'Stop camera' : 'Start camera',
+            tooltip: session.cameraOn ? t.voiceBarStopCameraTooltip : t.voiceBarStartCameraTooltip,
           ),
 
           // Leave
@@ -128,7 +128,7 @@ class VoiceBar extends ConsumerWidget {
             iconSize: 18,
             icon: Icon(Icons.call_end, color: KodaColors.accent),
             onPressed: () => ref.read(voiceSessionProvider.notifier).leave(),
-            tooltip: 'Leave Voice',
+            tooltip: t.voiceBarLeaveVoiceTooltip,
           ),
         ]),
       ),

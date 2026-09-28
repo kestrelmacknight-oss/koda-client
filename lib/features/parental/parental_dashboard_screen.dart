@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 import 'child_detail_screen.dart';
 
@@ -40,6 +41,7 @@ class _ParentalDashboardScreenState extends State<ParentalDashboardScreen> {
   }
 
   Future<void> _showCreateDialog() async {
+    final t = AppLocalizations.of(context);
     final usernameCtrl = TextEditingController();
     final emailCtrl = TextEditingController();
     final passwordCtrl = TextEditingController();
@@ -48,32 +50,30 @@ class _ParentalDashboardScreenState extends State<ParentalDashboardScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: KodaColors.card,
-        title: Text('Create Child Account', style: TextStyle(color: KodaColors.text1)),
+        title: Text(t.parentalDashboardCreateChildTitle, style: TextStyle(color: KodaColors.text1)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
-          KodaTextField(controller: usernameCtrl, hintText: 'Username'),
+          KodaTextField(controller: usernameCtrl, hintText: t.parentalDashboardUsernameHint, autofocus: true),
           const SizedBox(height: 10),
-          KodaTextField(controller: emailCtrl, hintText: 'Email'),
+          KodaTextField(controller: emailCtrl, hintText: t.parentalDashboardEmailHint),
           const SizedBox(height: 10),
-          KodaTextField(controller: passwordCtrl, hintText: 'Password', obscureText: true),
+          KodaTextField(controller: passwordCtrl, hintText: t.parentalDashboardPasswordHint, obscureText: true),
           const SizedBox(height: 8),
           Text(
-            'This creates a fully supervised account: labeled channels are '
-            'blocked, and you\'ll be able to set allowed hours and see (but '
-            'not read) their friends and servers.',
+            t.parentalDashboardCreateChildExplanation,
             style: TextStyle(color: KodaColors.text3, fontSize: 11),
           ),
         ]),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Create')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.commonCancel)),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text(t.commonCreate)),
         ],
       ),
     );
     if (confirmed != true || !mounted) return;
     if (usernameCtrl.text.trim().isEmpty || emailCtrl.text.trim().isEmpty ||
         passwordCtrl.text.length < 8) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Username, email, and an 8+ character password are required.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(t.parentalDashboardValidationError)));
       return;
     }
 
@@ -88,12 +88,13 @@ class _ParentalDashboardScreenState extends State<ParentalDashboardScreen> {
     if (child != null) {
       _load();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Could not create child account -- username/email may already be taken.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(t.parentalDashboardCreateChildFailed)));
     }
   }
 
   Widget _buildBody() {
+    final t = AppLocalizations.of(context);
     if (_loading) {
       return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
@@ -110,14 +111,14 @@ class _ParentalDashboardScreenState extends State<ParentalDashboardScreen> {
               ? const SizedBox(width: 14, height: 14,
                   child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
               : const Icon(Icons.add, size: 18),
-          label: Text(_creating ? 'Creating...' : 'Create Child Account'),
+          label: Text(_creating ? t.parentalDashboardCreatingLabel : t.parentalDashboardCreateChildTitle),
           onPressed: _creating ? null : _showCreateDialog,
         ),
         const SizedBox(height: 16),
         if (_children.isEmpty)
           Padding(
             padding: EdgeInsets.symmetric(vertical: 24),
-            child: Text('No linked accounts yet.',
+            child: Text(t.parentalDashboardNoChildren,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: KodaColors.text3, fontSize: 13)),
           )
@@ -133,9 +134,9 @@ class _ParentalDashboardScreenState extends State<ParentalDashboardScreen> {
                   leading: KodaAvatar(
                       username: child['username'] as String? ?? '?',
                       avatarUrl: child['avatar_url'] as String?, size: 36),
-                  title: Text(child['username'] as String? ?? 'Unknown',
+                  title: Text(child['username'] as String? ?? t.parentalDashboardUnknownUser,
                       style: TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w500)),
-                  subtitle: Text('Supervised account',
+                  subtitle: Text(t.parentalDashboardSupervisedLabel,
                       style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                   trailing: Icon(Icons.chevron_right, color: KodaColors.text3),
                   onTap: () => Navigator.push(context, MaterialPageRoute(
@@ -149,11 +150,12 @@ class _ParentalDashboardScreenState extends State<ParentalDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     if (widget.embedded) return _buildBody();
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: Text('Family',
+        title: Text(t.parentalDashboardTitle,
             style: TextStyle(color: KodaColors.text1, fontSize: 16, fontWeight: FontWeight.w700)),
       ),
       body: _buildBody(),

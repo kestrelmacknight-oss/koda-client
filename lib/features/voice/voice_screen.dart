@@ -13,6 +13,8 @@ import '../../core/theme.dart';
 import '../../core/providers.dart';
 import '../../core/voice_activity_controller.dart';
 import '../../core/voice_session.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../../shared/channel_chat_panel.dart';
 import '../../shared/pronoun_label.dart';
 import '../../shared/widgets.dart';
 import 'varm_widget.dart';
@@ -43,6 +45,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
   bool _leaving       = false;
   bool _cameraOn      = false;
   bool _showVarm      = false;
+  bool _showChat      = false;
   bool _screenShareOn = false;
   String? _error;
   lk.LocalVideoTrack? _localVideoTrack;
@@ -231,8 +234,9 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
       } catch (e) {
         debugPrint('[ScreenShare] error: $e');
         if (mounted) {
+          final t = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Screen share failed: $e')));
+              SnackBar(content: Text(t.voiceScreenScreenShareFailed(e.toString()))));
         }
       }
     }
@@ -270,6 +274,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
   // is purely local: it never touches what they publish or what anyone
   // else hears.
   void _showVolumeDialog(lk.Participant participant, String name) {
+    final t = AppLocalizations.of(context);
     final notifier = ref.read(voiceSessionProvider.notifier);
     var volume = notifier.volumeForParticipant(participant.identity);
     showDialog(
@@ -277,7 +282,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: KodaColors.card,
-          title: Text('$name\'s Volume', style: TextStyle(color: KodaColors.text1)),
+          title: Text(t.voiceScreenUsersVolumeTitle(name), style: TextStyle(color: KodaColors.text1)),
           content: SizedBox(
             width: 280,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -296,7 +301,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                 },
               ),
               Text(
-                'Only affects what you hear -- this device, this call.',
+                t.voiceScreenVolumeOnlyAffectsYou,
                 style: TextStyle(color: KodaColors.text3, fontSize: 11),
                 textAlign: TextAlign.center,
               ),
@@ -308,11 +313,11 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                 setDialogState(() => volume = 1.0);
                 notifier.setParticipantVolume(participant.identity, 1.0);
               },
-              child: const Text('Reset'),
+              child: Text(t.voiceScreenResetVolumeButton),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Done'),
+              child: Text(t.commonDone),
             ),
           ],
         ),
@@ -360,6 +365,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final settings = ref.watch(voiceSettingsProvider);
     final participants = <lk.Participant>[
       if (_room.localParticipant != null) _room.localParticipant!,
@@ -381,15 +387,17 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
           : _error != null
               ? Center(child: Padding(
                   padding: const EdgeInsets.all(24),
-                  child: Text('Could not connect: $_error',
+                  child: Text(t.voiceScreenCouldNotConnect(_error!),
                       style: TextStyle(color: KodaColors.accent),
                       textAlign: TextAlign.center)))
               : Column(children: [
                   Expanded(
+                    child: Row(children: [
+                  Expanded(
                     child: Stack(children: [
                       // Participant grid
                       participants.isEmpty
-                          ? Center(child: Text('Connecting...',
+                          ? Center(child: Text(t.serverConnecting,
                               style: TextStyle(color: KodaColors.text3)))
                           : GridView.builder(
                               padding: const EdgeInsets.all(16),
@@ -403,10 +411,9 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                               itemBuilder: (_, i) {
                                 // Screen share tile
                                 if (_screenShareOn && i == participants.length) {
-                                  return Semantics(
-                                    button: true,
-                                    label: 'Your screen, tap to view full-screen',
-                                    child: GestureDetector(
+                                  return KodaTappable(
+                                    semanticLabel: t.voiceScreenYourScreenTapFullscreen,
+                                    borderRadius: BorderRadius.circular(10),
                                     onTap: () => showDialog(
                                       context: context,
                                       barrierColor: Colors.black87,
@@ -422,9 +429,9 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                                 child: ColoredBox(color: Colors.black,
                                                     child: lk.VideoTrackRenderer(_screenShareTrack!)),
                                               )),
-                                              const Text('Your screen',
+                                              Text(t.voiceScreenYourScreenLabel,
                                                   style: TextStyle(color: Colors.white, fontSize: 14)),
-                                              const Text('Tap to close',
+                                              Text(t.voiceScreenTapToClose,
                                                   style: TextStyle(color: Colors.white54, fontSize: 11)),
                                               const SizedBox(height: 16),
                                             ],
@@ -432,7 +439,6 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                         ),
                                       ),
                                     ),
-                                    child: ExcludeSemantics(
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color: KodaColors.card,
@@ -452,14 +458,13 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                                             Icon(Icons.screen_share, color: KodaColors.koda, size: 12),
                                             SizedBox(width: 4),
-                                            Text('Your screen',
+                                            Text(t.voiceScreenYourScreenLabel,
                                                 style: TextStyle(color: KodaColors.text1, fontSize: 11)),
                                           ]),
                                         ),
                                       ]),
                                     ),
-                                    ),
-                                  ));
+                                  );
                                 }
 
                                 // Participant tile
@@ -482,19 +487,16 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                         : null)
                                     : _varmConfigFor(p);
 
-                                return Semantics(
-                                  button: true,
-                                  label: '${isLocal ? "$name (you)" : name}'
-                                      '${speaking ? ", speaking" : ""}'
-                                      '${isLocal && _cameraOn ? ", camera on" : ""}'
-                                      ', double tap to pop out',
-                                  child: GestureDetector(
-                                  onDoubleTap: () => _popOutParticipant(context, name, videoTrack),
+                                return KodaTappable(
+                                  semanticLabel: '${isLocal ? t.voiceScreenParticipantYouLabel(name) : name}'
+                                      '${speaking ? t.voiceScreenSpeakingSuffix : ""}'
+                                      '${isLocal && _cameraOn ? t.voiceScreenCameraOnSuffix : ""}'
+                                      '${t.voiceScreenActivateToPopOut}',
+                                  borderRadius: BorderRadius.circular(10),
                                   onTap: () => _popOutParticipant(context, name, videoTrack),
                                   onSecondaryTapUp: isLocal
                                       ? null
                                       : (d) => _showVolumeDialog(p, name),
-                                  child: ExcludeSemantics(
                                   child: Container(
                                     decoration: BoxDecoration(
                                       color: KodaColors.card,
@@ -534,18 +536,28 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                                       Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                                         child: Text(
-                                          isLocal ? '$name (you)' : name,
+                                          isLocal ? t.voiceScreenParticipantYouLabel(name) : name,
                                           style: TextStyle(color: KodaColors.text1, fontSize: 11),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ]),
                                   ),
-                                  ),
-                                  ),
                                 );
                               },
                             ),
+                    ]),
+                  ),
+                  if (_showChat) ...[
+                    VerticalDivider(width: 1, color: KodaColors.border),
+                    SizedBox(
+                      width: 320,
+                      child: ChannelChatPanel(
+                        channelId: widget.existingSession?.channelId ?? '',
+                        serverId:  widget.existingSession?.serverId ?? '',
+                      ),
+                    ),
+                  ],
                     ]),
                   ),
 
@@ -560,7 +572,16 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                         icon: Icon(_muted ? Icons.mic_off : Icons.mic,
                             color: _muted ? KodaColors.accent : KodaColors.text1),
                         onPressed: _toggleMute,
-                        tooltip: _muted ? 'Unmute' : 'Mute',
+                        tooltip: _muted ? t.serverUnmute : t.serverMute,
+                      ),
+                      const SizedBox(width: 8),
+
+                      IconButton(
+                        iconSize: 28,
+                        icon: Icon(Icons.chat_bubble_outline,
+                            color: _showChat ? KodaColors.koda : KodaColors.text2),
+                        tooltip: _showChat ? t.voiceScreenHideChatTooltip : t.voiceScreenShowChatTooltip,
+                        onPressed: () => setState(() => _showChat = !_showChat),
                       ),
                       const SizedBox(width: 16),
 
@@ -569,7 +590,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                           iconSize: 28,
                           icon: Icon(Icons.face_retouching_natural,
                               color: _showVarm ? KodaColors.koda : KodaColors.text2),
-                          tooltip: _showVarm ? 'Hide VARM' : 'Show VARM',
+                          tooltip: _showVarm ? t.voiceScreenHideVarmTooltip : t.voiceScreenShowVarmTooltip,
                           onPressed: () async {
                             if (!_showVarm && _cameraOn) await _toggleCamera();
                             await _setShowVarm(!_showVarm);
@@ -588,7 +609,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                           if (!_cameraOn && _showVarm) await _setShowVarm(false);
                           await _toggleCamera();
                         },
-                        tooltip: _cameraOn ? 'Stop camera' : 'Start camera',
+                        tooltip: _cameraOn ? t.voiceScreenStopCameraTooltip : t.voiceScreenStartCameraTooltip,
                       ),
                       const SizedBox(width: 8),
 
@@ -600,12 +621,12 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                             color: _screenShareOn ? KodaColors.accent : KodaColors.text2,
                           ),
                           onPressed: _toggleScreenShare,
-                          tooltip: _screenShareOn ? 'Stop sharing' : 'Share screen',
+                          tooltip: _screenShareOn ? t.voiceScreenStopSharingTooltip : t.voiceScreenShareScreenTooltip,
                         ),
                         IconButton(
                           iconSize: 24,
                           icon: Icon(Icons.open_in_new, color: KodaColors.text2),
-                          tooltip: 'Pop out voice to separate window',
+                          tooltip: t.voiceScreenPopOutTooltip,
                           onPressed: () async {
                             final channelId = widget.existingSession?.channelId;
                             if (channelId == null) return;
@@ -620,7 +641,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                             if (!context.mounted) return;
                             if (result == null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Could not pop out voice.')),
+                                SnackBar(content: Text(t.voiceScreenCouldNotPopOut)),
                               );
                               return;
                             }
@@ -648,7 +669,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                         iconSize: 28,
                         icon: Icon(Icons.call_end, color: KodaColors.accent),
                         onPressed: _leave,
-                        tooltip: 'Leave Voice',
+                        tooltip: t.voiceScreenLeaveVoiceTooltip,
                       ),
 
                     ]),
@@ -673,6 +694,7 @@ class _PopOutWindowState extends State<_PopOutWindow> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Stack(children: [
       // Dismiss backdrop
       if (!_pinned)
@@ -726,7 +748,7 @@ class _PopOutWindowState extends State<_PopOutWindow> {
                       ),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
-                      tooltip: _pinned ? 'Unpin' : 'Pin (keep open)',
+                      tooltip: _pinned ? t.voiceScreenUnpinTooltip : t.voiceScreenPinTooltip,
                       onPressed: () => setState(() => _pinned = !_pinned),
                     ),
                     const SizedBox(width: 8),
@@ -735,10 +757,10 @@ class _PopOutWindowState extends State<_PopOutWindow> {
                       icon: Icon(Icons.open_in_full,
                           size: 14, color: KodaColors.text3),
                       itemBuilder: (_) => [
-                        const PopupMenuItem(value: Size(320, 180), child: Text('Small (320x180)')),
-                        const PopupMenuItem(value: Size(480, 270), child: Text('Medium (480x270)')),
-                        const PopupMenuItem(value: Size(640, 360), child: Text('Large (640x360)')),
-                        const PopupMenuItem(value: Size(960, 540), child: Text('XL (960x540)')),
+                        PopupMenuItem(value: const Size(320, 180), child: Text(t.voiceScreenSizeSmall)),
+                        PopupMenuItem(value: const Size(480, 270), child: Text(t.voiceScreenSizeMedium)),
+                        PopupMenuItem(value: const Size(640, 360), child: Text(t.voiceScreenSizeLarge)),
+                        PopupMenuItem(value: const Size(960, 540), child: Text(t.voiceScreenSizeXl)),
                       ],
                       onSelected: (s) => setState(() => _size = s),
                     ),

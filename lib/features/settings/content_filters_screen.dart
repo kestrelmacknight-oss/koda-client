@@ -16,6 +16,7 @@
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 const kContentLabels = ['adult', 'suggestive', 'graphic', 'nudity'];
 
@@ -27,12 +28,21 @@ const kContentLabelNames = {
   'graphic':    'Graphic media',
   'nudity':     'Non-sexual nudity',
 };
-const _labelNames = kContentLabelNames;
-const _labelDescriptions = {
-  'adult':      'Sexually explicit content',
-  'suggestive': 'Sexually suggestive but not explicit content',
-  'graphic':    'Violence or gore',
-  'nudity':     'Nudity in a non-sexual context',
+// kContentLabelNames above stays as a plain (unlocalized) const -- it's
+// also imported by channel_edit_dialog.dart and home_screen.dart, which
+// don't have a BuildContext handy at their call sites. This screen's own
+// UI uses these localized equivalents instead, which do need one.
+Map<String, String> _labelNames(AppLocalizations t) => {
+  'adult':      t.contentFiltersLabelAdult,
+  'suggestive': t.contentFiltersLabelSuggestive,
+  'graphic':    t.contentFiltersLabelGraphic,
+  'nudity':     t.contentFiltersLabelNudity,
+};
+Map<String, String> _labelDescriptions(AppLocalizations t) => {
+  'adult':      t.contentFiltersDescAdult,
+  'suggestive': t.contentFiltersDescSuggestive,
+  'graphic':    t.contentFiltersDescGraphic,
+  'nudity':     t.contentFiltersDescNudity,
 };
 
 /// Most restrictive first -- used elsewhere (channel rendering) to pick
@@ -83,11 +93,13 @@ class _ContentFiltersScreenState extends State<ContentFiltersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
         backgroundColor: KodaColors.bg2,
-        title: Text('Content Filters',
+        // Exact match with the Settings nav entry's own title.
+        title: Text(t.settingsContentFiltersTitle,
             style: TextStyle(color: KodaColors.text1, fontSize: 16, fontWeight: FontWeight.w700)),
       ),
       body: _loading
@@ -96,19 +108,17 @@ class _ContentFiltersScreenState extends State<ContentFiltersScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 Text(
-                  'Servers can flag channels with content labels. Choose how you want '
-                  'labeled channels to behave -- this is your own preference and never '
-                  'affects what anyone else sees.',
+                  t.contentFiltersDescription,
                   style: TextStyle(color: KodaColors.text3, fontSize: 12, height: 1.5),
                 ),
                 const SizedBox(height: 20),
-                ...kContentLabels.map(_buildLabelRow),
+                ...kContentLabels.map((label) => _buildLabelRow(t, label)),
               ],
             ),
     );
   }
 
-  Widget _buildLabelRow(String label) {
+  Widget _buildLabelRow(AppLocalizations t, String label) {
     final current = _filters[label] as String? ?? 'warn';
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -119,17 +129,17 @@ class _ContentFiltersScreenState extends State<ContentFiltersScreen> {
         border: Border.all(color: KodaColors.border),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(_labelNames[label] ?? label,
+        Text(_labelNames(t)[label] ?? label,
             style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w600)),
         const SizedBox(height: 2),
-        Text(_labelDescriptions[label] ?? '',
+        Text(_labelDescriptions(t)[label] ?? '',
             style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         const SizedBox(height: 10),
         SegmentedButton<String>(
-          segments: const [
-            ButtonSegment(value: 'hide', label: Text('Hide')),
-            ButtonSegment(value: 'warn', label: Text('Warn')),
-            ButtonSegment(value: 'show', label: Text('Show')),
+          segments: [
+            ButtonSegment(value: 'hide', label: Text(t.contentFiltersHide)),
+            ButtonSegment(value: 'warn', label: Text(t.contentFiltersWarn)),
+            ButtonSegment(value: 'show', label: Text(t.contentFiltersShow)),
           ],
           selected: {current},
           onSelectionChanged: (s) => _setFilter(label, s.first),

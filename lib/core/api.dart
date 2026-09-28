@@ -655,6 +655,15 @@ class KodaApi {
     } catch (e) { _log('unmuteMember', e); return false; }
   }
 
+  Future<bool> moveVoiceMember(String serverId, String userId,
+      {required String fromChannelId, required String toChannelId}) async {
+    try {
+      await _dio.post('/servers/$serverId/members/$userId/voice-move',
+          data: {'from_channel_id': fromChannelId, 'to_channel_id': toChannelId});
+      return true;
+    } catch (e) { _log('moveVoiceMember', e); return false; }
+  }
+
   Future<bool> unlockInvites(String serverId) async {
     try {
       await _dio.post('/servers/$serverId/invites/unlock');

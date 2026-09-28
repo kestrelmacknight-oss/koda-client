@@ -10,6 +10,7 @@ import '../../core/socket.dart';
 import '../../core/crypto/dm_session_manager.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 import 'child_lockout_screen.dart';
 import 'verify_email_screen.dart';
@@ -59,8 +60,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }
 
   Future<void> _login() async {
+    final t = AppLocalizations.of(context);
     if (_loginEmail.text.trim().isEmpty || _loginPassword.text.isEmpty) {
-      setState(() => _error = 'Email and password are required.');
+      setState(() => _error = t.authErrorEmailPasswordRequired);
       return;
     }
     setState(() { _busy = true; _error = null; });
@@ -81,7 +83,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
     final result = apiResult.data;
     if (result == null) {
-      setState(() => _error = 'Incorrect email or password.');
+      setState(() => _error = t.authErrorIncorrectCredentials);
       return;
     }
 
@@ -106,22 +108,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }
 
   Future<void> _register() async {
+    final t = AppLocalizations.of(context);
     if (!_agree) {
-      setState(() => _error = 'Please accept the Terms & Conditions.');
+      setState(() => _error = t.authErrorMustAcceptTerms);
       return;
     }
     if (_regEmail.text.trim().isEmpty ||
         _regUsername.text.trim().isEmpty ||
         _regPassword.text.isEmpty) {
-      setState(() => _error = 'All fields are required.');
+      setState(() => _error = t.authErrorAllFieldsRequired);
       return;
     }
     if (_regPassword.text != _regConfirm.text) {
-      setState(() => _error = 'Passwords do not match.');
+      setState(() => _error = t.authErrorPasswordsDontMatch);
       return;
     }
     if (_regPassword.text.length < 8) {
-      setState(() => _error = 'Password must be at least 8 characters.');
+      setState(() => _error = t.authErrorPasswordTooShort);
       return;
     }
 
@@ -138,7 +141,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
     if (result == null) {
       setState(() =>
-          _error = 'Registration failed. That email may already be in use.');
+          _error = t.authErrorRegistrationFailed);
       return;
     }
 
@@ -160,6 +163,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       body: Center(
@@ -190,7 +194,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       fontSize: 24,
                       fontWeight: FontWeight.w800,
                       color: KodaColors.text1)),
-              Text('${KodaConfig.buildLabel} v${KodaConfig.appVersion}',
+              Text(t.settingsAboutBuildLabel(KodaConfig.buildLabel, KodaConfig.appVersion),
                   style: TextStyle(fontSize: 12, color: KodaColors.gold)),
               const SizedBox(height: 28),
 
@@ -207,7 +211,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   unselectedLabelColor: KodaColors.text3,
                   dividerColor: Colors.transparent,
                   padding: const EdgeInsets.all(4),
-                  tabs: const [Tab(text: 'Sign In'), Tab(text: 'Create Account')],
+                  tabs: [Tab(text: t.authTabSignIn), Tab(text: t.authTabCreateAccount)],
                 ),
               ),
               const SizedBox(height: 18),
@@ -217,28 +221,28 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               SizedBox(
                 height: 320,
                 child: TabBarView(controller: _tabs, children: [
-                  _loginTab(), _registerTab(),
+                  _loginTab(t), _registerTab(t),
                 ]),
               ),
 
               const SizedBox(height: 22),
               Text.rich(
                 TextSpan(style: TextStyle(color: KodaColors.text3, fontSize: 11), children: [
-                  const TextSpan(text: 'By using Koda you agree to our '),
+                  TextSpan(text: t.authAgreementPrefix),
                   TextSpan(
-                    text: 'Terms & Conditions',
+                    text: t.authTermsLink,
                     style: TextStyle(color: KodaColors.koda),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () => _openUrl(KodaConfig.termsUrl),
                   ),
-                  const TextSpan(text: ' and '),
+                  TextSpan(text: t.authAgreementMiddle),
                   TextSpan(
-                    text: 'Privacy Policy',
+                    text: t.authPrivacyLink,
                     style: TextStyle(color: KodaColors.koda),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () => _openUrl(KodaConfig.privacyUrl),
                   ),
-                  const TextSpan(text: '.'),
+                  TextSpan(text: t.authAgreementSuffix),
                 ]),
                 textAlign: TextAlign.center,
               ),
@@ -249,34 +253,34 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     );
   }
 
-  Widget _loginTab() => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        KodaTextField(controller: _loginEmail, hintText: 'Email address',
+  Widget _loginTab(AppLocalizations t) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        KodaTextField(controller: _loginEmail, hintText: t.authEmailHint,
             keyboardType: TextInputType.emailAddress),
         const SizedBox(height: 10),
-        KodaTextField(controller: _loginPassword, hintText: 'Password', obscureText: true),
+        KodaTextField(controller: _loginPassword, hintText: t.authPasswordHint, obscureText: true),
         Align(
           alignment: Alignment.centerRight,
           child: TextButton(
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const ForgotPasswordScreen())),
-            child: Text('Forgot password?',
+            child: Text(t.authForgotPassword,
                 style: TextStyle(color: KodaColors.koda, fontSize: 12)),
           ),
         ),
         const SizedBox(height: 8),
-        KodaPrimaryButton(label: 'Sign In', onPressed: _login, busy: _busy),
+        KodaPrimaryButton(label: t.authSignInButton, onPressed: _login, busy: _busy),
       ]);
 
-  Widget _registerTab() => SingleChildScrollView(
+  Widget _registerTab(AppLocalizations t) => SingleChildScrollView(
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          KodaTextField(controller: _regEmail, hintText: 'Email address',
+          KodaTextField(controller: _regEmail, hintText: t.authEmailHint,
               keyboardType: TextInputType.emailAddress),
           const SizedBox(height: 10),
-          KodaTextField(controller: _regUsername, hintText: 'Username'),
+          KodaTextField(controller: _regUsername, hintText: t.authUsernameHint),
           const SizedBox(height: 10),
-          KodaTextField(controller: _regPassword, hintText: 'Password', obscureText: true),
+          KodaTextField(controller: _regPassword, hintText: t.authPasswordHint, obscureText: true),
           const SizedBox(height: 10),
-          KodaTextField(controller: _regConfirm, hintText: 'Confirm password', obscureText: true),
+          KodaTextField(controller: _regConfirm, hintText: t.authConfirmPasswordHint, obscureText: true),
           const SizedBox(height: 14),
           GestureDetector(
             onTap: () => setState(() => _agree = !_agree),
@@ -289,14 +293,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(top: 12),
-                  child: Text('I agree to the Terms & Conditions and Privacy Policy',
+                  child: Text(t.authAgreeToTerms,
                       style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 ),
               ),
             ]),
           ),
           const SizedBox(height: 12),
-          KodaPrimaryButton(label: 'Create Account', onPressed: _register, busy: _busy),
+          KodaPrimaryButton(label: t.authCreateAccountButton, onPressed: _register, busy: _busy),
         ]),
       );
 }

@@ -11,6 +11,7 @@
 
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class ChildLockoutScreen extends StatelessWidget {
   final VoidCallback onLogout;
@@ -18,6 +19,7 @@ class ChildLockoutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       body: Center(
@@ -28,14 +30,13 @@ class ChildLockoutScreen extends StatelessWidget {
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Icon(Icons.schedule_outlined, size: 56, color: KodaColors.text3),
               const SizedBox(height: 20),
-              Text("It's outside your allowed hours",
+              Text(t.childLockoutTitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: KodaColors.text1,
                       fontSize: 18, fontWeight: FontWeight.w700)),
               const SizedBox(height: 10),
               Text(
-                'A parent or guardian has set times this account can use Koda. '
-                'Ask them for more time, or check back during your next allowed window.',
+                t.childLockoutBody,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: KodaColors.text3, fontSize: 13, height: 1.5),
               ),
@@ -47,7 +48,7 @@ class ChildLockoutScreen extends StatelessWidget {
                   side: BorderSide(color: KodaColors.border),
                   minimumSize: const Size(double.infinity, 44),
                 ),
-                child: const Text('Log Out'),
+                child: Text(t.childLockoutLogOutButton),
               ),
             ]),
           ),

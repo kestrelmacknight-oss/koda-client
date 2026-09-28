@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class RoleSelectScreen extends StatefulWidget {
   final String serverId;
@@ -73,6 +74,7 @@ class _RoleSelectScreenState extends State<RoleSelectScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       appBar: AppBar(
@@ -88,13 +90,13 @@ class _RoleSelectScreenState extends State<RoleSelectScreen> {
           ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
           : _roles.isEmpty
               ? Center(
-                  child: Text('No self-assignable roles available.',
+                  child: Text(t.roleSelectNoRolesAvailable,
                       style: TextStyle(color: KodaColors.text3)))
               : ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
                     Text(
-                      'Select the roles you want. Tap a role to add or remove it.',
+                      t.roleSelectInstructions,
                       style: TextStyle(color: KodaColors.text3, fontSize: 13),
                     ),
                     const SizedBox(height: 16),

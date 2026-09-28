@@ -18,6 +18,7 @@ import '../../core/merch_cart.dart';
 import '../../core/permissions.dart';
 import '../../core/providers.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/shipping_address_form.dart';
 
 class PrintfulMerchScreen extends ConsumerStatefulWidget {
@@ -68,6 +69,9 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
   }
 
   Future<void> _sync() async {
+    // Captured before the `await` below, in case this widget is no longer
+    // mounted by the time the request comes back.
+    final t = AppLocalizations.of(context);
     final serverId = _serverId;
     if (serverId == null) return;
     setState(() => _syncing = true);
@@ -77,10 +81,10 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
     if (products != null) {
       setState(() => _products = products);
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Synced ${products.length} product${products.length == 1 ? '' : 's'} from Printful')));
+          SnackBar(content: Text(t.printfulMerchSyncedCount(products.length))));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not sync with Printful -- check the connection in Merch settings.')));
+          SnackBar(content: Text(t.printfulMerchSyncFailed)));
     }
   }
 
@@ -97,8 +101,9 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     if (_serverId == null) {
-      return Center(child: Text('Select a server to view its merch',
+      return Center(child: Text(t.printfulMerchSelectServer,
           style: TextStyle(color: KodaColors.text3)));
     }
 
@@ -108,7 +113,7 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
         child: Row(children: [
           Expanded(
             child: Text(
-              _creatorMode ? 'Manage Merch Catalog' : 'Merch',
+              _creatorMode ? t.printfulMerchManageCatalogTitle : t.printfulMerchTitle,
               style: TextStyle(color: KodaColors.text1,
                   fontSize: 16, fontWeight: FontWeight.w700),
             ),
@@ -123,7 +128,7 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
                   ? SizedBox(width: 14, height: 14,
                       child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
                   : const Icon(Icons.sync, size: 16),
-              label: Text(_syncing ? 'Syncing...' : 'Sync Catalog'),
+              label: Text(_syncing ? t.printfulMerchSyncingLabel : t.printfulMerchSyncCatalogButton),
               onPressed: _syncing ? null : _sync,
             ),
           if (!_creatorMode) _buildCartButton(),
@@ -131,7 +136,7 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
             IconButton(
               icon: Icon(_creatorMode ? Icons.storefront_outlined : Icons.inventory_2_outlined,
                   color: KodaColors.text2),
-              tooltip: _creatorMode ? 'Switch to Browse' : 'Manage this server\'s merch',
+              tooltip: _creatorMode ? t.printfulMerchSwitchToBrowseTooltip : t.printfulMerchManageTooltip,
               onPressed: _toggleCreatorMode,
             ),
         ]),
@@ -145,19 +150,20 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
   }
 
   Widget _buildList() {
+    final t = AppLocalizations.of(context);
     if (_products.isEmpty) {
       return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
         Icon(Icons.storefront_outlined, color: KodaColors.text3, size: 48),
         const SizedBox(height: 12),
         Text(
-          _creatorMode ? 'Nothing synced yet' : 'No merch available yet',
+          _creatorMode ? t.printfulMerchNothingSyncedYet : t.printfulMerchNoMerchAvailable,
           style: TextStyle(color: KodaColors.text1, fontSize: 16, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         Text(
           _creatorMode
-              ? 'Sync your Printful store to pull in your product catalog'
-              : 'Check back later for merch from this server',
+              ? t.printfulMerchSyncHint
+              : t.printfulMerchCheckBackLater,
           style: TextStyle(color: KodaColors.text3, fontSize: 13),
         ),
       ]));
@@ -171,6 +177,7 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
   }
 
   Widget _buildProductCard(Map<String, dynamic> product) {
+    final t = AppLocalizations.of(context);
     final variants = List<Map<String, dynamic>>.from(product['variants'] ?? []);
     final inStock = variants.where((v) => v['in_stock'] == true).toList();
     final cheapest = inStock.isEmpty ? null : inStock.reduce((a, b) =>
@@ -207,8 +214,10 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
               const SizedBox(height: 2),
               Text(
                 cheapest == null
-                    ? 'Out of stock'
-                    : 'From ${formatMerchPrice(cheapest['retail_price_cents'] as int, cheapest['currency'] as String? ?? 'USD')} • ${inStock.length} option${inStock.length == 1 ? '' : 's'}',
+                    ? t.printfulMerchOutOfStock
+                    : t.printfulMerchFromPriceOptions(
+                        formatMerchPrice(cheapest['retail_price_cents'] as int, cheapest['currency'] as String? ?? 'USD'),
+                        inStock.length),
                 style: TextStyle(color: KodaColors.text3, fontSize: 12),
               ),
             ]),
@@ -225,7 +234,7 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
               style: OutlinedButton.styleFrom(
                   foregroundColor: KodaColors.koda, side: BorderSide(color: KodaColors.koda)),
               onPressed: cheapest == null ? null : () => _openProductDetail(product, inStock),
-              child: const Text('View'),
+              child: Text(t.printfulMerchViewButton),
             ),
         ]),
       ),
@@ -234,12 +243,13 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
 
   Widget _buildCartButton() {
     return Consumer(builder: (context, ref, _) {
+      final t = AppLocalizations.of(context);
       final cart = ref.watch(merchCartProvider);
       final count = cart.serverId == _serverId ? cart.totalItems : 0;
       return Stack(clipBehavior: Clip.none, children: [
         IconButton(
           icon: Icon(Icons.shopping_cart_outlined, color: KodaColors.text2),
-          tooltip: 'Cart',
+          tooltip: t.printfulMerchCartTooltip,
           onPressed: _openCart,
         ),
         if (count > 0)
@@ -380,6 +390,8 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
   }
 
   void _addToCart() {
+    // Captured before `Navigator.pop` below invalidates this context.
+    final t = AppLocalizations.of(context);
     widget.ref.read(merchCartProvider.notifier).addItem(
           serverId: widget.serverId,
           variantId: _selectedVariant['id'] as String,
@@ -392,11 +404,12 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
         );
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Added ${widget.productName} to cart')));
+        SnackBar(content: Text(t.printfulMerchAddedToCart(widget.productName))));
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final imageUrl = (_selectedVariant['image_url'] as String?) ?? widget.productThumbnailUrl;
     final priceText = formatMerchPrice(_selectedVariant['retail_price_cents'] as int,
         _selectedVariant['currency'] as String? ?? 'USD');
@@ -429,18 +442,18 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
             const SizedBox(height: 16),
             if (widget.variants.length > 1) _buildVariantPicker(),
             const SizedBox(height: 16),
-            Text('Quantity', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+            Text(t.printfulMerchQuantityLabel, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
             const SizedBox(height: 4),
             Row(children: [
               IconButton(
                 icon: Icon(Icons.remove_circle_outline, color: KodaColors.text2),
-                tooltip: 'Decrease quantity',
+                tooltip: t.printfulMerchDecreaseQuantityTooltip,
                 onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
               ),
               Text('$_quantity', style: TextStyle(color: KodaColors.text1, fontSize: 14)),
               IconButton(
                 icon: Icon(Icons.add_circle_outline, color: KodaColors.text2),
-                tooltip: 'Increase quantity',
+                tooltip: t.printfulMerchIncreaseQuantityTooltip,
                 onPressed: () => setState(() => _quantity++),
               ),
             ]),
@@ -450,7 +463,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(foregroundColor: KodaColors.text2),
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
+                  child: Text(t.commonCancel),
                 ),
               ),
               const SizedBox(width: 10),
@@ -459,7 +472,7 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
                   style: ElevatedButton.styleFrom(
                       backgroundColor: KodaColors.koda, foregroundColor: Colors.black),
                   onPressed: _addToCart,
-                  child: const Text('Add to Cart'),
+                  child: Text(t.printfulMerchAddToCartButton),
                 ),
               ),
             ]),
@@ -470,12 +483,13 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
   }
 
   Widget _buildVariantPicker() {
+    final t = AppLocalizations.of(context);
     final grid = _grid;
     if (grid == null) {
       // Fallback for products whose variant names don't split cleanly
       // into style/size -- same flat dropdown the app already had.
       return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Option', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+        Text(t.printfulMerchOptionLabel, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
         const SizedBox(height: 4),
         DropdownButton<String>(
           value: _selectedVariant['id'] as String,
@@ -486,8 +500,8 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
               _selectedVariant = widget.variants.firstWhere((v) => v['id'] == id)),
           items: widget.variants.map((v) => DropdownMenuItem(
                 value: v['id'] as String,
-                child: Text('${v['name']} -- '
-                    '${formatMerchPrice(v['retail_price_cents'] as int, v['currency'] as String? ?? 'USD')}'),
+                child: Text(t.printfulMerchVariantPriceOption(v['name'] as String? ?? '',
+                    formatMerchPrice(v['retail_price_cents'] as int, v['currency'] as String? ?? 'USD'))),
               )).toList(),
         ),
       ]);
@@ -518,10 +532,10 @@ class _ProductDetailDialogState extends State<_ProductDetailDialog> {
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       if (grid.styles.length > 1)
-        chipRow('Style', grid.styles, _selectedStyle,
+        chipRow(t.printfulMerchStyleLabel, grid.styles, _selectedStyle,
             (style) => grid.variantFor(style, _selectedSize ?? '') != null, _pickStyle),
       if (grid.sizes.length > 1)
-        chipRow('Size', grid.sizes, _selectedSize,
+        chipRow(t.printfulMerchSizeLabel, grid.sizes, _selectedSize,
             (size) => grid.variantFor(_selectedStyle ?? '', size) != null, _pickSize),
     ]);
   }
@@ -536,24 +550,25 @@ class _CartDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final cart = ref.watch(merchCartProvider);
     final items = cart.serverId == serverId ? cart.items : <CartItem>[];
 
     return AlertDialog(
       backgroundColor: KodaColors.card,
-      title: Text('Your Cart', style: TextStyle(color: KodaColors.text1, fontSize: 16)),
+      title: Text(t.printfulMerchYourCartTitle, style: TextStyle(color: KodaColors.text1, fontSize: 16)),
       content: SizedBox(
         width: 380,
         child: items.isEmpty
             ? Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Text('Your cart is empty.', style: TextStyle(color: KodaColors.text3)),
+                child: Text(t.printfulMerchCartEmpty, style: TextStyle(color: KodaColors.text3)),
               )
             : Column(mainAxisSize: MainAxisSize.min, children: [
-                ...items.map(_buildCartRow),
+                ...items.map((item) => _buildCartRow(t, item)),
                 const Divider(),
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  Text('Subtotal', style: TextStyle(color: KodaColors.text2, fontSize: 13)),
+                  Text(t.printfulMerchSubtotalLabel, style: TextStyle(color: KodaColors.text2, fontSize: 13)),
                   // One Printful store has one currency -- every line in
                   // this (single-store, see merch_cart.dart) cart shares it.
                   Text(formatMerchPrice(cart.subtotalCents, items.first.currency),
@@ -562,7 +577,7 @@ class _CartDialog extends StatelessWidget {
               ]),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(t.commonClose)),
         if (items.isNotEmpty)
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: KodaColors.koda, foregroundColor: Colors.black),
@@ -573,13 +588,13 @@ class _CartDialog extends StatelessWidget {
                 builder: (_) => _CheckoutDialog(ref: ref, serverId: serverId, items: items),
               );
             },
-            child: const Text('Checkout'),
+            child: Text(t.printfulMerchCheckoutLabel),
           ),
       ],
     );
   }
 
-  Widget _buildCartRow(CartItem item) {
+  Widget _buildCartRow(AppLocalizations t, CartItem item) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(children: [
@@ -605,7 +620,7 @@ class _CartDialog extends StatelessWidget {
         ),
         IconButton(
           icon: Icon(Icons.remove_circle_outline, size: 18, color: KodaColors.text2),
-          tooltip: 'Decrease quantity',
+          tooltip: t.printfulMerchDecreaseQuantityTooltip,
           onPressed: item.quantity > 1
               ? () => ref.read(merchCartProvider.notifier).updateQuantity(item.variantId, item.quantity - 1)
               : null,
@@ -613,12 +628,12 @@ class _CartDialog extends StatelessWidget {
         Text('${item.quantity}', style: TextStyle(color: KodaColors.text1, fontSize: 13)),
         IconButton(
           icon: Icon(Icons.add_circle_outline, size: 18, color: KodaColors.text2),
-          tooltip: 'Increase quantity',
+          tooltip: t.printfulMerchIncreaseQuantityTooltip,
           onPressed: () => ref.read(merchCartProvider.notifier).updateQuantity(item.variantId, item.quantity + 1),
         ),
         IconButton(
           icon: Icon(Icons.delete_outline, size: 18, color: KodaColors.accent),
-          tooltip: 'Remove from cart',
+          tooltip: t.printfulMerchRemoveFromCartTooltip,
           onPressed: () => ref.read(merchCartProvider.notifier).removeItem(item.variantId),
         ),
       ]),
@@ -662,8 +677,11 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
   List<Map<String, dynamic>> get _items => widget.items.map((i) => i.toOrderItem()).toList();
 
   Future<void> _getRates() async {
+    // Captured before the `await` below, in case this widget is no longer
+    // mounted by the time the request comes back.
+    final t = AppLocalizations.of(context);
     if (!ShippingAddressForm.isComplete(_address)) {
-      setState(() => _error = 'Fill in your shipping address first.');
+      setState(() => _error = t.printfulMerchFillShippingAddressFirst);
       return;
     }
     setState(() { _loading = true; _error = null; });
@@ -673,7 +691,7 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
     setState(() {
       _loading = false;
       if (rates == null || rates.isEmpty) {
-        _error = 'Could not get shipping rates for that address.';
+        _error = t.printfulMerchCouldNotGetShippingRates;
       } else {
         _rates = rates;
         _selectedRate = rates.first;
@@ -683,6 +701,8 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
   }
 
   Future<void> _pay() async {
+    // Captured before `Navigator.pop` below invalidates this context.
+    final t = AppLocalizations.of(context);
     final rate = _selectedRate;
     if (rate == null) return;
     setState(() { _loading = true; _error = null; });
@@ -694,7 +714,7 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
     final checkoutUrl = result?['checkout_url'] as String?;
     final orderId = result?['order_id'] as String?;
     if (checkoutUrl == null || orderId == null) {
-      setState(() => _error = 'Could not start checkout. Try again in a moment.');
+      setState(() => _error = t.printfulMerchCouldNotStartCheckout);
       return;
     }
 
@@ -708,21 +728,22 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
         matches: (data) => data['payment_type'] == 'printful_order' && data['order_id'] == orderId);
     if (confirmed) widget.ref.read(merchCartProvider.notifier).clear();
     messenger.showSnackBar(SnackBar(content: Text(confirmed
-        ? 'Order placed!'
-        : 'Still waiting on that payment -- it\'ll be placed once completed.')));
+        ? t.printfulMerchOrderPlaced
+        : t.printfulMerchOrderPending)));
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AlertDialog(
       backgroundColor: KodaColors.card,
-      title: Text('Checkout', style: TextStyle(color: KodaColors.text1, fontSize: 16)),
-      content: SizedBox(width: 360, child: _buildStep()),
-      actions: _buildActions(),
+      title: Text(t.printfulMerchCheckoutLabel, style: TextStyle(color: KodaColors.text1, fontSize: 16)),
+      content: SizedBox(width: 360, child: _buildStep(t)),
+      actions: _buildActions(t),
     );
   }
 
-  Widget _buildStep() {
+  Widget _buildStep(AppLocalizations t) {
     switch (_step) {
       case _CheckoutStep.address:
         return SingleChildScrollView(
@@ -733,13 +754,13 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
         );
       case _CheckoutStep.rates:
       case _CheckoutStep.placing:
-        return _buildRatesStep();
+        return _buildRatesStep(t);
     }
   }
 
-  Widget _buildRatesStep() {
+  Widget _buildRatesStep(AppLocalizations t) {
     return Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Shipping speed', style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+      Text(t.printfulMerchShippingSpeedLabel, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
       const SizedBox(height: 6),
       ..._rates.map((r) {
         final selected = _selectedRate?['id'] == r['id'];
@@ -763,7 +784,8 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
                     Text(r['name'] as String? ?? '',
                         style: TextStyle(color: KodaColors.text1, fontSize: 13)),
                     if (r['min_delivery_days'] != null)
-                      Text('${r['min_delivery_days']}-${r['max_delivery_days']} business days',
+                      Text(t.printfulMerchBusinessDaysRange(
+                              r['min_delivery_days'] as int, r['max_delivery_days'] as int),
                           style: TextStyle(color: KodaColors.text3, fontSize: 11)),
                   ]),
                 ),
@@ -783,10 +805,10 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
         child: Text(_error!, style: TextStyle(color: KodaColors.accent, fontSize: 12)),
       );
 
-  List<Widget> _buildActions() {
+  List<Widget> _buildActions(AppLocalizations t) {
     final cancel = TextButton(
       onPressed: _loading ? null : () => Navigator.pop(context),
-      child: const Text('Cancel'),
+      child: Text(t.commonCancel),
     );
 
     switch (_step) {
@@ -797,7 +819,7 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
           child: _loading
               ? const SizedBox(width: 16, height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-              : const Text('Get Shipping Quote'),
+              : Text(t.printfulMerchGetShippingQuoteButton),
         )];
       case _CheckoutStep.rates:
       case _CheckoutStep.placing:
@@ -807,7 +829,7 @@ class _CheckoutDialogState extends State<_CheckoutDialog> {
           child: _loading
               ? const SizedBox(width: 16, height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-              : const Text('Pay'),
+              : Text(t.printfulMerchPayButton),
         )];
     }
   }

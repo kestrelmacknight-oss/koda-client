@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import '../core/notifications_provider.dart';
 import '../core/theme.dart';
 import '../core/time_utils.dart';
+import '../l10n/generated/app_localizations.dart';
 
 class NotificationBell extends ConsumerWidget {
   const NotificationBell({super.key});
@@ -17,6 +18,7 @@ class NotificationBell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(notificationsProvider);
     final unread = state.unreadCount;
+    final t = AppLocalizations.of(context);
 
     return Stack(
       clipBehavior: Clip.none,
@@ -24,7 +26,7 @@ class NotificationBell extends ConsumerWidget {
         IconButton(
           icon: Icon(Icons.notifications_outlined,
               color: KodaColors.text2, size: 20),
-          tooltip: 'Notifications',
+          tooltip: t.notificationBellTitle,
           onPressed: () => _showDropdown(context, ref),
         ),
         if (unread > 0)
@@ -54,6 +56,7 @@ class NotificationBell extends ConsumerWidget {
   void _showDropdown(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(notificationsProvider.notifier);
     final state = ref.read(notificationsProvider);
+    final t = AppLocalizations.of(context);
 
     showDialog(
       context: context,
@@ -78,7 +81,7 @@ class NotificationBell extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 14, 8, 8),
                     child: Row(children: [
-                      Text('Notifications',
+                      Text(t.notificationBellTitle,
                           style: TextStyle(color: KodaColors.text1,
                               fontSize: 15, fontWeight: FontWeight.w700)),
                       const Spacer(),
@@ -88,7 +91,7 @@ class NotificationBell extends ConsumerWidget {
                             notifier.markAllRead();
                             Navigator.pop(context);
                           },
-                          child: Text('Mark all read',
+                          child: Text(t.notificationBellMarkAllRead,
                               style: TextStyle(
                                   color: KodaColors.koda, fontSize: 12)),
                         ),
@@ -105,7 +108,7 @@ class NotificationBell extends ConsumerWidget {
                   else if (state.notifications.isEmpty)
                     Padding(
                       padding: EdgeInsets.all(32),
-                      child: Text('No notifications yet',
+                      child: Text(t.notificationBellEmptyState,
                           style: TextStyle(color: KodaColors.text3,
                               fontSize: 13)),
                     )
@@ -140,7 +143,7 @@ class NotificationBell extends ConsumerWidget {
                                 // text equivalent, merged into this row's
                                 // announcement by the MergeSemantics above.
                                 if (!read)
-                                  Semantics(label: 'Unread', child: const SizedBox.shrink()),
+                                  Semantics(label: t.notificationBellUnreadLabel, child: const SizedBox.shrink()),
                                 Icon(
                                   _notifIcon(n['type'] as String? ?? ''),
                                   color: read

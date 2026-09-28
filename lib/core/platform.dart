@@ -14,3 +14,4 @@ bool get isDesktop =>
 
 bool get isMobile => !kIsWeb && (Platform.isAndroid || Platform.isIOS);
 bool get isIOS => !kIsWeb && Platform.isIOS;
+bool get isAndroid => !kIsWeb && Platform.isAndroid;

@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
 import '../../core/providers.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 import '../home/home_screen.dart';
 
@@ -46,6 +47,9 @@ class _ForcePasswordChangeScreenState
     );
 
     if (!mounted) return;
+    // Captured before the possible navigation below, so we don't touch a
+    // possibly-unmounted context afterward.
+    final t = AppLocalizations.of(context);
     setState(() => _busy = false);
 
     if (result != null) {
@@ -58,12 +62,13 @@ class _ForcePasswordChangeScreenState
         (route) => false,
       );
     } else {
-      setState(() => _error = 'Could not update password. Try again.');
+      setState(() => _error = t.forcePasswordChangeError);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       body: Center(
@@ -82,14 +87,14 @@ class _ForcePasswordChangeScreenState
                 child: Column(children: [
                   Icon(Icons.lock_reset, color: KodaColors.gold, size: 40),
                   const SizedBox(height: 12),
-                  Text('Welcome, ${widget.username}',
+                  Text(t.forcePasswordChangeWelcome(widget.username),
                       style: TextStyle(
                           color: KodaColors.text1,
                           fontSize: 20,
                           fontWeight: FontWeight.w800)),
                   const SizedBox(height: 8),
                   Text(
-                    'Your account requires a new password before you can continue.',
+                    t.forcePasswordChangeSubtitle,
                     style: TextStyle(color: KodaColors.text2, fontSize: 13),
                     textAlign: TextAlign.center,
                   ),
@@ -97,10 +102,10 @@ class _ForcePasswordChangeScreenState
               ),
               const SizedBox(height: 24),
               if (_error != null) KodaErrorBanner(message: _error!),
-              KodaTextField(controller: _newPassword, hintText: 'New password',
+              KodaTextField(controller: _newPassword, hintText: t.forcePasswordChangeNewPasswordHint,
                   obscureText: true, onChanged: (_) => setState(() {})),
               const SizedBox(height: 10),
-              KodaTextField(controller: _confirm, hintText: 'Confirm new password',
+              KodaTextField(controller: _confirm, hintText: t.forcePasswordChangeConfirmPasswordHint,
                   obscureText: true, onChanged: (_) => setState(() {})),
               const SizedBox(height: 14),
               Container(
@@ -111,16 +116,16 @@ class _ForcePasswordChangeScreenState
                   border: Border.all(color: KodaColors.border),
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  _req('At least 12 characters', _hasLength),
-                  _req('One uppercase letter', _hasUpper),
-                  _req('One lowercase letter', _hasLower),
-                  _req('One number', _hasDigit),
-                  _req('Passwords match', _match),
+                  _req(t.forcePasswordChangeReqLength, _hasLength),
+                  _req(t.forcePasswordChangeReqUpper, _hasUpper),
+                  _req(t.forcePasswordChangeReqLower, _hasLower),
+                  _req(t.forcePasswordChangeReqDigit, _hasDigit),
+                  _req(t.forcePasswordChangeReqMatch, _match),
                 ]),
               ),
               const SizedBox(height: 20),
               KodaPrimaryButton(
-                  label: 'Set New Password',
+                  label: t.forcePasswordChangeSubmitButton,
                   onPressed: _valid ? _submit : null,
                   busy: _busy),
             ]),

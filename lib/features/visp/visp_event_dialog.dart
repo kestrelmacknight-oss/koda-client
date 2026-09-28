@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import 'visp_avatar.dart';
 import 'visp_question_step.dart';
 
@@ -56,11 +57,14 @@ class _VispEventDialogState extends State<VispEventDialog> {
   Map<String, dynamic>? _plan;
   bool _showAvatar = true;
 
-  static const _recurrenceLabels = {
-    'none': 'One-time',
-    'daily': 'Repeats daily',
-    'weekly': 'Repeats weekly',
-    'monthly': 'Repeats monthly',
+  // 'none'/'daily'/'weekly'/'monthly' stay as fixed internal lookup keys;
+  // only the display label needs to be localized, which needs a
+  // BuildContext.
+  static Map<String, String> _recurrenceLabels(AppLocalizations t) => {
+    'none': t.vispEventDialogRecurrenceNone,
+    'daily': t.vispEventDialogRecurrenceDaily,
+    'weekly': t.vispEventDialogRecurrenceWeekly,
+    'monthly': t.vispEventDialogRecurrenceMonthly,
   };
 
   VispMood get _mood {
@@ -108,12 +112,13 @@ class _VispEventDialogState extends State<VispEventDialog> {
       forcePlan: forcePlan,
     );
     if (!mounted) return;
+    final t = AppLocalizations.of(context);
 
     switch (result?['action']) {
       case 'ask':
         final question = result?['question'] as String?;
         if (question == null) {
-          setState(() { _error = 'Visp could not generate an event.'; _loading = false; });
+          setState(() { _error = t.vispEventDialogCouldNotGenerate; _loading = false; });
           return;
         }
         _messages.add({'role': 'assistant', 'content': jsonEncode({
@@ -131,7 +136,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
       case 'plan':
         final plan = result?['plan'] as Map<String, dynamic>?;
         if (plan == null) {
-          setState(() { _error = 'Visp could not generate an event.'; _loading = false; });
+          setState(() { _error = t.vispEventDialogCouldNotGenerate; _loading = false; });
           return;
         }
         setState(() { _plan = plan; _currentQuestion = null; _loading = false; });
@@ -139,7 +144,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
 
       default:
         setState(() {
-          _error = result?['error'] as String? ?? 'Visp could not generate an event.';
+          _error = result?['error'] as String? ?? t.vispEventDialogCouldNotGenerate;
           _loading = false;
         });
     }
@@ -155,6 +160,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
       plan: plan,
     );
     if (!mounted) return;
+    final t = AppLocalizations.of(context);
 
     final eventId = result?['event_id'] as String?;
     if (result?['ok'] == true && eventId != null) {
@@ -162,7 +168,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
       widget.onApplied(eventId);
     } else {
       setState(() {
-        _error = result?['error'] as String? ?? 'Could not create that event.';
+        _error = result?['error'] as String? ?? t.vispEventDialogCouldNotCreate;
         _loading = false;
       });
     }
@@ -189,6 +195,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final plan = _plan;
     final question = _currentQuestion;
 
@@ -210,7 +217,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 8, children: [
-                    Text('Ask Visp to create an event',
+                    Text(t.vispEventDialogTitle,
                         style: TextStyle(color: KodaColors.text1, fontSize: 16,
                             fontWeight: FontWeight.w700)),
                     const VispDevBadge(),
@@ -218,13 +225,13 @@ class _VispEventDialogState extends State<VispEventDialog> {
                 ),
                 IconButton(
                   icon: Icon(Icons.close, size: 18, color: KodaColors.text3),
-                  tooltip: 'Close',
+                  tooltip: t.commonClose,
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),
               const SizedBox(height: 6),
               Text(
-                'Describe the event -- Visp will propose a title, date/time, and any other details.',
+                t.vispEventDialogDescription,
                 style: TextStyle(color: KodaColors.text3, fontSize: 12),
               ),
               const SizedBox(height: 16),
@@ -232,18 +239,18 @@ class _VispEventDialogState extends State<VispEventDialog> {
               if (plan == null && question == null) ...[
                 TextField(
                   controller: _promptCtrl,
+                  autofocus: true,
                   maxLines: 3,
                   minLines: 3,
                   style: TextStyle(color: KodaColors.text1, fontSize: 14),
-                  decoration: const InputDecoration(
-                    hintText: 'e.g. "Weekly D&D session every Friday at 7pm for about 3 hours"',
-                    contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                  decoration: InputDecoration(
+                    hintText: t.vispEventDialogPromptHint,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
                   ),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Your description is sent to Visp (a self-hosted assistant -- '
-                  'nothing leaves Koda\'s servers) to generate this plan.',
+                  t.vispEventDialogPrivacyNote,
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
                 ),
               ],
@@ -276,7 +283,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
 
               if (plan != null) ...[
                 const SizedBox(height: 6),
-                _buildPreview(plan),
+                _buildPreview(t, plan),
                 const SizedBox(height: 20),
                 Row(children: [
                   Expanded(
@@ -287,7 +294,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: _loading ? null : _startOver,
-                      child: const Text('Start Over'),
+                      child: Text(t.vispEventDialogStartOver),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -302,8 +309,8 @@ class _VispEventDialogState extends State<VispEventDialog> {
                       child: _loading
                           ? const SizedBox(width: 18, height: 18,
                               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-                          : const Text('Create Event',
-                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700)),
+                          : Text(t.vispEventDialogCreateEvent,
+                              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ]),
@@ -322,7 +329,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
                         ? const SizedBox(width: 16, height: 16,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
                         : const Icon(Icons.auto_awesome, size: 16, color: Colors.black),
-                    label: Text(_loading ? 'Thinking...' : 'Generate Plan',
+                    label: Text(_loading ? t.vispEventDialogThinking : t.vispEventDialogGeneratePlan,
                         style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700)),
                   ),
                 ),
@@ -334,7 +341,7 @@ class _VispEventDialogState extends State<VispEventDialog> {
     );
   }
 
-  Widget _buildPreview(Map<String, dynamic> plan) {
+  Widget _buildPreview(AppLocalizations t, Map<String, dynamic> plan) {
     final startLocal = _tryParseLocal(plan['start_at'] as String?);
     final endLocal = _tryParseLocal(plan['end_at'] as String?);
     final recurrence = plan['recurrence'] as String? ?? 'none';
@@ -359,19 +366,19 @@ class _VispEventDialogState extends State<VispEventDialog> {
         _previewRow(Icons.event_outlined,
             startLocal != null
                 ? dateFmt.format(startLocal)
-                : 'Could not parse a date -- try rephrasing'),
+                : t.vispEventDialogCouldNotParseDate),
         if (endLocal != null)
-          _previewRow(Icons.event_available_outlined, 'Ends ${dateFmt.format(endLocal)}'),
+          _previewRow(Icons.event_available_outlined, t.vispEventDialogEndsLabel(dateFmt.format(endLocal))),
         if (recurrence != 'none')
-          _previewRow(Icons.repeat, _recurrenceLabels[recurrence] ?? recurrence),
+          _previewRow(Icons.repeat, _recurrenceLabels(t)[recurrence] ?? recurrence),
         if (plan['location'] != null && (plan['location'] as String).isNotEmpty)
           _previewRow(Icons.place_outlined, plan['location'] as String),
         if (priceCents > 0)
           _previewRow(Icons.confirmation_number_outlined,
-              '\$${(priceCents / 100).toStringAsFixed(2)} per ticket'),
+              t.vispEventDialogPricePerTicket('\$${(priceCents / 100).toStringAsFixed(2)}')),
         if (sources.isNotEmpty) ...[
           const SizedBox(height: 8),
-          _sourcesRow(sources),
+          _sourcesRow(t, sources),
         ],
       ]),
     );
@@ -389,10 +396,10 @@ class _VispEventDialogState extends State<VispEventDialog> {
   // Which wiki articles (see koda-server's Koda.Wiki) Visp actually
   // grounded this plan in, if any -- lets the user check the source
   // rather than just trusting the model's claim.
-  Widget _sourcesRow(List<String> sources) {
+  Widget _sourcesRow(AppLocalizations t, List<String> sources) {
     return Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
       Icon(Icons.menu_book_outlined, size: 12, color: KodaColors.text3),
-      Text('Based on:', style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+      Text(t.vispEventDialogBasedOn, style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       ...sources.map((title) => Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(

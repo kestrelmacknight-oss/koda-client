@@ -27,6 +27,7 @@ class VoiceSession {
   final lk.Room room;
   final String channelId;
   final String channelName;
+  final String serverId;
   final String token;
   final String url;
   final bool muted;
@@ -37,6 +38,7 @@ class VoiceSession {
     required this.room,
     required this.channelId,
     required this.channelName,
+    required this.serverId,
     required this.token,
     required this.url,
     this.muted = false,
@@ -53,6 +55,7 @@ class VoiceSession {
     room:             room,
     channelId:        channelId,
     channelName:      channelName,
+    serverId:         serverId,
     token:            token,
     url:              url,
     muted:            muted ?? this.muted,
@@ -75,7 +78,12 @@ class VoiceSession {
 lk.AudioCaptureOptions audioCaptureOptionsFor(VoiceSettings settings) =>
     lk.AudioCaptureOptions(
       deviceId:            settings.audioInputId,
-      noiseSuppression:    settings.noiseSuppression,
+      // Defensive re-assertion of the mutual exclusivity the settings UI
+      // already enforces -- WebRTC's own built-in NS runs upstream of
+      // the RNNoise capture-post-processing hook, so stacking both is
+      // redundant at best. Guards against a stale/synced settings blob
+      // that somehow has both true (e.g. a multi-device sync race).
+      noiseSuppression:    settings.noiseSuppression && !settings.deepNoiseSuppression,
       echoCancellation:    settings.echoCancellation,
       autoGainControl:     settings.autoGainControl,
       highPassFilter:      settings.highPassFilter,
@@ -106,8 +114,11 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
       final boostChanged = previous == null ||
           previous.micBoostEnabled != next.micBoostEnabled ||
           previous.micBoostGain != next.micBoostGain;
+      final deepNsChanged = previous == null ||
+          previous.deepNoiseSuppression != next.deepNoiseSuppression;
       if (eqChanged) _applyEqGains(next);
       if (boostChanged) _applyMicBoost(next);
+      if (deepNsChanged) _applyDeepNoiseSuppression(next);
     });
 
     // The pop-out video window (see pop_out_video_window.dart) runs in
@@ -142,6 +153,10 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
         settings.micBoostEnabled ? settings.micBoostGain : 0.0);
   }
 
+  Future<void> _applyDeepNoiseSuppression(VoiceSettings settings) {
+    return rtc.Helper.setDeepNoiseSuppression(settings.deepNoiseSuppression);
+  }
+
   // Serializes join()/leave() calls. Without this, two rapid join() calls
   // (e.g. a double-tap on a voice channel) can both read `state == null`
   // before either finishes connecting, so neither one's leave-guard fires
@@ -156,6 +171,7 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
     required String token,
     required String channelId,
     required String channelName,
+    required String serverId,
   }) async {
     final previous = _opLock;
     final completer = Completer<void>();
@@ -167,6 +183,7 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
         token: token,
         channelId: channelId,
         channelName: channelName,
+        serverId: serverId,
       );
     } finally {
       completer.complete();
@@ -178,6 +195,7 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
     required String token,
     required String channelId,
     required String channelName,
+    required String serverId,
   }) async {
     // Leave any existing session first
     if (state != null) await _doLeave();
@@ -191,11 +209,13 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
         room:        room,
         channelId:   channelId,
         channelName: channelName,
+        serverId:    serverId,
         token:       token,
         url:         url,
       );
       unawaited(_applyEqGains(_ref.read(voiceSettingsProvider)));
       unawaited(_applyMicBoost(_ref.read(voiceSettingsProvider)));
+      unawaited(_applyDeepNoiseSuppression(_ref.read(voiceSettingsProvider)));
 
       // Runs for the whole life of the session -- including while
       // collapsed to the VoiceBar, not just while VoiceScreen's full

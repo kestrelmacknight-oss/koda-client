@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import '../../core/api.dart';
 import '../../core/theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 import 'auth_screen.dart';
 
@@ -21,8 +22,11 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   String? _info;
 
   Future<void> _verify() async {
+    // Captured before the await below, so we don't touch a
+    // possibly-unmounted context afterward.
+    final t = AppLocalizations.of(context);
     if (_code.text.trim().length != 6) {
-      setState(() => _error = 'Enter the 6-digit code from your email.');
+      setState(() => _error = t.verifyEmailEnterCodeError);
       return;
     }
     setState(() { _busy = true; _error = null; });
@@ -39,19 +43,24 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         (route) => false,
       );
     } else {
-      setState(() => _error = 'Invalid or expired code.');
+      setState(() => _error = t.verifyEmailInvalidCode);
     }
   }
 
   Future<void> _resend() async {
+    // Captured before the await below, so we don't touch a
+    // possibly-unmounted context afterward.
+    final t = AppLocalizations.of(context);
     setState(() => _info = null);
     final ok = await KodaApi.instance.resendVerification();
+    if (!mounted) return;
     setState(() => _info =
-        ok ? 'A new code has been sent to ${widget.email}.' : 'Could not resend right now.');
+        ok ? t.verifyEmailResentInfo(widget.email) : t.verifyEmailResendFailed);
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: KodaColors.voidBg,
       body: Center(
@@ -63,13 +72,13 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               Icon(Icons.mark_email_unread_outlined,
                   color: KodaColors.koda, size: 40),
               const SizedBox(height: 16),
-              Text('Check your email',
+              Text(t.verifyEmailTitle,
                   style: TextStyle(
                       color: KodaColors.text1,
                       fontSize: 20,
                       fontWeight: FontWeight.w800)),
               const SizedBox(height: 8),
-              Text('We sent a 6-digit code to ${widget.email}',
+              Text(t.verifyEmailSentCode(widget.email),
                   style: TextStyle(color: KodaColors.text2, fontSize: 13),
                   textAlign: TextAlign.center),
               const SizedBox(height: 24),
@@ -80,14 +89,14 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                   child: Text(_info!,
                       style: TextStyle(color: KodaColors.mint, fontSize: 12)),
                 ),
-              KodaTextField(controller: _code, hintText: '000000',
+              KodaTextField(controller: _code, hintText: t.verifyEmailCodeHint,
                   keyboardType: TextInputType.number),
               const SizedBox(height: 16),
-              KodaPrimaryButton(label: 'Verify Email', onPressed: _verify, busy: _busy),
+              KodaPrimaryButton(label: t.verifyEmailVerifyButton, onPressed: _verify, busy: _busy),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: _resend,
-                child: Text('Resend code',
+                child: Text(t.verifyEmailResendButton,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
               ),
             ]),
