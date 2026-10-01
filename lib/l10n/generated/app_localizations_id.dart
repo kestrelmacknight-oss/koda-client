@@ -318,6 +318,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsStatusLabel => 'STATUS';
 
   @override
+  String get settingsCustomStatusLabel => 'STATUS KUSTOM';
+
+  @override
+  String get settingsCustomStatusHint => 'Apa yang sedang kamu pikirkan?';
+
+  @override
   String get statusOnline => 'Online';
 
   @override
@@ -551,6 +557,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get homeCouldNotConnectVoice => 'Tidak dapat terhubung ke suara.';
+
+  @override
+  String get homeVoiceChannelFull => 'Saluran suara ini penuh.';
 
   @override
   String get homeCreateServer => 'Buat Server';
@@ -818,6 +827,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get homeAttachmentFallback => 'Lampiran';
 
   @override
+  String get homeAttachmentUploadFailed => 'Unggah lampiran gagal.';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return '$fileName disimpan';
+  }
+
+  @override
   String serverConnectError(String service) {
     return 'Tidak dapat memulai koneksi $service.';
   }
@@ -1040,7 +1057,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'Menyertakan server ini ke tab Discover di seluruh platform, dan kesempatan masuk rotasi unggulan mingguan. Terpisah dari keterlihatan umum untuk bergabung server.';
+      'Mencantumkan toko server ini di Koda Marketplace, dengan kesempatan masuk rotasi unggulan mingguan. Ini soal belanja, bukan menemukan server untuk bergabung -- tidak memengaruhi pencarian server secara umum.';
 
   @override
   String get serverSocialLinkLabel => 'Tautan Sosial / Undangan (opsional)';
@@ -2492,6 +2509,42 @@ class AppLocalizationsId extends AppLocalizations {
   String get printfulMerchViewButton => 'Lihat';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return 'Pembayaran ke: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => 'Pembayaran ke: Anda';
+
+  @override
+  String get printfulMerchPayoutChangeButton => 'Ubah';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => 'Penerima Pembayaran';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'Arahkan bagian hasil pesanan item ini ke pengguna lain, bukan ke Anda -- mereka perlu menghubungkan akun Stripe mereka sendiri dan menyelesaikan onboarding sebelum ada yang bisa membelinya.';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'Nama pengguna';
+
+  @override
+  String get printfulMerchPayoutLookupButton => 'Cari';
+
+  @override
+  String get printfulMerchPayoutUserNotFound =>
+      'Tidak ditemukan pengguna dengan nama itu.';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return 'Ditemukan: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => 'Atur ulang ke saya';
+
+  @override
   String get printfulMerchCartTooltip => 'Keranjang';
 
   @override
@@ -2745,6 +2798,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get kodaMarketplaceAllListedServersHeader => 'SEMUA SERVER TERDAFTAR';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => 'ITEM UNGGULAN';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'SEMUA ITEM';
+
+  @override
   String get kodaMarketplaceServerFallback => 'Server';
 
   @override
@@ -2756,6 +2815,9 @@ class AppLocalizationsId extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'Kunjungi Toko';
 
   @override
   String get calendarFallbackTitle => 'Kalender';
@@ -3437,6 +3499,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get channelEditDialogNameHint => 'Nama kanal';
 
   @override
+  String get channelEditDialogDescriptionHint => 'Topik (opsional)';
+
+  @override
   String get channelEditDialogTypeLabel => 'Jenis';
 
   @override
@@ -3478,6 +3543,18 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get channelEditDialogNotifyRolesLabel =>
       'Beri tahu peran ini saat diposting (opsional)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'Mode Lambat';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'Nonaktif';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'Batas Pengguna';
+
+  @override
+  String get channelEditDialogUserLimitOff => 'Tanpa batas';
 
   @override
   String get channelEditDialogCategoryLabel => 'Kategori';

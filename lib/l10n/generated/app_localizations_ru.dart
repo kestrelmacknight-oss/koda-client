@@ -320,6 +320,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsStatusLabel => 'СТАТУС';
 
   @override
+  String get settingsCustomStatusLabel => 'СВОЙ СТАТУС';
+
+  @override
+  String get settingsCustomStatusHint => 'О чём вы думаете?';
+
+  @override
   String get statusOnline => 'В сети';
 
   @override
@@ -556,6 +562,9 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get homeCouldNotConnectVoice =>
       'Не удалось подключиться к голосовому каналу.';
+
+  @override
+  String get homeVoiceChannelFull => 'Этот голосовой канал заполнен.';
 
   @override
   String get homeCreateServer => 'Создать сервер';
@@ -826,6 +835,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeAttachmentFallback => 'Вложение';
 
   @override
+  String get homeAttachmentUploadFailed => 'Не удалось загрузить вложение.';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return 'Сохранено: $fileName';
+  }
+
+  @override
   String serverConnectError(String service) {
     return 'Не удалось начать подключение к $service.';
   }
@@ -1047,7 +1064,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'Включает этот сервер во вкладку «Обзор» по всей платформе и даёт шанс попасть в еженедельную подборку рекомендуемых. Не связано с общей доступностью сервера для присоединения.';
+      'Добавляет магазин этого сервера в Koda Marketplace с шансом попасть в еженедельную ротацию рекомендуемых товаров. Это касается покупок, а не поиска серверов для вступления -- это никак не влияет на общий поиск серверов.';
 
   @override
   String get serverSocialLinkLabel =>
@@ -2537,6 +2554,42 @@ class AppLocalizationsRu extends AppLocalizations {
   String get printfulMerchViewButton => 'Просмотреть';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return 'Выплата: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => 'Выплата: вам';
+
+  @override
+  String get printfulMerchPayoutChangeButton => 'Изменить';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => 'Получатель выплаты';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'Направьте долю выручки от этого товара другому пользователю вместо себя -- ему нужно будет подключить собственный аккаунт Stripe и завершить регистрацию, прежде чем кто-либо сможет его купить.';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'Имя пользователя';
+
+  @override
+  String get printfulMerchPayoutLookupButton => 'Найти';
+
+  @override
+  String get printfulMerchPayoutUserNotFound =>
+      'Пользователь с таким именем не найден.';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return 'Найдено: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => 'Сбросить на себя';
+
+  @override
   String get printfulMerchCartTooltip => 'Корзина';
 
   @override
@@ -2796,6 +2849,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get kodaMarketplaceAllListedServersHeader => 'ВСЕ РАЗМЕЩЁННЫЕ СЕРВЕРЫ';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => 'РЕКОМЕНДУЕМЫЕ ТОВАРЫ';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'ВСЕ ТОВАРЫ';
+
+  @override
   String get kodaMarketplaceServerFallback => 'Сервер';
 
   @override
@@ -2810,6 +2869,9 @@ class AppLocalizationsRu extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'Перейти в магазин';
 
   @override
   String get calendarFallbackTitle => 'Календарь';
@@ -3513,6 +3575,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get channelEditDialogNameHint => 'Название канала';
 
   @override
+  String get channelEditDialogDescriptionHint => 'Тема (необязательно)';
+
+  @override
   String get channelEditDialogTypeLabel => 'Тип';
 
   @override
@@ -3554,6 +3619,18 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get channelEditDialogNotifyRolesLabel =>
       'Уведомлять эти роли при публикации (необязательно)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'Медленный режим';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'Выключено';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'Лимит участников';
+
+  @override
+  String get channelEditDialogUserLimitOff => 'Без лимита';
 
   @override
   String get channelEditDialogCategoryLabel => 'Категория';

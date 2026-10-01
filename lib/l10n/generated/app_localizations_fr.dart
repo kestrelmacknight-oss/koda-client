@@ -319,6 +319,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsStatusLabel => 'STATUT';
 
   @override
+  String get settingsCustomStatusLabel => 'STATUT PERSONNALISÉ';
+
+  @override
+  String get settingsCustomStatusHint => 'À quoi penses-tu ?';
+
+  @override
   String get statusOnline => 'En ligne';
 
   @override
@@ -557,6 +563,9 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get homeCouldNotConnectVoice =>
       'Impossible de se connecter à la voix.';
+
+  @override
+  String get homeVoiceChannelFull => 'Ce salon vocal est complet.';
 
   @override
   String get homeCreateServer => 'Créer un serveur';
@@ -826,6 +835,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeAttachmentFallback => 'Pièce jointe';
 
   @override
+  String get homeAttachmentUploadFailed =>
+      'Échec de l\'envoi de la pièce jointe.';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return '$fileName enregistré';
+  }
+
+  @override
   String serverConnectError(String service) {
     return 'Impossible de démarrer la connexion à $service.';
   }
@@ -1049,7 +1067,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'Inclut ce serveur dans l\'onglet Découvrir de la plateforme, avec une chance d\'apparaître dans la rotation hebdomadaire des serveurs mis en avant. Indépendant de la découverte générale pour rejoindre le serveur.';
+      'Inscrit la boutique de ce serveur dans le Koda Marketplace, avec une chance de figurer dans la rotation hebdomadaire des articles mis en avant. Il s\'agit de shopping, pas de trouver des serveurs à rejoindre -- cela n\'affecte pas la recherche générale de serveurs.';
 
   @override
   String get serverSocialLinkLabel =>
@@ -2531,6 +2549,42 @@ class AppLocalizationsFr extends AppLocalizations {
   String get printfulMerchViewButton => 'Voir';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return 'Versement à : $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => 'Versement à : vous';
+
+  @override
+  String get printfulMerchPayoutChangeButton => 'Modifier';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => 'Bénéficiaire du Versement';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'Redirigez la part des revenus de commande de cet article vers un autre utilisateur plutôt que vers vous -- il devra connecter son propre compte Stripe et terminer la vérification avant que quiconque puisse l\'acheter.';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'Nom d\'utilisateur';
+
+  @override
+  String get printfulMerchPayoutLookupButton => 'Rechercher';
+
+  @override
+  String get printfulMerchPayoutUserNotFound =>
+      'Aucun utilisateur trouvé avec ce nom.';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return 'Trouvé : $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => 'Réinitialiser à moi';
+
+  @override
   String get printfulMerchCartTooltip => 'Panier';
 
   @override
@@ -2790,6 +2844,12 @@ class AppLocalizationsFr extends AppLocalizations {
       'TOUS LES SERVEURS LISTÉS';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => 'ARTICLES EN VEDETTE';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'TOUS LES ARTICLES';
+
+  @override
   String get kodaMarketplaceServerFallback => 'Serveur';
 
   @override
@@ -2802,6 +2862,9 @@ class AppLocalizationsFr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'Visiter la boutique';
 
   @override
   String get calendarFallbackTitle => 'Calendrier';
@@ -3495,6 +3558,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get channelEditDialogNameHint => 'Nom du salon';
 
   @override
+  String get channelEditDialogDescriptionHint => 'Sujet (facultatif)';
+
+  @override
   String get channelEditDialogTypeLabel => 'Type';
 
   @override
@@ -3536,6 +3602,18 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get channelEditDialogNotifyRolesLabel =>
       'Notifier ces rôles lors d\'une publication (facultatif)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'Mode lent';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'Désactivé';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'Limite d\'utilisateurs';
+
+  @override
+  String get channelEditDialogUserLimitOff => 'Aucune limite';
 
   @override
   String get channelEditDialogCategoryLabel => 'Catégorie';

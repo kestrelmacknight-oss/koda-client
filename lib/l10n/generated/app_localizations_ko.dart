@@ -309,6 +309,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsStatusLabel => '상태';
 
   @override
+  String get settingsCustomStatusLabel => '사용자 지정 상태';
+
+  @override
+  String get settingsCustomStatusHint => '무슨 생각을 하고 계신가요?';
+
+  @override
   String get statusOnline => '온라인';
 
   @override
@@ -536,6 +542,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get homeCouldNotConnectVoice => '음성에 연결할 수 없습니다.';
+
+  @override
+  String get homeVoiceChannelFull => '이 음성 채널은 가득 찼습니다.';
 
   @override
   String get homeCreateServer => '서버 만들기';
@@ -802,6 +811,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String get homeAttachmentFallback => '첨부 파일';
 
   @override
+  String get homeAttachmentUploadFailed => '첨부 파일 업로드에 실패했습니다.';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return '$fileName 저장됨';
+  }
+
+  @override
   String serverConnectError(String service) {
     return '$service 연결을 시작할 수 없습니다.';
   }
@@ -1017,7 +1034,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      '플랫폼 전체의 \'둘러보기\' 탭에 이 서버를 등록하고, 매주 진행되는 추천 로테이션에 선정될 기회를 얻습니다. 일반적인 서버 참가 노출도와는 별개입니다.';
+      '이 서버의 스토어를 Koda 마켓플레이스에 등록하고, 매주 진행되는 추천 상품 로테이션에 포함될 기회를 얻습니다. 이는 쇼핑에 관한 것이며 가입할 서버를 찾는 것과는 무관합니다 -- 일반 서버 검색에는 영향을 주지 않습니다.';
 
   @override
   String get serverSocialLinkLabel => '소셜 / 초대 링크 (선택)';
@@ -2438,6 +2455,41 @@ class AppLocalizationsKo extends AppLocalizations {
   String get printfulMerchViewButton => '보기';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return '정산 대상: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => '정산 대상: 나';
+
+  @override
+  String get printfulMerchPayoutChangeButton => '변경';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => '정산 수령인';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      '이 상품의 주문 수익 몫을 본인이 아닌 다른 사용자에게 지급하도록 설정합니다 -- 누군가 구매하기 전에 해당 사용자가 자신의 Stripe 계정을 연결하고 온보딩을 완료해야 합니다.';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => '사용자 이름';
+
+  @override
+  String get printfulMerchPayoutLookupButton => '조회';
+
+  @override
+  String get printfulMerchPayoutUserNotFound => '해당 이름의 사용자를 찾을 수 없습니다.';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return '찾음: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => '나로 재설정';
+
+  @override
   String get printfulMerchCartTooltip => '장바구니';
 
   @override
@@ -2682,6 +2734,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get kodaMarketplaceAllListedServersHeader => '등록된 모든 서버';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => '추천 아이템';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => '전체 아이템';
+
+  @override
   String get kodaMarketplaceServerFallback => '서버';
 
   @override
@@ -2693,6 +2751,9 @@ class AppLocalizationsKo extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => '스토어 방문';
 
   @override
   String get calendarFallbackTitle => '캘린더';
@@ -3360,6 +3421,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get channelEditDialogNameHint => '채널 이름';
 
   @override
+  String get channelEditDialogDescriptionHint => '주제 (선택 사항)';
+
+  @override
   String get channelEditDialogTypeLabel => '유형';
 
   @override
@@ -3400,6 +3464,18 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get channelEditDialogNotifyRolesLabel => '게시 시 알릴 역할 (선택 사항)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => '슬로우 모드';
+
+  @override
+  String get channelEditDialogSlowmodeOff => '꺼짐';
+
+  @override
+  String get channelEditDialogUserLimitLabel => '사용자 제한';
+
+  @override
+  String get channelEditDialogUserLimitOff => '제한 없음';
 
   @override
   String get channelEditDialogCategoryLabel => '카테고리';

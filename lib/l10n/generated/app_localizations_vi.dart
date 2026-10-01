@@ -320,6 +320,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsStatusLabel => 'TRẠNG THÁI';
 
   @override
+  String get settingsCustomStatusLabel => 'TRẠNG THÁI TÙY CHỈNH';
+
+  @override
+  String get settingsCustomStatusHint => 'Bạn đang nghĩ gì?';
+
+  @override
   String get statusOnline => 'Trực tuyến';
 
   @override
@@ -553,6 +559,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get homeCouldNotConnectVoice => 'Không thể kết nối vào kênh thoại.';
+
+  @override
+  String get homeVoiceChannelFull => 'Kênh thoại này đã đầy.';
 
   @override
   String get homeCreateServer => 'Tạo máy chủ';
@@ -822,6 +831,15 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeAttachmentFallback => 'Tệp đính kèm';
 
   @override
+  String get homeAttachmentUploadFailed =>
+      'Tải tệp đính kèm lên không thành công.';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return 'Đã lưu $fileName';
+  }
+
+  @override
   String serverConnectError(String service) {
     return 'Không thể bắt đầu kết nối $service.';
   }
@@ -1042,7 +1060,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'Đưa máy chủ này vào tab Khám phá trên toàn nền tảng, và có cơ hội xuất hiện trong vòng quay nổi bật hàng tuần. Tách biệt với khả năng được khám phá để tham gia máy chủ nói chung.';
+      'Liệt kê cửa hàng của máy chủ này trên Koda Marketplace, với cơ hội được chọn trong vòng xoay nổi bật hàng tuần. Đây là về mua sắm, không phải về việc tìm máy chủ để tham gia -- điều này không ảnh hưởng đến tìm kiếm máy chủ chung.';
 
   @override
   String get serverSocialLinkLabel =>
@@ -2503,6 +2521,42 @@ class AppLocalizationsVi extends AppLocalizations {
   String get printfulMerchViewButton => 'Xem';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return 'Thanh toán cho: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => 'Thanh toán cho: bạn';
+
+  @override
+  String get printfulMerchPayoutChangeButton => 'Thay đổi';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => 'Người Nhận Thanh Toán';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'Chuyển phần doanh thu đơn hàng của mặt hàng này cho người dùng khác thay vì bạn -- họ sẽ cần liên kết tài khoản Stripe riêng và hoàn tất thiết lập trước khi ai đó có thể mua nó.';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'Tên người dùng';
+
+  @override
+  String get printfulMerchPayoutLookupButton => 'Tra cứu';
+
+  @override
+  String get printfulMerchPayoutUserNotFound =>
+      'Không tìm thấy người dùng nào với tên đó.';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return 'Đã tìm thấy: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => 'Đặt lại về tôi';
+
+  @override
   String get printfulMerchCartTooltip => 'Giỏ hàng';
 
   @override
@@ -2756,6 +2810,12 @@ class AppLocalizationsVi extends AppLocalizations {
       'TẤT CẢ MÁY CHỦ ĐƯỢC NIÊM YẾT';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => 'SẢN PHẨM NỔI BẬT';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'TẤT CẢ SẢN PHẨM';
+
+  @override
   String get kodaMarketplaceServerFallback => 'Máy chủ';
 
   @override
@@ -2767,6 +2827,9 @@ class AppLocalizationsVi extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'Xem cửa hàng';
 
   @override
   String get calendarFallbackTitle => 'Lịch';
@@ -3447,6 +3510,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get channelEditDialogNameHint => 'Tên kênh';
 
   @override
+  String get channelEditDialogDescriptionHint => 'Chủ đề (tùy chọn)';
+
+  @override
   String get channelEditDialogTypeLabel => 'Loại';
 
   @override
@@ -3488,6 +3554,18 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get channelEditDialogNotifyRolesLabel =>
       'Thông báo cho các vai trò này khi có bài đăng (không bắt buộc)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'Chế độ chậm';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'Tắt';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'Giới hạn người dùng';
+
+  @override
+  String get channelEditDialogUserLimitOff => 'Không giới hạn';
 
   @override
   String get channelEditDialogCategoryLabel => 'Danh mục';

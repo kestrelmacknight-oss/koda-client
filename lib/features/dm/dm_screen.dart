@@ -17,12 +17,14 @@ import '../../core/message_language.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/socket.dart';
 import '../../core/theme.dart';
+import '../../core/presence_provider.dart';
 import '../../core/providers.dart';
 import '../../core/secure_storage.dart';
 import '../../core/time_utils.dart';
 import '../../core/crypto/dm_attachments.dart';
 import '../../core/crypto/dm_session_manager.dart';
 import '../../core/crypto/double_ratchet.dart' show DoubleRatchetDecryptFailure;
+import '../../shared/presence_status.dart';
 import '../../shared/pronoun_label.dart';
 import '../../shared/report_dialog.dart';
 import '../../shared/tier_badge.dart';
@@ -576,12 +578,46 @@ class _DmScreenState extends ConsumerState<DmScreen>
                           final name = other?['username'] as String? ?? 'Unknown';
                           final active = _activeConversation?['id'] == c['id'];
                           final unread = _unreadCounts[c['id']] ?? 0;
+
+                          // Live overlay (see core/presence_provider.dart)
+                          // falls back to whatever this row's own fetch
+                          // already had (dm_controller.ex's user_json/1).
+                          final otherId = other?['id'] as String?;
+                          final override =
+                              otherId != null ? ref.watch(presenceOverridesProvider)[otherId] : null;
+                          final customStatus =
+                              override?.customStatus ?? other?['custom_status'] as String?;
+                          // No real per-connection presence signal exists
+                          // for the DM list (unlike the member list's
+                          // separate /presence endpoint) -- the
+                          // self-reported status is the only thing
+                          // available either way, so shown as-is rather
+                          // than run through effectiveStatus's
+                          // online-wins-over-self-report rule, which
+                          // needs a real connection boolean this list
+                          // doesn't have.
+                          final effective =
+                              override?.status ?? other?['status'] as String? ?? 'offline';
+
                           return ListTile(
                             selected: active,
                             selectedTileColor: KodaColors.koda.withValues(alpha: 0.1),
-                            leading: KodaAvatar(username: name, size: 32,
-                                avatarUrl: other?['avatar_url'] as String?,
-                                tier: other?['koda_tier'] as String?),
+                            leading: Stack(clipBehavior: Clip.none, children: [
+                              KodaAvatar(username: name, size: 32,
+                                  avatarUrl: other?['avatar_url'] as String?,
+                                  tier: other?['koda_tier'] as String?),
+                              Positioned(
+                                bottom: -1, right: -1,
+                                child: Container(
+                                  width: 10, height: 10,
+                                  decoration: BoxDecoration(
+                                    color: statusColor(effective),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: KodaColors.bg2, width: 1.5),
+                                  ),
+                                ),
+                              ),
+                            ]),
                             title: Row(mainAxisSize: MainAxisSize.min, children: [
                               Flexible(child: Text(name,
                                   style: TextStyle(
@@ -591,6 +627,11 @@ class _DmScreenState extends ConsumerState<DmScreen>
                               const SizedBox(width: 4),
                               TierBadge(tier: other?['koda_tier'] as String?, size: 12),
                             ]),
+                            subtitle: customStatus != null && customStatus.isNotEmpty
+                                ? Text(customStatus,
+                                    style: TextStyle(color: KodaColors.text3, fontSize: 11),
+                                    overflow: TextOverflow.ellipsis)
+                                : null,
                             trailing: unread > 0
                                 ? Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),

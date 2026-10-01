@@ -288,6 +288,7 @@ class KodaApi {
         List<String>? mentionedUserIds,
         List<String>? mentionedRoleIds,
         bool mentionEveryone = false,
+        bool mentionHere = false,
       }) async {
     try {
       final res = await _dio.post('/channels/$channelId/messages',
@@ -300,6 +301,7 @@ class KodaApi {
             if (mentionedUserIds != null) 'mentioned_user_ids': mentionedUserIds,
             if (mentionedRoleIds != null) 'mentioned_role_ids': mentionedRoleIds,
             'mention_everyone': mentionEveryone,
+            'mention_here': mentionHere,
             if (attachmentUrl != null) 'attachment_url': attachmentUrl,
             if (attachmentContentType != null) 'attachment_content_type': attachmentContentType,
           });
@@ -389,12 +391,20 @@ class KodaApi {
 
   // ── Voice ────────────────────────────────────────────────────────────
 
-  Future<Map<String, dynamic>?> getVoiceToken(String channelId, {bool viewer = false}) async {
+  /// [errorCode] is `'channel_full'` when the voice channel's
+  /// moderator-set user limit (see Koda.Voice.join_token/3) is the
+  /// specific reason this failed -- every other failure (not a
+  /// member, wrong channel type, etc.) leaves it null, same generic
+  /// "could not connect" handling as before.
+  Future<KodaApiResult<Map<String, dynamic>>> getVoiceToken(String channelId, {bool viewer = false}) async {
     try {
       final res = await _dio.get('/channels/$channelId/voice/token',
           queryParameters: viewer ? {'viewer': 'true'} : null);
-      return res.data as Map<String, dynamic>;
-    } catch (e) { _log('getVoiceToken', e); return null; }
+      return KodaApiResult(data: res.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      _log('getVoiceToken', e);
+      return KodaApiResult(statusCode: e.response?.statusCode, errorCode: _errorCodeOf(e));
+    }
   }
 
   Future<Map<String, dynamic>?> getSelfTestVoiceToken() async {
@@ -1167,6 +1177,7 @@ class KodaApi {
     String? pronouns,
     bool? showPronouns,
     String? status,
+    String? customStatus,
   }) async {
     try {
       final res = await _dio.patch('/users/me', data: {
@@ -1176,6 +1187,7 @@ class KodaApi {
         if (pronouns      != null) 'pronouns':      pronouns,
         if (showPronouns  != null) 'show_pronouns': showPronouns,
         if (status        != null) 'status':        status,
+        if (customStatus  != null) 'custom_status': customStatus,
       });
       return res.data['user'] as Map<String, dynamic>;
     } catch (e) { _log('updateProfile', e); return null; }
@@ -2073,6 +2085,30 @@ class KodaApi {
           queryParameters: {if (featuredOnly) 'featured': 'true'});
       return List<Map<String, dynamic>>.from(res.data['servers'] ?? []);
     } catch (e) { _log('getMarketplaceServers', e); return []; }
+  }
+
+  /// Individual merch items across every marketplace-discoverable
+  /// server's published catalog (public, no auth needed -- see
+  /// Koda.Printful.list_marketplace_products/1). [featuredOnly]
+  /// restricts to this week's weighted featured rotation.
+  Future<List<Map<String, dynamic>>> getMarketplaceProducts({bool featuredOnly = false}) async {
+    try {
+      final res = await _dio.get('/marketplace/products',
+          queryParameters: {if (featuredOnly) 'featured': 'true'});
+      return List<Map<String, dynamic>>.from(res.data['products'] ?? []);
+    } catch (e) { _log('getMarketplaceProducts', e); return []; }
+  }
+
+  /// Owner-only: routes a product's share of future order proceeds to
+  /// [payoutUserId] instead of the server owner, or clears the
+  /// override back to the owner if null.
+  Future<bool> setProductPayoutRecipient(
+      String serverId, String productId, String? payoutUserId) async {
+    try {
+      await _dio.patch('/servers/$serverId/printful/products/$productId/payout',
+          data: {'payout_user_id': payoutUserId});
+      return true;
+    } catch (e) { _log('setProductPayoutRecipient', e); return false; }
   }
 
   // -- Custom server emoji (boost-level-gated slots, see Koda.Emoji) -----------

@@ -315,6 +315,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settingsStatusLabel => 'סטטוס';
 
   @override
+  String get settingsCustomStatusLabel => 'סטטוס מותאם אישית';
+
+  @override
+  String get settingsCustomStatusHint => 'מה קורה?';
+
+  @override
   String get statusOnline => 'מקוון';
 
   @override
@@ -545,6 +551,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get homeCouldNotConnectVoice => 'לא ניתן היה להתחבר לערוץ קולי.';
+
+  @override
+  String get homeVoiceChannelFull => 'ערוץ קולי זה מלא.';
 
   @override
   String get homeCreateServer => 'יצירת שרת';
@@ -814,6 +823,14 @@ class AppLocalizationsHe extends AppLocalizations {
   String get homeAttachmentFallback => 'קובץ מצורף';
 
   @override
+  String get homeAttachmentUploadFailed => 'העלאת הקובץ המצורף נכשלה.';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return '$fileName נשמר';
+  }
+
+  @override
   String serverConnectError(String service) {
     return 'לא ניתן היה להתחיל את חיבור $service.';
   }
@@ -1033,7 +1050,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'מוסיף את השרת הזה ללשונית הגילוי הכלל-פלטפורמית, וסיכוי להופיע בסבב המומלצים השבועי. נפרד מהאפשרות הכללית להיחשף להצטרפות לשרת.';
+      'מציג את החנות של השרת הזה ב-Koda Marketplace, עם סיכוי להופיע בסבב הפריטים המומלצים השבועי. זה קשור לקניות, לא למציאת שרתים להצטרפות -- אין לכך השפעה על חיפוש שרתים כללי.';
 
   @override
   String get serverSocialLinkLabel => 'קישור חברתי / קישור הזמנה (אופציונלי)';
@@ -2503,6 +2520,41 @@ class AppLocalizationsHe extends AppLocalizations {
   String get printfulMerchViewButton => 'הצגה';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return 'תשלום ל: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => 'תשלום ל: אתה';
+
+  @override
+  String get printfulMerchPayoutChangeButton => 'שינוי';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => 'מקבל התשלום';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'נתב את חלקו של פריט זה מהכנסות ההזמנה למשתמש אחר במקומך -- הוא יצטרך לחבר ולהשלים את תהליך ה-Stripe שלו לפני שמישהו יוכל לרכוש אותו.';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'שם משתמש';
+
+  @override
+  String get printfulMerchPayoutLookupButton => 'חיפוש';
+
+  @override
+  String get printfulMerchPayoutUserNotFound => 'לא נמצא משתמש בשם זה.';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return 'נמצא: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => 'איפוס אליי';
+
+  @override
   String get printfulMerchCartTooltip => 'עגלה';
 
   @override
@@ -2754,6 +2806,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get kodaMarketplaceAllListedServersHeader => 'כל השרתים הרשומים';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => 'פריטים מומלצים';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'כל הפריטים';
+
+  @override
   String get kodaMarketplaceServerFallback => 'שרת';
 
   @override
@@ -2768,6 +2826,9 @@ class AppLocalizationsHe extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'בקר בחנות';
 
   @override
   String get calendarFallbackTitle => 'לוח שנה';
@@ -3460,6 +3521,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get channelEditDialogNameHint => 'שם הערוץ';
 
   @override
+  String get channelEditDialogDescriptionHint => 'נושא (אופציונלי)';
+
+  @override
   String get channelEditDialogTypeLabel => 'סוג';
 
   @override
@@ -3501,6 +3565,18 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get channelEditDialogNotifyRolesLabel =>
       'התראה לתפקידים אלה עם הפרסום (אופציונלי)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'מצב איטי';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'כבוי';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'מגבלת משתמשים';
+
+  @override
+  String get channelEditDialogUserLimitOff => 'ללא הגבלה';
 
   @override
   String get channelEditDialogCategoryLabel => 'קטגוריה';

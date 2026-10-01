@@ -19,6 +19,7 @@ import '../../core/platform.dart';
 import '../../core/providers.dart';
 import '../../core/tray_service.dart';
 import '../../core/uploader.dart';
+import '../../shared/presence_status.dart';
 import '../../shared/widgets.dart';
 import 'content_filters_screen.dart';
 import 'devices_screen.dart';
@@ -48,6 +49,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   late TextEditingController _avatarUrlCtrl;
   late TextEditingController _bioCtrl;
   late TextEditingController _pronounsCtrl;
+  late TextEditingController _customStatusCtrl;
   bool _showPronouns = false;
   String _status = 'online';
   String? _throneWebhookUrl;
@@ -79,16 +81,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     'dnd':     t.statusDnd,
     'offline': t.statusInvisible,
   };
-  // A getter, not a static const/final -- re-evaluated on each access
-  // so it always reflects the currently-active palette (a cached final
-  // would freeze at whichever palette was active on first read and
-  // never pick up a live High Contrast toggle).
-  static Map<String, Color> get _statusColors => {
-    'online':  KodaColors.mint,
-    'away':    KodaColors.gold,
-    'dnd':     KodaColors.accent,
-    'offline': KodaColors.text3,
-  };
 
   @override
   void initState() {
@@ -98,6 +90,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _avatarUrlCtrl   = TextEditingController();
     _bioCtrl         = TextEditingController();
     _pronounsCtrl    = TextEditingController();
+    _customStatusCtrl = TextEditingController();
     _status = 'online';
     if (isDesktop) {
       TrayService.instance.getCloseToTrayEnabled().then((v) {
@@ -170,6 +163,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _avatarUrlCtrl.dispose();
     _bioCtrl.dispose();
     _pronounsCtrl.dispose();
+    _customStatusCtrl.dispose();
     super.dispose();
   }
 
@@ -233,6 +227,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (_pronounsCtrl.text.trim().isNotEmpty) {
       data['pronouns'] = _pronounsCtrl.text.trim();
     }
+    if (_customStatusCtrl.text.trim().isNotEmpty) {
+      data['custom_status'] = _customStatusCtrl.text.trim();
+    }
     data['status'] = _status;
 
     await KodaApi.instance.updateProfile(
@@ -242,6 +239,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       pronouns:     data['pronouns'],
       showPronouns: _showPronouns,
       status:       _status,
+      customStatus: data['custom_status'],
     );
 
     if (mounted) setState(() { _editingProfile = false; _savingProfile = false; });
@@ -656,7 +654,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: Container(
                 width: 16, height: 16,
                 decoration: BoxDecoration(
-                    color: _statusColors[_status] ?? KodaColors.mint,
+                    color: statusColor(_status),
                     shape: BoxShape.circle,
                     border: Border.all(color: KodaColors.card, width: 2)),
               ),
@@ -691,11 +689,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                      color: (_statusColors[_status] ?? KodaColors.mint).withValues(alpha: 0.15),
+                      color: statusColor(_status).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(99)),
                   child: Text(_statusLabels(t)[_status] ?? t.statusOnline,
                       style: TextStyle(
-                          color: _statusColors[_status] ?? KodaColors.mint,
+                          color: statusColor(_status),
                           fontSize: 10)),
                 ),
               ]),
@@ -986,7 +984,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Container(
                   width: 10, height: 10,
                   decoration: BoxDecoration(
-                      color: _statusColors[s], shape: BoxShape.circle),
+                      color: statusColor(s), shape: BoxShape.circle),
                 ),
                 const SizedBox(width: 8),
                 Text(_statusLabels(t)[s] ?? s,
@@ -997,6 +995,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ),
       ),
+      const SizedBox(height: 20),
+
+      // Custom status -- a short line shown next to the dot above,
+      // wherever this user is rendered elsewhere (member list, DM
+      // list, profile popover). Always public when set, unlike
+      // pronouns -- matches Discord, no show/hide toggle.
+      Text(t.settingsCustomStatusLabel,
+          style: TextStyle(color: KodaColors.text3, fontSize: 11,
+              fontWeight: FontWeight.w700, letterSpacing: 1)),
+      const SizedBox(height: 8),
+      KodaTextField(controller: _customStatusCtrl, hintText: t.settingsCustomStatusHint),
       const SizedBox(height: 28),
 
       // Save / Cancel

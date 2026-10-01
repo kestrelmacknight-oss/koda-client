@@ -639,7 +639,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                             final result = await KodaApi.instance
                                 .getVoiceToken(channelId, viewer: true);
                             if (!context.mounted) return;
-                            if (result == null) {
+                            if (result.data == null) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(t.voiceScreenCouldNotPopOut)),
                               );
@@ -647,8 +647,8 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                             }
                             final args = jsonEncode({
                               'type': 'voice_popout',
-                              'token': result['token'],
-                              'url': result['url'],
+                              'token': result.data!['token'],
+                              'url': result.data!['url'],
                               'channel_name': widget.channelName,
                             });
                             final ctrl = await WindowController.create(WindowConfiguration(

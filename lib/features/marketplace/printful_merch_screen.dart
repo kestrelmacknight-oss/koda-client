@@ -20,6 +20,7 @@ import '../../core/providers.dart';
 import '../../core/theme.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/shipping_address_form.dart';
+import '../../shared/widgets.dart';
 
 class PrintfulMerchScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic>? server;
@@ -35,6 +36,7 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
   bool _syncing = false;
   late bool _creatorMode = widget.creatorMode;
   bool _canManageMarketplace = false;
+  bool _isOwner = false;
 
   String? get _serverId => widget.server?['id'] as String?;
 
@@ -49,7 +51,17 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
     final user = ref.read(authProvider).user;
     final canManage = await hasServerPermission(widget.server, 'manage_marketplace',
         currentUserId: user?.id, isKodaAdmin: user?.isAdmin ?? false);
-    if (mounted) setState(() => _canManageMarketplace = canManage);
+    // Payout-recipient assignment is owner-only (see
+    // printful_controller.ex's set_payout_recipient/2) -- deliberately
+    // stricter than _canManageMarketplace above, which also covers
+    // non-owner mods who hold manage_marketplace. widget.server only
+    // carries owner_id when this screen was reached through a server's
+    // own creator-management entry point, not from the platform-wide
+    // Koda Marketplace browse screen -- so this is naturally false
+    // there too, same as _canManageMarketplace.
+    final isOwner = widget.server?['owner_id'] != null &&
+        widget.server!['owner_id'] == user?.id;
+    if (mounted) setState(() { _canManageMarketplace = canManage; _isOwner = isOwner; });
   }
 
   Future<void> _load() async {
@@ -193,52 +205,142 @@ class _PrintfulMerchScreenState extends ConsumerState<PrintfulMerchScreen> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),
-        child: Row(children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: SizedBox(
-              width: 56, height: 56,
-              child: product['thumbnail_url'] != null
-                  ? Image.network(product['thumbnail_url'] as String, fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => ColoredBox(color: KodaColors.elevated))
-                  : ColoredBox(color: KodaColors.elevated,
-                      child: Icon(Icons.checkroom_outlined, color: KodaColors.text3)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SizedBox(
+                width: 56, height: 56,
+                child: product['thumbnail_url'] != null
+                    ? Image.network(product['thumbnail_url'] as String, fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => ColoredBox(color: KodaColors.elevated))
+                    : ColoredBox(color: KodaColors.elevated,
+                        child: Icon(Icons.checkroom_outlined, color: KodaColors.text3)),
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(product['name'] as String? ?? '',
-                  style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w600),
-                  maxLines: 1, overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 2),
-              Text(
-                cheapest == null
-                    ? t.printfulMerchOutOfStock
-                    : t.printfulMerchFromPriceOptions(
-                        formatMerchPrice(cheapest['retail_price_cents'] as int, cheapest['currency'] as String? ?? 'USD'),
-                        inStock.length),
-                style: TextStyle(color: KodaColors.text3, fontSize: 12),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(product['name'] as String? ?? '',
+                    style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w600),
+                    maxLines: 1, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 2),
+                Text(
+                  cheapest == null
+                      ? t.printfulMerchOutOfStock
+                      : t.printfulMerchFromPriceOptions(
+                          formatMerchPrice(cheapest['retail_price_cents'] as int, cheapest['currency'] as String? ?? 'USD'),
+                          inStock.length),
+                  style: TextStyle(color: KodaColors.text3, fontSize: 12),
+                ),
+              ]),
+            ),
+            const SizedBox(width: 8),
+            if (_creatorMode)
+              Switch(
+                value: published,
+                activeThumbColor: KodaColors.koda,
+                onChanged: (_) => _togglePublish(product),
+              )
+            else
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                    foregroundColor: KodaColors.koda, side: BorderSide(color: KodaColors.koda)),
+                onPressed: cheapest == null ? null : () => _openProductDetail(product, inStock),
+                child: Text(t.printfulMerchViewButton),
+              ),
+          ]),
+          if (_creatorMode && _isOwner) ...[
+            const Divider(height: 20),
+            Row(children: [
+              Icon(Icons.payments_outlined, size: 14, color: KodaColors.text3),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  product['payout_username'] != null
+                      ? t.printfulMerchPayoutTo(product['payout_username'] as String)
+                      : t.printfulMerchPayoutToYou,
+                  style: TextStyle(color: KodaColors.text3, fontSize: 12),
+                ),
+              ),
+              TextButton(
+                onPressed: () => _showPayoutDialog(product),
+                child: Text(t.printfulMerchPayoutChangeButton,
+                    style: TextStyle(color: KodaColors.koda, fontSize: 12)),
               ),
             ]),
-          ),
-          const SizedBox(width: 8),
-          if (_creatorMode)
-            Switch(
-              value: published,
-              activeThumbColor: KodaColors.koda,
-              onChanged: (_) => _togglePublish(product),
-            )
-          else
-            OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                  foregroundColor: KodaColors.koda, side: BorderSide(color: KodaColors.koda)),
-              onPressed: cheapest == null ? null : () => _openProductDetail(product, inStock),
-              child: Text(t.printfulMerchViewButton),
-            ),
+          ],
         ]),
       ),
     );
+  }
+
+  Future<void> _showPayoutDialog(Map<String, dynamic> product) async {
+    final t = AppLocalizations.of(context);
+    final serverId = _serverId;
+    if (serverId == null) return;
+    final ctrl = TextEditingController();
+    Map<String, dynamic>? resolved;
+    String? error;
+
+    final confirmedUserId = await showDialog<String?>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          backgroundColor: KodaColors.card,
+          title: Text(t.printfulMerchPayoutDialogTitle, style: TextStyle(color: KodaColors.text1)),
+          content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(t.printfulMerchPayoutDialogBody,
+                style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+            const SizedBox(height: 12),
+            KodaTextField(controller: ctrl, hintText: t.printfulMerchPayoutUsernameHint),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () async {
+                final user = await KodaApi.instance.getUserByUsername(ctrl.text.trim());
+                setDialogState(() {
+                  resolved = user;
+                  error = user == null ? t.printfulMerchPayoutUserNotFound : null;
+                });
+              },
+              child: Text(t.printfulMerchPayoutLookupButton),
+            ),
+            if (resolved != null)
+              Text(t.printfulMerchPayoutResolvedAs(resolved!['username'] as String),
+                  style: TextStyle(color: KodaColors.koda, fontSize: 12)),
+            if (error != null)
+              Text(error!, style: TextStyle(color: KodaColors.accent, fontSize: 12)),
+          ]),
+          actions: [
+            if (product['payout_user_id'] != null)
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, ''),
+                child: Text(t.printfulMerchPayoutResetButton,
+                    style: TextStyle(color: KodaColors.accent)),
+              ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, null),
+              child: Text(t.commonCancel),
+            ),
+            TextButton(
+              onPressed: resolved == null ? null : () => Navigator.pop(dialogContext, resolved!['id'] as String),
+              child: Text(t.commonSave),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirmedUserId == null || !mounted) return;
+    // '' is the Reset sentinel -- null means cleared on the server.
+    final payoutUserId = confirmedUserId.isEmpty ? null : confirmedUserId;
+    final ok = await KodaApi.instance.setProductPayoutRecipient(serverId, product['id'] as String, payoutUserId);
+    if (ok && mounted) {
+      setState(() {
+        product['payout_user_id'] = payoutUserId;
+        product['payout_username'] = payoutUserId == null ? null : resolved?['username'];
+      });
+    }
   }
 
   Widget _buildCartButton() {

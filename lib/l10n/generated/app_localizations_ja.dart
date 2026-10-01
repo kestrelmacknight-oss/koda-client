@@ -306,6 +306,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsStatusLabel => 'ステータス';
 
   @override
+  String get settingsCustomStatusLabel => 'カスタムステータス';
+
+  @override
+  String get settingsCustomStatusHint => '今なにしてる?';
+
+  @override
   String get statusOnline => 'オンライン';
 
   @override
@@ -534,6 +540,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get homeCouldNotConnectVoice => 'ボイスに接続できませんでした。';
+
+  @override
+  String get homeVoiceChannelFull => 'このボイスチャンネルは満員です。';
 
   @override
   String get homeCreateServer => 'サーバーを作成';
@@ -800,6 +809,14 @@ class AppLocalizationsJa extends AppLocalizations {
   String get homeAttachmentFallback => '添付ファイル';
 
   @override
+  String get homeAttachmentUploadFailed => '添付ファイルのアップロードに失敗しました。';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return '$fileName を保存しました';
+  }
+
+  @override
   String serverConnectError(String service) {
     return '$serviceへの接続を開始できませんでした。';
   }
@@ -1014,7 +1031,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'プラットフォーム全体の「発見」タブにこのサーバーを掲載し、毎週の注目ローテーションに選ばれるチャンスを得られます。一般的なサーバー参加時の見つけやすさとは別の設定です。';
+      'このサーバーのストアをKoda Marketplaceに掲載し、毎週のおすすめ商品ローテーションに選ばれるチャンスを得ます。これは買い物に関するものであり、参加するサーバーを探すこととは無関係です -- 一般のサーバー検索には影響しません。';
 
   @override
   String get serverSocialLinkLabel => 'SNS / 招待リンク（任意）';
@@ -2438,6 +2455,41 @@ class AppLocalizationsJa extends AppLocalizations {
   String get printfulMerchViewButton => '見る';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return '支払い先: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => '支払い先: あなた';
+
+  @override
+  String get printfulMerchPayoutChangeButton => '変更';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => '支払い受取人';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'この商品の注文収益の取り分を、自分ではなく別のユーザーに振り込みます -- 購入可能になる前に、その相手が自分自身のStripeアカウントを接続しオンボーディングを完了させる必要があります。';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'ユーザー名';
+
+  @override
+  String get printfulMerchPayoutLookupButton => '検索';
+
+  @override
+  String get printfulMerchPayoutUserNotFound => 'その名前のユーザーは見つかりませんでした。';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return '見つかりました: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => '自分にリセット';
+
+  @override
   String get printfulMerchCartTooltip => 'カート';
 
   @override
@@ -2680,6 +2732,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get kodaMarketplaceAllListedServersHeader => '掲載中のすべてのサーバー';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => '注目のアイテム';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'すべてのアイテム';
+
+  @override
   String get kodaMarketplaceServerFallback => 'サーバー';
 
   @override
@@ -2691,6 +2749,9 @@ class AppLocalizationsJa extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'ストアを見る';
 
   @override
   String get calendarFallbackTitle => 'カレンダー';
@@ -3357,6 +3418,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get channelEditDialogNameHint => 'チャンネル名';
 
   @override
+  String get channelEditDialogDescriptionHint => 'トピック（任意）';
+
+  @override
   String get channelEditDialogTypeLabel => '種類';
 
   @override
@@ -3397,6 +3461,18 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get channelEditDialogNotifyRolesLabel => '投稿時に通知するロール（任意）';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'スローモード';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'オフ';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'ユーザー上限';
+
+  @override
+  String get channelEditDialogUserLimitOff => '上限なし';
 
   @override
   String get channelEditDialogCategoryLabel => 'カテゴリー';

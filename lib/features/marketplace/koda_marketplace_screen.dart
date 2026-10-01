@@ -14,11 +14,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/api.dart';
 import '../../core/checkout.dart';
+import '../../core/merch_cart.dart' show formatMerchPrice;
 import '../../core/theme.dart';
 import '../../core/time_utils.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/tier_badge.dart';
 import '../../shared/widgets.dart';
+import 'printful_merch_screen.dart';
 
 class KodaMarketplaceScreen extends ConsumerStatefulWidget {
   const KodaMarketplaceScreen({super.key});
@@ -515,6 +517,8 @@ class _DiscoverTab extends StatefulWidget {
 class _DiscoverTabState extends State<_DiscoverTab> {
   List<Map<String, dynamic>> _featured = [];
   List<Map<String, dynamic>> _all = [];
+  List<Map<String, dynamic>> _featuredProducts = [];
+  List<Map<String, dynamic>> _allProducts = [];
   bool _loading = true;
 
   @override
@@ -527,11 +531,15 @@ class _DiscoverTabState extends State<_DiscoverTab> {
     final results = await Future.wait([
       KodaApi.instance.getMarketplaceServers(featuredOnly: true),
       KodaApi.instance.getMarketplaceServers(),
+      KodaApi.instance.getMarketplaceProducts(featuredOnly: true),
+      KodaApi.instance.getMarketplaceProducts(),
     ]);
     if (!mounted) return;
     setState(() {
       _featured = results[0];
       _all = results[1];
+      _featuredProducts = results[2];
+      _allProducts = results[3];
       _loading = false;
     });
   }
@@ -542,7 +550,7 @@ class _DiscoverTabState extends State<_DiscoverTab> {
     if (_loading) {
       return Center(child: CircularProgressIndicator(color: KodaColors.koda));
     }
-    if (_all.isEmpty) {
+    if (_all.isEmpty && _allProducts.isEmpty) {
       return Center(child: Padding(
         padding: const EdgeInsets.all(24),
         child: Text(
@@ -556,6 +564,21 @@ class _DiscoverTabState extends State<_DiscoverTab> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        if (_featuredProducts.isNotEmpty) ...[
+          Text(t.kodaMarketplaceFeaturedItemsHeader, style: TextStyle(color: KodaColors.text3,
+              fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 190,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _featuredProducts.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (_, i) => _MarketplaceProductCard(product: _featuredProducts[i], width: 140),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
         if (_featured.isNotEmpty) ...[
           Text(t.kodaMarketplaceFeaturedThisWeekHeader, style: TextStyle(color: KodaColors.text3,
               fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
@@ -571,13 +594,27 @@ class _DiscoverTabState extends State<_DiscoverTab> {
           ),
           const SizedBox(height: 20),
         ],
-        Text(t.kodaMarketplaceAllListedServersHeader, style: TextStyle(color: KodaColors.text3,
-            fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
-        const SizedBox(height: 8),
-        ..._all.map((s) => Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: _MarketplaceServerCard(server: s, width: double.infinity),
-            )),
+        if (_allProducts.isNotEmpty) ...[
+          Text(t.kodaMarketplaceAllItemsHeader, style: TextStyle(color: KodaColors.text3,
+              fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 10, runSpacing: 10,
+            children: _allProducts
+                .map((p) => _MarketplaceProductCard(product: p, width: 140))
+                .toList(),
+          ),
+          const SizedBox(height: 20),
+        ],
+        if (_all.isNotEmpty) ...[
+          Text(t.kodaMarketplaceAllListedServersHeader, style: TextStyle(color: KodaColors.text3,
+              fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+          const SizedBox(height: 8),
+          ..._all.map((s) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _MarketplaceServerCard(server: s, width: double.infinity),
+              )),
+        ],
       ],
     );
   }
@@ -599,55 +636,140 @@ class _MarketplaceServerCard extends StatelessWidget {
 
     return Container(
       width: width,
-      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: KodaColors.card,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: KodaColors.border),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: SizedBox(
-              width: 36, height: 36,
-              child: iconUrl != null
-                  ? Image.network(iconUrl, fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => ColoredBox(color: KodaColors.elevated))
-                  : ColoredBox(color: KodaColors.elevated,
-                      child: Icon(Icons.groups_outlined, color: KodaColors.text3, size: 18)),
-            ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        // The card's real destination: that server's actual in-app
+        // store (browsable/purchasable without membership, see
+        // printful_controller.ex's public merch/2 action) -- not the
+        // optional external social/website link below, which used to
+        // be this card's only tap target at all.
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (_) => PrintfulMerchScreen(server: server))),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  width: 36, height: 36,
+                  child: iconUrl != null
+                      ? Image.network(iconUrl, fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => ColoredBox(color: KodaColors.elevated))
+                      : ColoredBox(color: KodaColors.elevated,
+                          child: Icon(Icons.groups_outlined, color: KodaColors.text3, size: 18)),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
+              ),
+              if (link != null && link.isNotEmpty)
+                Tooltip(
+                  message: t.serverSocialLinkLabel,
+                  child: GestureDetector(
+                    onTap: () async {
+                      final uri = Uri.tryParse(link);
+                      if (uri != null && await canLaunchUrl(uri)) {
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                    child: Icon(Icons.open_in_new, size: 14, color: KodaColors.text3),
+                  ),
+                ),
+            ]),
+            const SizedBox(height: 8),
+            if (description != null && description.isNotEmpty)
+              Expanded(
+                child: Text(description, maxLines: 3, overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+              ),
+            const SizedBox(height: 6),
+            Row(children: [
+              Icon(Icons.people_outline, size: 12, color: KodaColors.text3),
+              const SizedBox(width: 4),
+              Text(t.kodaMarketplaceMemberCount(memberCount), style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+              const Spacer(),
+              Icon(Icons.storefront_outlined, size: 12, color: KodaColors.koda),
+              const SizedBox(width: 4),
+              Text(t.kodaMarketplaceVisitStore,
+                  style: TextStyle(color: KodaColors.koda, fontSize: 11, fontWeight: FontWeight.w600)),
+            ]),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+/// One merch item from Koda.Printful.list_marketplace_products/1,
+/// shown mixed in with items from every other marketplace-discoverable
+/// server -- tapping it goes straight to that item's own server's real
+/// store (same PrintfulMerchScreen destination the server card above
+/// uses), built from the server id/name/icon this row already carries,
+/// no separate fetch needed.
+class _MarketplaceProductCard extends StatelessWidget {
+  final Map<String, dynamic> product;
+  final double width;
+  const _MarketplaceProductCard({required this.product, required this.width});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final thumbnailUrl = product['thumbnail_url'] as String?;
+    final name = product['name'] as String? ?? '';
+    final serverName = product['server_name'] as String? ?? t.kodaMarketplaceServerFallback;
+    final minPriceCents = product['min_price_cents'] as int?;
+    final currency = product['currency'] as String? ?? 'USD';
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(10),
+      onTap: () => Navigator.push(context, MaterialPageRoute(
+          builder: (_) => PrintfulMerchScreen(server: {
+                'id': product['server_id'],
+                'name': product['server_name'],
+                'icon_url': product['server_icon_url'],
+              }))),
+      child: Container(
+        width: width,
+        decoration: BoxDecoration(
+          color: KodaColors.card,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: KodaColors.border),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          AspectRatio(
+            aspectRatio: 1,
+            child: thumbnailUrl != null
+                ? Image.network(thumbnailUrl, fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => ColoredBox(color: KodaColors.elevated,
+                        child: Icon(Icons.shopping_bag_outlined, color: KodaColors.text3)))
+                : ColoredBox(color: KodaColors.elevated,
+                    child: Icon(Icons.shopping_bag_outlined, color: KodaColors.text3)),
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: KodaColors.text1, fontSize: 12, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 2),
+              Text(serverName, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: KodaColors.text3, fontSize: 10)),
+              const SizedBox(height: 4),
+              if (minPriceCents != null)
+                Text(formatMerchPrice(minPriceCents, currency),
+                    style: TextStyle(color: KodaColors.koda, fontSize: 12, fontWeight: FontWeight.w700)),
+            ]),
           ),
         ]),
-        const SizedBox(height: 8),
-        if (description != null && description.isNotEmpty)
-          Expanded(
-            child: Text(description, maxLines: 3, overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: KodaColors.text3, fontSize: 11)),
-          ),
-        const SizedBox(height: 6),
-        Row(children: [
-          Icon(Icons.people_outline, size: 12, color: KodaColors.text3),
-          const SizedBox(width: 4),
-          Text(t.kodaMarketplaceMemberCount(memberCount), style: TextStyle(color: KodaColors.text3, fontSize: 11)),
-          const Spacer(),
-          if (link != null && link.isNotEmpty)
-            GestureDetector(
-              onTap: () async {
-                final uri = Uri.tryParse(link);
-                if (uri != null && await canLaunchUrl(uri)) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                }
-              },
-              child: Icon(Icons.open_in_new, size: 14, color: KodaColors.koda),
-            ),
-        ]),
-      ]),
+      ),
     );
   }
 }

@@ -10,9 +10,18 @@
 // with `encrypted: true` but no `epoch` predates that work (the old
 // demo bridge that base64-"encrypted" everything, never real
 // cryptography) and is just base64-decoded to stay readable.
+//
+// The decrypted plaintext is itself either bare text (every message
+// before attachment encryption shipped) or a small JSON envelope
+// carrying text plus an encrypted attachment's metadata (see
+// crypto/channel_attachments.dart) -- decodeChannelPayload tells the
+// two apart. What gets cached in SecureStorage is always the raw
+// decrypted string (pre-decode), so a cache hit still recovers any
+// attachment on the next render, not just the text.
 
 import 'dart:convert';
 import 'secure_storage.dart';
+import 'crypto/channel_attachments.dart';
 import 'crypto/channel_key_manager.dart';
 import 'message_language.dart';
 
@@ -21,9 +30,15 @@ import 'message_language.dart';
 // under '_detectedLang' -- see message_language.dart for why this has
 // to be a client-side, on-device computation rather than anything the
 // server could annotate for us.
-Map<String, dynamic> _withPlaintext(Map<String, dynamic> m, String content) {
-  final lang = detectMessageLanguage(content);
-  return {...m, 'content': content, if (lang != null) '_detectedLang': lang};
+Map<String, dynamic> _withPlaintext(Map<String, dynamic> m, String raw) {
+  final payload = decodeChannelPayload(raw);
+  final lang = detectMessageLanguage(payload.text);
+  return {
+    ...m,
+    'content': payload.text,
+    if (payload.attachment != null) '_attachment': payload.attachment,
+    if (lang != null) '_detectedLang': lang,
+  };
 }
 
 Future<List<Map<String, dynamic>>> decryptMessages(

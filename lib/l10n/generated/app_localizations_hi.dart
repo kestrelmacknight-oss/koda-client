@@ -318,6 +318,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String get settingsStatusLabel => 'स्टेटस';
 
   @override
+  String get settingsCustomStatusLabel => 'कस्टम स्थिति';
+
+  @override
+  String get settingsCustomStatusHint => 'आपके मन में क्या है?';
+
+  @override
   String get statusOnline => 'ऑनलाइन';
 
   @override
@@ -550,6 +556,9 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get homeCouldNotConnectVoice => 'वॉइस से कनेक्ट नहीं हो सका।';
+
+  @override
+  String get homeVoiceChannelFull => 'यह वॉइस चैनल भरा हुआ है।';
 
   @override
   String get homeCreateServer => 'सर्वर बनाएं';
@@ -820,6 +829,14 @@ class AppLocalizationsHi extends AppLocalizations {
   String get homeAttachmentFallback => 'अटैचमेंट';
 
   @override
+  String get homeAttachmentUploadFailed => 'अटैचमेंट अपलोड विफल रहा।';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return '$fileName सेव हो गया';
+  }
+
+  @override
   String serverConnectError(String service) {
     return '$service कनेक्शन शुरू नहीं हो सका।';
   }
@@ -1041,7 +1058,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'इस सर्वर को पूरे प्लेटफ़ॉर्म के डिस्कवर टैब में शामिल करता है, और साप्ताहिक फ़ीचर्ड रोटेशन में आने का मौका देता है। यह सामान्य सर्वर-जॉइन डिस्कवरेबिलिटी से अलग है।';
+      'यह इस सर्वर के स्टोर को Koda Marketplace में सूचीबद्ध करता है, साप्ताहिक फीचर्ड रोटेशन में शामिल होने के मौके के साथ। यह खरीदारी के बारे में है, सर्वर खोजने के बारे में नहीं -- इसका सामान्य सर्वर खोज पर कोई असर नहीं पड़ता।';
 
   @override
   String get serverSocialLinkLabel => 'सोशल / इनवाइट लिंक (वैकल्पिक)';
@@ -2506,6 +2523,42 @@ class AppLocalizationsHi extends AppLocalizations {
   String get printfulMerchViewButton => 'देखें';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return 'भुगतान प्राप्तकर्ता: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => 'भुगतान प्राप्तकर्ता: आप';
+
+  @override
+  String get printfulMerchPayoutChangeButton => 'बदलें';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => 'भुगतान प्राप्तकर्ता';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'इस आइटम के ऑर्डर आय के हिस्से को अपने बजाय किसी अन्य उपयोगकर्ता को भेजें -- इसे खरीदे जाने से पहले उन्हें अपना खुद का Stripe खाता जोड़ना और सेटअप पूरा करना होगा।';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'उपयोगकर्ता नाम';
+
+  @override
+  String get printfulMerchPayoutLookupButton => 'खोजें';
+
+  @override
+  String get printfulMerchPayoutUserNotFound =>
+      'इस नाम से कोई उपयोगकर्ता नहीं मिला।';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return 'मिला: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => 'मुझ पर रीसेट करें';
+
+  @override
   String get printfulMerchCartTooltip => 'कार्ट';
 
   @override
@@ -2758,6 +2811,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String get kodaMarketplaceAllListedServersHeader => 'सभी लिस्टेड सर्वर';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => 'फीचर्ड आइटम';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'सभी आइटम';
+
+  @override
   String get kodaMarketplaceServerFallback => 'सर्वर';
 
   @override
@@ -2770,6 +2829,9 @@ class AppLocalizationsHi extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'स्टोर देखें';
 
   @override
   String get calendarFallbackTitle => 'कैलेंडर';
@@ -3459,6 +3521,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get channelEditDialogNameHint => 'चैनल का नाम';
 
   @override
+  String get channelEditDialogDescriptionHint => 'विषय (वैकल्पिक)';
+
+  @override
   String get channelEditDialogTypeLabel => 'टाइप';
 
   @override
@@ -3500,6 +3565,18 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get channelEditDialogNotifyRolesLabel =>
       'पोस्ट होने पर इन रोल्स को नोटिफाई करें (वैकल्पिक)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'स्लो मोड';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'बंद';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'उपयोगकर्ता सीमा';
+
+  @override
+  String get channelEditDialogUserLimitOff => 'कोई सीमा नहीं';
 
   @override
   String get channelEditDialogCategoryLabel => 'कैटेगरी';

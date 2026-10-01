@@ -319,6 +319,12 @@ class AppLocalizationsEl extends AppLocalizations {
   String get settingsStatusLabel => 'ΚΑΤΑΣΤΑΣΗ';
 
   @override
+  String get settingsCustomStatusLabel => 'ΠΡΟΣΑΡΜΟΣΜΕΝΗ ΚΑΤΑΣΤΑΣΗ';
+
+  @override
+  String get settingsCustomStatusHint => 'Τι σκέφτεσαι;';
+
+  @override
   String get statusOnline => 'Συνδεδεμένος';
 
   @override
@@ -558,6 +564,9 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get homeCouldNotConnectVoice => 'Δεν ήταν δυνατή η σύνδεση στη φωνή.';
+
+  @override
+  String get homeVoiceChannelFull => 'Αυτό το κανάλι φωνής είναι γεμάτο.';
 
   @override
   String get homeCreateServer => 'Δημιουργία διακομιστή';
@@ -830,6 +839,15 @@ class AppLocalizationsEl extends AppLocalizations {
   String get homeAttachmentFallback => 'Συνημμένο';
 
   @override
+  String get homeAttachmentUploadFailed =>
+      'Η μεταφόρτωση του συνημμένου απέτυχε.';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return 'Το $fileName αποθηκεύτηκε';
+  }
+
+  @override
   String serverConnectError(String service) {
     return 'Δεν ήταν δυνατή η έναρξη της σύνδεσης $service.';
   }
@@ -1052,7 +1070,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'Εντάσσει αυτόν τον διακομιστή στην καρτέλα Ανακάλυψης όλης της πλατφόρμας, και μια πιθανότητα εβδομαδιαίας προβεβλημένης περιστροφής. Ξεχωριστό από τη γενική δυνατότητα εύρεσης για συμμετοχή σε διακομιστή.';
+      'Καταχωρεί το κατάστημα αυτού του διακομιστή στο Koda Marketplace, με πιθανότητα συμμετοχής στην εβδομαδιαία περιστροφή προβεβλημένων προϊόντων. Αφορά τις αγορές, όχι την εύρεση διακομιστών για συμμετοχή -- δεν επηρεάζει τη γενική αναζήτηση διακομιστών.';
 
   @override
   String get serverSocialLinkLabel =>
@@ -2537,6 +2555,42 @@ class AppLocalizationsEl extends AppLocalizations {
   String get printfulMerchViewButton => 'Προβολή';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return 'Πληρωμή σε: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => 'Πληρωμή σε: εσένα';
+
+  @override
+  String get printfulMerchPayoutChangeButton => 'Αλλαγή';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => 'Παραλήπτης Πληρωμής';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'Κατευθύνετε το μερίδιο αυτού του προϊόντος από τα έσοδα της παραγγελίας σε άλλον χρήστη αντί για εσάς -- θα χρειαστεί να συνδέσει και να ολοκληρώσει τη ρύθμιση του δικού του λογαριασμού Stripe πριν μπορέσει κάποιος να το αγοράσει.';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'Όνομα χρήστη';
+
+  @override
+  String get printfulMerchPayoutLookupButton => 'Αναζήτηση';
+
+  @override
+  String get printfulMerchPayoutUserNotFound =>
+      'Δεν βρέθηκε χρήστης με αυτό το όνομα.';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return 'Βρέθηκε: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => 'Επαναφορά σε εμένα';
+
+  @override
   String get printfulMerchCartTooltip => 'Καλάθι';
 
   @override
@@ -2795,6 +2849,12 @@ class AppLocalizationsEl extends AppLocalizations {
       'ΟΛΟΙ ΟΙ ΚΑΤΑΧΩΡΙΣΜΕΝΟΙ ΔΙΑΚΟΜΙΣΤΕΣ';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => 'ΠΡΟΒΕΒΛΗΜΕΝΑ ΠΡΟΪΟΝΤΑ';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'ΟΛΑ ΤΑ ΠΡΟΪΟΝΤΑ';
+
+  @override
   String get kodaMarketplaceServerFallback => 'Διακομιστής';
 
   @override
@@ -2807,6 +2867,9 @@ class AppLocalizationsEl extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'Επίσκεψη καταστήματος';
 
   @override
   String get calendarFallbackTitle => 'Ημερολόγιο';
@@ -3502,6 +3565,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get channelEditDialogNameHint => 'Όνομα καναλιού';
 
   @override
+  String get channelEditDialogDescriptionHint => 'Θέμα (προαιρετικό)';
+
+  @override
   String get channelEditDialogTypeLabel => 'Τύπος';
 
   @override
@@ -3543,6 +3609,18 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get channelEditDialogNotifyRolesLabel =>
       'Ειδοποίηση αυτών των ρόλων κατά την ανάρτηση (προαιρετικό)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'Αργή λειτουργία';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'Απενεργοποιημένο';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'Όριο χρηστών';
+
+  @override
+  String get channelEditDialogUserLimitOff => 'Χωρίς όριο';
 
   @override
   String get channelEditDialogCategoryLabel => 'Κατηγορία';

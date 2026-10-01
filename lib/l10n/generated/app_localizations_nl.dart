@@ -319,6 +319,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsStatusLabel => 'STATUS';
 
   @override
+  String get settingsCustomStatusLabel => 'AANGEPASTE STATUS';
+
+  @override
+  String get settingsCustomStatusHint => 'Waar denk je aan?';
+
+  @override
   String get statusOnline => 'Online';
 
   @override
@@ -555,6 +561,9 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get homeCouldNotConnectVoice =>
       'Kan geen verbinding maken met spraak.';
+
+  @override
+  String get homeVoiceChannelFull => 'Dit spraakkanaal is vol.';
 
   @override
   String get homeCreateServer => 'Server aanmaken';
@@ -825,6 +834,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get homeAttachmentFallback => 'Bijlage';
 
   @override
+  String get homeAttachmentUploadFailed => 'Uploaden van bijlage mislukt.';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return '$fileName opgeslagen';
+  }
+
+  @override
   String serverConnectError(String service) {
     return 'Kan verbinding met $service niet starten.';
   }
@@ -1047,7 +1064,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'Neemt deze server op in het platformbrede tabblad Ontdekken, met kans op de wekelijkse uitgelichte rotatie. Los van de algemene vindbaarheid om deel te nemen aan de server.';
+      'Vermeldt de winkel van deze server in de Koda Marketplace, met een kans op de wekelijkse uitgelichte rotatie. Dit gaat over winkelen, niet over het vinden van servers om lid van te worden -- het heeft geen invloed op het algemene zoeken naar servers.';
 
   @override
   String get serverSocialLinkLabel =>
@@ -2514,6 +2531,42 @@ class AppLocalizationsNl extends AppLocalizations {
   String get printfulMerchViewButton => 'Bekijken';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return 'Uitbetaling aan: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => 'Uitbetaling aan: jou';
+
+  @override
+  String get printfulMerchPayoutChangeButton => 'Wijzigen';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => 'Uitbetalingsontvanger';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'Stuur het aandeel van deze bestellingopbrengst van dit item naar een andere gebruiker in plaats van naar jezelf -- diegene moet eerst een eigen Stripe-account koppelen en de onboarding voltooien voordat iemand het kan kopen.';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'Gebruikersnaam';
+
+  @override
+  String get printfulMerchPayoutLookupButton => 'Opzoeken';
+
+  @override
+  String get printfulMerchPayoutUserNotFound =>
+      'Geen gebruiker gevonden met die naam.';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return 'Gevonden: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => 'Terugzetten naar mij';
+
+  @override
   String get printfulMerchCartTooltip => 'Winkelwagen';
 
   @override
@@ -2767,6 +2820,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get kodaMarketplaceAllListedServersHeader => 'ALLE VERMELDE SERVERS';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => 'UITGELICHTE ITEMS';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'ALLE ITEMS';
+
+  @override
   String get kodaMarketplaceServerFallback => 'Server';
 
   @override
@@ -2779,6 +2838,9 @@ class AppLocalizationsNl extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'Winkel bezoeken';
 
   @override
   String get calendarFallbackTitle => 'Kalender';
@@ -3467,6 +3529,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get channelEditDialogNameHint => 'Kanaalnaam';
 
   @override
+  String get channelEditDialogDescriptionHint => 'Onderwerp (optioneel)';
+
+  @override
   String get channelEditDialogTypeLabel => 'Type';
 
   @override
@@ -3508,6 +3573,18 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get channelEditDialogNotifyRolesLabel =>
       'Stel deze rollen op de hoogte bij plaatsing (optioneel)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'Slowmode';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'Uit';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'Gebruikerslimiet';
+
+  @override
+  String get channelEditDialogUserLimitOff => 'Geen limiet';
 
   @override
   String get channelEditDialogCategoryLabel => 'Categorie';

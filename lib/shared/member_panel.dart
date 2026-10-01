@@ -8,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
+import '../core/presence_provider.dart';
 import '../core/providers.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'presence_status.dart';
 import 'pronoun_label.dart';
 import 'tier_badge.dart';
 import 'widgets.dart';
@@ -219,6 +221,15 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
         ? _parseColor(topRole['color'] as String? ?? '#e2e4f0')
         : KodaColors.text2;
 
+    // Live overlay (a status/custom_status change since this list was
+    // fetched) falls back to whatever this row's own fetch already had
+    // -- see core/presence_provider.dart.
+    final userId = member['user_id'] as String?;
+    final override = userId != null ? ref.watch(presenceOverridesProvider)[userId] : null;
+    final customStatus = override?.customStatus ?? member['custom_status'] as String?;
+    final effective = effectiveStatus(
+        online: !isOffline, selfReported: override?.status ?? member['status'] as String?);
+
     final statusLabel = isOffline ? t.memberPanelOfflineLabel : t.statusOnline;
     final tierLabel = tier != null && tier != 'free' ? t.memberPanelTierSuffix(tier) : '';
 
@@ -261,9 +272,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
                     width: 10,
                     height: 10,
                     decoration: BoxDecoration(
-                      color: isOffline
-                          ? const Color(0xFF6b7280)
-                          : KodaColors.koda,
+                      color: statusColor(effective),
                       shape: BoxShape.circle,
                       border: Border.all(
                           color: KodaColors.bg2, width: 1.5),
@@ -274,16 +283,28 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: Text(
-                withPronouns(username, member),
-                style: TextStyle(
-                  color: isOffline
-                      ? KodaColors.text3
-                      : nameColor,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-                overflow: TextOverflow.ellipsis,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    withPronouns(username, member),
+                    style: TextStyle(
+                      color: isOffline
+                          ? KodaColors.text3
+                          : nameColor,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (customStatus != null && customStatus.isNotEmpty)
+                    Text(
+                      customStatus,
+                      style: TextStyle(color: KodaColors.text3, fontSize: 11),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
               ),
             ),
             TierBadge(tier: tier, size: 13),

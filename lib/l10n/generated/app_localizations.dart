@@ -706,6 +706,18 @@ abstract class AppLocalizations {
   /// **'STATUS'**
   String get settingsStatusLabel;
 
+  /// No description provided for @settingsCustomStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CUSTOM STATUS'**
+  String get settingsCustomStatusLabel;
+
+  /// No description provided for @settingsCustomStatusHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s on your mind?'**
+  String get settingsCustomStatusHint;
+
   /// No description provided for @statusOnline.
   ///
   /// In en, this message translates to:
@@ -1137,6 +1149,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not connect to voice.'**
   String get homeCouldNotConnectVoice;
+
+  /// No description provided for @homeVoiceChannelFull.
+  ///
+  /// In en, this message translates to:
+  /// **'This voice channel is full.'**
+  String get homeVoiceChannelFull;
 
   /// No description provided for @homeCreateServer.
   ///
@@ -1624,6 +1642,18 @@ abstract class AppLocalizations {
   /// **'Attachment'**
   String get homeAttachmentFallback;
 
+  /// No description provided for @homeAttachmentUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachment upload failed.'**
+  String get homeAttachmentUploadFailed;
+
+  /// No description provided for @homeSavedAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {fileName}'**
+  String homeSavedAttachment(String fileName);
+
   /// No description provided for @serverConnectError.
   ///
   /// In en, this message translates to:
@@ -2017,7 +2047,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverListInMarketplaceDescription.
   ///
   /// In en, this message translates to:
-  /// **'Opts this server into the platform-wide Discover tab, and a chance at the weekly featured rotation. Separate from general server-join discoverability.'**
+  /// **'Lists this server\'s store in the Koda Marketplace, with a chance at the weekly featured rotation. This is about shopping, not finding servers to join -- it has no effect on general server search.'**
   String get serverListInMarketplaceDescription;
 
   /// No description provided for @serverSocialLinkLabel.
@@ -4451,6 +4481,66 @@ abstract class AppLocalizations {
   /// **'View'**
   String get printfulMerchViewButton;
 
+  /// No description provided for @printfulMerchPayoutTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Payout to: {username}'**
+  String printfulMerchPayoutTo(String username);
+
+  /// No description provided for @printfulMerchPayoutToYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Payout to: you'**
+  String get printfulMerchPayoutToYou;
+
+  /// No description provided for @printfulMerchPayoutChangeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get printfulMerchPayoutChangeButton;
+
+  /// No description provided for @printfulMerchPayoutDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payout Recipient'**
+  String get printfulMerchPayoutDialogTitle;
+
+  /// No description provided for @printfulMerchPayoutDialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Route this item\'s share of order proceeds to another user instead of yourself -- they\'ll need their own Stripe account connected and onboarded before anyone can buy it.'**
+  String get printfulMerchPayoutDialogBody;
+
+  /// No description provided for @printfulMerchPayoutUsernameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get printfulMerchPayoutUsernameHint;
+
+  /// No description provided for @printfulMerchPayoutLookupButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Look Up'**
+  String get printfulMerchPayoutLookupButton;
+
+  /// No description provided for @printfulMerchPayoutUserNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No user found with that username.'**
+  String get printfulMerchPayoutUserNotFound;
+
+  /// No description provided for @printfulMerchPayoutResolvedAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Found: {username}'**
+  String printfulMerchPayoutResolvedAs(String username);
+
+  /// No description provided for @printfulMerchPayoutResetButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to Me'**
+  String get printfulMerchPayoutResetButton;
+
   /// No description provided for @printfulMerchCartTooltip.
   ///
   /// In en, this message translates to:
@@ -4865,6 +4955,18 @@ abstract class AppLocalizations {
   /// **'ALL LISTED SERVERS'**
   String get kodaMarketplaceAllListedServersHeader;
 
+  /// No description provided for @kodaMarketplaceFeaturedItemsHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'FEATURED ITEMS'**
+  String get kodaMarketplaceFeaturedItemsHeader;
+
+  /// No description provided for @kodaMarketplaceAllItemsHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'ALL ITEMS'**
+  String get kodaMarketplaceAllItemsHeader;
+
   /// No description provided for @kodaMarketplaceServerFallback.
   ///
   /// In en, this message translates to:
@@ -4876,6 +4978,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, one{{count} member} other{{count} members}}'**
   String kodaMarketplaceMemberCount(int count);
+
+  /// No description provided for @kodaMarketplaceVisitStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit Store'**
+  String get kodaMarketplaceVisitStore;
 
   /// No description provided for @calendarFallbackTitle.
   ///
@@ -6012,6 +6120,12 @@ abstract class AppLocalizations {
   /// **'Channel name'**
   String get channelEditDialogNameHint;
 
+  /// No description provided for @channelEditDialogDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Topic (optional)'**
+  String get channelEditDialogDescriptionHint;
+
   /// No description provided for @channelEditDialogTypeLabel.
   ///
   /// In en, this message translates to:
@@ -6089,6 +6203,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notify these roles when posted (optional)'**
   String get channelEditDialogNotifyRolesLabel;
+
+  /// No description provided for @channelEditDialogSlowmodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Slowmode'**
+  String get channelEditDialogSlowmodeLabel;
+
+  /// No description provided for @channelEditDialogSlowmodeOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get channelEditDialogSlowmodeOff;
+
+  /// No description provided for @channelEditDialogUserLimitLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'User Limit'**
+  String get channelEditDialogUserLimitLabel;
+
+  /// No description provided for @channelEditDialogUserLimitOff.
+  ///
+  /// In en, this message translates to:
+  /// **'No limit'**
+  String get channelEditDialogUserLimitOff;
 
   /// No description provided for @channelEditDialogCategoryLabel.
   ///

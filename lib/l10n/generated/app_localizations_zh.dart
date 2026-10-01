@@ -303,6 +303,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsStatusLabel => '状态';
 
   @override
+  String get settingsCustomStatusLabel => '自定义状态';
+
+  @override
+  String get settingsCustomStatusHint => '你在想什么？';
+
+  @override
   String get statusOnline => '在线';
 
   @override
@@ -528,6 +534,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeCouldNotConnectVoice => '无法连接语音。';
+
+  @override
+  String get homeVoiceChannelFull => '该语音频道已满。';
 
   @override
   String get homeCreateServer => '创建服务器';
@@ -794,6 +803,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeAttachmentFallback => '附件';
 
   @override
+  String get homeAttachmentUploadFailed => '附件上传失败。';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return '已保存 $fileName';
+  }
+
+  @override
   String serverConnectError(String service) {
     return '无法开始连接 $service。';
   }
@@ -1004,7 +1021,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      '将此服务器纳入全平台的“发现”标签页，并有机会入选每周精选轮播。这与常规的服务器可发现性设置是分开的。';
+      '将此服务器的商店列入 Koda 市场，并有机会进入每周精选轮换。这关乎购物，与寻找要加入的服务器无关——不会影响常规服务器搜索。';
 
   @override
   String get serverSocialLinkLabel => '社交/邀请链接（可选）';
@@ -2413,6 +2430,41 @@ class AppLocalizationsZh extends AppLocalizations {
   String get printfulMerchViewButton => '查看';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return '付款给：$username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => '付款给：你';
+
+  @override
+  String get printfulMerchPayoutChangeButton => '更改';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => '收款人';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      '将此商品订单收益的份额分配给其他用户，而不是你自己——在有人购买之前，对方需要连接自己的 Stripe 账户并完成入驻流程。';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => '用户名';
+
+  @override
+  String get printfulMerchPayoutLookupButton => '查找';
+
+  @override
+  String get printfulMerchPayoutUserNotFound => '未找到该用户名对应的用户。';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return '已找到：$username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => '重置为我';
+
+  @override
   String get printfulMerchCartTooltip => '购物车';
 
   @override
@@ -2651,6 +2703,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get kodaMarketplaceAllListedServersHeader => '所有已上架服务器';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => '精选商品';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => '所有商品';
+
+  @override
   String get kodaMarketplaceServerFallback => '服务器';
 
   @override
@@ -2662,6 +2720,9 @@ class AppLocalizationsZh extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => '访问商店';
 
   @override
   String get calendarFallbackTitle => '日历';
@@ -3323,6 +3384,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get channelEditDialogNameHint => '频道名称';
 
   @override
+  String get channelEditDialogDescriptionHint => '主题（可选）';
+
+  @override
   String get channelEditDialogTypeLabel => '类型';
 
   @override
@@ -3361,6 +3425,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get channelEditDialogNotifyRolesLabel => '发布时通知这些身份组（可选）';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => '慢速模式';
+
+  @override
+  String get channelEditDialogSlowmodeOff => '关闭';
+
+  @override
+  String get channelEditDialogUserLimitLabel => '用户上限';
+
+  @override
+  String get channelEditDialogUserLimitOff => '无限制';
 
   @override
   String get channelEditDialogCategoryLabel => '分类';
@@ -4472,6 +4548,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get settingsStatusLabel => '狀態';
 
   @override
+  String get settingsCustomStatusLabel => '自訂狀態';
+
+  @override
+  String get settingsCustomStatusHint => '你在想什麼？';
+
+  @override
   String get statusOnline => '上線';
 
   @override
@@ -4697,6 +4779,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get homeCouldNotConnectVoice => '無法連線至語音。';
+
+  @override
+  String get homeVoiceChannelFull => '此語音頻道已滿。';
 
   @override
   String get homeCreateServer => '建立伺服器';
@@ -4963,6 +5048,14 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get homeAttachmentFallback => '附件';
 
   @override
+  String get homeAttachmentUploadFailed => '附件上傳失敗。';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return '已儲存 $fileName';
+  }
+
+  @override
   String serverConnectError(String service) {
     return '無法開始連結 $service。';
   }
@@ -5173,7 +5266,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get serverListInMarketplaceDescription =>
-      '將此伺服器納入全平台的「探索」分頁，並有機會入選每週精選輪播。此設定與一般的伺服器加入可見度是分開的。';
+      '將此伺服器的商店列入 Koda 市集，並有機會進入每週精選輪播。這與購物有關，與尋找要加入的伺服器無關——不會影響一般伺服器搜尋。';
 
   @override
   String get serverSocialLinkLabel => '社群／邀請連結（選填）';
@@ -6584,6 +6677,41 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get printfulMerchViewButton => '查看';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return '付款給：$username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => '付款給：你';
+
+  @override
+  String get printfulMerchPayoutChangeButton => '更改';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => '收款人';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      '將此商品訂單收益的份額分配給其他使用者，而不是你自己——在有人購買之前，對方需要連接自己的 Stripe 帳戶並完成入駐流程。';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => '使用者名稱';
+
+  @override
+  String get printfulMerchPayoutLookupButton => '查找';
+
+  @override
+  String get printfulMerchPayoutUserNotFound => '找不到該使用者名稱對應的使用者。';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return '已找到：$username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => '重設為我';
+
+  @override
   String get printfulMerchCartTooltip => '購物車';
 
   @override
@@ -6822,6 +6950,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get kodaMarketplaceAllListedServersHeader => '所有已上架伺服器';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => '精選商品';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => '所有商品';
+
+  @override
   String get kodaMarketplaceServerFallback => '伺服器';
 
   @override
@@ -6833,6 +6967,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => '造訪商店';
 
   @override
   String get calendarFallbackTitle => '行事曆';
@@ -7494,6 +7631,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get channelEditDialogNameHint => '頻道名稱';
 
   @override
+  String get channelEditDialogDescriptionHint => '主題（選填）';
+
+  @override
   String get channelEditDialogTypeLabel => '類型';
 
   @override
@@ -7532,6 +7672,18 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get channelEditDialogNotifyRolesLabel => '發文時通知這些身分組（選填）';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => '慢速模式';
+
+  @override
+  String get channelEditDialogSlowmodeOff => '關閉';
+
+  @override
+  String get channelEditDialogUserLimitLabel => '使用者上限';
+
+  @override
+  String get channelEditDialogUserLimitOff => '無限制';
 
   @override
   String get channelEditDialogCategoryLabel => '分類';

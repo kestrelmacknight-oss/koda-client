@@ -38,9 +38,15 @@ import '../dm/dm_screen.dart';
 import '../../core/socket.dart';
 import '../../core/link_preview.dart';
 import '../../core/message_utils.dart';
+import '../../core/presence_provider.dart';
 import '../../core/secure_storage.dart';
+import '../../core/crypto/attachment_crypto.dart';
+import '../../core/crypto/channel_attachments.dart';
 import '../../core/crypto/channel_key_manager.dart';
 import '../../core/time_utils.dart';
+import '../../shared/encrypted_attachment_view.dart';
+import '../../shared/presence_status.dart';
+import '../../shared/slowmode.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 import '../gallery/gallery_screen.dart';
 import '../stage/stage_screen.dart';
@@ -91,7 +97,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   final _messageController = TextEditingController();
   final _scroll = ScrollController();
   Map<String, dynamic>? _replyingTo;
-  Map<String, String>? _pendingAttachment; // {url, contentType, fileName}
+  // Exactly one of these is non-null at a time. A real file upload is
+  // encrypted client-side (see core/crypto/attachment_crypto.dart) and
+  // embedded in the message's own encrypted content -- a GIF is a public
+  // CDN reference with nothing to encrypt, so it keeps using the legacy
+  // plaintext attachment_url/attachment_content_type fields.
+  EncryptedAttachmentMeta? _pendingFileAttachment;
+  Map<String, String>? _pendingGifAttachment; // {url, contentType, fileName}
+  String? get _pendingAttachmentFileName =>
+      _pendingFileAttachment?.fileName ?? _pendingGifAttachment?['fileName'];
+  bool get _hasPendingAttachment =>
+      _pendingFileAttachment != null || _pendingGifAttachment != null;
+  void _clearPendingAttachment() {
+    _pendingFileAttachment = null;
+    _pendingGifAttachment = null;
+  }
   bool _uploadingAttachment = false;
   bool _showMemberPanel = true;
   final Set<String> _expandedThreads = {};
@@ -359,6 +379,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 channelId: (_channelUnread[channelId] ?? 0) + 1,
               });
         }
+      } else if (msg.event == const PhoenixChannelEvent.custom('presence_update')) {
+        // A fellow server member or friend changed their status/
+        // custom_status (see Koda.Auth.broadcast_presence_update/1) --
+        // patch the live overlay so the member list/DM list/profile
+        // popover pick it up without a refetch.
+        final payload = msg.payload as Map<String, dynamic>?;
+        final userId = payload?['user_id'] as String?;
+        if (userId != null) {
+          ref.read(presenceOverridesProvider.notifier).patch(userId,
+              status: payload?['status'] as String?,
+              customStatus: payload?['custom_status'] as String?);
+        }
       }
     });
   }
@@ -400,6 +432,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         return Icons.alternate_email;
       case 'dm_message':
         return Icons.mail_outline;
+      case 'friend_request':
+        return Icons.person_add_outlined;
       default:
         return Icons.notifications_none;
     }
@@ -796,8 +830,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   // instead, since an encrypted message's content isn't something the
   // server can read. Role matches take priority over username matches
   // for the same token, same as the old server-side behavior.
-  ({bool everyone, List<String> userIds, List<String> roleIds}) _resolveMentions(String text) {
+  ({bool everyone, bool here, List<String> userIds, List<String> roleIds}) _resolveMentions(String text) {
     final everyone = text.contains('@everyone') && _can('mention_everyone');
+    final here = text.contains('@here') && _can('mention_everyone');
     final tokens = RegExp(r'@([A-Za-z0-9_]+)')
         .allMatches(text)
         .map((m) => m.group(1)!)
@@ -821,16 +856,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       final userId = member?['user_id'] as String?;
       if (userId != null) userIds.add(userId);
     }
-    return (everyone: everyone, userIds: userIds.toList(), roleIds: roleIds.toList());
+    return (everyone: everyone, here: here, userIds: userIds.toList(), roleIds: roleIds.toList());
   }
 
   Future<void> _sendMessage() async {
     final channel = ref.read(selectedChannelProvider);
     final text = _messageController.text.trim();
-    final attachment = _pendingAttachment;
-    if (channel == null || (text.isEmpty && attachment == null)) return;
+    final fileAttachment = _pendingFileAttachment;
+    final gifAttachment = _pendingGifAttachment;
+    if (channel == null || (text.isEmpty && fileAttachment == null && gifAttachment == null)) {
+      return;
+    }
     final replyToId = _replyingTo?['id'] as String?;
-    setState(() { _replyingTo = null; _pendingAttachment = null; });
+    setState(() { _replyingTo = null; _clearPendingAttachment(); });
     _messageController.clear();
 
     final channelId = channel['id'] as String;
@@ -841,9 +879,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     // per-channel key (see lib/core/crypto/channel_key_manager.dart) --
     // this bootstraps/rotates/distributes that key as needed and only
     // returns null if the channel genuinely isn't ready yet (e.g. still
-    // waiting on another member's device to deliver the current key).
+    // waiting on another member's device to deliver the current key). A
+    // real file attachment's key/nonce/content-type ride inside this
+    // same encrypted payload (see core/crypto/channel_attachments.dart)
+    // rather than as a server-visible field -- a GIF has nothing to
+    // encrypt (it's a public CDN reference) and keeps using the legacy
+    // plaintext attachment fields below.
+    final payload = encodeChannelPayload(text, attachment: fileAttachment);
     final encrypted = await ChannelKeyManager.instance
-        .encryptForChannel(channelId, text, myUserId: myUserId);
+        .encryptForChannel(channelId, payload, myUserId: myUserId);
     if (encrypted == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
@@ -861,13 +905,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         mentionedUserIds: mentions.userIds,
         mentionedRoleIds: mentions.roleIds,
         mentionEveryone: mentions.everyone,
-        attachmentUrl: attachment?['url'],
-        attachmentContentType: attachment?['contentType']);
+        mentionHere: mentions.here,
+        attachmentUrl: gifAttachment?['url'],
+        attachmentContentType: gifAttachment?['contentType']);
     final msg = result.data;
     if (msg != null && mounted) {
-      await SecureStorage.cacheDecryptedContent(msg['id'] as String, text);
+      await SecureStorage.cacheDecryptedContent(msg['id'] as String, payload);
       final lang = detectMessageLanguage(text);
       setState(() => _messages.add({...msg, 'content': text,
+          if (fileAttachment != null) '_attachment': fileAttachment,
           if (lang != null) '_detectedLang': lang}));
       Future.delayed(const Duration(milliseconds: 50), () {
         if (_scroll.hasClients) {
@@ -917,6 +963,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     'wav': 'audio/wav', 'pdf': 'application/pdf',
   };
 
+  // Mirrors KodaUploader's own default -- kept client-side because
+  // encryptAndUploadAttachment (unlike KodaUploader.upload) has no
+  // built-in size check of its own, and there's no reason to lose the
+  // existing friendly limit just because the bytes go through the
+  // encrypt-in-memory path now.
+  static const _maxAttachmentBytes = 8 * 1024 * 1024;
+
   Future<void> _pickAttachment() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -929,17 +982,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     final fileName = result.files.single.name;
 
     setState(() => _uploadingAttachment = true);
+    final t = AppLocalizations.of(context);
     try {
-      final uploaded = await KodaUploader.instance.upload(
-        file: File(path), uploadType: 'attachment', contentType: contentType);
-      if (mounted) {
-        setState(() {
-          _pendingAttachment = {
-            'url': uploaded.cdnUrl, 'contentType': contentType, 'fileName': fileName,
-          };
-          _uploadingAttachment = false;
-        });
+      final file = File(path);
+      if (await file.length() > _maxAttachmentBytes) {
+        final maxMb = (_maxAttachmentBytes / (1024 * 1024)).round();
+        throw UploadException('File is too large. Maximum size is ${maxMb}MB.');
       }
+      final bytes = await file.readAsBytes();
+      final meta = await encryptAndUploadAttachment(
+          bytes: bytes, contentType: contentType, fileName: fileName);
+      if (!mounted) return;
+      if (meta == null) {
+        setState(() => _uploadingAttachment = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(t.homeAttachmentUploadFailed)));
+        return;
+      }
+      setState(() {
+        _pendingFileAttachment = meta;
+        _uploadingAttachment = false;
+      });
     } on UploadException catch (e) {
       if (mounted) {
         setState(() => _uploadingAttachment = false);
@@ -955,7 +1018,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     );
     final url = gif?['url'] as String?;
     if (url == null || !mounted) return;
-    setState(() => _pendingAttachment = {
+    setState(() => _pendingGifAttachment = {
       'url': url, 'contentType': 'image/gif', 'fileName': gif?['title'] as String? ?? 'GIF',
     });
     await _sendMessage();
@@ -983,15 +1046,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     final result = await KodaApi.instance.getVoiceToken(channel['id']);
     if (!mounted) return;
     final t = AppLocalizations.of(context);
-    if (result == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(t.homeCouldNotConnectVoice)));
+    if (result.data == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+          result.errorCode == 'channel_full' ? t.homeVoiceChannelFull : t.homeCouldNotConnectVoice)));
       return;
     }
     final serverId = ref.read(selectedServerProvider)?['id'] as String? ?? '';
     final ok = await ref.read(voiceSessionProvider.notifier).join(
-      url:         result['url'] as String,
-      token:       result['token'] as String,
+      url:         result.data!['url'] as String,
+      token:       result.data!['token'] as String,
       channelId:   channel['id'] as String,
       channelName: channel['name'] as String,
       serverId:    serverId,
@@ -1134,10 +1197,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           TextButton(
             onPressed: () async {
               final raw = ctrl.text.trim();
-              // Extract code from URL if pasted as full URL
-              final code = raw.contains('/invite/')
+              // Extract the code from a full URL if pasted as one
+              // (legacy/future-proofing -- invites aren't URLs today,
+              // see invite_controller.ex's invite_json/1), then strip
+              // the leading "#" Koda's own invite display uses (e.g.
+              // "#XK9MP2") so pasting exactly what was shown works too.
+              var code = raw.contains('/invite/')
                   ? raw.split('/invite/').last.trim()
-                  : raw.toUpperCase();
+                  : raw;
+              if (code.startsWith('#')) code = code.substring(1);
+              code = code.toUpperCase();
               if (code.isEmpty) return;
               Navigator.pop(context);
               final result = await KodaApi.instance.redeemInvite(code);
@@ -1204,12 +1273,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     final t = AppLocalizations.of(context);
     final username = author['username'] as String? ?? t.dmUnknownUser;
     final avatarUrl = author['avatar_url'] as String?;
+    final baseStatus = author['status'] as String?;
+    final baseCustomStatus = author['custom_status'] as String?;
 
     // Check friendship status
-    final status = await KodaApi.instance.getFriendStatus(userId);
+    final friendStatus = await KodaApi.instance.getFriendStatus(userId);
     if (!context.mounted) return;
-    final isFriend = status?['friends'] == true;
-    final canDm = status?['can_dm'] == true;
+    final isFriend = friendStatus?['friends'] == true;
+    final canDm = friendStatus?['can_dm'] == true;
 
     showDialog(
       context: context,
@@ -1218,7 +1289,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         content: SizedBox(
           width: 280,
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            KodaAvatar(username: username, size: 64, avatarUrl: avatarUrl),
+            Consumer(builder: (context, ref, _) {
+              // No real per-connection presence signal is available from
+              // here (this popover can be opened from a message author or
+              // a member row, not a dedicated presence fetch) -- the
+              // self-reported status (live-overlaid) is shown as-is, same
+              // as the DM list.
+              final override = ref.watch(presenceOverridesProvider)[userId];
+              final presenceStatus = override?.status ?? baseStatus ?? 'offline';
+              final customStatus = override?.customStatus ?? baseCustomStatus;
+              return Column(children: [
+                Stack(clipBehavior: Clip.none, children: [
+                  KodaAvatar(username: username, size: 64, avatarUrl: avatarUrl),
+                  Positioned(
+                    bottom: 2, right: 2,
+                    child: Container(
+                      width: 16, height: 16,
+                      decoration: BoxDecoration(
+                        color: statusColor(presenceStatus),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: KodaColors.card, width: 2),
+                      ),
+                    ),
+                  ),
+                ]),
+                if (customStatus != null && customStatus.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(customStatus,
+                      style: TextStyle(color: KodaColors.text3, fontSize: 12),
+                      textAlign: TextAlign.center),
+                ],
+              ]);
+            }),
             const SizedBox(height: 12),
             Text(withPronouns(username, author), style: TextStyle(color: KodaColors.text1,
                 fontSize: 18, fontWeight: FontWeight.w700)),
@@ -1832,6 +1934,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   }
 
   Widget _buildAttachment(Map<String, dynamic> m) {
+    final attachment = m['_attachment'];
+    if (attachment is EncryptedAttachmentMeta) {
+      return EncryptedAttachmentView(meta: attachment);
+    }
+
     final url = m['attachment_url'] as String? ?? '';
     final contentType = m['attachment_content_type'] as String? ?? '';
     final fileName = url.split('/').last;
@@ -2049,6 +2156,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           : (isThread ? Icons.forum_outlined : Icons.tag),
     };
     final occupants = isVoice ? (_voiceOccupants[c['id']] ?? const []) : const [];
+    final userLimit = (c['user_limit'] as num?)?.toInt() ?? 0;
     final labelSetting = _labelSettingFor(c);
     final hasMention = _channelsWithMentions.contains(c['id']);
     final tile = GestureDetector(
@@ -2098,6 +2206,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                         fontSize: 10, fontWeight: FontWeight.w700)),
               ),
             ),
+          if (isVoice && userLimit > 0) ...[
+            Text('${occupants.length}/$userLimit',
+                style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+            const SizedBox(width: 4),
+          ],
           if (isVoice)
             IconButton(
               icon: Icon(Icons.chat_bubble_outline, size: 14, color: KodaColors.text3),
@@ -2278,6 +2391,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               child: Icon(Icons.campaign_outlined, size: 14, color: KodaColors.gold),
             ),
           ],
+          if ((selectedChannel['description'] as String? ?? '').isNotEmpty) ...[
+            const SizedBox(width: 8),
+            Container(width: 1, height: 16, color: KodaColors.border),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Tooltip(
+                message: selectedChannel['description'] as String,
+                child: Text(selectedChannel['description'] as String,
+                    style: TextStyle(color: KodaColors.text3, fontSize: 12),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1),
+              ),
+            ),
+          ],
+          if ((selectedChannel['slowmode_seconds'] as num? ?? 0) > 0) ...[
+            const SizedBox(width: 8),
+            Container(width: 1, height: 16, color: KodaColors.border),
+            const SizedBox(width: 8),
+            Tooltip(
+              message: t.channelEditDialogSlowmodeLabel,
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.hourglass_bottom, size: 12, color: KodaColors.text3),
+                const SizedBox(width: 3),
+                Text(
+                    formatSlowmode(
+                        (selectedChannel['slowmode_seconds'] as num).toInt(), t),
+                    style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+              ]),
+            ),
+          ],
           const Spacer(),
           IconButton(
             icon: Icon(Icons.search, color: KodaColors.text3, size: 18),
@@ -2415,7 +2558,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                       Text.rich(TextSpan(children: renderMessageWithEmoji(
                           m['content'] as String, _currentServerEmoji(),
                           TextStyle(color: KodaColors.text1, fontSize: 14)))),
-                    if (m['attachment_url'] != null) ...[
+                    if (m['_attachment'] != null || m['attachment_url'] != null) ...[
                       const SizedBox(height: 4),
                       _buildAttachment(m),
                     ],
@@ -2466,7 +2609,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             ),
           ]),
         ),
-      if (_pendingAttachment != null)
+      if (_hasPendingAttachment)
         Container(
           color: KodaColors.elevated,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -2474,14 +2617,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             Icon(Icons.attach_file, size: 14, color: KodaColors.koda),
             const SizedBox(width: 6),
             Expanded(
-              child: Text(_pendingAttachment!['fileName'] ?? t.homeAttachmentFallback,
+              child: Text(_pendingAttachmentFileName ?? t.homeAttachmentFallback,
                   style: TextStyle(color: KodaColors.text3, fontSize: 12),
                   overflow: TextOverflow.ellipsis),
             ),
             IconButton(
               icon: Icon(Icons.close, size: 14, color: KodaColors.text3),
               tooltip: t.homeRemoveAttachmentTooltip,
-              onPressed: () => setState(() => _pendingAttachment = null),
+              onPressed: () => setState(() => _clearPendingAttachment()),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
             ),
@@ -2582,15 +2725,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
 
     final messageId = message['id'] as String? ?? '';
     final epoch = message['epoch'] as int?;
+    final existingAttachment = message['_attachment'];
+    // A message's attachment (if any) is embedded in the same encrypted
+    // payload as its text (see core/crypto/channel_attachments.dart) --
+    // re-encrypting must carry it forward, or an otherwise-ordinary text
+    // edit would silently strip the attachment.
+    final payload = encodeChannelPayload(content,
+        attachment: existingAttachment is EncryptedAttachmentMeta ? existingAttachment : null);
     String? nonce;
-    String newContent = content;
+    String newContent = payload;
 
     if (epoch != null) {
       // Re-encrypt under the epoch this message was originally sent
       // with -- not necessarily the channel's current epoch, since a
       // message's readability shouldn't shift out from under an edit
       // (see ChannelKeyManager.encryptForEpoch).
-      final encrypted = await ChannelKeyManager.instance.encryptForEpoch(channelId, epoch, content);
+      final encrypted = await ChannelKeyManager.instance.encryptForEpoch(channelId, epoch, payload);
       if (encrypted == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
@@ -2604,7 +2754,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
 
     final updated = await KodaApi.instance.editMessage(channelId, messageId, newContent, nonce: nonce);
     if (updated != null && mounted) {
-      await SecureStorage.cacheDecryptedContent(messageId, content);
+      await SecureStorage.cacheDecryptedContent(messageId, payload);
       setState(() {
         message['content'] = content;
         message['nonce'] = updated['nonce'];
@@ -3003,6 +3153,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   'id': member['user_id'],
                   'username': member['username'],
                   'avatar_url': member['avatar_url'],
+                  'status': member['status'],
+                  'custom_status': member['custom_status'],
                 }),
               )),
           ])),  // closes content Row

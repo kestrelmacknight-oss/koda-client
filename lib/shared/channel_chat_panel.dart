@@ -36,7 +36,10 @@ import '../core/socket.dart';
 import '../core/link_preview.dart';
 import '../core/message_utils.dart';
 import '../core/secure_storage.dart';
+import '../core/crypto/attachment_crypto.dart';
+import '../core/crypto/channel_attachments.dart';
 import '../core/crypto/channel_key_manager.dart';
+import 'encrypted_attachment_view.dart';
 import 'widgets.dart';
 import 'custom_emoji.dart';
 import 'pronoun_label.dart';
@@ -66,7 +69,21 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
   List<Map<String, dynamic>> _members = [];
   List<Map<String, dynamic>> _roles = [];
   Map<String, dynamic>? _replyingTo;
-  Map<String, dynamic>? _pendingAttachment;
+  // Exactly one of these is non-null at a time. A real file upload is
+  // encrypted client-side (see core/crypto/attachment_crypto.dart) and
+  // embedded in the message's own encrypted content -- a GIF is a public
+  // CDN reference with nothing to encrypt, so it keeps using the legacy
+  // plaintext attachment_url/attachment_content_type fields.
+  EncryptedAttachmentMeta? _pendingFileAttachment;
+  Map<String, String>? _pendingGifAttachment; // {url, contentType, fileName}
+  String? get _pendingAttachmentFileName =>
+      _pendingFileAttachment?.fileName ?? _pendingGifAttachment?['fileName'];
+  bool get _hasPendingAttachment =>
+      _pendingFileAttachment != null || _pendingGifAttachment != null;
+  void _clearPendingAttachment() {
+    _pendingFileAttachment = null;
+    _pendingGifAttachment = null;
+  }
   bool _uploadingAttachment = false;
   bool _loading = true;
   final _messageController = TextEditingController();
@@ -194,8 +211,9 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
     });
   }
 
-  ({bool everyone, List<String> userIds, List<String> roleIds}) _resolveMentions(String text) {
+  ({bool everyone, bool here, List<String> userIds, List<String> roleIds}) _resolveMentions(String text) {
     final everyone = text.contains('@everyone');
+    final here = text.contains('@here');
     final tokens = RegExp(r'@([A-Za-z0-9_]+)')
         .allMatches(text)
         .map((m) => m.group(1)!)
@@ -219,23 +237,30 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
       final userId = member?['user_id'] as String?;
       if (userId != null) userIds.add(userId);
     }
-    return (everyone: everyone, userIds: userIds.toList(), roleIds: roleIds.toList());
+    return (everyone: everyone, here: here, userIds: userIds.toList(), roleIds: roleIds.toList());
   }
 
   Future<void> _sendMessage() async {
     final channelId = widget.channelId;
     final text = _messageController.text.trim();
-    final attachment = _pendingAttachment;
-    if (text.isEmpty && attachment == null) return;
+    final fileAttachment = _pendingFileAttachment;
+    final gifAttachment = _pendingGifAttachment;
+    if (text.isEmpty && fileAttachment == null && gifAttachment == null) return;
     final replyToId = _replyingTo?['id'] as String?;
-    setState(() { _replyingTo = null; _pendingAttachment = null; });
+    setState(() { _replyingTo = null; _clearPendingAttachment(); });
     _messageController.clear();
 
     final myUserId = ref.read(authProvider).user?.id;
     if (myUserId == null) return;
 
+    // A real file attachment's key/nonce/content-type ride inside this
+    // same encrypted payload (see core/crypto/channel_attachments.dart)
+    // rather than as a server-visible field -- a GIF has nothing to
+    // encrypt (it's a public CDN reference) and keeps using the legacy
+    // plaintext attachment fields below.
+    final payload = encodeChannelPayload(text, attachment: fileAttachment);
     final encrypted = await ChannelKeyManager.instance
-        .encryptForChannel(channelId, text, myUserId: myUserId);
+        .encryptForChannel(channelId, payload, myUserId: myUserId);
     if (encrypted == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
@@ -253,13 +278,15 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
         mentionedUserIds: mentions.userIds,
         mentionedRoleIds: mentions.roleIds,
         mentionEveryone: mentions.everyone,
-        attachmentUrl: attachment?['url'],
-        attachmentContentType: attachment?['contentType']);
+        mentionHere: mentions.here,
+        attachmentUrl: gifAttachment?['url'],
+        attachmentContentType: gifAttachment?['contentType']);
     final msg = result.data;
     if (msg != null && mounted) {
-      await SecureStorage.cacheDecryptedContent(msg['id'] as String, text);
+      await SecureStorage.cacheDecryptedContent(msg['id'] as String, payload);
       final lang = detectMessageLanguage(text);
       setState(() => _messages.add({...msg, 'content': text,
+          if (fileAttachment != null) '_attachment': fileAttachment,
           if (lang != null) '_detectedLang': lang}));
       Future.delayed(const Duration(milliseconds: 50), () {
         if (_scroll.hasClients) {
@@ -304,6 +331,13 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
     'wav': 'audio/wav', 'pdf': 'application/pdf',
   };
 
+  // Mirrors KodaUploader's own default -- kept client-side because
+  // encryptAndUploadAttachment (unlike KodaUploader.upload) has no
+  // built-in size check of its own, and there's no reason to lose the
+  // existing friendly limit just because the bytes go through the
+  // encrypt-in-memory path now.
+  static const _maxAttachmentBytes = 8 * 1024 * 1024;
+
   Future<void> _pickAttachment() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -316,17 +350,27 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
     final fileName = result.files.single.name;
 
     setState(() => _uploadingAttachment = true);
+    final t = AppLocalizations.of(context);
     try {
-      final uploaded = await KodaUploader.instance.upload(
-        file: File(path), uploadType: 'attachment', contentType: contentType);
-      if (mounted) {
-        setState(() {
-          _pendingAttachment = {
-            'url': uploaded.cdnUrl, 'contentType': contentType, 'fileName': fileName,
-          };
-          _uploadingAttachment = false;
-        });
+      final file = File(path);
+      if (await file.length() > _maxAttachmentBytes) {
+        final maxMb = (_maxAttachmentBytes / (1024 * 1024)).round();
+        throw UploadException('File is too large. Maximum size is ${maxMb}MB.');
       }
+      final bytes = await file.readAsBytes();
+      final meta = await encryptAndUploadAttachment(
+          bytes: bytes, contentType: contentType, fileName: fileName);
+      if (!mounted) return;
+      if (meta == null) {
+        setState(() => _uploadingAttachment = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(t.homeAttachmentUploadFailed)));
+        return;
+      }
+      setState(() {
+        _pendingFileAttachment = meta;
+        _uploadingAttachment = false;
+      });
     } on UploadException catch (e) {
       if (mounted) {
         setState(() => _uploadingAttachment = false);
@@ -342,7 +386,7 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
     );
     final url = gif?['url'] as String?;
     if (url == null || !mounted) return;
-    setState(() => _pendingAttachment = {
+    setState(() => _pendingGifAttachment = {
       'url': url, 'contentType': 'image/gif', 'fileName': gif?['title'] as String? ?? 'GIF',
     });
     await _sendMessage();
@@ -369,14 +413,21 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
 
     final messageId = message['id'] as String? ?? '';
     final epoch = message['epoch'] as int?;
+    final existingAttachment = message['_attachment'];
+    // A message's attachment (if any) is embedded in the same encrypted
+    // payload as its text (see core/crypto/channel_attachments.dart) --
+    // re-encrypting must carry it forward, or an otherwise-ordinary text
+    // edit would silently strip the attachment.
+    final payload = encodeChannelPayload(content,
+        attachment: existingAttachment is EncryptedAttachmentMeta ? existingAttachment : null);
     String? nonce;
-    String newContent = content;
+    String newContent = payload;
 
     if (epoch != null) {
       // Re-encrypt under the epoch this message was originally sent
       // with -- not necessarily the channel's current epoch, since a
       // message's readability shouldn't shift out from under an edit.
-      final encrypted = await ChannelKeyManager.instance.encryptForEpoch(channelId, epoch, content);
+      final encrypted = await ChannelKeyManager.instance.encryptForEpoch(channelId, epoch, payload);
       if (encrypted == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
@@ -390,7 +441,7 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
 
     final updated = await KodaApi.instance.editMessage(channelId, messageId, newContent, nonce: nonce);
     if (updated != null && mounted) {
-      await SecureStorage.cacheDecryptedContent(messageId, content);
+      await SecureStorage.cacheDecryptedContent(messageId, payload);
       setState(() {
         message['content'] = content;
         message['nonce'] = updated['nonce'];
@@ -585,6 +636,11 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
   }
 
   Widget _buildAttachment(Map<String, dynamic> m) {
+    final attachment = m['_attachment'];
+    if (attachment is EncryptedAttachmentMeta) {
+      return EncryptedAttachmentView(meta: attachment);
+    }
+
     final url = m['attachment_url'] as String? ?? '';
     final contentType = m['attachment_content_type'] as String? ?? '';
     final fileName = url.split('/').last;
@@ -869,7 +925,7 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
                             Text.rich(TextSpan(children: renderMessageWithEmoji(
                                 m['content'] as String, _serverEmoji(),
                                 TextStyle(color: KodaColors.text1, fontSize: 13)))),
-                          if (m['attachment_url'] != null) ...[
+                          if (m['_attachment'] != null || m['attachment_url'] != null) ...[
                             const SizedBox(height: 4),
                             _buildAttachment(m),
                           ],
@@ -911,7 +967,7 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
             ),
           ]),
         ),
-      if (_pendingAttachment != null)
+      if (_hasPendingAttachment)
         Container(
           color: KodaColors.elevated,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -919,14 +975,14 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
             Icon(Icons.attach_file, size: 12, color: KodaColors.koda),
             const SizedBox(width: 6),
             Expanded(
-              child: Text(_pendingAttachment!['fileName'] ?? t.homeAttachmentFallback,
+              child: Text(_pendingAttachmentFileName ?? t.homeAttachmentFallback,
                   style: TextStyle(color: KodaColors.text3, fontSize: 11),
                   overflow: TextOverflow.ellipsis),
             ),
             IconButton(
               icon: Icon(Icons.close, size: 12, color: KodaColors.text3),
               tooltip: t.homeRemoveAttachmentTooltip,
-              onPressed: () => setState(() => _pendingAttachment = null),
+              onPressed: () => setState(() => _clearPendingAttachment()),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
             ),

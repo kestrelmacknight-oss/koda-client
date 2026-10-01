@@ -319,6 +319,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsStatusLabel => 'STAV';
 
   @override
+  String get settingsCustomStatusLabel => 'VLASTNÍ STAV';
+
+  @override
+  String get settingsCustomStatusHint => 'Co máš na mysli?';
+
+  @override
   String get statusOnline => 'Online';
 
   @override
@@ -550,6 +556,9 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get homeCouldNotConnectVoice => 'Nepodařilo se připojit k hlasu.';
+
+  @override
+  String get homeVoiceChannelFull => 'Tento hlasový kanál je plný.';
 
   @override
   String get homeCreateServer => 'Vytvořit server';
@@ -821,6 +830,14 @@ class AppLocalizationsCs extends AppLocalizations {
   String get homeAttachmentFallback => 'Příloha';
 
   @override
+  String get homeAttachmentUploadFailed => 'Nahrání přílohy se nezdařilo.';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return 'Uloženo $fileName';
+  }
+
+  @override
   String serverConnectError(String service) {
     return 'Nepodařilo se zahájit připojení $service.';
   }
@@ -1041,7 +1058,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'Zařadí tento server do celoplatformní karty Objevit a šanci na týdenní doporučenou rotaci. Odděleno od obecné dohledatelnosti pro připojení k serveru.';
+      'Zařadí obchod tohoto serveru do Koda Marketplace, se šancí na týdenní rotaci doporučených položek. Jde o nakupování, ne o hledání serverů ke vstupu -- nemá žádný vliv na obecné vyhledávání serverů.';
 
   @override
   String get serverSocialLinkLabel =>
@@ -2531,6 +2548,42 @@ class AppLocalizationsCs extends AppLocalizations {
   String get printfulMerchViewButton => 'Zobrazit';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return 'Výplata pro: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => 'Výplata pro: vás';
+
+  @override
+  String get printfulMerchPayoutChangeButton => 'Změnit';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => 'Příjemce výplaty';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'Nasměrujte podíl tohoto produktu na výnosech z objednávky jinému uživateli místo sobě -- bude si muset propojit a dokončit nastavení vlastního účtu Stripe, než si ho bude moct někdo koupit.';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'Uživatelské jméno';
+
+  @override
+  String get printfulMerchPayoutLookupButton => 'Vyhledat';
+
+  @override
+  String get printfulMerchPayoutUserNotFound =>
+      'Uživatel s tímto jménem nebyl nalezen.';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return 'Nalezeno: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => 'Obnovit na mě';
+
+  @override
   String get printfulMerchCartTooltip => 'Košík';
 
   @override
@@ -2786,6 +2839,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get kodaMarketplaceAllListedServersHeader => 'VŠECHNY UVEDENÉ SERVERY';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => 'DOPORUČENÉ POLOŽKY';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'VŠECHNY POLOŽKY';
+
+  @override
   String get kodaMarketplaceServerFallback => 'Server';
 
   @override
@@ -2800,6 +2859,9 @@ class AppLocalizationsCs extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'Navštívit obchod';
 
   @override
   String get calendarFallbackTitle => 'Kalendář';
@@ -3502,6 +3564,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get channelEditDialogNameHint => 'Název kanálu';
 
   @override
+  String get channelEditDialogDescriptionHint => 'Téma (volitelné)';
+
+  @override
   String get channelEditDialogTypeLabel => 'Typ';
 
   @override
@@ -3543,6 +3608,18 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get channelEditDialogNotifyRolesLabel =>
       'Upozornit tyto role při zveřejnění (nepovinné)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'Zpomalený režim';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'Vypnuto';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'Limit uživatelů';
+
+  @override
+  String get channelEditDialogUserLimitOff => 'Bez limitu';
 
   @override
   String get channelEditDialogCategoryLabel => 'Kategorie';

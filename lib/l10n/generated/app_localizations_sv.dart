@@ -317,6 +317,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String get settingsStatusLabel => 'STATUS';
 
   @override
+  String get settingsCustomStatusLabel => 'ANPASSAD STATUS';
+
+  @override
+  String get settingsCustomStatusHint => 'Vad tänker du på?';
+
+  @override
   String get statusOnline => 'Online';
 
   @override
@@ -549,6 +555,9 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get homeCouldNotConnectVoice => 'Kunde inte ansluta till röst.';
+
+  @override
+  String get homeVoiceChannelFull => 'Den här röstkanalen är full.';
 
   @override
   String get homeCreateServer => 'Skapa server';
@@ -819,6 +828,15 @@ class AppLocalizationsSv extends AppLocalizations {
   String get homeAttachmentFallback => 'Bilaga';
 
   @override
+  String get homeAttachmentUploadFailed =>
+      'Det gick inte att ladda upp bilagan.';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return 'Sparade $fileName';
+  }
+
+  @override
   String serverConnectError(String service) {
     return 'Kunde inte starta $service-anslutningen.';
   }
@@ -1041,7 +1059,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'Tar med den här servern i den plattformsövergripande fliken Upptäck, och en chans till den veckovisa utvalda rotationen. Skilt från allmän synlighet för att gå med i servern.';
+      'Listar den här serverns butik i Koda Marketplace, med chans till den veckovisa utvalda-rotationen. Det här handlar om shopping, inte om att hitta servrar att gå med i -- det påverkar inte den allmänna serversökningen.';
 
   @override
   String get serverSocialLinkLabel => 'Social länk/inbjudningslänk (valfritt)';
@@ -2504,6 +2522,42 @@ class AppLocalizationsSv extends AppLocalizations {
   String get printfulMerchViewButton => 'Visa';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return 'Utbetalning till: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => 'Utbetalning till: dig';
+
+  @override
+  String get printfulMerchPayoutChangeButton => 'Ändra';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => 'Utbetalningsmottagare';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'Skicka den här artikelns andel av orderintäkterna till en annan användare istället för dig själv -- personen måste koppla sitt eget Stripe-konto och slutföra registreringen innan någon kan köpa den.';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'Användarnamn';
+
+  @override
+  String get printfulMerchPayoutLookupButton => 'Sök';
+
+  @override
+  String get printfulMerchPayoutUserNotFound =>
+      'Ingen användare med det namnet hittades.';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return 'Hittad: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => 'Återställ till mig';
+
+  @override
   String get printfulMerchCartTooltip => 'Varukorg';
 
   @override
@@ -2756,6 +2810,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String get kodaMarketplaceAllListedServersHeader => 'ALLA LISTADE SERVRAR';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => 'UTVALDA ARTIKLAR';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'ALLA ARTIKLAR';
+
+  @override
   String get kodaMarketplaceServerFallback => 'Server';
 
   @override
@@ -2768,6 +2828,9 @@ class AppLocalizationsSv extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'Besök butiken';
 
   @override
   String get calendarFallbackTitle => 'Kalender';
@@ -3453,6 +3516,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get channelEditDialogNameHint => 'Kanalnamn';
 
   @override
+  String get channelEditDialogDescriptionHint => 'Ämne (valfritt)';
+
+  @override
   String get channelEditDialogTypeLabel => 'Typ';
 
   @override
@@ -3494,6 +3560,18 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get channelEditDialogNotifyRolesLabel =>
       'Meddela dessa roller vid postning (valfritt)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'Långsamt läge';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'Av';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'Användargräns';
+
+  @override
+  String get channelEditDialogUserLimitOff => 'Ingen gräns';
 
   @override
   String get channelEditDialogCategoryLabel => 'Kategori';

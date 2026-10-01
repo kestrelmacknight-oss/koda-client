@@ -12,7 +12,12 @@ import '../core/api.dart';
 import '../core/theme.dart';
 import '../features/settings/content_filters_screen.dart' show kContentLabels, kContentLabelNames;
 import '../l10n/generated/app_localizations.dart';
+import 'slowmode.dart';
 import 'widgets.dart';
+
+// Discord's own voice channel user-limit presets, in participants.
+// 0 is unlimited.
+const List<int> kUserLimitPresets = [0, 2, 3, 5, 10, 15, 20, 25, 50, 99];
 
 Future<void> showChannelEditDialog(
   BuildContext context, {
@@ -24,10 +29,13 @@ Future<void> showChannelEditDialog(
   required VoidCallback onSaved,
 }) async {
   final nameController = TextEditingController(text: existing?['name'] ?? '');
+  final descriptionController = TextEditingController(text: existing?['description'] ?? '');
   String type = existing?['type'] ?? 'text';
   String? selectedCategoryId = existing?['category_id'] ?? categoryId;
   bool isReadOnly = existing?['is_read_only'] == true;
   bool liveAnnouncements = existing?['live_announcements'] == true;
+  int slowmodeSeconds = (existing?['slowmode_seconds'] as num?)?.toInt() ?? 0;
+  int userLimit = (existing?['user_limit'] as num?)?.toInt() ?? 0;
   final allowedRoleIds = List<String>.from(existing?['allowed_role_ids'] ?? []);
   final selectedRoleIds = List<String>.from(allowedRoleIds);
   final announcementRoleIds = List<String>.from(existing?['announcement_role_ids'] ?? []);
@@ -50,6 +58,11 @@ Future<void> showChannelEditDialog(
           child: SingleChildScrollView(
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               KodaTextField(controller: nameController, hintText: t.channelEditDialogNameHint, autofocus: true),
+              if (existing != null) ...[
+                const SizedBox(height: 12),
+                KodaTextField(controller: descriptionController,
+                    hintText: t.channelEditDialogDescriptionHint),
+              ],
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: type,
@@ -118,6 +131,29 @@ Future<void> showChannelEditDialog(
                     );
                   }),
                 ],
+                const SizedBox(height: 12),
+                DropdownButtonFormField<int>(
+                  initialValue: slowmodeSeconds,
+                  dropdownColor: KodaColors.card,
+                  decoration: InputDecoration(labelText: t.channelEditDialogSlowmodeLabel),
+                  items: kSlowmodePresets
+                      .map((s) => DropdownMenuItem(value: s, child: Text(formatSlowmode(s, t))))
+                      .toList(),
+                  onChanged: (v) => setDialogState(() => slowmodeSeconds = v ?? 0),
+                ),
+              ],
+              if (type == 'voice') ...[
+                const SizedBox(height: 12),
+                DropdownButtonFormField<int>(
+                  initialValue: userLimit,
+                  dropdownColor: KodaColors.card,
+                  decoration: InputDecoration(labelText: t.channelEditDialogUserLimitLabel),
+                  items: kUserLimitPresets
+                      .map((s) => DropdownMenuItem(
+                          value: s, child: Text(s == 0 ? t.channelEditDialogUserLimitOff : '$s')))
+                      .toList(),
+                  onChanged: (v) => setDialogState(() => userLimit = v ?? 0),
+                ),
               ],
               const SizedBox(height: 12),
               DropdownButtonFormField<String?>(
@@ -214,6 +250,9 @@ Future<void> showChannelEditDialog(
       'is_read_only': isReadOnly, 'content_labels': selectedLabels,
       'announcement_role_ids': announcementRoleIds,
       'live_announcements': liveAnnouncements,
+      'description': descriptionController.text.trim(),
+      'slowmode_seconds': slowmodeSeconds,
+      'user_limit': userLimit,
     });
     await KodaApi.instance.setChannelAllowedRoles(existing['id'] as String, selectedRoleIds);
   }

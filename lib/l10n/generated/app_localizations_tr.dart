@@ -319,6 +319,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsStatusLabel => 'DURUM';
 
   @override
+  String get settingsCustomStatusLabel => 'ÖZEL DURUM';
+
+  @override
+  String get settingsCustomStatusHint => 'Aklında ne var?';
+
+  @override
   String get statusOnline => 'Çevrimiçi';
 
   @override
@@ -551,6 +557,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get homeCouldNotConnectVoice => 'Sese bağlanılamadı.';
+
+  @override
+  String get homeVoiceChannelFull => 'Bu ses kanalı dolu.';
 
   @override
   String get homeCreateServer => 'Sunucu Oluştur';
@@ -819,6 +828,14 @@ class AppLocalizationsTr extends AppLocalizations {
   String get homeAttachmentFallback => 'Ek';
 
   @override
+  String get homeAttachmentUploadFailed => 'Ek yükleme başarısız oldu.';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return '$fileName kaydedildi';
+  }
+
+  @override
   String serverConnectError(String service) {
     return '$service bağlantısı başlatılamadı.';
   }
@@ -1040,7 +1057,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'Bu sunucuyu platform genelindeki Keşfet sekmesine dahil eder ve haftalık öne çıkan rotasyona girme şansı tanır. Genel sunucuya katılım keşfedilebilirliğinden ayrıdır.';
+      'Bu sunucunun mağazasını Koda Marketplace\'te listeler ve haftalık öne çıkan ürün rotasyonuna girme şansı tanır. Bu, katılınacak sunucuları bulmakla değil alışverişle ilgilidir -- genel sunucu aramasını etkilemez.';
 
   @override
   String get serverSocialLinkLabel =>
@@ -2507,6 +2524,42 @@ class AppLocalizationsTr extends AppLocalizations {
   String get printfulMerchViewButton => 'Görüntüle';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return 'Ödeme alıcısı: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => 'Ödeme alıcısı: siz';
+
+  @override
+  String get printfulMerchPayoutChangeButton => 'Değiştir';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => 'Ödeme Alıcısı';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'Bu ürünün sipariş gelirindeki payını siz yerine başka bir kullanıcıya yönlendirin -- biri satın alabilmeden önce o kişinin kendi Stripe hesabını bağlaması ve katılım sürecini tamamlaması gerekir.';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'Kullanıcı adı';
+
+  @override
+  String get printfulMerchPayoutLookupButton => 'Ara';
+
+  @override
+  String get printfulMerchPayoutUserNotFound =>
+      'Bu adla bir kullanıcı bulunamadı.';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return 'Bulundu: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => 'Bana sıfırla';
+
+  @override
   String get printfulMerchCartTooltip => 'Sepet';
 
   @override
@@ -2759,6 +2812,12 @@ class AppLocalizationsTr extends AppLocalizations {
       'TÜM LİSTELENEN SUNUCULAR';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => 'ÖNE ÇIKAN ÜRÜNLER';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'TÜM ÜRÜNLER';
+
+  @override
   String get kodaMarketplaceServerFallback => 'Sunucu';
 
   @override
@@ -2771,6 +2830,9 @@ class AppLocalizationsTr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'Mağazayı Ziyaret Et';
 
   @override
   String get calendarFallbackTitle => 'Takvim';
@@ -3460,6 +3522,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get channelEditDialogNameHint => 'Kanal adı';
 
   @override
+  String get channelEditDialogDescriptionHint => 'Konu (isteğe bağlı)';
+
+  @override
   String get channelEditDialogTypeLabel => 'Tür';
 
   @override
@@ -3501,6 +3566,18 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get channelEditDialogNotifyRolesLabel =>
       'Paylaşıldığında bu rolleri bilgilendir (isteğe bağlı)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'Yavaş Mod';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'Kapalı';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'Kullanıcı Sınırı';
+
+  @override
+  String get channelEditDialogUserLimitOff => 'Sınır yok';
 
   @override
   String get channelEditDialogCategoryLabel => 'Kategori';

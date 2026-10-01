@@ -322,6 +322,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get settingsStatusLabel => 'สถานะ';
 
   @override
+  String get settingsCustomStatusLabel => 'สถานะที่กำหนดเอง';
+
+  @override
+  String get settingsCustomStatusHint => 'คุณกำลังคิดอะไรอยู่?';
+
+  @override
   String get statusOnline => 'ออนไลน์';
 
   @override
@@ -553,6 +559,9 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get homeCouldNotConnectVoice => 'ไม่สามารถเชื่อมต่อกับช่องเสียงได้';
+
+  @override
+  String get homeVoiceChannelFull => 'ช่องเสียงนี้เต็มแล้ว';
 
   @override
   String get homeCreateServer => 'สร้างเซิร์ฟเวอร์';
@@ -819,6 +828,14 @@ class AppLocalizationsTh extends AppLocalizations {
   String get homeAttachmentFallback => 'ไฟล์แนบ';
 
   @override
+  String get homeAttachmentUploadFailed => 'อัปโหลดไฟล์แนบไม่สำเร็จ';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return 'บันทึก $fileName แล้ว';
+  }
+
+  @override
   String serverConnectError(String service) {
     return 'ไม่สามารถเริ่มการเชื่อมต่อ $service ได้';
   }
@@ -1039,7 +1056,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'เพิ่มเซิร์ฟเวอร์นี้เข้าสู่แท็บค้นพบทั่วทั้งแพลตฟอร์ม และมีโอกาสได้อยู่ในรอบหมุนเวียนเด่นประจำสัปดาห์ แยกต่างหากจากความสามารถในการค้นพบเพื่อเข้าร่วมเซิร์ฟเวอร์โดยทั่วไป';
+      'แสดงรายการร้านค้าของเซิร์ฟเวอร์นี้ใน Koda Marketplace พร้อมโอกาสได้รับเลือกในรอบหมุนเวียนสินค้าแนะนำประจำสัปดาห์ นี่เกี่ยวกับการช้อปปิ้ง ไม่ใช่การค้นหาเซิร์ฟเวอร์เพื่อเข้าร่วม -- ไม่มีผลต่อการค้นหาเซิร์ฟเวอร์ทั่วไป';
 
   @override
   String get serverSocialLinkLabel => 'ลิงก์โซเชียล / คำเชิญ (ไม่บังคับ)';
@@ -2493,6 +2510,41 @@ class AppLocalizationsTh extends AppLocalizations {
   String get printfulMerchViewButton => 'ดู';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return 'จ่ายให้: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => 'จ่ายให้: คุณ';
+
+  @override
+  String get printfulMerchPayoutChangeButton => 'เปลี่ยน';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => 'ผู้รับเงิน';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'กำหนดส่วนแบ่งรายได้จากคำสั่งซื้อของสินค้านี้ให้ผู้ใช้รายอื่นแทนตัวคุณ -- ผู้นั้นจะต้องเชื่อมต่อบัญชี Stripe ของตนเองและทำการตั้งค่าให้เสร็จสิ้นก่อนที่ใครจะสามารถซื้อได้';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'ชื่อผู้ใช้';
+
+  @override
+  String get printfulMerchPayoutLookupButton => 'ค้นหา';
+
+  @override
+  String get printfulMerchPayoutUserNotFound => 'ไม่พบผู้ใช้ชื่อนี้';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return 'พบ: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => 'รีเซ็ตเป็นตัวฉัน';
+
+  @override
   String get printfulMerchCartTooltip => 'ตะกร้าสินค้า';
 
   @override
@@ -2748,6 +2800,12 @@ class AppLocalizationsTh extends AppLocalizations {
       'เซิร์ฟเวอร์ที่ลงรายการทั้งหมด';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => 'สินค้าแนะนำ';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'สินค้าทั้งหมด';
+
+  @override
   String get kodaMarketplaceServerFallback => 'เซิร์ฟเวอร์';
 
   @override
@@ -2759,6 +2817,9 @@ class AppLocalizationsTh extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'เยี่ยมชมร้านค้า';
 
   @override
   String get calendarFallbackTitle => 'ปฏิทิน';
@@ -3434,6 +3495,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get channelEditDialogNameHint => 'ชื่อช่อง';
 
   @override
+  String get channelEditDialogDescriptionHint => 'หัวข้อ (ไม่บังคับ)';
+
+  @override
   String get channelEditDialogTypeLabel => 'ประเภท';
 
   @override
@@ -3475,6 +3539,18 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get channelEditDialogNotifyRolesLabel =>
       'แจ้งเตือนยศเหล่านี้เมื่อมีการโพสต์ (ไม่บังคับ)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'โหมดหน่วงเวลา';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'ปิด';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'ขีดจำกัดผู้ใช้';
+
+  @override
+  String get channelEditDialogUserLimitOff => 'ไม่จำกัด';
 
   @override
   String get channelEditDialogCategoryLabel => 'หมวดหมู่';

@@ -317,6 +317,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsStatusLabel => 'الحالة';
 
   @override
+  String get settingsCustomStatusLabel => 'الحالة المخصصة';
+
+  @override
+  String get settingsCustomStatusHint => 'بم تفكر؟';
+
+  @override
   String get statusOnline => 'متصل';
 
   @override
@@ -548,6 +554,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get homeCouldNotConnectVoice => 'تعذّر الاتصال بالصوت.';
+
+  @override
+  String get homeVoiceChannelFull => 'هذه القناة الصوتية ممتلئة.';
 
   @override
   String get homeCreateServer => 'إنشاء خادم';
@@ -820,6 +829,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeAttachmentFallback => 'مرفق';
 
   @override
+  String get homeAttachmentUploadFailed => 'فشل رفع المرفق.';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return 'تم حفظ $fileName';
+  }
+
+  @override
   String serverConnectError(String service) {
     return 'تعذّر بدء الاتصال بـ $service.';
   }
@@ -1039,7 +1056,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'يُدرج هذا الخادم في علامة تبويب الاستكشاف على مستوى المنصة، مع فرصة للظهور في التدوير الأسبوعي المميز. هذا منفصل عن إمكانية الانضمام العامة للخادم.';
+      'يُدرج متجر هذا الخادم في سوق Koda، مع فرصة في التدوير الأسبوعي للعناصر المميزة. يتعلق هذا بالتسوق، وليس بالعثور على خوادم للانضمام إليها -- ولا يؤثر على البحث العام عن الخوادم.';
 
   @override
   String get serverSocialLinkLabel => 'رابط اجتماعي / دعوة (اختياري)';
@@ -2531,6 +2548,42 @@ class AppLocalizationsAr extends AppLocalizations {
   String get printfulMerchViewButton => 'عرض';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return 'الدفع إلى: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => 'الدفع إلى: أنت';
+
+  @override
+  String get printfulMerchPayoutChangeButton => 'تغيير';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => 'مستلم الدفع';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'وجّه حصة هذا المنتج من عائدات الطلب إلى مستخدم آخر بدلاً منك -- سيحتاجون إلى ربط حساب Stripe الخاص بهم وإكمال الإعداد قبل أن يتمكن أي شخص من شرائه.';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'اسم المستخدم';
+
+  @override
+  String get printfulMerchPayoutLookupButton => 'بحث';
+
+  @override
+  String get printfulMerchPayoutUserNotFound =>
+      'لم يتم العثور على مستخدم بهذا الاسم.';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return 'تم العثور على: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => 'إعادة التعيين إليّ';
+
+  @override
   String get printfulMerchCartTooltip => 'السلة';
 
   @override
@@ -2785,6 +2838,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get kodaMarketplaceAllListedServersHeader => 'جميع الخوادم المدرجة';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => 'العناصر المميزة';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'جميع العناصر';
+
+  @override
   String get kodaMarketplaceServerFallback => 'الخادم';
 
   @override
@@ -2801,6 +2860,9 @@ class AppLocalizationsAr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'زيارة المتجر';
 
   @override
   String get calendarFallbackTitle => 'التقويم';
@@ -3503,6 +3565,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get channelEditDialogNameHint => 'اسم القناة';
 
   @override
+  String get channelEditDialogDescriptionHint => 'الموضوع (اختياري)';
+
+  @override
   String get channelEditDialogTypeLabel => 'النوع';
 
   @override
@@ -3544,6 +3609,18 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get channelEditDialogNotifyRolesLabel =>
       'إشعار هذه الأدوار عند النشر (اختياري)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'الوضع البطيء';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'إيقاف';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'حد المستخدمين';
+
+  @override
+  String get channelEditDialogUserLimitOff => 'بلا حد';
 
   @override
   String get channelEditDialogCategoryLabel => 'الفئة';

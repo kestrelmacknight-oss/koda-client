@@ -3,50 +3,25 @@
 // End-to-end encrypted file attachments for DMs. The file itself is
 // encrypted client-side with a fresh, random, single-use AES-256-GCM key
 // before it ever leaves the device -- the server and CDN only ever see
-// ciphertext. That per-file key travels to the recipient the same way
-// everything else in a DM does: inside the Double Ratchet-encrypted
-// message content (see the envelope helpers below), never as a
-// separate plaintext field the server could read.
+// ciphertext (see attachment_crypto.dart for the shared encrypt/upload/
+// download primitives channel attachments now use too). That per-file
+// key travels to the recipient the same way everything else in a DM
+// does: inside the Double Ratchet-encrypted message content (see the
+// envelope helpers below), never as a separate plaintext field the
+// server could read.
 //
-// This is a deliberately different design from channel attachments
-// (home_screen.dart), which upload the real file and content-type in
-// the clear -- channels aren't end-to-end encrypted at all yet (group
-// encryption is a separate, harder protocol), so there's no
-// expectation of confidentiality to preserve there. DMs already have
-// real E2EE for text; leaving attachments as a plaintext side-channel
-// would undermine that.
+// Channel attachments (channel_attachments.dart) follow the identical
+// design, substituting the channel's shared epoch key for the DM
+// ratchet as the envelope's outer encryption. Channel *text* has been
+// genuinely end-to-end encrypted since channel_key_manager.dart shipped
+// -- this file's envelope pattern was simply the first of the two to
+// exist, not a DM-only capability.
 
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:cryptography/cryptography.dart';
-import '../api.dart';
-import 'kcp_primitives.dart';
+import 'attachment_crypto.dart';
 
-class DmAttachmentMeta {
-  final String url; // CDN URL -- points at ciphertext, harmless if seen
-  final String key; // base64 AES-256 key -- only ever travels encrypted
-  final String nonce; // base64 12-byte nonce
-  final String contentType; // the *real* type, known only after decrypting
-  final String fileName;
-  const DmAttachmentMeta({
-    required this.url,
-    required this.key,
-    required this.nonce,
-    required this.contentType,
-    required this.fileName,
-  });
-
-  Map<String, dynamic> toJson() =>
-      {'url': url, 'key': key, 'nonce': nonce, 'content_type': contentType, 'file_name': fileName};
-
-  factory DmAttachmentMeta.fromJson(Map<String, dynamic> j) => DmAttachmentMeta(
-        url: j['url'] as String,
-        key: j['key'] as String,
-        nonce: j['nonce'] as String,
-        contentType: j['content_type'] as String,
-        fileName: j['file_name'] as String,
-      );
-}
+typedef DmAttachmentMeta = EncryptedAttachmentMeta;
 
 /// Encrypts [bytes] with a fresh random key and uploads the ciphertext.
 /// Returns the metadata needed to fetch and decrypt it later -- the
@@ -56,60 +31,16 @@ Future<DmAttachmentMeta?> encryptAndUploadDmAttachment({
   required Uint8List bytes,
   required String contentType,
   required String fileName,
-}) async {
-  final key = Uint8List.fromList(SecretKeyData.random(length: 32).bytes);
-  final nonce = randomNonce();
-  final ciphertext = await aesGcmEncrypt(key: key, nonce: nonce, plaintext: bytes);
-
-  final url = await KodaApi.instance.uploadBytes(
-    bytes: ciphertext,
-    uploadType: 'attachment',
-    contentType: 'application/octet-stream',
-  );
-  if (url == null) {
-    secureZero(key);
-    return null;
-  }
-
-  // Base64-encode before zeroing -- the returned DmAttachmentMeta.key
-  // string is an immutable Dart String that can never be wiped the way
-  // this raw buffer can, so it's the one copy of this key that just has
-  // to be trusted to the GC eventually. Zeroing the buffer afterward is
-  // still real: it's the copy that would otherwise sit at whatever
-  // address SecretKeyData.random allocated it at for the rest of this
-  // isolate's life.
-  final result = DmAttachmentMeta(
-    url: url,
-    key: bytesToB64(key),
-    nonce: bytesToB64(nonce),
-    contentType: contentType,
-    fileName: fileName,
-  );
-  secureZero(key);
-  return result;
-}
+}) =>
+    encryptAndUploadAttachment(bytes: bytes, contentType: contentType, fileName: fileName);
 
 /// Inverse of the upload half: fetches ciphertext from [meta.url] and
 /// decrypts it with the key/nonce carried in the (already-decrypted)
 /// message envelope. Throws on any failure -- same fail-closed rule as
 /// the rest of this app's crypto: a corrupted or tampered attachment
 /// must surface as an error, never as garbage bytes rendered to the UI.
-Future<Uint8List> downloadAndDecryptDmAttachment(DmAttachmentMeta meta) async {
-  final response = await KodaApi.instance.downloadRawBytes(meta.url);
-  if (response == null) {
-    throw StateError('Could not download attachment.');
-  }
-  final key = b64ToBytes(meta.key);
-  try {
-    return await aesGcmDecrypt(
-      key: key,
-      nonce: b64ToBytes(meta.nonce),
-      payload: Uint8List.fromList(response),
-    );
-  } finally {
-    secureZero(key);
-  }
-}
+Future<Uint8List> downloadAndDecryptDmAttachment(DmAttachmentMeta meta) =>
+    downloadAndDecryptAttachment(meta);
 
 // ── DM message envelope ──────────────────────────────────────────────────
 //

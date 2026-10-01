@@ -317,6 +317,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsStatusLabel => 'STATUS';
 
   @override
+  String get settingsCustomStatusLabel => 'CUSTOM STATUS';
+
+  @override
+  String get settingsCustomStatusHint => 'What\'s on your mind?';
+
+  @override
   String get statusOnline => 'Online';
 
   @override
@@ -551,6 +557,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeCouldNotConnectVoice => 'Could not connect to voice.';
+
+  @override
+  String get homeVoiceChannelFull => 'This voice channel is full.';
 
   @override
   String get homeCreateServer => 'Create Server';
@@ -820,6 +829,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeAttachmentFallback => 'Attachment';
 
   @override
+  String get homeAttachmentUploadFailed => 'Attachment upload failed.';
+
+  @override
+  String homeSavedAttachment(String fileName) {
+    return 'Saved $fileName';
+  }
+
+  @override
   String serverConnectError(String service) {
     return 'Could not start $service connection.';
   }
@@ -1041,7 +1058,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverListInMarketplaceDescription =>
-      'Opts this server into the platform-wide Discover tab, and a chance at the weekly featured rotation. Separate from general server-join discoverability.';
+      'Lists this server\'s store in the Koda Marketplace, with a chance at the weekly featured rotation. This is about shopping, not finding servers to join -- it has no effect on general server search.';
 
   @override
   String get serverSocialLinkLabel => 'Social / Invite Link (optional)';
@@ -2496,6 +2513,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get printfulMerchViewButton => 'View';
 
   @override
+  String printfulMerchPayoutTo(String username) {
+    return 'Payout to: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutToYou => 'Payout to: you';
+
+  @override
+  String get printfulMerchPayoutChangeButton => 'Change';
+
+  @override
+  String get printfulMerchPayoutDialogTitle => 'Payout Recipient';
+
+  @override
+  String get printfulMerchPayoutDialogBody =>
+      'Route this item\'s share of order proceeds to another user instead of yourself -- they\'ll need their own Stripe account connected and onboarded before anyone can buy it.';
+
+  @override
+  String get printfulMerchPayoutUsernameHint => 'Username';
+
+  @override
+  String get printfulMerchPayoutLookupButton => 'Look Up';
+
+  @override
+  String get printfulMerchPayoutUserNotFound =>
+      'No user found with that username.';
+
+  @override
+  String printfulMerchPayoutResolvedAs(String username) {
+    return 'Found: $username';
+  }
+
+  @override
+  String get printfulMerchPayoutResetButton => 'Reset to Me';
+
+  @override
   String get printfulMerchCartTooltip => 'Cart';
 
   @override
@@ -2746,6 +2799,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get kodaMarketplaceAllListedServersHeader => 'ALL LISTED SERVERS';
 
   @override
+  String get kodaMarketplaceFeaturedItemsHeader => 'FEATURED ITEMS';
+
+  @override
+  String get kodaMarketplaceAllItemsHeader => 'ALL ITEMS';
+
+  @override
   String get kodaMarketplaceServerFallback => 'Server';
 
   @override
@@ -2758,6 +2817,9 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get kodaMarketplaceVisitStore => 'Visit Store';
 
   @override
   String get calendarFallbackTitle => 'Calendar';
@@ -3441,6 +3503,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get channelEditDialogNameHint => 'Channel name';
 
   @override
+  String get channelEditDialogDescriptionHint => 'Topic (optional)';
+
+  @override
   String get channelEditDialogTypeLabel => 'Type';
 
   @override
@@ -3482,6 +3547,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get channelEditDialogNotifyRolesLabel =>
       'Notify these roles when posted (optional)';
+
+  @override
+  String get channelEditDialogSlowmodeLabel => 'Slowmode';
+
+  @override
+  String get channelEditDialogSlowmodeOff => 'Off';
+
+  @override
+  String get channelEditDialogUserLimitLabel => 'User Limit';
+
+  @override
+  String get channelEditDialogUserLimitOff => 'No limit';
 
   @override
   String get channelEditDialogCategoryLabel => 'Category';
