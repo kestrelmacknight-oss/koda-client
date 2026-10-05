@@ -11,6 +11,7 @@ import '../core/theme.dart';
 import '../core/presence_provider.dart';
 import '../core/providers.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'glowing_username.dart';
 import 'presence_status.dart';
 import 'pronoun_label.dart';
 import 'tier_badge.dart';
@@ -213,6 +214,11 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
     final username = member['username'] as String? ?? t.memberPanelUnknownUser;
     final avatarUrl = member['avatar_url'] as String?;
     final tier = member['koda_tier'] as String?;
+    // Backer-reward state -- see koda-server's Koda.Invites.apply_rewards/3
+    // and ServerController's member-list serializer.
+    final badges = List<String>.from(member['badges'] as List? ?? []);
+    final ownedFrames = List<String>.from(member['owned_frames'] as List? ?? []);
+    final glows = List<String>.from(member['glows'] as List? ?? []);
     final roles = member['roles'] as List? ?? [];
     final topRole = roles.isNotEmpty
         ? roles.first as Map<String, dynamic>
@@ -248,6 +254,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
             TierFramedAvatar(
               tier: tier,
               avatarSize: 32,
+              ownedFrames: ownedFrames,
               child: Stack(clipBehavior: Clip.none, children: [
                 // Avatar
                 CircleAvatar(
@@ -287,16 +294,19 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    withPronouns(username, member),
-                    style: TextStyle(
-                      color: isOffline
-                          ? KodaColors.text3
-                          : nameColor,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
+                  GlowingUsername(
+                    glows: glows,
+                    child: Text(
+                      withPronouns(username, member),
+                      style: TextStyle(
+                        color: isOffline
+                            ? KodaColors.text3
+                            : nameColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
                   if (customStatus != null && customStatus.isNotEmpty)
                     Text(
@@ -307,7 +317,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
                 ],
               ),
             ),
-            TierBadge(tier: tier, size: 13),
+            TierBadge(tier: tier, size: 13, rewardBadges: badges),
             if ((widget.canKick || widget.canBan) &&
                 member['user_id'] != ref.read(authProvider).user?.id)
               Builder(builder: (buttonContext) => IconButton(

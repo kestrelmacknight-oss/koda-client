@@ -135,6 +135,8 @@
   "authSignInButton": "Logga in",
   "authUsernameHint": "Användarnamn",
   "authConfirmPasswordHint": "Bekräfta lösenord",
+
+  "authAccessCodeHint": "Åtkomstkod (om du har en)",
   "authAgreeToTerms": "Jag godkänner villkoren och integritetspolicyn",
   "authCreateAccountButton": "Skapa konto",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "Ta bort fastnålning",
   "homeReportMessageAction": "Rapportera meddelande",
   "homeReportSubmitted": "Rapporten har skickats.",
+
+  "messageActionForward": "Vidarebefordra",
+
+  "messageForwardedFromLabel": "Vidarebefordrat från {name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "Vidarebefordra meddelande",
+
+  "forwardDestinationPickerChannelsTab": "Kanaler",
+
+  "forwardDestinationPickerDmsTab": "Direktmeddelanden",
+
+  "forwardDestinationPickerNoServers": "Du är inte med i någon server än.",
+
+  "forwardDestinationPickerNoChannels": "Inga textkanaler i den här servern.",
+
+  "forwardDestinationPickerNoConversations": "Inga konversationer än.",
+
+  "forwardSuccessToast": "Meddelandet vidarebefordrat.",
+
+  "forwardFailedToast": "Det gick inte att vidarebefordra meddelandet -- försök igen.",
   "homeAddReactionTitle": "Lägg till reaktion",
   "homeThreadCount": "{count, plural, one{{count} tråd} other{{count} trådar}}",
   "homeCategoryOptionsTooltip": "Kategorialternativ",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "Backer- och belöningskoder",
   "adminNewCodeButton": "Ny kod",
   "adminNoCodesYet": "Inga koder än",
+
+  "adminRewardsHeader": "Belöningar",
+
+  "adminRewardAlphaBetaAccess": "Alpha/Beta-åtkomst + Alpha Spark-märke",
+
+  "adminRewardLifetimePulse": "Livstids Pulse-status + Founder-märke + förbättrad bitrate",
+
+  "adminRewardMonthlyBoostTokenOne": "Månatlig server-boost-token (förbättrat ljud/video)",
+
+  "adminRewardAnimatedFrameBundle": "Animerad profilram + Founders Hall + 2 månatliga servertokens",
+
+  "adminRewardTitanGlow": "Permanent \"Titan\"-användarnamnsglöd",
+
+  "adminRewardAnimatedFrame": "Animerad ram",
+
+  "adminRewardFoundersHall": "Founders Hall",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, one{1 boost-token/månad} other{{count} boost-tokens/månad}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "Inga belöningar",
+
+  "adminRegistrationOpenLabel": "Registrering är öppen för alla",
+
+  "adminRegistrationInviteOnlyLabel": "Registrering är endast på inbjudan (backer-kod krävs)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "{uses} användningar",
   "adminSearchUsersHint": "Sök användare efter användarnamn...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "Senare",
   "tierBadgeSparkSubscriber": "Spark-prenumerant",
   "tierBadgePulseSubscriber": "Pulse-prenumerant",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Founders Hall",
+
+  "foundersHallSubtitle": "De tidigaste backers som gjorde Koda möjligt.",
+
+  "foundersHallEmptyState": "Inga founders än.",
+
+  "settingsFoundersHallTitle": "Founders Hall",
+
+  "settingsFoundersHallSubtitle": "Se vem som hjälpte bygga Koda",
   "vispAvatarInDevelopment": "UNDER UTVECKLING",
   "vispBoostAdvisorCouldNotAnswer": "Visp kunde inte sätta ihop ett svar.",
   "vispBoostAdvisorTitle": "Fråga Visp: Boost-ROI-rådgivare",

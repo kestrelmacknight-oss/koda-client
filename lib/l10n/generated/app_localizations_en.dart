@@ -434,6 +434,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authConfirmPasswordHint => 'Confirm password';
 
   @override
+  String get authAccessCodeHint => 'Access code (if you have one)';
+
+  @override
   String get authAgreeToTerms =>
       'I agree to the Terms & Conditions and Privacy Policy';
 
@@ -708,6 +711,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeReportSubmitted => 'Report submitted.';
+
+  @override
+  String get messageActionForward => 'Forward';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return 'Forwarded from $name';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => 'Forward message';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => 'Channels';
+
+  @override
+  String get forwardDestinationPickerDmsTab => 'Direct Messages';
+
+  @override
+  String get forwardDestinationPickerNoServers =>
+      'You\'re not in any servers yet.';
+
+  @override
+  String get forwardDestinationPickerNoChannels =>
+      'No text channels in this server.';
+
+  @override
+  String get forwardDestinationPickerNoConversations => 'No conversations yet.';
+
+  @override
+  String get forwardSuccessToast => 'Message forwarded.';
+
+  @override
+  String get forwardFailedToast =>
+      'Couldn\'t forward the message -- try again.';
 
   @override
   String get homeAddReactionTitle => 'Add Reaction';
@@ -1446,8 +1484,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminNoteHint => 'Note (e.g. \"Kickstarter Tier 2\")';
 
   @override
-  String get adminFlagsJsonHint =>
-      'Flags as JSON, e.g. \"backer_tier\":\"founding\"';
+  String get adminFlagsJsonHint => 'Advanced: extra flags as JSON (optional)';
 
   @override
   String get adminMaxUsesHint => 'Max uses (leave blank = unlimited)';
@@ -1474,6 +1511,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminNoCodesYet => 'No codes yet';
+
+  @override
+  String get adminRewardsHeader => 'Rewards';
+
+  @override
+  String get adminRewardAlphaBetaAccess =>
+      'Alpha/Beta Access + Alpha Spark Badge';
+
+  @override
+  String get adminRewardLifetimePulse =>
+      'Lifetime Pulse + Founder Badge + Enhanced Bitrate';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne =>
+      'Monthly Server Boost Token (Enhanced Audio/Video)';
+
+  @override
+  String get adminRewardAnimatedFrameBundle =>
+      'Animated Profile Frame + Founders Hall + 2 Monthly Server Tokens';
+
+  @override
+  String get adminRewardTitanGlow => 'Permanent \"Titan\" Username Glow';
+
+  @override
+  String get adminRewardAnimatedFrame => 'Animated Frame';
+
+  @override
+  String get adminRewardFoundersHall => 'Founders Hall';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count boost tokens/month',
+      one: '1 boost token/month',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => 'No rewards';
+
+  @override
+  String get adminRegistrationOpenLabel => 'Registration is open to everyone';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel =>
+      'Registration is invite-only (backer code required)';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -3728,6 +3814,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tierBadgePulseSubscriber => 'Pulse subscriber';
+
+  @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => 'Founders Hall';
+
+  @override
+  String get foundersHallSubtitle =>
+      'The earliest backers who helped make Koda possible.';
+
+  @override
+  String get foundersHallEmptyState => 'No founders yet.';
+
+  @override
+  String get settingsFoundersHallTitle => 'Founders Hall';
+
+  @override
+  String get settingsFoundersHallSubtitle => 'See who helped build Koda';
 
   @override
   String get vispAvatarInDevelopment => 'IN DEVELOPMENT';

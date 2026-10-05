@@ -433,6 +433,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authConfirmPasswordHint => 'تأكيد كلمة المرور';
 
   @override
+  String get authAccessCodeHint => 'رمز الوصول (إن وجد)';
+
+  @override
   String get authAgreeToTerms => 'أوافق على الشروط والأحكام وسياسة الخصوصية';
 
   @override
@@ -704,6 +707,41 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get homeReportSubmitted => 'تم إرسال البلاغ.';
+
+  @override
+  String get messageActionForward => 'إعادة توجيه';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return 'تمت إعادة التوجيه من $name';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => 'إعادة توجيه الرسالة';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => 'القنوات';
+
+  @override
+  String get forwardDestinationPickerDmsTab => 'الرسائل المباشرة';
+
+  @override
+  String get forwardDestinationPickerNoServers =>
+      'أنت لست عضوًا في أي خادم بعد.';
+
+  @override
+  String get forwardDestinationPickerNoChannels =>
+      'لا توجد قنوات نصية في هذا الخادم.';
+
+  @override
+  String get forwardDestinationPickerNoConversations => 'لا توجد محادثات بعد.';
+
+  @override
+  String get forwardSuccessToast => 'تم إعادة توجيه الرسالة.';
+
+  @override
+  String get forwardFailedToast =>
+      'تعذرت إعادة توجيه الرسالة -- حاول مرة أخرى.';
 
   @override
   String get homeAddReactionTitle => 'إضافة تفاعل';
@@ -1477,6 +1515,55 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adminNoCodesYet => 'لا توجد رموز بعد';
+
+  @override
+  String get adminRewardsHeader => 'المكافآت';
+
+  @override
+  String get adminRewardAlphaBetaAccess =>
+      'الوصول للنسخة التجريبية + شعار Alpha Spark';
+
+  @override
+  String get adminRewardLifetimePulse =>
+      'عضوية Pulse مدى الحياة + شعار Founder + معدل بت محسّن';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne =>
+      'رمز تعزيز خادم شهري (صوت وفيديو محسّن)';
+
+  @override
+  String get adminRewardAnimatedFrameBundle =>
+      'إطار ملف شخصي متحرك + قاعة المؤسسين + رمزا تعزيز شهريًا';
+
+  @override
+  String get adminRewardTitanGlow => 'توهج اسم المستخدم \"Titan\" الدائم';
+
+  @override
+  String get adminRewardAnimatedFrame => 'إطار متحرك';
+
+  @override
+  String get adminRewardFoundersHall => 'قاعة المؤسسين';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count رموز تعزيز شهريًا',
+      one: 'رمز تعزيز واحد شهريًا',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => 'لا توجد مكافآت';
+
+  @override
+  String get adminRegistrationOpenLabel => 'التسجيل مفتوح لكل شخص';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel =>
+      'التسجيل بالدعوة فقط (يتطلب رمز داعم)';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -3795,6 +3882,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tierBadgePulseSubscriber => 'مشترك Pulse';
+
+  @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => 'قاعة المؤسسين';
+
+  @override
+  String get foundersHallSubtitle => 'أقدم الداعمين الذين ساعدوا في بناء Koda.';
+
+  @override
+  String get foundersHallEmptyState => 'لا يوجد مؤسسون بعد.';
+
+  @override
+  String get settingsFoundersHallTitle => 'قاعة المؤسسين';
+
+  @override
+  String get settingsFoundersHallSubtitle => 'شاهد من ساعد في بناء Koda';
 
   @override
   String get vispAvatarInDevelopment => 'قيد التطوير';

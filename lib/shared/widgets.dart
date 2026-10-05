@@ -54,6 +54,10 @@ class KodaAvatar extends StatelessWidget {
   /// 'spark' | 'pulse' | 'free' | null -- see lib/shared/tier_badge.dart.
   /// Purely decorative; omit where the caller doesn't have tier info handy.
   final String? tier;
+  /// Backer-reward frames this user owns (e.g. KodaUser.ownedFrames) --
+  /// takes priority over [tier]'s own frame when present. Purely
+  /// decorative, same as [tier]; omit where the caller doesn't have it.
+  final List<String> ownedFrames;
 
   const KodaAvatar({
     super.key,
@@ -61,6 +65,7 @@ class KodaAvatar extends StatelessWidget {
     this.size = 40,
     this.avatarUrl,
     this.tier,
+    this.ownedFrames = const [],
   });
 
   @override
@@ -84,7 +89,7 @@ class KodaAvatar extends StatelessWidget {
       label: t.widgetsAvatarSemanticLabel(username),
       image: true,
       child: ExcludeSemantics(
-        child: TierFramedAvatar(tier: tier, avatarSize: size, child: avatar),
+        child: TierFramedAvatar(tier: tier, avatarSize: size, ownedFrames: ownedFrames, child: avatar),
       ),
     );
   }

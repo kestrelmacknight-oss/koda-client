@@ -438,6 +438,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get authConfirmPasswordHint => 'Підтвердіть пароль';
 
   @override
+  String get authAccessCodeHint => 'Код доступу (якщо є)';
+
+  @override
   String get authAgreeToTerms =>
       'Я погоджуюся з Умовами використання та Політикою конфіденційності';
 
@@ -712,6 +715,41 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get homeReportSubmitted => 'Скаргу надіслано.';
+
+  @override
+  String get messageActionForward => 'Переслати';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return 'Переслано від $name';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => 'Переслати повідомлення';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => 'Канали';
+
+  @override
+  String get forwardDestinationPickerDmsTab => 'Прямі повідомлення';
+
+  @override
+  String get forwardDestinationPickerNoServers =>
+      'Ви ще не перебуваєте на жодному сервері.';
+
+  @override
+  String get forwardDestinationPickerNoChannels =>
+      'На цьому сервері немає текстових каналів.';
+
+  @override
+  String get forwardDestinationPickerNoConversations => 'Поки немає розмов.';
+
+  @override
+  String get forwardSuccessToast => 'Повідомлення переслано.';
+
+  @override
+  String get forwardFailedToast =>
+      'Не вдалося переслати повідомлення -- спробуйте ще раз.';
 
   @override
   String get homeAddReactionTitle => 'Додати реакцію';
@@ -1485,6 +1523,58 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get adminNoCodesYet => 'Кодів поки немає';
+
+  @override
+  String get adminRewardsHeader => 'Нагороди';
+
+  @override
+  String get adminRewardAlphaBetaAccess =>
+      'Доступ до альфи/бети + значок Alpha Spark';
+
+  @override
+  String get adminRewardLifetimePulse =>
+      'Довічний статус Pulse + значок Founder + збільшений бітрейт';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne =>
+      'Щомісячний токен посилення серверу (покращене аудіо/відео)';
+
+  @override
+  String get adminRewardAnimatedFrameBundle =>
+      'Анімована рамка профілю + Зал засновників + 2 щомісячні токени серверу';
+
+  @override
+  String get adminRewardTitanGlow =>
+      'Постійне сяйво імені користувача \"Titan\"';
+
+  @override
+  String get adminRewardAnimatedFrame => 'Анімована рамка';
+
+  @override
+  String get adminRewardFoundersHall => 'Зал засновників';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count токена посилення/місяць',
+      many: '$count токенів посилення/місяць',
+      few: '$count токени посилення/місяць',
+      one: '1 токен посилення/місяць',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => 'Без нагород';
+
+  @override
+  String get adminRegistrationOpenLabel => 'Реєстрація відкрита для всіх';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel =>
+      'Реєстрація лише за запрошенням (потрібен код бекера)';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -3803,6 +3893,29 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get tierBadgePulseSubscriber => 'Підписник Pulse';
+
+  @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => 'Зал засновників';
+
+  @override
+  String get foundersHallSubtitle =>
+      'Найперші бекери, які зробили Koda можливою.';
+
+  @override
+  String get foundersHallEmptyState => 'Поки немає засновників.';
+
+  @override
+  String get settingsFoundersHallTitle => 'Зал засновників';
+
+  @override
+  String get settingsFoundersHallSubtitle =>
+      'Дивіться, хто допоміг створити Koda';
 
   @override
   String get vispAvatarInDevelopment => 'У РОЗРОБЦІ';

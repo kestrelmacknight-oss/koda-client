@@ -1,10 +1,12 @@
 // lib/features/admin/admin_screen.dart
 //
 // Admin panel — visible only to users with is_admin: true.
-// Tabs: Backer Codes | Users
+// Tabs: Backer Codes | Users | DM Reports | Spam Flags | Wiki | Boosts
 //
-// Backer Codes: create codes with custom flags, view all codes,
-// redemption counts, expiry.
+// Backer Codes: pick from the 5 backer-reward checkboxes (see
+// koda-server's Koda.Invites.apply_rewards/3) or hand-type advanced
+// flags, generate a one-time code, view all codes/redemption counts/
+// expiry, and toggle whether /auth/register requires one at all.
 // Users: search users, view flags, apply manual flags.
 
 import 'package:flutter/material.dart';
@@ -90,11 +92,15 @@ class _BackerCodesTab extends StatefulWidget {
 class _BackerCodesTabState extends State<_BackerCodesTab> {
   List<Map<String, dynamic>> _codes = [];
   bool _loading = true;
+  bool? _registrationOpen;
 
   @override
   void initState() {
     super.initState();
     _load();
+    KodaApi.instance.getRegistrationOpen().then((open) {
+      if (mounted) setState(() => _registrationOpen = open);
+    });
   }
 
   Future<void> _load() async {
@@ -104,6 +110,28 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
     setState(() { _codes = codes; _loading = false; });
   }
 
+  Future<void> _toggleRegistrationOpen(bool open) async {
+    setState(() => _registrationOpen = open); // optimistic
+    final result = await KodaApi.instance.setRegistrationOpen(open);
+    if (result == null && mounted) setState(() => _registrationOpen = !open); // revert on failure
+  }
+
+  /// One-line human summary of a code's `rewards` map, shown in the list
+  /// instead of raw JSON -- mirrors the 5 reward checkboxes in
+  /// _showCreateDialog exactly, so a glance at this list tells you what
+  /// a code actually does without opening it.
+  String _rewardsSummary(AppLocalizations t, Map<String, dynamic> rewards) {
+    final parts = <String>[];
+    if (rewards['alpha_beta_access'] == true) parts.add(t.adminRewardAlphaBetaAccess);
+    if (rewards['lifetime_pulse'] == true) parts.add(t.adminRewardLifetimePulse);
+    final tokens = rewards['monthly_boost_tokens'] as int? ?? 0;
+    if (tokens > 0) parts.add(t.adminRewardMonthlyBoostTokens(tokens));
+    if (rewards['animated_frame'] == true) parts.add(t.adminRewardAnimatedFrame);
+    if (rewards['founders_hall'] == true) parts.add(t.adminRewardFoundersHall);
+    if (rewards['titan_glow'] == true) parts.add(t.adminRewardTitanGlow);
+    return parts.isEmpty ? t.adminRewardsNone : parts.join(' · ');
+  }
+
   Future<void> _showCreateDialog() async {
     final t = AppLocalizations.of(context);
     final codeCtrl  = TextEditingController();
@@ -111,103 +139,169 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
     final flagCtrl  = TextEditingController();
     final maxCtrl   = TextEditingController();
 
+    // The 5 reward checkboxes map 1:1 onto Koda.Invites.apply_rewards/3's
+    // well-known `rewards` keys -- see that function's doc comment for
+    // exactly what each one does to the redeeming account.
+    var alphaBetaAccess = false;
+    var lifetimePulse = false;
+    var oneMonthlyToken = false;
+    var animatedFrameBundle = false; // frame + Founders Hall + 2 tokens, bundled as the user asked
+    var titanGlow = false;
+
     await showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: KodaColors.card,
-        title: Text(t.adminCreateBackerCodeTitle,
-            style: TextStyle(color: KodaColors.text1)),
-        content: SizedBox(
-          width: 400,
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            KodaTextField(controller: codeCtrl,
-                hintText: t.adminCodeHint, autofocus: true),
-            const SizedBox(height: 8),
-            KodaTextField(controller: noteCtrl,
-                hintText: t.adminNoteHint),
-            const SizedBox(height: 8),
-            KodaTextField(controller: flagCtrl,
-                hintText: t.adminFlagsJsonHint),
-            const SizedBox(height: 8),
-            KodaTextField(controller: maxCtrl,
-                hintText: t.adminMaxUsesHint,
-                keyboardType: TextInputType.number),
-          ]),
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(t.commonCancel)),
-          TextButton(
-            onPressed: () async {
-              Map<String, dynamic> flags = {};
-              try {
-                if (flagCtrl.text.trim().isNotEmpty) {
-                  // Simple JSON parse
-                  final cleaned = flagCtrl.text.trim();
-                  flags = Map<String, dynamic>.from(
-                    (cleaned.startsWith('{')
-                        ? _parseSimpleJson(cleaned)
-                        : {'flag': cleaned}));
-                }
-              } catch (_) {
-                flags = {'note': flagCtrl.text.trim()};
-              }
-
-              Navigator.pop(context);
-              final result = await KodaApi.instance.createBackerCode(
-                code:    codeCtrl.text.trim().isEmpty ? null : codeCtrl.text.trim().toUpperCase(),
-                flags:   flags,
-                note:    noteCtrl.text.trim().isEmpty ? null : noteCtrl.text.trim(),
-                maxUses: int.tryParse(maxCtrl.text.trim()),
-              );
-
-              if (result != null && mounted) {
-                _load();
-                final code = result['code'] as String? ?? '';
-                showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    backgroundColor: KodaColors.card,
-                    title: Text(t.adminCodeCreatedTitle,
-                        style: TextStyle(color: KodaColors.text1)),
-                    content: Column(mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                      Text(t.adminCodeLabel,
-                          style: TextStyle(color: KodaColors.text3, fontSize: 12)),
-                      const SizedBox(height: 4),
-                      Row(children: [
-                        Expanded(child: SelectableText(code,
-                            style: TextStyle(
-                                color: KodaColors.koda,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700))),
-                        IconButton(
-                          icon: Icon(Icons.copy, size: 16,
-                              color: KodaColors.text3),
-                          tooltip: t.adminCopyCodeTooltip,
-                          onPressed: () =>
-                              Clipboard.setData(ClipboardData(text: code)),
-                        ),
-                      ]),
-                      const SizedBox(height: 8),
-                      Text(t.adminFlagsValue('${result['flags']}'),
-                          style: TextStyle(
-                              color: KodaColors.text3, fontSize: 12)),
-                    ]),
-                    actions: [
-                      TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(t.commonDone)),
-                    ],
-                  ),
-                );
-              }
-            },
-            child: Text(t.commonCreate),
+      builder: (_) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          backgroundColor: KodaColors.card,
+          title: Text(t.adminCreateBackerCodeTitle,
+              style: TextStyle(color: KodaColors.text1)),
+          content: SizedBox(
+            width: 420,
+            child: SingleChildScrollView(
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                KodaTextField(controller: codeCtrl,
+                    hintText: t.adminCodeHint, autofocus: true),
+                const SizedBox(height: 8),
+                KodaTextField(controller: noteCtrl,
+                    hintText: t.adminNoteHint),
+                const SizedBox(height: 8),
+                KodaTextField(controller: maxCtrl,
+                    hintText: t.adminMaxUsesHint,
+                    keyboardType: TextInputType.number),
+                const SizedBox(height: 12),
+                Text(t.adminRewardsHeader,
+                    style: TextStyle(color: KodaColors.text3, fontSize: 12, fontWeight: FontWeight.w600)),
+                CheckboxListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: Text(t.adminRewardAlphaBetaAccess, style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+                  value: alphaBetaAccess,
+                  onChanged: (v) => setDialogState(() => alphaBetaAccess = v ?? false),
+                ),
+                CheckboxListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: Text(t.adminRewardLifetimePulse, style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+                  value: lifetimePulse,
+                  onChanged: (v) => setDialogState(() => lifetimePulse = v ?? false),
+                ),
+                CheckboxListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: Text(t.adminRewardMonthlyBoostTokenOne, style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+                  value: oneMonthlyToken,
+                  onChanged: (v) => setDialogState(() => oneMonthlyToken = v ?? false),
+                ),
+                CheckboxListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: Text(t.adminRewardAnimatedFrameBundle, style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+                  value: animatedFrameBundle,
+                  onChanged: (v) => setDialogState(() => animatedFrameBundle = v ?? false),
+                ),
+                CheckboxListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: Text(t.adminRewardTitanGlow, style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+                  value: titanGlow,
+                  onChanged: (v) => setDialogState(() => titanGlow = v ?? false),
+                ),
+                const SizedBox(height: 8),
+                KodaTextField(controller: flagCtrl,
+                    hintText: t.adminFlagsJsonHint),
+              ]),
+            ),
           ),
-        ],
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(t.commonCancel)),
+            TextButton(
+              onPressed: () async {
+                Map<String, dynamic> flags = {};
+                try {
+                  if (flagCtrl.text.trim().isNotEmpty) {
+                    final cleaned = flagCtrl.text.trim();
+                    flags = Map<String, dynamic>.from(
+                      (cleaned.startsWith('{')
+                          ? _parseSimpleJson(cleaned)
+                          : {'flag': cleaned}));
+                  }
+                } catch (_) {
+                  flags = {'note': flagCtrl.text.trim()};
+                }
+
+                final rewards = <String, dynamic>{
+                  if (alphaBetaAccess) 'alpha_beta_access': true,
+                  if (lifetimePulse) 'lifetime_pulse': true,
+                  if (animatedFrameBundle) 'animated_frame': true,
+                  if (animatedFrameBundle) 'founders_hall': true,
+                  if (titanGlow) 'titan_glow': true,
+                  if (oneMonthlyToken || animatedFrameBundle)
+                    'monthly_boost_tokens': (oneMonthlyToken ? 1 : 0) + (animatedFrameBundle ? 2 : 0),
+                };
+
+                Navigator.pop(dialogContext);
+                final result = await KodaApi.instance.createBackerCode(
+                  code:    codeCtrl.text.trim().isEmpty ? null : codeCtrl.text.trim().toUpperCase(),
+                  flags:   flags,
+                  rewards: rewards,
+                  note:    noteCtrl.text.trim().isEmpty ? null : noteCtrl.text.trim(),
+                  maxUses: int.tryParse(maxCtrl.text.trim()),
+                );
+
+                if (result != null && mounted) {
+                  _load();
+                  final code = result['code'] as String? ?? '';
+                  showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      backgroundColor: KodaColors.card,
+                      title: Text(t.adminCodeCreatedTitle,
+                          style: TextStyle(color: KodaColors.text1)),
+                      content: Column(mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                        Text(t.adminCodeLabel,
+                            style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                        const SizedBox(height: 4),
+                        Row(children: [
+                          Expanded(child: SelectableText(code,
+                              style: TextStyle(
+                                  color: KodaColors.koda,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700))),
+                          IconButton(
+                            icon: Icon(Icons.copy, size: 16,
+                                color: KodaColors.text3),
+                            tooltip: t.adminCopyCodeTooltip,
+                            onPressed: () =>
+                                Clipboard.setData(ClipboardData(text: code)),
+                          ),
+                        ]),
+                        const SizedBox(height: 8),
+                        Text(_rewardsSummary(t, rewards),
+                            style: TextStyle(
+                                color: KodaColors.text3, fontSize: 12)),
+                      ]),
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(t.commonDone)),
+                      ],
+                    ),
+                  );
+                }
+              },
+              child: Text(t.commonCreate),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -247,6 +341,28 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
           ),
         ]),
       ),
+      // Registration gate toggle -- this is what makes "Alpha/Beta
+      // Access" a real reward rather than just a recorded flag (see
+      // AuthController.register/2 server-side): while invite-only, a
+      // backer code doubles as the thing that lets someone create an
+      // account at all.
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: Row(children: [
+          Icon(Icons.lock_outline, size: 14, color: KodaColors.text3),
+          const SizedBox(width: 6),
+          Expanded(child: Text(
+              _registrationOpen == true
+                  ? t.adminRegistrationOpenLabel
+                  : t.adminRegistrationInviteOnlyLabel,
+              style: TextStyle(color: KodaColors.text2, fontSize: 12))),
+          Switch(
+            value: _registrationOpen ?? false,
+            activeThumbColor: KodaColors.koda,
+            onChanged: _registrationOpen == null ? null : _toggleRegistrationOpen,
+          ),
+        ]),
+      ),
       Divider(color: KodaColors.border, height: 1),
       Expanded(
         child: _loading
@@ -265,6 +381,7 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
                       final usesStr = maxUses != null
                           ? t.adminUsesOfMax(uses, maxUses)
                           : t.adminUsesCount(uses);
+                      final rewards = Map<String, dynamic>.from(c['rewards'] as Map? ?? {});
                       return Container(
                         margin: const EdgeInsets.only(bottom: 8),
                         padding: const EdgeInsets.all(14),
@@ -302,7 +419,7 @@ class _BackerCodesTabState extends State<_BackerCodesTab> {
                                   style: TextStyle(
                                       color: KodaColors.text2, fontSize: 12)),
                             const SizedBox(height: 4),
-                            Text(t.adminFlagsValue('${c['flags']}'),
+                            Text(_rewardsSummary(t, rewards),
                                 style: TextStyle(
                                     color: KodaColors.text3, fontSize: 11)),
                             Text(usesStr,

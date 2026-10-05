@@ -922,6 +922,12 @@ abstract class AppLocalizations {
   /// **'Confirm password'**
   String get authConfirmPasswordHint;
 
+  /// No description provided for @authAccessCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Access code (if you have one)'**
+  String get authAccessCodeHint;
+
   /// No description provided for @authAgreeToTerms.
   ///
   /// In en, this message translates to:
@@ -1431,6 +1437,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Report submitted.'**
   String get homeReportSubmitted;
+
+  /// No description provided for @messageActionForward.
+  ///
+  /// In en, this message translates to:
+  /// **'Forward'**
+  String get messageActionForward;
+
+  /// No description provided for @messageForwardedFromLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Forwarded from {name}'**
+  String messageForwardedFromLabel(String name);
+
+  /// No description provided for @forwardDestinationPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Forward message'**
+  String get forwardDestinationPickerTitle;
+
+  /// No description provided for @forwardDestinationPickerChannelsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Channels'**
+  String get forwardDestinationPickerChannelsTab;
+
+  /// No description provided for @forwardDestinationPickerDmsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Direct Messages'**
+  String get forwardDestinationPickerDmsTab;
+
+  /// No description provided for @forwardDestinationPickerNoServers.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re not in any servers yet.'**
+  String get forwardDestinationPickerNoServers;
+
+  /// No description provided for @forwardDestinationPickerNoChannels.
+  ///
+  /// In en, this message translates to:
+  /// **'No text channels in this server.'**
+  String get forwardDestinationPickerNoChannels;
+
+  /// No description provided for @forwardDestinationPickerNoConversations.
+  ///
+  /// In en, this message translates to:
+  /// **'No conversations yet.'**
+  String get forwardDestinationPickerNoConversations;
+
+  /// No description provided for @forwardSuccessToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Message forwarded.'**
+  String get forwardSuccessToast;
+
+  /// No description provided for @forwardFailedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t forward the message -- try again.'**
+  String get forwardFailedToast;
 
   /// No description provided for @homeAddReactionTitle.
   ///
@@ -2737,7 +2803,7 @@ abstract class AppLocalizations {
   /// No description provided for @adminFlagsJsonHint.
   ///
   /// In en, this message translates to:
-  /// **'Flags as JSON, e.g. \"backer_tier\":\"founding\"'**
+  /// **'Advanced: extra flags as JSON (optional)'**
   String get adminFlagsJsonHint;
 
   /// No description provided for @adminMaxUsesHint.
@@ -2787,6 +2853,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No codes yet'**
   String get adminNoCodesYet;
+
+  /// No description provided for @adminRewardsHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards'**
+  String get adminRewardsHeader;
+
+  /// No description provided for @adminRewardAlphaBetaAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Alpha/Beta Access + Alpha Spark Badge'**
+  String get adminRewardAlphaBetaAccess;
+
+  /// No description provided for @adminRewardLifetimePulse.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifetime Pulse + Founder Badge + Enhanced Bitrate'**
+  String get adminRewardLifetimePulse;
+
+  /// No description provided for @adminRewardMonthlyBoostTokenOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Server Boost Token (Enhanced Audio/Video)'**
+  String get adminRewardMonthlyBoostTokenOne;
+
+  /// No description provided for @adminRewardAnimatedFrameBundle.
+  ///
+  /// In en, this message translates to:
+  /// **'Animated Profile Frame + Founders Hall + 2 Monthly Server Tokens'**
+  String get adminRewardAnimatedFrameBundle;
+
+  /// No description provided for @adminRewardTitanGlow.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanent \"Titan\" Username Glow'**
+  String get adminRewardTitanGlow;
+
+  /// No description provided for @adminRewardAnimatedFrame.
+  ///
+  /// In en, this message translates to:
+  /// **'Animated Frame'**
+  String get adminRewardAnimatedFrame;
+
+  /// No description provided for @adminRewardFoundersHall.
+  ///
+  /// In en, this message translates to:
+  /// **'Founders Hall'**
+  String get adminRewardFoundersHall;
+
+  /// No description provided for @adminRewardMonthlyBoostTokens.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 boost token/month} other{{count} boost tokens/month}}'**
+  String adminRewardMonthlyBoostTokens(int count);
+
+  /// No description provided for @adminRewardsNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No rewards'**
+  String get adminRewardsNone;
+
+  /// No description provided for @adminRegistrationOpenLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration is open to everyone'**
+  String get adminRegistrationOpenLabel;
+
+  /// No description provided for @adminRegistrationInviteOnlyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration is invite-only (backer code required)'**
+  String get adminRegistrationInviteOnlyLabel;
 
   /// No description provided for @adminUsesOfMax.
   ///
@@ -6521,6 +6659,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pulse subscriber'**
   String get tierBadgePulseSubscriber;
+
+  /// No description provided for @tierBadgeAlphaSpark.
+  ///
+  /// In en, this message translates to:
+  /// **'Alpha Spark'**
+  String get tierBadgeAlphaSpark;
+
+  /// No description provided for @tierBadgeFounder.
+  ///
+  /// In en, this message translates to:
+  /// **'Founder'**
+  String get tierBadgeFounder;
+
+  /// No description provided for @foundersHallTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Founders Hall'**
+  String get foundersHallTitle;
+
+  /// No description provided for @foundersHallSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The earliest backers who helped make Koda possible.'**
+  String get foundersHallSubtitle;
+
+  /// No description provided for @foundersHallEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No founders yet.'**
+  String get foundersHallEmptyState;
+
+  /// No description provided for @settingsFoundersHallTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Founders Hall'**
+  String get settingsFoundersHallTitle;
+
+  /// No description provided for @settingsFoundersHallSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'See who helped build Koda'**
+  String get settingsFoundersHallSubtitle;
 
   /// No description provided for @vispAvatarInDevelopment.
   ///

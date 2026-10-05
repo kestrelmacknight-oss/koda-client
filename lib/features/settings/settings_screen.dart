@@ -11,6 +11,7 @@ import '../../core/language_prefs.dart';
 import '../../core/language_options.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config.dart';
+import '../founders/founders_hall_screen.dart';
 import '../../core/api.dart';
 import '../../core/push_notifications.dart';
 import '../../core/socket.dart';
@@ -19,6 +20,7 @@ import '../../core/platform.dart';
 import '../../core/providers.dart';
 import '../../core/tray_service.dart';
 import '../../core/uploader.dart';
+import '../../shared/glowing_username.dart';
 import '../../shared/presence_status.dart';
 import '../../shared/widgets.dart';
 import 'content_filters_screen.dart';
@@ -460,6 +462,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ]),
           ),
           const SizedBox(height: 20),
+          _tile(Icons.auto_awesome_outlined, t.settingsFoundersHallTitle, t.settingsFoundersHallSubtitle,
+              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FoundersHallScreen()))),
           _tile(Icons.gavel_outlined, t.settingsTermsTitle, 'koda.fyi/terms.html',
               () => _openUrl(KodaConfig.termsUrl)),
           _tile(Icons.privacy_tip_outlined, t.settingsPrivacyTitle, 'koda.fyi/privacy.html',
@@ -648,7 +652,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         child: Row(children: [
           Stack(children: [
             KodaAvatar(username: user?.username ?? '?', size: 64, avatarUrl: user?.avatarUrl,
-                tier: user?.kodaTier),
+                tier: user?.kodaTier, ownedFrames: user?.ownedFrames ?? const []),
             Positioned(
               bottom: 0, right: 0,
               child: Container(
@@ -664,12 +668,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Text(user?.username ?? '',
-                    style: TextStyle(color: KodaColors.text1,
-                        fontSize: 17, fontWeight: FontWeight.w700)),
-                if (user != null && user.kodaTier != 'free') ...[
+                GlowingUsername(
+                    glows: user?.glows ?? const [],
+                    child: Text(user?.username ?? '',
+                        style: TextStyle(color: KodaColors.text1,
+                            fontSize: 17, fontWeight: FontWeight.w700))),
+                if (user != null && (user.kodaTier != 'free' || user.badges.isNotEmpty)) ...[
                   const SizedBox(width: 6),
-                  TierBadge(tier: user.kodaTier, size: 15),
+                  TierBadge(tier: user.kodaTier, size: 15, rewardBadges: user.badges),
                 ],
               ]),
               Text(user?.email ?? '',

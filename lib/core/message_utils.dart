@@ -37,6 +37,7 @@ Map<String, dynamic> _withPlaintext(Map<String, dynamic> m, String raw) {
     ...m,
     'content': payload.text,
     if (payload.attachment != null) '_attachment': payload.attachment,
+    if (payload.forwardedFrom != null) '_forwardedFrom': payload.forwardedFrom,
     if (lang != null) '_detectedLang': lang,
   };
 }

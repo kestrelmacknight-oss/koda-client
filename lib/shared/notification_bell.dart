@@ -12,7 +12,12 @@ import '../core/time_utils.dart';
 import '../l10n/generated/app_localizations.dart';
 
 class NotificationBell extends ConsumerWidget {
-  const NotificationBell({super.key});
+  /// Routes a tapped notification to the screen it's actually about --
+  /// same `(type, data)` shape as a tapped OS push notification (see
+  /// home_screen.dart's _routeToNotification, which both this and
+  /// push_notifications.dart's tap stream funnel into).
+  final void Function(String? type, Map<String, dynamic>? data) onNavigate;
+  const NotificationBell({super.key, required this.onNavigate});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -129,7 +134,8 @@ class NotificationBell extends ConsumerWidget {
                             onTap: () {
                               if (!read) notifier.markRead(n['id'] as String);
                               Navigator.pop(context);
-                              // TODO: navigate to channel
+                              onNavigate(n['type'] as String?,
+                                  n['data'] as Map<String, dynamic>?);
                             },
                             child: Container(
                               color: read
@@ -196,7 +202,10 @@ class NotificationBell extends ConsumerWidget {
     return switch (type) {
       'mention'      => Icons.alternate_email,
       'role_mention' => Icons.group_outlined,
-      'dm'           => Icons.mail_outline,
+      // Persisted/broadcast as "dm_message" (see Koda.Chat.notify_dm_recipient/5),
+      // not "dm" -- this never matched, so every DM notification fell
+      // through to the generic bell icon below.
+      'dm_message'   => Icons.mail_outline,
       'friend_request' => Icons.person_add_outlined,
       _              => Icons.notifications_outlined,
     };

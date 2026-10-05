@@ -135,6 +135,8 @@
   "authSignInButton": "Přihlásit se",
   "authUsernameHint": "Uživatelské jméno",
   "authConfirmPasswordHint": "Potvrďte heslo",
+
+  "authAccessCodeHint": "Přístupový kód (pokud máte)",
   "authAgreeToTerms": "Souhlasím s Podmínkami použití a Zásadami ochrany osobních údajů",
   "authCreateAccountButton": "Vytvořit účet",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "Odepnout zprávu",
   "homeReportMessageAction": "Nahlásit zprávu",
   "homeReportSubmitted": "Nahlášení odesláno.",
+
+  "messageActionForward": "Přeposlat",
+
+  "messageForwardedFromLabel": "Přeposláno od uživatele {name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "Přeposlat zprávu",
+
+  "forwardDestinationPickerChannelsTab": "Kanály",
+
+  "forwardDestinationPickerDmsTab": "Přímé zprávy",
+
+  "forwardDestinationPickerNoServers": "Zatím nejste na žádném serveru.",
+
+  "forwardDestinationPickerNoChannels": "V tomto serveru nejsou žádné textové kanály.",
+
+  "forwardDestinationPickerNoConversations": "Zatím žádné konverzace.",
+
+  "forwardSuccessToast": "Zpráva byla přeposlána.",
+
+  "forwardFailedToast": "Zprávu se nepodařilo přeposlat -- zkuste to znovu.",
   "homeAddReactionTitle": "Přidat reakci",
   "homeThreadCount": "{count, plural, one{{count} vlákno} few{{count} vlákna} many{{count} vlákna} other{{count} vláken}}",
   "homeCategoryOptionsTooltip": "Možnosti kategorie",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "Kódy pro podporovatele a odměny",
   "adminNewCodeButton": "Nový kód",
   "adminNoCodesYet": "Zatím žádné kódy",
+
+  "adminRewardsHeader": "Odměny",
+
+  "adminRewardAlphaBetaAccess": "Přístup do alfy/bety + odznak Alpha Spark",
+
+  "adminRewardLifetimePulse": "Trvalé Pulse + odznak Founder + vylepšený datový tok",
+
+  "adminRewardMonthlyBoostTokenOne": "Měsíční token pro boost serveru (vylepšené audio/video)",
+
+  "adminRewardAnimatedFrameBundle": "Animovaný profilový rámeček + Síň zakladatelů + 2 měsíční tokeny serveru",
+
+  "adminRewardTitanGlow": "Trvalý zářící efekt jména \"Titan\"",
+
+  "adminRewardAnimatedFrame": "Animovaný rámeček",
+
+  "adminRewardFoundersHall": "Síň zakladatelů",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, one{1 boost token/měsíc} other{{count} boost tokenů/měsíc}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "Žádné odměny",
+
+  "adminRegistrationOpenLabel": "Registrace je otevřená všem",
+
+  "adminRegistrationInviteOnlyLabel": "Registrace je jen na pozvánky (je nutný kód backera)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "{uses} použití",
   "adminSearchUsersHint": "Hledat uživatele podle jména...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "Později",
   "tierBadgeSparkSubscriber": "Předplatitel Spark",
   "tierBadgePulseSubscriber": "Předplatitel Pulse",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Síň zakladatelů",
+
+  "foundersHallSubtitle": "Nejranější podporovatelé, kteří pomohli Koda vytvořit.",
+
+  "foundersHallEmptyState": "Zatím žádní zakladatelé.",
+
+  "settingsFoundersHallTitle": "Síň zakladatelů",
+
+  "settingsFoundersHallSubtitle": "Zjistěte, kdo pomohl Koda vytvořit",
   "vispAvatarInDevelopment": "VE VÝVOJI",
   "vispBoostAdvisorCouldNotAnswer": "Visp se nepodařilo sestavit odpověď.",
   "vispBoostAdvisorTitle": "Zeptat se Visp: Poradce ROI vylepšení",

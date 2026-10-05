@@ -34,6 +34,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   final _regUsername = TextEditingController();
   final _regPassword = TextEditingController();
   final _regConfirm = TextEditingController();
+  final _regAccessCode = TextEditingController();
 
   bool _busy = false;
   bool _agree = false;
@@ -134,14 +135,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       email: _regEmail.text.trim(),
       username: _regUsername.text.trim(),
       password: _regPassword.text,
+      accessCode: _regAccessCode.text.trim(),
     );
 
     if (!mounted) return;
     setState(() => _busy = false);
 
-    if (result == null) {
-      setState(() =>
-          _error = t.authErrorRegistrationFailed);
+    if (!result.ok) {
+      // The access_code field is the one error worth surfacing
+      // specifically (wrong/expired/missing code) -- anything else
+      // (taken username, bad email, etc.) falls back to the existing
+      // generic message, matching how every other field error here
+      // already works.
+      final accessCodeError = (result.errorBody?['errors']
+          as Map<String, dynamic>?)?['access_code'] as List?;
+      setState(() => _error = accessCodeError != null && accessCodeError.isNotEmpty
+          ? accessCodeError.first as String
+          : t.authErrorRegistrationFailed);
       return;
     }
 
@@ -154,7 +164,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     _tabs.dispose();
     for (final c in [
       _loginEmail, _loginPassword, _regEmail, _regUsername,
-      _regPassword, _regConfirm
+      _regPassword, _regConfirm, _regAccessCode
     ]) {
       c.dispose();
     }
@@ -281,6 +291,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           KodaTextField(controller: _regPassword, hintText: t.authPasswordHint, obscureText: true),
           const SizedBox(height: 10),
           KodaTextField(controller: _regConfirm, hintText: t.authConfirmPasswordHint, obscureText: true),
+          const SizedBox(height: 10),
+          // Only actually required while Koda is invite-only (see
+          // Koda.PlatformSettings server-side) -- shown unconditionally
+          // rather than fetched-and-conditionally-shown so there's no
+          // extra round trip before the form even renders; harmless/
+          // ignored once registration opens up, and the server's own
+          // error message tells the user clearly if it was required and
+          // missing or wrong.
+          KodaTextField(controller: _regAccessCode, hintText: t.authAccessCodeHint),
           const SizedBox(height: 14),
           GestureDetector(
             onTap: () => setState(() => _agree = !_agree),

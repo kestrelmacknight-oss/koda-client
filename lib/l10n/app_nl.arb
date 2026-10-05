@@ -135,6 +135,8 @@
   "authSignInButton": "Aanmelden",
   "authUsernameHint": "Gebruikersnaam",
   "authConfirmPasswordHint": "Wachtwoord bevestigen",
+
+  "authAccessCodeHint": "Toegangscode (indien je er een hebt)",
   "authAgreeToTerms": "Ik ga akkoord met de Algemene voorwaarden en het Privacybeleid",
   "authCreateAccountButton": "Account aanmaken",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "Bericht losmaken",
   "homeReportMessageAction": "Bericht melden",
   "homeReportSubmitted": "Melding verzonden.",
+
+  "messageActionForward": "Doorsturen",
+
+  "messageForwardedFromLabel": "Doorgestuurd van {name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "Bericht doorsturen",
+
+  "forwardDestinationPickerChannelsTab": "Kanalen",
+
+  "forwardDestinationPickerDmsTab": "Directe berichten",
+
+  "forwardDestinationPickerNoServers": "Je zit nog in geen enkele server.",
+
+  "forwardDestinationPickerNoChannels": "Geen tekstkanalen in deze server.",
+
+  "forwardDestinationPickerNoConversations": "Nog geen gesprekken.",
+
+  "forwardSuccessToast": "Bericht doorgestuurd.",
+
+  "forwardFailedToast": "Kon het bericht niet doorsturen -- probeer het opnieuw.",
   "homeAddReactionTitle": "Reactie toevoegen",
   "homeThreadCount": "{count, plural, one{{count} thread} other{{count} threads}}",
   "homeCategoryOptionsTooltip": "Categorie-opties",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "Backer- en beloningscodes",
   "adminNewCodeButton": "Nieuwe code",
   "adminNoCodesYet": "Nog geen codes",
+
+  "adminRewardsHeader": "Beloningen",
+
+  "adminRewardAlphaBetaAccess": "Alpha/Beta-toegang + Alpha Spark-badge",
+
+  "adminRewardLifetimePulse": "Permanente Pulse-status + Founder-badge + verbeterde bitrate",
+
+  "adminRewardMonthlyBoostTokenOne": "Maandelijks server-boosttoken (verbeterde audio/video)",
+
+  "adminRewardAnimatedFrameBundle": "Geanimeerd profielkader + Founders Hall + 2 maandelijkse servertokens",
+
+  "adminRewardTitanGlow": "Permanente \"Titan\"-gebruikersnaamgloed",
+
+  "adminRewardAnimatedFrame": "Geanimeerd kader",
+
+  "adminRewardFoundersHall": "Founders Hall",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, one{1 boosttoken/maand} other{{count} boosttokens/maand}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "Geen beloningen",
+
+  "adminRegistrationOpenLabel": "Registratie staat open voor iedereen",
+
+  "adminRegistrationInviteOnlyLabel": "Registratie is alleen op uitnodiging (backercode vereist)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "{uses} keer gebruikt",
   "adminSearchUsersHint": "Zoek gebruikers op gebruikersnaam...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "Later",
   "tierBadgeSparkSubscriber": "Spark-abonnee",
   "tierBadgePulseSubscriber": "Pulse-abonnee",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Founders Hall",
+
+  "foundersHallSubtitle": "De vroegste backers die Koda mogelijk maakten.",
+
+  "foundersHallEmptyState": "Nog geen founders.",
+
+  "settingsFoundersHallTitle": "Founders Hall",
+
+  "settingsFoundersHallSubtitle": "Bekijk wie heeft meegeholpen aan Koda",
   "vispAvatarInDevelopment": "IN ONTWIKKELING",
   "vispBoostAdvisorCouldNotAnswer": "Visp kon geen antwoord samenstellen.",
   "vispBoostAdvisorTitle": "Vraag het Visp: Boost ROI-adviseur",

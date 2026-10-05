@@ -135,6 +135,8 @@
   "authSignInButton": "サインイン",
   "authUsernameHint": "ユーザー名",
   "authConfirmPasswordHint": "パスワードの確認",
+
+  "authAccessCodeHint": "アクセスコード（お持ちの場合）",
   "authAgreeToTerms": "利用規約とプライバシーポリシーに同意します",
   "authCreateAccountButton": "アカウント作成",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "ピン留めを解除",
   "homeReportMessageAction": "メッセージを報告",
   "homeReportSubmitted": "報告を送信しました。",
+
+  "messageActionForward": "転送",
+
+  "messageForwardedFromLabel": "{name}さんから転送",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "メッセージを転送",
+
+  "forwardDestinationPickerChannelsTab": "チャンネル",
+
+  "forwardDestinationPickerDmsTab": "ダイレクトメッセージ",
+
+  "forwardDestinationPickerNoServers": "まだどのサーバーにも参加していません。",
+
+  "forwardDestinationPickerNoChannels": "このサーバーにテキストチャンネルがありません。",
+
+  "forwardDestinationPickerNoConversations": "まだ会話がありません。",
+
+  "forwardSuccessToast": "メッセージを転送しました。",
+
+  "forwardFailedToast": "メッセージを転送できませんでした -- もう一度お試しください。",
   "homeAddReactionTitle": "リアクションを追加",
   "homeThreadCount": "{count, plural, other{スレッド{count}件}}",
   "homeCategoryOptionsTooltip": "カテゴリーオプション",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "バッカー＆リワードコード",
   "adminNewCodeButton": "新規コード",
   "adminNoCodesYet": "コードはまだありません",
+
+  "adminRewardsHeader": "リワード",
+
+  "adminRewardAlphaBetaAccess": "アルファ/ベータアクセス + Alpha Sparkバッジ",
+
+  "adminRewardLifetimePulse": "ライフタイムPulse + Founderバッジ + 強化ビットレート",
+
+  "adminRewardMonthlyBoostTokenOne": "月間サーバーブーストトークン（音声/映像の強化）",
+
+  "adminRewardAnimatedFrameBundle": "アニメーションプロフィールフレーム + Founders Hall + 月間サーバートークン2個",
+
+  "adminRewardTitanGlow": "永続的な\"Titan\"ユーザー名グロー",
+
+  "adminRewardAnimatedFrame": "アニメーションフレーム",
+
+  "adminRewardFoundersHall": "Founders Hall",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, other{月間{count}ブーストトークン}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "リワードなし",
+
+  "adminRegistrationOpenLabel": "登録は全員に開放されています",
+
+  "adminRegistrationInviteOnlyLabel": "登録は招待制です（バッカーコードが必要）",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "{uses} 回使用",
   "adminSearchUsersHint": "ユーザー名でユーザーを検索...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "後で",
   "tierBadgeSparkSubscriber": "Spark購読者",
   "tierBadgePulseSubscriber": "Pulse購読者",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Founders Hall",
+
+  "foundersHallSubtitle": "Kodaを実現させた最初の支援者たち。",
+
+  "foundersHallEmptyState": "まだファウンダーはいません。",
+
+  "settingsFoundersHallTitle": "Founders Hall",
+
+  "settingsFoundersHallSubtitle": "Kodaの構築を助けた人を見る",
   "vispAvatarInDevelopment": "開発中",
   "vispBoostAdvisorCouldNotAnswer": "Vispは回答をまとめられませんでした。",
   "vispBoostAdvisorTitle": "Vispに聞く：ブーストROIアドバイザー",

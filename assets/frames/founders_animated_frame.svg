@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- Founders animated avatar frame (placeholder art). The static ring
+       drawn here is wrapped in a pulsing-glow AnimatedBuilder by
+       lib/shared/tier_badge.dart's TierFramedAvatar -- this file is just
+       the ring + star-accent geometry the animation scales/fades, not
+       the animation itself. See founder_badge.svg for the matching gold
+       palette. -->
+  <defs>
+    <linearGradient id="foundersFrameGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE59A"/>
+      <stop offset="100%" stop-color="#D4A017"/>
+    </linearGradient>
+  </defs>
+  <circle cx="24" cy="24" r="22.5" fill="none" stroke="url(#foundersFrameGrad)" stroke-width="3"/>
+  <path d="M24 1.5 L25.6 5.3 L29.7 5.7 L26.6 8.4 L27.5 12.4 L24 10.3 L20.5 12.4 L21.4 8.4 L18.3 5.7 L22.4 5.3 Z" fill="#FFE59A"/>
+</svg>

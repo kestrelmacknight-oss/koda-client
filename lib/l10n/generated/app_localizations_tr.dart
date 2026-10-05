@@ -434,6 +434,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get authConfirmPasswordHint => 'Şifreyi onayla';
 
   @override
+  String get authAccessCodeHint => 'Erişim kodu (varsa)';
+
+  @override
   String get authAgreeToTerms =>
       'Şartlar ve Koşulları ve Gizlilik Politikasını kabul ediyorum';
 
@@ -707,6 +710,40 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get homeReportSubmitted => 'Bildirim gönderildi.';
+
+  @override
+  String get messageActionForward => 'İlet';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return '$name tarafından iletildi';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => 'Mesajı ilet';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => 'Kanallar';
+
+  @override
+  String get forwardDestinationPickerDmsTab => 'Doğrudan Mesajlar';
+
+  @override
+  String get forwardDestinationPickerNoServers =>
+      'Henüz hiçbir sunucuda değilsin.';
+
+  @override
+  String get forwardDestinationPickerNoChannels =>
+      'Bu sunucuda metin kanalı yok.';
+
+  @override
+  String get forwardDestinationPickerNoConversations => 'Henüz konuşma yok.';
+
+  @override
+  String get forwardSuccessToast => 'Mesaj iletildi.';
+
+  @override
+  String get forwardFailedToast => 'Mesaj iletilemedi -- tekrar deneyin.';
 
   @override
   String get homeAddReactionTitle => 'Tepki Ekle';
@@ -1476,6 +1513,55 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get adminNoCodesYet => 'Henüz kod yok';
+
+  @override
+  String get adminRewardsHeader => 'Ödüller';
+
+  @override
+  String get adminRewardAlphaBetaAccess =>
+      'Alfa/Beta Erişimi + Alpha Spark Rozeti';
+
+  @override
+  String get adminRewardLifetimePulse =>
+      'Ömür Boyu Pulse Durumu + Founder Rozeti + Geliştirilmiş Bit Hızı';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne =>
+      'Aylık Sunucu Güçlendirme Jetonu (Geliştirilmiş Ses/Görüntü)';
+
+  @override
+  String get adminRewardAnimatedFrameBundle =>
+      'Animasyonlu Profil Çerçevesi + Founders Hall + Aylık 2 Sunucu Jetonu';
+
+  @override
+  String get adminRewardTitanGlow => 'Kalıcı \"Titan\" Kullanıcı Adı Parıltısı';
+
+  @override
+  String get adminRewardAnimatedFrame => 'Animasyonlu çerçeve';
+
+  @override
+  String get adminRewardFoundersHall => 'Founders Hall';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ayda $count güçlendirme jetonu',
+      one: 'Ayda 1 güçlendirme jetonu',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => 'Ödül yok';
+
+  @override
+  String get adminRegistrationOpenLabel => 'Kayıt herkese açık';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel =>
+      'Kayıt yalnızca davetle (destekçi kodu gerekli)';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -3748,6 +3834,29 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get tierBadgePulseSubscriber => 'Pulse abonesi';
+
+  @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => 'Founders Hall';
+
+  @override
+  String get foundersHallSubtitle =>
+      'Koda’yı mümkün kılan en eski destekçiler.';
+
+  @override
+  String get foundersHallEmptyState => 'Henüz kurucu yok.';
+
+  @override
+  String get settingsFoundersHallTitle => 'Founders Hall';
+
+  @override
+  String get settingsFoundersHallSubtitle =>
+      'Koda’yı kimin inşa etmeye yardım ettiğini gör';
 
   @override
   String get vispAvatarInDevelopment => 'GELİŞTİRİLİYOR';

@@ -435,6 +435,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get authConfirmPasswordHint => 'Xác nhận mật khẩu';
 
   @override
+  String get authAccessCodeHint => 'Mã truy cập (nếu có)';
+
+  @override
   String get authAgreeToTerms =>
       'Tôi đồng ý với Điều khoản & Điều kiện và Chính sách quyền riêng tư';
 
@@ -711,6 +714,42 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get homeReportSubmitted => 'Đã gửi báo cáo.';
+
+  @override
+  String get messageActionForward => 'Chuyển tiếp';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return 'Đã chuyển tiếp từ $name';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => 'Chuyển tiếp tin nhắn';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => 'Kênh';
+
+  @override
+  String get forwardDestinationPickerDmsTab => 'Tin nhắn trực tiếp';
+
+  @override
+  String get forwardDestinationPickerNoServers =>
+      'Bạn chưa tham gia máy chủ nào.';
+
+  @override
+  String get forwardDestinationPickerNoChannels =>
+      'Không có kênh văn bản nào trong máy chủ này.';
+
+  @override
+  String get forwardDestinationPickerNoConversations =>
+      'Chưa có cuộc trò chuyện nào.';
+
+  @override
+  String get forwardSuccessToast => 'Đã chuyển tiếp tin nhắn.';
+
+  @override
+  String get forwardFailedToast =>
+      'Không thể chuyển tiếp tin nhắn -- hãy thử lại.';
 
   @override
   String get homeAddReactionTitle => 'Thêm biểu cảm';
@@ -1479,6 +1518,55 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get adminNoCodesYet => 'Chưa có mã nào';
+
+  @override
+  String get adminRewardsHeader => 'Phần thưởng';
+
+  @override
+  String get adminRewardAlphaBetaAccess =>
+      'Quyền truy cập Alpha/Beta + Huy hiệu Alpha Spark';
+
+  @override
+  String get adminRewardLifetimePulse =>
+      'Trạng thái Pulse vĩnh viễn + Huy hiệu Founder + Bitrate nâng cao';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne =>
+      'Token tăng cường máy chủ hàng tháng (Âm thanh/Video nâng cao)';
+
+  @override
+  String get adminRewardAnimatedFrameBundle =>
+      'Khung hồ sơ hoạt hình + Founders Hall + 2 token máy chủ hàng tháng';
+
+  @override
+  String get adminRewardTitanGlow =>
+      'Hiệu ứng phát sáng tên người dùng \"Titan\" vĩnh viễn';
+
+  @override
+  String get adminRewardAnimatedFrame => 'Khung hoạt hình';
+
+  @override
+  String get adminRewardFoundersHall => 'Founders Hall';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count token tăng cường/tháng',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => 'Không có phần thưởng';
+
+  @override
+  String get adminRegistrationOpenLabel => 'Đăng ký mở cho tất cả mọi người';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel =>
+      'Đăng ký chỉ theo lời mời (yêu cầu mã người hậu thuẫn)';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -3735,6 +3823,28 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get tierBadgePulseSubscriber => 'Người đăng ký Pulse';
+
+  @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => 'Founders Hall';
+
+  @override
+  String get foundersHallSubtitle =>
+      'Những người hậu thuẫn sớm nhất đã giúp Koda trở thành hiện thực.';
+
+  @override
+  String get foundersHallEmptyState => 'Chưa có người sáng lập nào.';
+
+  @override
+  String get settingsFoundersHallTitle => 'Founders Hall';
+
+  @override
+  String get settingsFoundersHallSubtitle => 'Xem ai đã giúp xây dựng Koda';
 
   @override
   String get vispAvatarInDevelopment => 'ĐANG PHÁT TRIỂN';

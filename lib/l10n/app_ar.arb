@@ -135,6 +135,8 @@
   "authSignInButton": "تسجيل الدخول",
   "authUsernameHint": "اسم المستخدم",
   "authConfirmPasswordHint": "تأكيد كلمة المرور",
+
+  "authAccessCodeHint": "رمز الوصول (إن وجد)",
   "authAgreeToTerms": "أوافق على الشروط والأحكام وسياسة الخصوصية",
   "authCreateAccountButton": "إنشاء حساب",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "إلغاء تثبيت الرسالة",
   "homeReportMessageAction": "الإبلاغ عن الرسالة",
   "homeReportSubmitted": "تم إرسال البلاغ.",
+
+  "messageActionForward": "إعادة توجيه",
+
+  "messageForwardedFromLabel": "تمت إعادة التوجيه من {name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "إعادة توجيه الرسالة",
+
+  "forwardDestinationPickerChannelsTab": "القنوات",
+
+  "forwardDestinationPickerDmsTab": "الرسائل المباشرة",
+
+  "forwardDestinationPickerNoServers": "أنت لست عضوًا في أي خادم بعد.",
+
+  "forwardDestinationPickerNoChannels": "لا توجد قنوات نصية في هذا الخادم.",
+
+  "forwardDestinationPickerNoConversations": "لا توجد محادثات بعد.",
+
+  "forwardSuccessToast": "تم إعادة توجيه الرسالة.",
+
+  "forwardFailedToast": "تعذرت إعادة توجيه الرسالة -- حاول مرة أخرى.",
   "homeAddReactionTitle": "إضافة تفاعل",
   "homeThreadCount": "{count, plural, zero{{count} مناقشة} one{مناقشة واحدة} two{مناقشتان} few{{count} مناقشات} many{{count} مناقشة} other{{count} مناقشة}}",
   "homeCategoryOptionsTooltip": "خيارات الفئة",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "رموز الداعمين والمكافآت",
   "adminNewCodeButton": "رمز جديد",
   "adminNoCodesYet": "لا توجد رموز بعد",
+
+  "adminRewardsHeader": "المكافآت",
+
+  "adminRewardAlphaBetaAccess": "الوصول للنسخة التجريبية + شعار Alpha Spark",
+
+  "adminRewardLifetimePulse": "عضوية Pulse مدى الحياة + شعار Founder + معدل بت محسّن",
+
+  "adminRewardMonthlyBoostTokenOne": "رمز تعزيز خادم شهري (صوت وفيديو محسّن)",
+
+  "adminRewardAnimatedFrameBundle": "إطار ملف شخصي متحرك + قاعة المؤسسين + رمزا تعزيز شهريًا",
+
+  "adminRewardTitanGlow": "توهج اسم المستخدم \"Titan\" الدائم",
+
+  "adminRewardAnimatedFrame": "إطار متحرك",
+
+  "adminRewardFoundersHall": "قاعة المؤسسين",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, one{رمز تعزيز واحد شهريًا} other{{count} رموز تعزيز شهريًا}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "لا توجد مكافآت",
+
+  "adminRegistrationOpenLabel": "التسجيل مفتوح لكل شخص",
+
+  "adminRegistrationInviteOnlyLabel": "التسجيل بالدعوة فقط (يتطلب رمز داعم)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "{uses} استخدامًا",
   "adminSearchUsersHint": "البحث عن المستخدمين بالاسم...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "لاحقًا",
   "tierBadgeSparkSubscriber": "مشترك Spark",
   "tierBadgePulseSubscriber": "مشترك Pulse",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "قاعة المؤسسين",
+
+  "foundersHallSubtitle": "أقدم الداعمين الذين ساعدوا في بناء Koda.",
+
+  "foundersHallEmptyState": "لا يوجد مؤسسون بعد.",
+
+  "settingsFoundersHallTitle": "قاعة المؤسسين",
+
+  "settingsFoundersHallSubtitle": "شاهد من ساعد في بناء Koda",
   "vispAvatarInDevelopment": "قيد التطوير",
   "vispBoostAdvisorCouldNotAnswer": "تعذّر على Visp تجهيز إجابة.",
   "vispBoostAdvisorTitle": "اسأل Visp: مستشار عائد استثمار التعزيز",

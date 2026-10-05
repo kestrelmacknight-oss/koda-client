@@ -135,6 +135,8 @@
   "authSignInButton": "เข้าสู่ระบบ",
   "authUsernameHint": "ชื่อผู้ใช้",
   "authConfirmPasswordHint": "ยืนยันรหัสผ่าน",
+
+  "authAccessCodeHint": "โค้ดการเข้าถึง (ถ้ามี)",
   "authAgreeToTerms": "ฉันยอมรับข้อกำหนดและเงื่อนไข และนโยบายความเป็นส่วนตัว",
   "authCreateAccountButton": "สร้างบัญชี",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "เลิกปักหมุดข้อความ",
   "homeReportMessageAction": "รายงานข้อความ",
   "homeReportSubmitted": "ส่งรายงานแล้ว",
+
+  "messageActionForward": "ส่งต่อ",
+
+  "messageForwardedFromLabel": "ส่งต่อจาก {name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "ส่งต่อข้อความ",
+
+  "forwardDestinationPickerChannelsTab": "ช่อง",
+
+  "forwardDestinationPickerDmsTab": "ข้อความส่วนตัว",
+
+  "forwardDestinationPickerNoServers": "คุณยังไม่ได้เข้าร่วมเซิร์ฟเวอร์ใด ๆ",
+
+  "forwardDestinationPickerNoChannels": "ไม่มีช่องข้อความในเซิร์ฟเวอร์นี้",
+
+  "forwardDestinationPickerNoConversations": "ยังไม่มีการสนทนา",
+
+  "forwardSuccessToast": "ส่งต่อข้อความแล้ว",
+
+  "forwardFailedToast": "ไม่สามารถส่งต่อข้อความได้ -- ลองอีกครั้ง",
   "homeAddReactionTitle": "เพิ่มรีแอกชัน",
   "homeThreadCount": "{count, plural, other{{count} กระทู้}}",
   "homeCategoryOptionsTooltip": "ตัวเลือกหมวดหมู่",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "โค้ดผู้สนับสนุนและรางวัล",
   "adminNewCodeButton": "โค้ดใหม่",
   "adminNoCodesYet": "ยังไม่มีโค้ด",
+
+  "adminRewardsHeader": "รางวัล",
+
+  "adminRewardAlphaBetaAccess": "สิทธิ์เข้าถึง Alpha/Beta + ตรา Alpha Spark",
+
+  "adminRewardLifetimePulse": "สถานะ Pulse ตลอดชีพ + ตรา Founder + บิตเรตที่เพิ่มขึ้นถาวร",
+
+  "adminRewardMonthlyBoostTokenOne": "โทเค็นเพิ่มพลังเซิร์ฟเวอร์รายเดือน (เสียง/วิดีโอที่ดีขึ้น)",
+
+  "adminRewardAnimatedFrameBundle": "เฟรมโปรไฟล์แบบแอนิเมชัน + Founders Hall + โทเค็นเซิร์ฟเวอร์รายเดือน 2 ชิ้น",
+
+  "adminRewardTitanGlow": "เอฟเฟกต์เรืองแสงชื่อผู้ใช้ \"Titan\" แบบถาวร",
+
+  "adminRewardAnimatedFrame": "เฟรมแอนิเมชัน",
+
+  "adminRewardFoundersHall": "Founders Hall",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, other{{count} โทเค็นเพิ่มพลัง/เดือน}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "ไม่มีรางวัล",
+
+  "adminRegistrationOpenLabel": "การลงทะเบียนเปิดให้ทุกคน",
+
+  "adminRegistrationInviteOnlyLabel": "การลงทะเบียนแบบรับคำเชิญเท่านั้น (ต้องใช้โค้ดผู้สนับสนุน)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "ใช้ไปแล้ว {uses} ครั้ง",
   "adminSearchUsersHint": "ค้นหาผู้ใช้ตามชื่อผู้ใช้...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "ไว้ทีหลัง",
   "tierBadgeSparkSubscriber": "ผู้สมัครสมาชิก Spark",
   "tierBadgePulseSubscriber": "ผู้สมัครสมาชิก Pulse",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Founders Hall",
+
+  "foundersHallSubtitle": "ผู้สนับสนุนรุ่นแรกที่ทำให้ Koda เป็นไปได้",
+
+  "foundersHallEmptyState": "ยังไม่มีผู้ก่อตั้ง",
+
+  "settingsFoundersHallTitle": "Founders Hall",
+
+  "settingsFoundersHallSubtitle": "ดูว่าใครช่วยสร้าง Koda",
   "vispAvatarInDevelopment": "อยู่ระหว่างการพัฒนา",
   "vispBoostAdvisorCouldNotAnswer": "Visp ไม่สามารถสร้างคำตอบได้",
   "vispBoostAdvisorTitle": "ถาม Visp: ที่ปรึกษา ROI ของบูสต์",

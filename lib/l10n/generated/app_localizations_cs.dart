@@ -433,6 +433,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get authConfirmPasswordHint => 'Potvrďte heslo';
 
   @override
+  String get authAccessCodeHint => 'Přístupový kód (pokud máte)';
+
+  @override
   String get authAgreeToTerms =>
       'Souhlasím s Podmínkami použití a Zásadami ochrany osobních údajů';
 
@@ -707,6 +710,42 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get homeReportSubmitted => 'Nahlášení odesláno.';
+
+  @override
+  String get messageActionForward => 'Přeposlat';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return 'Přeposláno od uživatele $name';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => 'Přeposlat zprávu';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => 'Kanály';
+
+  @override
+  String get forwardDestinationPickerDmsTab => 'Přímé zprávy';
+
+  @override
+  String get forwardDestinationPickerNoServers =>
+      'Zatím nejste na žádném serveru.';
+
+  @override
+  String get forwardDestinationPickerNoChannels =>
+      'V tomto serveru nejsou žádné textové kanály.';
+
+  @override
+  String get forwardDestinationPickerNoConversations =>
+      'Zatím žádné konverzace.';
+
+  @override
+  String get forwardSuccessToast => 'Zpráva byla přeposlána.';
+
+  @override
+  String get forwardFailedToast =>
+      'Zprávu se nepodařilo přeposlat -- zkuste to znovu.';
 
   @override
   String get homeAddReactionTitle => 'Přidat reakci';
@@ -1481,6 +1520,55 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get adminNoCodesYet => 'Zatím žádné kódy';
+
+  @override
+  String get adminRewardsHeader => 'Odměny';
+
+  @override
+  String get adminRewardAlphaBetaAccess =>
+      'Přístup do alfy/bety + odznak Alpha Spark';
+
+  @override
+  String get adminRewardLifetimePulse =>
+      'Trvalé Pulse + odznak Founder + vylepšený datový tok';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne =>
+      'Měsíční token pro boost serveru (vylepšené audio/video)';
+
+  @override
+  String get adminRewardAnimatedFrameBundle =>
+      'Animovaný profilový rámeček + Síň zakladatelů + 2 měsíční tokeny serveru';
+
+  @override
+  String get adminRewardTitanGlow => 'Trvalý zářící efekt jména \"Titan\"';
+
+  @override
+  String get adminRewardAnimatedFrame => 'Animovaný rámeček';
+
+  @override
+  String get adminRewardFoundersHall => 'Síň zakladatelů';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count boost tokenů/měsíc',
+      one: '1 boost token/měsíc',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => 'Žádné odměny';
+
+  @override
+  String get adminRegistrationOpenLabel => 'Registrace je otevřená všem';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel =>
+      'Registrace je jen na pozvánky (je nutný kód backera)';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -3792,6 +3880,29 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get tierBadgePulseSubscriber => 'Předplatitel Pulse';
+
+  @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => 'Síň zakladatelů';
+
+  @override
+  String get foundersHallSubtitle =>
+      'Nejranější podporovatelé, kteří pomohli Koda vytvořit.';
+
+  @override
+  String get foundersHallEmptyState => 'Zatím žádní zakladatelé.';
+
+  @override
+  String get settingsFoundersHallTitle => 'Síň zakladatelů';
+
+  @override
+  String get settingsFoundersHallSubtitle =>
+      'Zjistěte, kdo pomohl Koda vytvořit';
 
   @override
   String get vispAvatarInDevelopment => 'VE VÝVOJI';

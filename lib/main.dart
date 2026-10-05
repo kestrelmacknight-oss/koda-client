@@ -10,7 +10,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_langdetect/flutter_langdetect.dart' as langdetect;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'core/accessibility_prefs.dart';
+import 'core/background_sync.dart';
 import 'core/language_prefs.dart';
 import 'core/language_options.dart';
 import 'core/api.dart';
@@ -70,6 +73,21 @@ void main(List<String> args) async {
     // engineering cost. See VoiceSettings in core/providers.dart for the
     // noise-suppression/echo-cancellation toggles this complements.
     await rtc.WebRTC.initialize(options: {'androidUseHardwareAudioProcessing': false});
+  }
+
+  if (isMobile) {
+    // Must be registered here, before runApp, not inside
+    // PushNotifications.init() (which only runs later, after login) --
+    // Firebase's background-message delivery requires the handler be
+    // known at app startup, since the isolate it runs in doesn't go
+    // through this file's own normal startup path at all. Same
+    // fail-safe swallow as push_notifications.dart's own init(): a
+    // missing/misconfigured Firebase project must never break login or
+    // the home screen. See lib/core/background_sync.dart.
+    try {
+      await Firebase.initializeApp();
+      FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
+    } catch (_) {}
   }
 
   // Message language auto-detection (see core/message_language.dart) --

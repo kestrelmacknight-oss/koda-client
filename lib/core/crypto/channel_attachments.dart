@@ -15,20 +15,26 @@ import 'attachment_crypto.dart';
 
 /// What actually gets epoch-key-encrypted as a channel message's
 /// "plaintext" is this small JSON envelope, not a bare string, whenever
-/// there's an attachment to carry alongside (or instead of) text. Every
-/// channel message encrypted before this existed is a plain string with
-/// no envelope; decodeChannelPayload treats anything that isn't a
-/// recognizable envelope as plain text rather than erroring, so old
-/// history keeps working.
-String encodeChannelPayload(String text, {EncryptedAttachmentMeta? attachment}) {
-  if (attachment == null) return text;
-  return jsonEncode({'koda_channel_v1': true, 'text': text, 'attachment': attachment.toJson()});
+/// there's an attachment or forward provenance to carry alongside (or
+/// instead of) text. Every channel message encrypted before this existed
+/// is a plain string with no envelope; decodeChannelPayload treats
+/// anything that isn't a recognizable envelope as plain text rather than
+/// erroring, so old history keeps working.
+String encodeChannelPayload(String text, {EncryptedAttachmentMeta? attachment, ForwardedFrom? forwardedFrom}) {
+  if (attachment == null && forwardedFrom == null) return text;
+  return jsonEncode({
+    'koda_channel_v1': true,
+    'text': text,
+    'attachment': attachment?.toJson(),
+    'forwarded_from': forwardedFrom?.toJson(),
+  });
 }
 
 class ChannelPayload {
   final String text;
   final EncryptedAttachmentMeta? attachment;
-  const ChannelPayload(this.text, this.attachment);
+  final ForwardedFrom? forwardedFrom;
+  const ChannelPayload(this.text, this.attachment, [this.forwardedFrom]);
 }
 
 ChannelPayload decodeChannelPayload(String raw) {
@@ -36,9 +42,11 @@ ChannelPayload decodeChannelPayload(String raw) {
     final decoded = jsonDecode(raw);
     if (decoded is Map<String, dynamic> && decoded['koda_channel_v1'] == true) {
       final attachmentJson = decoded['attachment'] as Map<String, dynamic>?;
+      final forwardedFromJson = decoded['forwarded_from'] as Map<String, dynamic>?;
       return ChannelPayload(
         decoded['text'] as String? ?? '',
         attachmentJson != null ? EncryptedAttachmentMeta.fromJson(attachmentJson) : null,
+        forwardedFromJson != null ? ForwardedFrom.fromJson(forwardedFromJson) : null,
       );
     }
   } catch (_) {

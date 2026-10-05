@@ -200,7 +200,27 @@ class VoiceSessionNotifier extends StateNotifier<VoiceSession?> {
     // Leave any existing session first
     if (state != null) await _doLeave();
 
-    final room = lk.Room();
+    // "Permanent enhanced bitrate" backer reward (see koda-server's
+    // Koda.Invites.apply_rewards/3) -- real SDK presets, not invented
+    // numbers: presetMusicHighQualityStereo (128kbps stereo) over the
+    // implicit default presetMusic (48kbps mono), and h1080_169's
+    // encoding (3Mbps/30fps) over the implicit default h720_169's
+    // (1.7Mbps/30fps). Setting these as the room's *defaults* means
+    // every existing setMicrophoneEnabled/publishVideoTrack call site
+    // stays untouched -- local.dart already falls back to
+    // room.roomOptions.default*PublishOptions when a call doesn't pass
+    // its own, which is exactly the behavior every call site here relies on.
+    final enhanced = _ref.read(authProvider).user?.hasEnhancedBitrate == true;
+    final room = lk.Room(
+      roomOptions: enhanced
+          ? lk.RoomOptions(
+              defaultAudioPublishOptions: const lk.AudioPublishOptions(
+                  encoding: lk.AudioEncoding.presetMusicHighQualityStereo),
+              defaultVideoPublishOptions: lk.VideoPublishOptions(
+                  videoEncoding: lk.VideoParametersPresets.h1080_169.encoding),
+            )
+          : const lk.RoomOptions(),
+    );
     try {
       await room.connect(url, token);
       await room.localParticipant?.setMicrophoneEnabled(true,

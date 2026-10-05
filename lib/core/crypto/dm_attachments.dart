@@ -51,15 +51,21 @@ Future<Uint8List> downloadAndDecryptDmAttachment(DmAttachmentMeta meta) =>
 // treats anything that isn't a recognizable envelope as legacy plain text
 // rather than erroring, so old history keeps working.
 
-String encodeDmPayload(String text, {DmAttachmentMeta? attachment}) {
-  if (attachment == null) return text;
-  return jsonEncode({'koda_dm_v1': true, 'text': text, 'attachment': attachment.toJson()});
+String encodeDmPayload(String text, {DmAttachmentMeta? attachment, ForwardedFrom? forwardedFrom}) {
+  if (attachment == null && forwardedFrom == null) return text;
+  return jsonEncode({
+    'koda_dm_v1': true,
+    'text': text,
+    'attachment': attachment?.toJson(),
+    'forwarded_from': forwardedFrom?.toJson(),
+  });
 }
 
 class DmPayload {
   final String text;
   final DmAttachmentMeta? attachment;
-  const DmPayload(this.text, this.attachment);
+  final ForwardedFrom? forwardedFrom;
+  const DmPayload(this.text, this.attachment, [this.forwardedFrom]);
 }
 
 DmPayload decodeDmPayload(String raw) {
@@ -67,9 +73,11 @@ DmPayload decodeDmPayload(String raw) {
     final decoded = jsonDecode(raw);
     if (decoded is Map<String, dynamic> && decoded['koda_dm_v1'] == true) {
       final attachmentJson = decoded['attachment'] as Map<String, dynamic>?;
+      final forwardedFromJson = decoded['forwarded_from'] as Map<String, dynamic>?;
       return DmPayload(
         decoded['text'] as String? ?? '',
         attachmentJson != null ? DmAttachmentMeta.fromJson(attachmentJson) : null,
+        forwardedFromJson != null ? ForwardedFrom.fromJson(forwardedFromJson) : null,
       );
     }
   } catch (_) {

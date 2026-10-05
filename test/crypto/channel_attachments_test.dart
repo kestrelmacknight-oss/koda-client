@@ -70,6 +70,39 @@ void main() {
       expect(decoded.attachment, isNull);
     });
 
+    test('forwarded_from round-trips alongside text and an attachment', () {
+      const meta = EncryptedAttachmentMeta(
+        url: 'https://cdn.koda.fyi/attachment/u1/789-ghi',
+        key: 'k', nonce: 'n', contentType: 'image/png', fileName: 'pic.png',
+      );
+      const forwardedFrom = ForwardedFrom(senderName: 'Alice', originalSentAt: '2026-01-01T00:00:00Z');
+      final payload = encodeChannelPayload('fwd text', attachment: meta, forwardedFrom: forwardedFrom);
+      final decoded = decodeChannelPayload(payload);
+
+      expect(decoded.text, 'fwd text');
+      expect(decoded.attachment!.fileName, 'pic.png');
+      expect(decoded.forwardedFrom, isNotNull);
+      expect(decoded.forwardedFrom!.senderName, 'Alice');
+      expect(decoded.forwardedFrom!.originalSentAt, '2026-01-01T00:00:00Z');
+    });
+
+    test('forwarded_from with no attachment still wraps the envelope rather than staying a bare string', () {
+      const forwardedFrom = ForwardedFrom(senderName: 'Bob', originalSentAt: '2026-01-01T00:00:00Z');
+      final payload = encodeChannelPayload('just text', forwardedFrom: forwardedFrom);
+      expect(payload, isNot('just text')); // must wrap -- a bare string has nowhere to carry forwardedFrom
+
+      final decoded = decodeChannelPayload(payload);
+      expect(decoded.text, 'just text');
+      expect(decoded.attachment, isNull);
+      expect(decoded.forwardedFrom!.senderName, 'Bob');
+    });
+
+    test('a message with no forwarded_from decodes with a null forwardedFrom', () {
+      final decoded = decodeChannelPayload(encodeChannelPayload('plain', attachment: const EncryptedAttachmentMeta(
+          url: 'u', key: 'k', nonce: 'n', contentType: 'image/png', fileName: 'f')));
+      expect(decoded.forwardedFrom, isNull);
+    });
+
     test('a DM envelope is not mistaken for a channel envelope', () {
       // Different discriminator key (koda_dm_v1 vs koda_channel_v1) --
       // decodeChannelPayload must not cross-decode the other envelope

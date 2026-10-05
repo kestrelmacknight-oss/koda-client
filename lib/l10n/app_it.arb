@@ -130,6 +130,8 @@
   "authSignInButton": "Accedi",
   "authUsernameHint": "Nome utente",
   "authConfirmPasswordHint": "Conferma password",
+
+  "authAccessCodeHint": "Codice di accesso (se ne hai uno)",
   "authAgreeToTerms": "Accetto i Termini di servizio e l'Informativa sulla privacy",
   "authCreateAccountButton": "Crea account",
   "dmSafetyNumberChangedWarning": "Il numero di sicurezza di questa conversazione è cambiato -- verificalo prima di inviare.",
@@ -215,6 +217,28 @@
   "homeUnpinMessageAction": "Rimuovi messaggio fissato",
   "homeReportMessageAction": "Segnala messaggio",
   "homeReportSubmitted": "Segnalazione inviata.",
+
+  "messageActionForward": "Inoltra",
+
+  "messageForwardedFromLabel": "Inoltrato da {name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "Inoltra messaggio",
+
+  "forwardDestinationPickerChannelsTab": "Canali",
+
+  "forwardDestinationPickerDmsTab": "Messaggi Diretti",
+
+  "forwardDestinationPickerNoServers": "Non fai ancora parte di nessun server.",
+
+  "forwardDestinationPickerNoChannels": "Nessun canale di testo in questo server.",
+
+  "forwardDestinationPickerNoConversations": "Nessuna conversazione ancora.",
+
+  "forwardSuccessToast": "Messaggio inoltrato.",
+
+  "forwardFailedToast": "Impossibile inoltrare il messaggio -- riprova.",
   "homeAddReactionTitle": "Aggiungi reazione",
   "homeThreadCount": "{count, plural, one{{count} thread} other{{count} thread}}",
   "homeCategoryOptionsTooltip": "Opzioni categoria",
@@ -432,6 +456,32 @@
   "adminBackerCodesHeader": "Codici Sostenitore e Ricompensa",
   "adminNewCodeButton": "Nuovo Codice",
   "adminNoCodesYet": "Ancora nessun codice",
+
+  "adminRewardsHeader": "Ricompense",
+
+  "adminRewardAlphaBetaAccess": "Accesso Alpha/Beta + Badge Alpha Spark",
+
+  "adminRewardLifetimePulse": "Stato Pulse a vita + Badge Founder + Bitrate migliorato",
+
+  "adminRewardMonthlyBoostTokenOne": "Token di boost server mensile (Audio/Video migliorato)",
+
+  "adminRewardAnimatedFrameBundle": "Cornice profilo animata + Founders Hall + 2 token server mensili",
+
+  "adminRewardTitanGlow": "Bagliore permanente del nome utente \"Titan\"",
+
+  "adminRewardAnimatedFrame": "Cornice animata",
+
+  "adminRewardFoundersHall": "Founders Hall",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, one{1 token boost/mese} other{{count} token boost/mese}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "Nessuna ricompensa",
+
+  "adminRegistrationOpenLabel": "La registrazione è aperta a tutti",
+
+  "adminRegistrationInviteOnlyLabel": "La registrazione è solo su invito (richiesto codice backer)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "{uses} utilizzi",
   "adminSearchUsersHint": "Cerca utenti per nome utente...",
@@ -1054,6 +1104,20 @@
   "updateNudgeLaterButton": "Più tardi",
   "tierBadgeSparkSubscriber": "Abbonato Spark",
   "tierBadgePulseSubscriber": "Abbonato Pulse",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Founders Hall",
+
+  "foundersHallSubtitle": "I primi sostenitori che hanno reso possibile Koda.",
+
+  "foundersHallEmptyState": "Nessun fondatore ancora.",
+
+  "settingsFoundersHallTitle": "Founders Hall",
+
+  "settingsFoundersHallSubtitle": "Scopri chi ha aiutato a costruire Koda",
   "vispAvatarInDevelopment": "IN SVILUPPO",
   "vispBoostAdvisorCouldNotAnswer": "Visp non è riuscito a formulare una risposta.",
   "vispBoostAdvisorTitle": "Chiedi a Visp: Consulente ROI Boost",

@@ -135,6 +135,8 @@
   "authSignInButton": "Zaloguj się",
   "authUsernameHint": "Nazwa użytkownika",
   "authConfirmPasswordHint": "Potwierdź hasło",
+
+  "authAccessCodeHint": "Kod dostępu (jeśli masz)",
   "authAgreeToTerms": "Akceptuję Regulamin i Politykę prywatności",
   "authCreateAccountButton": "Utwórz konto",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "Odepnij wiadomość",
   "homeReportMessageAction": "Zgłoś wiadomość",
   "homeReportSubmitted": "Zgłoszenie wysłane.",
+
+  "messageActionForward": "Przekaż dalej",
+
+  "messageForwardedFromLabel": "Przekazano od {name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "Przekaż wiadomość",
+
+  "forwardDestinationPickerChannelsTab": "Kanały",
+
+  "forwardDestinationPickerDmsTab": "Wiadomości bezpośrednie",
+
+  "forwardDestinationPickerNoServers": "Nie należysz jeszcze do żadnego serwera.",
+
+  "forwardDestinationPickerNoChannels": "Brak kanałów tekstowych na tym serwerze.",
+
+  "forwardDestinationPickerNoConversations": "Brak rozmów.",
+
+  "forwardSuccessToast": "Wiadomość przekazana.",
+
+  "forwardFailedToast": "Nie udało się przekazać wiadomości -- spróbuj ponownie.",
   "homeAddReactionTitle": "Dodaj reakcję",
   "homeThreadCount": "{count, plural, one{{count} wątek} few{{count} wątki} many{{count} wątków} other{{count} wątku}}",
   "homeCategoryOptionsTooltip": "Opcje kategorii",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "Kody wspierających i nagród",
   "adminNewCodeButton": "Nowy kod",
   "adminNoCodesYet": "Brak kodów",
+
+  "adminRewardsHeader": "Nagrody",
+
+  "adminRewardAlphaBetaAccess": "Dostęp Alpha/Beta + Odznaka Alpha Spark",
+
+  "adminRewardLifetimePulse": "Dożywotni status Pulse + Odznaka Founder + Zwiększony bitrate",
+
+  "adminRewardMonthlyBoostTokenOne": "Miesięczny token wzmocnienia serwera (Lepsze audio/wideo)",
+
+  "adminRewardAnimatedFrameBundle": "Animowana ramka profilu + Sala Założycieli + 2 miesięczne tokeny serwera",
+
+  "adminRewardTitanGlow": "Trwała poświata nazwy użytkownika \"Titan\"",
+
+  "adminRewardAnimatedFrame": "Animowana ramka",
+
+  "adminRewardFoundersHall": "Sala Założycieli",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, one{1 token wzmocnienia/miesiąc} few{{count} tokeny wzmocnienia/miesiąc} other{{count} tokenów wzmocnienia/miesiąc}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "Brak nagród",
+
+  "adminRegistrationOpenLabel": "Rejestracja jest otwarta dla wszystkich",
+
+  "adminRegistrationInviteOnlyLabel": "Rejestracja jest tylko na zaproszenia (wymagany kod wspierającego)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "Użycia: {uses}",
   "adminSearchUsersHint": "Szukaj użytkowników po nazwie...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "Później",
   "tierBadgeSparkSubscriber": "Subskrybent Spark",
   "tierBadgePulseSubscriber": "Subskrybent Pulse",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Sala Założycieli",
+
+  "foundersHallSubtitle": "Najwcześniejsi wspierający, którzy umożliwili powstanie Koda.",
+
+  "foundersHallEmptyState": "Jeszcze nie ma założycieli.",
+
+  "settingsFoundersHallTitle": "Sala Założycieli",
+
+  "settingsFoundersHallSubtitle": "Zobacz, kto pomógł zbudować Koda",
   "vispAvatarInDevelopment": "W TRAKCIE PRAC",
   "vispBoostAdvisorCouldNotAnswer": "Visp nie mógł przygotować odpowiedzi.",
   "vispBoostAdvisorTitle": "Zapytaj Visp: Doradca ROI podbić",

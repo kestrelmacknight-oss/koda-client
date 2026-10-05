@@ -437,6 +437,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get authConfirmPasswordHint => 'Confirmar contraseña';
 
   @override
+  String get authAccessCodeHint => 'Código de acceso (si tienes uno)';
+
+  @override
   String get authAgreeToTerms =>
       'Acepto los Términos y condiciones y la Política de privacidad';
 
@@ -711,6 +714,42 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get homeReportSubmitted => 'Reporte enviado.';
+
+  @override
+  String get messageActionForward => 'Reenviar';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return 'Reenviado de $name';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => 'Reenviar mensaje';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => 'Canales';
+
+  @override
+  String get forwardDestinationPickerDmsTab => 'Mensajes Directos';
+
+  @override
+  String get forwardDestinationPickerNoServers =>
+      'Aún no perteneces a ningún servidor.';
+
+  @override
+  String get forwardDestinationPickerNoChannels =>
+      'No hay canales de texto en este servidor.';
+
+  @override
+  String get forwardDestinationPickerNoConversations =>
+      'Aún no hay conversaciones.';
+
+  @override
+  String get forwardSuccessToast => 'Mensaje reenviado.';
+
+  @override
+  String get forwardFailedToast =>
+      'No se pudo reenviar el mensaje -- inténtalo de nuevo.';
 
   @override
   String get homeAddReactionTitle => 'Agregar reacción';
@@ -1483,6 +1522,57 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get adminNoCodesYet => 'Aún no hay códigos';
+
+  @override
+  String get adminRewardsHeader => 'Recompensas';
+
+  @override
+  String get adminRewardAlphaBetaAccess =>
+      'Acceso Alfa/Beta + Insignia Alpha Spark';
+
+  @override
+  String get adminRewardLifetimePulse =>
+      'Pulse de por vida + Insignia Founder + Bitrate mejorado';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne =>
+      'Token de impulso de servidor mensual (Audio/Video mejorado)';
+
+  @override
+  String get adminRewardAnimatedFrameBundle =>
+      'Marco de perfil animado + Salón de Fundadores + 2 tokens de servidor mensuales';
+
+  @override
+  String get adminRewardTitanGlow =>
+      'Brillo de nombre de usuario \"Titan\" permanente';
+
+  @override
+  String get adminRewardAnimatedFrame => 'Marco animado';
+
+  @override
+  String get adminRewardFoundersHall => 'Salón de Fundadores';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tokens de impulso/mes',
+      one: '1 token de impulso/mes',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => 'Sin recompensas';
+
+  @override
+  String get adminRegistrationOpenLabel =>
+      'El registro está abierto para todos';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel =>
+      'El registro es solo por invitación (se requiere código de patrocinador)';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -3770,6 +3860,28 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tierBadgePulseSubscriber => 'Suscriptor Pulse';
+
+  @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => 'Salón de Fundadores';
+
+  @override
+  String get foundersHallSubtitle =>
+      'Los primeros patrocinadores que hicieron posible Koda.';
+
+  @override
+  String get foundersHallEmptyState => 'Aún no hay fundadores.';
+
+  @override
+  String get settingsFoundersHallTitle => 'Salón de Fundadores';
+
+  @override
+  String get settingsFoundersHallSubtitle => 'Ve quién ayudó a construir Koda';
 
   @override
   String get vispAvatarInDevelopment => 'EN DESARROLLO';

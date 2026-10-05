@@ -22,6 +22,7 @@ const _storage = FlutterSecureStorage(
 
 const _keyMaterialKey = 'kcp_key_material_v1';
 const _tokenKey = 'koda_jwt_v1';
+const _userIdKey = 'koda_user_id_v1';
 const _deviceIdKey = 'kcp_device_id';
 
 /// [peerDeviceId] null selects the original (pre-multi-device) storage
@@ -52,6 +53,19 @@ class SecureStorage {
   static Future<String?> loadToken() => _storage.read(key: _tokenKey);
 
   static Future<void> clearToken() => _storage.delete(key: _tokenKey);
+
+  // ── My own user id ───────────────────────────────────────────────────────
+  // Kept alongside the token (set/cleared together by AuthNotifier, see
+  // providers.dart) specifically so background_sync.dart's push
+  // background handler -- which runs in its own isolate with no
+  // Riverpod authProvider state at all -- has a way to know whose
+  // messages it's decrypting.
+
+  static Future<void> saveUserId(String userId) => _storage.write(key: _userIdKey, value: userId);
+
+  static Future<String?> loadUserId() => _storage.read(key: _userIdKey);
+
+  static Future<void> clearUserId() => _storage.delete(key: _userIdKey);
 
   // ── My own key material (identity, signed prekey, one-time prekeys) ────
 

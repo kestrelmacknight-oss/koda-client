@@ -429,6 +429,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get authConfirmPasswordHint => 'אימות סיסמה';
 
   @override
+  String get authAccessCodeHint => 'קוד גישה (אם יש לך)';
+
+  @override
   String get authAgreeToTerms =>
       'אני מסכים/ה לתנאים ולהגבלות ולמדיניות הפרטיות';
 
@@ -700,6 +703,38 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get homeReportSubmitted => 'הדיווח נשלח.';
+
+  @override
+  String get messageActionForward => 'העבר הלאה';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return 'הועבר מאת $name';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => 'העברת הודעה';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => 'ערוצים';
+
+  @override
+  String get forwardDestinationPickerDmsTab => 'הודעות ישירות';
+
+  @override
+  String get forwardDestinationPickerNoServers => 'אינך חבר באף שרת עדיין.';
+
+  @override
+  String get forwardDestinationPickerNoChannels => 'אין ערוצי טקסט בשרת זה.';
+
+  @override
+  String get forwardDestinationPickerNoConversations => 'אין עדיין שיחות.';
+
+  @override
+  String get forwardSuccessToast => 'ההודעה הועברה.';
+
+  @override
+  String get forwardFailedToast => 'לא ניתן היה להעביר את ההודעה -- נסה שוב.';
 
   @override
   String get homeAddReactionTitle => 'הוספת תגובה';
@@ -1469,6 +1504,54 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get adminNoCodesYet => 'אין עדיין קודים';
+
+  @override
+  String get adminRewardsHeader => 'תגמולים';
+
+  @override
+  String get adminRewardAlphaBetaAccess => 'גישת אלפא/בטא + תג Alpha Spark';
+
+  @override
+  String get adminRewardLifetimePulse =>
+      'מעמד Pulse לכל החיים + תג Founder + קצב סיביות משופר לצמיד';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne =>
+      'אסימון חיזוק שרת חודשי (אודיו/וידאו משופרים)';
+
+  @override
+  String get adminRewardAnimatedFrameBundle =>
+      'מסגרת פרופיל מונפשת + היכל המייסדים + 2 אסימוני שרת חודשיים';
+
+  @override
+  String get adminRewardTitanGlow => 'זוהר שם משתמש \"Titan\" קבוע';
+
+  @override
+  String get adminRewardAnimatedFrame => 'מסגרת מונפשת';
+
+  @override
+  String get adminRewardFoundersHall => 'היכל המייסדים';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count אסימוני חיזוק לחודש',
+      one: 'אסימון חיזוק אחד לחודש',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => 'אין תגמולים';
+
+  @override
+  String get adminRegistrationOpenLabel => 'ההרשמה פתוחה לכולם';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel =>
+      'ההרשמה היא בהזמנה בלבד (נדרש קוד תומך)';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -3748,6 +3831,27 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get tierBadgePulseSubscriber => 'מנוי/ת Pulse';
+
+  @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => 'היכל המייסדים';
+
+  @override
+  String get foundersHallSubtitle => 'התומכים המוקדמים ביותר שאפשרו את Koda.';
+
+  @override
+  String get foundersHallEmptyState => 'אין עדיין מייסדים.';
+
+  @override
+  String get settingsFoundersHallTitle => 'היכל המייסדים';
+
+  @override
+  String get settingsFoundersHallSubtitle => 'ראה מי עזר לבנות את Koda';
 
   @override
   String get vispAvatarInDevelopment => 'בפיתוח';

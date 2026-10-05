@@ -414,6 +414,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get authConfirmPasswordHint => '确认密码';
 
   @override
+  String get authAccessCodeHint => '访问代码（如果有）';
+
+  @override
   String get authAgreeToTerms => '我同意条款与条件及隐私政策';
 
   @override
@@ -683,6 +686,38 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeReportSubmitted => '举报已提交。';
+
+  @override
+  String get messageActionForward => '转发';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return '转发自$name';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => '转发消息';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => '频道';
+
+  @override
+  String get forwardDestinationPickerDmsTab => '私信';
+
+  @override
+  String get forwardDestinationPickerNoServers => '你还没有加入任何服务器。';
+
+  @override
+  String get forwardDestinationPickerNoChannels => '此服务器中没有文字频道。';
+
+  @override
+  String get forwardDestinationPickerNoConversations => '还没有对话。';
+
+  @override
+  String get forwardSuccessToast => '消息已转发。';
+
+  @override
+  String get forwardFailedToast => '无法转发消息 -- 请重试。';
 
   @override
   String get homeAddReactionTitle => '添加表情回应';
@@ -1432,6 +1467,49 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get adminNoCodesYet => '暂无代码';
+
+  @override
+  String get adminRewardsHeader => '奖励';
+
+  @override
+  String get adminRewardAlphaBetaAccess => 'Alpha/Beta 测试资格 + Alpha Spark 徽章';
+
+  @override
+  String get adminRewardLifetimePulse => '永久 Pulse 状态 + Founder 徽章 + 增强比特率';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne => '每月服务器加成令牌（增强音视频）';
+
+  @override
+  String get adminRewardAnimatedFrameBundle => '动态个人资料边框 + 创始人殿堂 + 每月 2 个服务器令牌';
+
+  @override
+  String get adminRewardTitanGlow => '永久 \"Titan\" 用户名光效';
+
+  @override
+  String get adminRewardAnimatedFrame => '动态边框';
+
+  @override
+  String get adminRewardFoundersHall => '创始人殿堂';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '每月 $count 个加成令牌',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => '无奖励';
+
+  @override
+  String get adminRegistrationOpenLabel => '注册对所有人开放';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel => '注册仅限邀请（需要支持者代码）';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -3603,6 +3681,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tierBadgePulseSubscriber => 'Pulse 订阅者';
 
   @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => '创始人殿堂';
+
+  @override
+  String get foundersHallSubtitle => '让 Koda 得以实现的最早支持者。';
+
+  @override
+  String get foundersHallEmptyState => '暂无创始人。';
+
+  @override
+  String get settingsFoundersHallTitle => '创始人殿堂';
+
+  @override
+  String get settingsFoundersHallSubtitle => '查看谁帮助构建了 Koda';
+
+  @override
   String get vispAvatarInDevelopment => '开发中';
 
   @override
@@ -4659,6 +4758,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get authConfirmPasswordHint => '確認密碼';
 
   @override
+  String get authAccessCodeHint => '存取代碼（如果有）';
+
+  @override
   String get authAgreeToTerms => '我同意條款與細則及隱私權政策';
 
   @override
@@ -4928,6 +5030,38 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get homeReportSubmitted => '檢舉已送出。';
+
+  @override
+  String get messageActionForward => '轉發';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return '轉發自$name';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => '轉發訊息';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => '頻道';
+
+  @override
+  String get forwardDestinationPickerDmsTab => '私訊';
+
+  @override
+  String get forwardDestinationPickerNoServers => '你還沒有加入任何伺服器。';
+
+  @override
+  String get forwardDestinationPickerNoChannels => '此伺服器中沒有文字頻道。';
+
+  @override
+  String get forwardDestinationPickerNoConversations => '還沒有對話。';
+
+  @override
+  String get forwardSuccessToast => '訊息已轉發。';
+
+  @override
+  String get forwardFailedToast => '無法轉發訊息 -- 請再試一次。';
 
   @override
   String get homeAddReactionTitle => '新增表情回應';
@@ -5678,6 +5812,49 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get adminNoCodesYet => '尚無代碼';
+
+  @override
+  String get adminRewardsHeader => '獎勵';
+
+  @override
+  String get adminRewardAlphaBetaAccess => 'Alpha/Beta 測試資格 + Alpha Spark 徽章';
+
+  @override
+  String get adminRewardLifetimePulse => '永久 Pulse 狀態 + Founder 徽章 + 增強位元率';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne => '每月伺服器加成代幣（增強音視訊）';
+
+  @override
+  String get adminRewardAnimatedFrameBundle => '動態個人檔案邊框 + 創始人殿堂 + 每月 2 個伺服器代幣';
+
+  @override
+  String get adminRewardTitanGlow => '永久 \"Titan\" 使用者名稱光效';
+
+  @override
+  String get adminRewardAnimatedFrame => '動態邊框';
+
+  @override
+  String get adminRewardFoundersHall => '創始人殿堂';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '每月 $count 個加成代幣',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => '無獎勵';
+
+  @override
+  String get adminRegistrationOpenLabel => '註冊對所有人開放';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel => '註冊僅限邀請（需要贊助者代碼）';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -7848,6 +8025,27 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get tierBadgePulseSubscriber => 'Pulse 訂閱者';
+
+  @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => '創始人殿堂';
+
+  @override
+  String get foundersHallSubtitle => '讓 Koda 得以實現的最早贊助者。';
+
+  @override
+  String get foundersHallEmptyState => '尚無創始人。';
+
+  @override
+  String get settingsFoundersHallTitle => '創始人殿堂';
+
+  @override
+  String get settingsFoundersHallSubtitle => '查看誰幫助建構了 Koda';
 
   @override
   String get vispAvatarInDevelopment => '開發中';

@@ -135,6 +135,8 @@
   "authSignInButton": "Войти",
   "authUsernameHint": "Имя пользователя",
   "authConfirmPasswordHint": "Подтвердите пароль",
+
+  "authAccessCodeHint": "Код доступа (если есть)",
   "authAgreeToTerms": "Я принимаю Условия использования и Политику конфиденциальности",
   "authCreateAccountButton": "Создать аккаунт",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "Открепить сообщение",
   "homeReportMessageAction": "Пожаловаться на сообщение",
   "homeReportSubmitted": "Жалоба отправлена.",
+
+  "messageActionForward": "Переслать",
+
+  "messageForwardedFromLabel": "Переслано от {name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "Переслать сообщение",
+
+  "forwardDestinationPickerChannelsTab": "Каналы",
+
+  "forwardDestinationPickerDmsTab": "Личные сообщения",
+
+  "forwardDestinationPickerNoServers": "Вы пока не состоите ни на одном сервере.",
+
+  "forwardDestinationPickerNoChannels": "На этом сервере нет текстовых каналов.",
+
+  "forwardDestinationPickerNoConversations": "Пока нет бесед.",
+
+  "forwardSuccessToast": "Сообщение переслано.",
+
+  "forwardFailedToast": "Не удалось переслать сообщение -- попробуйте снова.",
   "homeAddReactionTitle": "Добавить реакцию",
   "homeThreadCount": "{count, plural, one{{count} тред} few{{count} треда} many{{count} тредов} other{{count} треда}}",
   "homeCategoryOptionsTooltip": "Параметры категории",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "Коды бэкеров и наград",
   "adminNewCodeButton": "Новый код",
   "adminNoCodesYet": "Пока нет кодов",
+
+  "adminRewardsHeader": "Награды",
+
+  "adminRewardAlphaBetaAccess": "Доступ к альфе/бете + значок Alpha Spark",
+
+  "adminRewardLifetimePulse": "Пожизненный статус Pulse + значок Founder + увеличенный битрейт",
+
+  "adminRewardMonthlyBoostTokenOne": "Ежемесячный токен усиления сервера (улучшенное аудио/видео)",
+
+  "adminRewardAnimatedFrameBundle": "Анимированная рамка профиля + Зал основателей + 2 ежемесячных токена сервера",
+
+  "adminRewardTitanGlow": "Постоянное свечение имени пользователя \"Titan\"",
+
+  "adminRewardAnimatedFrame": "Анимированная рамка",
+
+  "adminRewardFoundersHall": "Зал основателей",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, one{1 токен усиления/месяц} few{{count} токена усиления/месяц} many{{count} токенов усиления/месяц} other{{count} токена усиления/месяц}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "Нет наград",
+
+  "adminRegistrationOpenLabel": "Регистрация открыта для всех",
+
+  "adminRegistrationInviteOnlyLabel": "Регистрация только по приглашению (требуется код бэкера)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "Использований: {uses}",
   "adminSearchUsersHint": "Поиск пользователей по имени...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "Позже",
   "tierBadgeSparkSubscriber": "Подписчик Spark",
   "tierBadgePulseSubscriber": "Подписчик Pulse",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Зал основателей",
+
+  "foundersHallSubtitle": "Самые первые бэкеры, которые сделали Koda возможной.",
+
+  "foundersHallEmptyState": "Пока нет основателей.",
+
+  "settingsFoundersHallTitle": "Зал основателей",
+
+  "settingsFoundersHallSubtitle": "Узнайте, кто помог создать Koda",
   "vispAvatarInDevelopment": "В РАЗРАБОТКЕ",
   "vispBoostAdvisorCouldNotAnswer": "Visp не смог составить ответ.",
   "vispBoostAdvisorTitle": "Спросить Visp: Советник по окупаемости бустов",

@@ -40,6 +40,7 @@ import '../core/crypto/attachment_crypto.dart';
 import '../core/crypto/channel_attachments.dart';
 import '../core/crypto/channel_key_manager.dart';
 import 'encrypted_attachment_view.dart';
+import 'forward_destination_picker.dart';
 import 'widgets.dart';
 import 'custom_emoji.dart';
 import 'pronoun_label.dart';
@@ -450,6 +451,41 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
     }
   }
 
+  /// If [m] is itself already a forward, attribution stays pinned to the
+  /// *original* sender/timestamp rather than being overwritten with this
+  /// intermediate forwarder's identity -- matches Signal/Discord's
+  /// "forward chains collapse to the original source" convention.
+  ForwardedFrom _forwardedFromFor(Map<String, dynamic> m) {
+    final existing = m['_forwardedFrom'];
+    if (existing is ForwardedFrom) return existing;
+    final author = (m['author'] as Map<String, dynamic>?)?['username'] as String?;
+    return ForwardedFrom(
+      senderName: author ?? AppLocalizations.of(context).dmUnknownUser,
+      originalSentAt: (m['inserted_at'] as String?) ?? DateTime.now().toUtc().toIso8601String(),
+    );
+  }
+
+  Future<void> _forwardMessage(Map<String, dynamic> m) async {
+    final myUserId = ref.read(authProvider).user?.id;
+    if (myUserId == null) return;
+    final attachment = m['_attachment'];
+    final gifAttachment = m['attachment_url'] != null
+        ? {'url': m['attachment_url'], 'contentType': m['attachment_content_type']}
+        : null;
+    final ok = await showForwardDestinationPicker(
+      context,
+      text: m['content'] as String? ?? '',
+      originalAttachment: attachment is EncryptedAttachmentMeta ? attachment : null,
+      gifAttachment: gifAttachment,
+      forwardedFrom: _forwardedFromFor(m),
+      myUserId: myUserId,
+    );
+    if (ok == null || !mounted) return;
+    final t = AppLocalizations.of(context);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(ok ? t.forwardSuccessToast : t.forwardFailedToast)));
+  }
+
   Future<void> _showMessageActionMenu(Offset position, Map<String, dynamic> m, String channelId,
       {required bool isMine, required bool isPinned, required bool canDelete}) async {
     final t = AppLocalizations.of(context);
@@ -461,6 +497,8 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
         PopupMenuItem(value: 'reply', child: Text(t.homeReplyAction)),
         if (isMine && m['encrypted'] != true)
           PopupMenuItem(value: 'edit', child: Text(t.homeEditMessageAction)),
+        if (m['_decryptPending'] != true && m['_decryptFailed'] != true)
+          PopupMenuItem(value: 'forward', child: Text(t.messageActionForward)),
         PopupMenuItem(value: isPinned ? 'unpin' : 'pin',
             child: Text(isPinned ? t.homeUnpinMessageAction : t.homePinMessageAction)),
         if (canDelete) PopupMenuItem(
@@ -475,6 +513,9 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
     }
     if (action == 'edit' && mounted) {
       _editMessage(channelId, m);
+    }
+    if (action == 'forward' && mounted) {
+      _forwardMessage(m);
     }
     if (action == 'pin' && mounted) {
       final ok = await KodaApi.instance.pinMessage(channelId, m['id'] as String? ?? '');
@@ -610,6 +651,23 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
     if (updated != null && mounted) {
       setState(() => message['reactions'] = updated);
     }
+  }
+
+  /// Deliberately not the same bordered-quote style as _buildReplyPreview
+  /// -- a forward isn't a link back to an addressable message the way a
+  /// reply is (the origin message may not even exist in a context this
+  /// destination has access to), it's just attribution.
+  Widget _buildForwardedLabel(ForwardedFrom forwardedFrom) {
+    final t = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(Icons.forward, size: 12, color: KodaColors.text3),
+        const SizedBox(width: 4),
+        Text(t.messageForwardedFromLabel(forwardedFrom.senderName),
+            style: TextStyle(color: KodaColors.text3, fontSize: 11, fontStyle: FontStyle.italic)),
+      ]),
+    );
   }
 
   Widget _buildReplyPreview(Map<String, dynamic> replyTo) {
@@ -911,6 +969,8 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
                             ],
                           ),
                           const SizedBox(height: 2),
+                          if (m['_forwardedFrom'] != null)
+                            _buildForwardedLabel(m['_forwardedFrom'] as ForwardedFrom),
                           if (m['reply_to'] != null)
                             _buildReplyPreview(m['reply_to'] as Map<String, dynamic>),
                           if (m['_decryptPending'] == true)

@@ -21,9 +21,12 @@ import '../../core/presence_provider.dart';
 import '../../core/providers.dart';
 import '../../core/secure_storage.dart';
 import '../../core/time_utils.dart';
+import '../../core/crypto/attachment_crypto.dart' show ForwardedFrom;
 import '../../core/crypto/dm_attachments.dart';
 import '../../core/crypto/dm_session_manager.dart';
 import '../../core/crypto/double_ratchet.dart' show DoubleRatchetDecryptFailure;
+import '../../shared/forward_destination_picker.dart';
+import '../../shared/glowing_username.dart';
 import '../../shared/presence_status.dart';
 import '../../shared/pronoun_label.dart';
 import '../../shared/report_dialog.dart';
@@ -32,11 +35,16 @@ import '../../shared/widgets.dart';
 import 'safety_number_screen.dart';
 
 class DmScreen extends ConsumerStatefulWidget {
-  // Set by push-notification-tap / deep-link routing (see
-  // home_screen.dart's _handlePushTap) to jump straight into a specific
-  // conversation once it's loaded, rather than landing on the bare list.
+  // Set by push-notification-tap / in-app-notification-tap routing (see
+  // home_screen.dart's _routeToNotification) to jump straight into a
+  // specific conversation once it's loaded, rather than landing on the
+  // bare list.
   final String? initialConversationId;
-  const DmScreen({super.key, this.initialConversationId});
+  // Same routing, for a friend_request notification -- there's no
+  // conversation to jump into yet, just the Requests tab (index 2; see
+  // _tabs below) so the request is right there to accept or decline.
+  final int? initialTabIndex;
+  const DmScreen({super.key, this.initialConversationId, this.initialTabIndex});
   @override
   ConsumerState<DmScreen> createState() => _DmScreenState();
 }
@@ -72,7 +80,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 3, vsync: this);
+    _tabs = TabController(length: 3, vsync: this, initialIndex: widget.initialTabIndex ?? 0);
     _tabs.addListener(() {
       if (!_tabs.indexIsChanging) {
         if (_tabs.index == 1) _loadFriends();
@@ -81,6 +89,11 @@ class _DmScreenState extends ConsumerState<DmScreen>
     });
     _loadConversations();
     _loadUnreadCounts();
+    // The tab listener above only fires on a user-driven change, so
+    // landing directly on a non-default tab (initialTabIndex) needs its
+    // own explicit load or it'd just spin forever.
+    if (widget.initialTabIndex == 1) _loadFriends();
+    if (widget.initialTabIndex == 2) _loadRequests();
   }
 
   @override
@@ -139,8 +152,9 @@ class _DmScreenState extends ConsumerState<DmScreen>
       (convo['user'] as Map<String, dynamic>?)?['id'] as String?;
 
   /// Real end-to-end decryption (X3DH + Double Ratchet, see
-  /// lib/core/crypto) for DMs -- unlike channel messages, which aren't
-  /// encrypted yet (group E2EE is a separate, harder protocol). Each
+  /// lib/core/crypto) for DMs -- channel messages are genuinely E2EE too
+  /// (see channel_key_manager.dart's rotating epoch keys), just via a
+  /// different scheme suited to a group rather than a 1:1 ratchet. Each
   /// message key is used once and then gone by design, so plaintext is
   /// cached locally the moment it's known (send or decrypt) -- that
   /// cache, not the ratchet, is what lets history redisplay later.
@@ -206,6 +220,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
       ...message,
       'content': payload.text,
       if (payload.attachment != null) '_attachment': payload.attachment,
+      if (payload.forwardedFrom != null) '_forwardedFrom': payload.forwardedFrom,
       if (lang != null) '_detectedLang': lang,
     };
   }
@@ -471,6 +486,23 @@ class _DmScreenState extends ConsumerState<DmScreen>
     } catch (_) { return ''; }
   }
 
+  /// Deliberately not the same bordered-quote treatment a reply preview
+  /// would get -- a forward isn't a link back to an addressable message
+  /// (the origin may not exist in any context this conversation has
+  /// access to), it's just attribution.
+  Widget _buildForwardedLabel(ForwardedFrom forwardedFrom) {
+    final t = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(Icons.forward, size: 12, color: KodaColors.text3),
+        const SizedBox(width: 4),
+        Text(t.messageForwardedFromLabel(forwardedFrom.senderName),
+            style: TextStyle(color: KodaColors.text3, fontSize: 11, fontStyle: FontStyle.italic)),
+      ]),
+    );
+  }
+
   /// There's no "server" to compare a DM message's detected language
   /// against (see message_language.dart) -- the meaningful baseline
   /// here is the viewer's own UI language instead, explicit override
@@ -483,17 +515,26 @@ class _DmScreenState extends ConsumerState<DmScreen>
   /// Shared by the message row's right-click handler and its visible
   /// "more actions" trigger button (keyboard/Tab-reachable -- see
   /// accessibility Phase 4) so both paths show the exact same menu.
-  Future<void> _showDmMessageMenu(Offset position, Map<String, dynamic> m) async {
+  /// [canReport] excludes your own messages (report is other-party-only);
+  /// forward has no such restriction -- this menu is only ever opened for
+  /// a message that decrypted successfully in the first place, mine or
+  /// not, which is the only requirement to forward it.
+  Future<void> _showDmMessageMenu(Offset position, Map<String, dynamic> m, {required bool canReport}) async {
     final t = AppLocalizations.of(context);
     final action = await showMenu<String>(
       context: context,
       position: RelativeRect.fromLTRB(position.dx, position.dy, position.dx, position.dy),
       color: KodaColors.card,
       items: [
-        PopupMenuItem(value: 'report',
-            child: Text(t.dmReportMessage, style: TextStyle(color: KodaColors.accent))),
+        PopupMenuItem(value: 'forward', child: Text(t.messageActionForward)),
+        if (canReport)
+          PopupMenuItem(value: 'report',
+              child: Text(t.dmReportMessage, style: TextStyle(color: KodaColors.accent))),
       ],
     );
+    if (action == 'forward' && mounted) {
+      _forwardMessage(m);
+    }
     if (action == 'report' && mounted) {
       final submitted = await showReportDmMessageDialog(
         context,
@@ -505,6 +546,37 @@ class _DmScreenState extends ConsumerState<DmScreen>
             SnackBar(content: Text(t.dmReportSubmitted)));
       }
     }
+  }
+
+  /// If [m] is itself already a forward, attribution stays pinned to the
+  /// *original* sender/timestamp rather than this intermediate
+  /// forwarder's identity -- matches Signal/Discord's "forward chains
+  /// collapse to the original source" convention.
+  ForwardedFrom _forwardedFromFor(Map<String, dynamic> m) {
+    final existing = m['_forwardedFrom'];
+    if (existing is ForwardedFrom) return existing;
+    final author = (m['author'] as Map<String, dynamic>?)?['username'] as String?;
+    return ForwardedFrom(
+      senderName: author ?? AppLocalizations.of(context).dmUnknownUser,
+      originalSentAt: (m['inserted_at'] as String?) ?? DateTime.now().toUtc().toIso8601String(),
+    );
+  }
+
+  Future<void> _forwardMessage(Map<String, dynamic> m) async {
+    final myUserId = ref.read(authProvider).user?.id;
+    if (myUserId == null) return;
+    final attachment = m['_attachment'];
+    final ok = await showForwardDestinationPicker(
+      context,
+      text: m['content'] as String? ?? '',
+      originalAttachment: attachment is DmAttachmentMeta ? attachment : null,
+      forwardedFrom: _forwardedFromFor(m),
+      myUserId: myUserId,
+    );
+    if (ok == null || !mounted) return;
+    final t = AppLocalizations.of(context);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(ok ? t.forwardSuccessToast : t.forwardFailedToast)));
   }
 
   @override
@@ -605,7 +677,8 @@ class _DmScreenState extends ConsumerState<DmScreen>
                             leading: Stack(clipBehavior: Clip.none, children: [
                               KodaAvatar(username: name, size: 32,
                                   avatarUrl: other?['avatar_url'] as String?,
-                                  tier: other?['koda_tier'] as String?),
+                                  tier: other?['koda_tier'] as String?,
+                                  ownedFrames: List<String>.from(other?['owned_frames'] as List? ?? [])),
                               Positioned(
                                 bottom: -1, right: -1,
                                 child: Container(
@@ -619,13 +692,16 @@ class _DmScreenState extends ConsumerState<DmScreen>
                               ),
                             ]),
                             title: Row(mainAxisSize: MainAxisSize.min, children: [
-                              Flexible(child: Text(name,
-                                  style: TextStyle(
-                                      color: KodaColors.text1, fontSize: 13,
-                                      fontWeight: unread > 0 ? FontWeight.w700 : FontWeight.w400),
-                                  overflow: TextOverflow.ellipsis)),
+                              Flexible(child: GlowingUsername(
+                                  glows: List<String>.from(other?['glows'] as List? ?? []),
+                                  child: Text(name,
+                                      style: TextStyle(
+                                          color: KodaColors.text1, fontSize: 13,
+                                          fontWeight: unread > 0 ? FontWeight.w700 : FontWeight.w400),
+                                      overflow: TextOverflow.ellipsis))),
                               const SizedBox(width: 4),
-                              TierBadge(tier: other?['koda_tier'] as String?, size: 12),
+                              TierBadge(tier: other?['koda_tier'] as String?, size: 12,
+                                  rewardBadges: List<String>.from(other?['badges'] as List? ?? [])),
                             ]),
                             subtitle: customStatus != null && customStatus.isNotEmpty
                                 ? Text(customStatus,
@@ -675,10 +751,13 @@ class _DmScreenState extends ConsumerState<DmScreen>
         decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: KodaColors.border))),
         child: Row(children: [
-          Text(withPronouns(peerName, peer), style: TextStyle(
-              color: KodaColors.text1, fontWeight: FontWeight.w600, fontSize: 13)),
+          GlowingUsername(
+              glows: List<String>.from(peer?['glows'] as List? ?? []),
+              child: Text(withPronouns(peerName, peer), style: TextStyle(
+                  color: KodaColors.text1, fontWeight: FontWeight.w600, fontSize: 13))),
           const SizedBox(width: 6),
-          TierBadge(tier: peerTier, size: 13),
+          TierBadge(tier: peerTier, size: 13,
+              rewardBadges: List<String>.from(peer?['badges'] as List? ?? [])),
           const SizedBox(width: 8),
           Tooltip(
             message: t.dmEndToEndEncryptedTooltip,
@@ -725,8 +804,11 @@ class _DmScreenState extends ConsumerState<DmScreen>
                   final author = (m['author'] as Map<String, dynamic>?)?
                       ['username'] as String? ?? 'Unknown';
                   final canReport = !isMe && m['_undecryptable'] == null;
+                  final canForward = m['_undecryptable'] == null;
                   return GestureDetector(
-                    onSecondaryTapUp: !canReport ? null : (d) => _showDmMessageMenu(d.globalPosition, m),
+                    onSecondaryTapUp: !canForward
+                        ? null
+                        : (d) => _showDmMessageMenu(d.globalPosition, m, canReport: canReport),
                     child: Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Row(
@@ -750,6 +832,8 @@ class _DmScreenState extends ConsumerState<DmScreen>
                                         color: KodaColors.koda,
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600)),
+                              if (m['_forwardedFrom'] != null)
+                                _buildForwardedLabel(m['_forwardedFrom'] as ForwardedFrom),
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 8),
@@ -820,7 +904,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                             ],
                           ),
                         ),
-                        if (canReport)
+                        if (canForward)
                           Builder(builder: (buttonContext) => IconButton(
                             icon: Icon(Icons.more_vert, size: 15, color: KodaColors.text3),
                             tooltip: t.dmMessageActionsTooltip,
@@ -828,7 +912,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
                             onPressed: () {
                               final box = buttonContext.findRenderObject() as RenderBox;
                               final position = box.localToGlobal(box.size.center(Offset.zero));
-                              _showDmMessageMenu(position, m);
+                              _showDmMessageMenu(position, m, canReport: canReport);
                             },
                           )),
                         if (isMe) const SizedBox(width: 8),
@@ -922,14 +1006,18 @@ class _DmScreenState extends ConsumerState<DmScreen>
           child: ListTile(
             leading: KodaAvatar(username: name, size: 36,
                 avatarUrl: f['avatar_url'] as String?,
-                tier: f['koda_tier'] as String?),
+                tier: f['koda_tier'] as String?,
+                ownedFrames: List<String>.from(f['owned_frames'] as List? ?? [])),
             title: Row(mainAxisSize: MainAxisSize.min, children: [
-              Flexible(child: Text(name,
-                  style: TextStyle(color: KodaColors.text1,
-                      fontWeight: FontWeight.w500),
-                  overflow: TextOverflow.ellipsis)),
+              Flexible(child: GlowingUsername(
+                  glows: List<String>.from(f['glows'] as List? ?? []),
+                  child: Text(name,
+                      style: TextStyle(color: KodaColors.text1,
+                          fontWeight: FontWeight.w500),
+                      overflow: TextOverflow.ellipsis))),
               const SizedBox(width: 4),
-              TierBadge(tier: f['koda_tier'] as String?, size: 12),
+              TierBadge(tier: f['koda_tier'] as String?, size: 12,
+                  rewardBadges: List<String>.from(f['badges'] as List? ?? [])),
             ]),
             trailing: Row(mainAxisSize: MainAxisSize.min, children: [
               IconButton(

@@ -135,6 +135,8 @@
   "authSignInButton": "로그인",
   "authUsernameHint": "사용자 이름",
   "authConfirmPasswordHint": "비밀번호 확인",
+
+  "authAccessCodeHint": "액세스 코드 (있는 경우)",
   "authAgreeToTerms": "이용약관 및 개인정보 처리방침에 동의합니다",
   "authCreateAccountButton": "계정 만들기",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "메시지 고정 해제",
   "homeReportMessageAction": "메시지 신고",
   "homeReportSubmitted": "신고가 접수되었습니다.",
+
+  "messageActionForward": "전달",
+
+  "messageForwardedFromLabel": "{name}님이 전달함",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "메시지 전달",
+
+  "forwardDestinationPickerChannelsTab": "채널",
+
+  "forwardDestinationPickerDmsTab": "다이렉트 메시지",
+
+  "forwardDestinationPickerNoServers": "아직 참여한 서버가 없습니다.",
+
+  "forwardDestinationPickerNoChannels": "이 서버에 텍스트 채널이 없습니다.",
+
+  "forwardDestinationPickerNoConversations": "아직 대화가 없습니다.",
+
+  "forwardSuccessToast": "메시지를 전달했습니다.",
+
+  "forwardFailedToast": "메시지를 전달하지 못했습니다 -- 다시 시도하세요.",
   "homeAddReactionTitle": "반응 추가",
   "homeThreadCount": "{count, plural, other{스레드 {count}개}}",
   "homeCategoryOptionsTooltip": "카테고리 옵션",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "후원자 및 리워드 코드",
   "adminNewCodeButton": "새 코드",
   "adminNoCodesYet": "아직 코드가 없습니다",
+
+  "adminRewardsHeader": "보상",
+
+  "adminRewardAlphaBetaAccess": "알파/베타 액세스 + Alpha Spark 배지",
+
+  "adminRewardLifetimePulse": "영구 Pulse 상태 + Founder 배지 + 향상된 비트레이트",
+
+  "adminRewardMonthlyBoostTokenOne": "월간 서버 부스트 토큰 (향상된 오디오/비디오)",
+
+  "adminRewardAnimatedFrameBundle": "애니메이션 프로필 프레임 + Founders Hall + 월간 서버 토큰 2개",
+
+  "adminRewardTitanGlow": "영구적인 \"Titan\" 사용자 이름 글로우",
+
+  "adminRewardAnimatedFrame": "애니메이션 프레임",
+
+  "adminRewardFoundersHall": "Founders Hall",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, other{월 {count}개 부스트 토큰}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "보상 없음",
+
+  "adminRegistrationOpenLabel": "가입이 모두에게 열려 있습니다",
+
+  "adminRegistrationInviteOnlyLabel": "가입은 초대 전용입니다 (후원자 코드 필요)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "{uses}회 사용",
   "adminSearchUsersHint": "사용자 이름으로 사용자 검색...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "나중에",
   "tierBadgeSparkSubscriber": "Spark 구독자",
   "tierBadgePulseSubscriber": "Pulse 구독자",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Founders Hall",
+
+  "foundersHallSubtitle": "Koda를 가능하게 만든 가장 초기 후원자들.",
+
+  "foundersHallEmptyState": "아직 창립자가 없습니다.",
+
+  "settingsFoundersHallTitle": "Founders Hall",
+
+  "settingsFoundersHallSubtitle": "Koda를 만드는 데 도움을 준 사람을 확인하세요",
   "vispAvatarInDevelopment": "개발 중",
   "vispBoostAdvisorCouldNotAnswer": "Visp가 답변을 준비하지 못했습니다.",
   "vispBoostAdvisorTitle": "Visp에게 묻기: 부스트 ROI 어드바이저",

@@ -135,6 +135,8 @@
   "authSignInButton": "Увійти",
   "authUsernameHint": "Імʼя користувача",
   "authConfirmPasswordHint": "Підтвердіть пароль",
+
+  "authAccessCodeHint": "Код доступу (якщо є)",
   "authAgreeToTerms": "Я погоджуюся з Умовами використання та Політикою конфіденційності",
   "authCreateAccountButton": "Створити акаунт",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "Відкріпити повідомлення",
   "homeReportMessageAction": "Поскаржитися на повідомлення",
   "homeReportSubmitted": "Скаргу надіслано.",
+
+  "messageActionForward": "Переслати",
+
+  "messageForwardedFromLabel": "Переслано від {name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "Переслати повідомлення",
+
+  "forwardDestinationPickerChannelsTab": "Канали",
+
+  "forwardDestinationPickerDmsTab": "Прямі повідомлення",
+
+  "forwardDestinationPickerNoServers": "Ви ще не перебуваєте на жодному сервері.",
+
+  "forwardDestinationPickerNoChannels": "На цьому сервері немає текстових каналів.",
+
+  "forwardDestinationPickerNoConversations": "Поки немає розмов.",
+
+  "forwardSuccessToast": "Повідомлення переслано.",
+
+  "forwardFailedToast": "Не вдалося переслати повідомлення -- спробуйте ще раз.",
   "homeAddReactionTitle": "Додати реакцію",
   "homeThreadCount": "{count, plural, one{{count} гілка} few{{count} гілки} many{{count} гілок} other{{count} гілки}}",
   "homeCategoryOptionsTooltip": "Параметри категорії",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "Коди спонсорів і винагород",
   "adminNewCodeButton": "Новий код",
   "adminNoCodesYet": "Кодів поки немає",
+
+  "adminRewardsHeader": "Нагороди",
+
+  "adminRewardAlphaBetaAccess": "Доступ до альфи/бети + значок Alpha Spark",
+
+  "adminRewardLifetimePulse": "Довічний статус Pulse + значок Founder + збільшений бітрейт",
+
+  "adminRewardMonthlyBoostTokenOne": "Щомісячний токен посилення серверу (покращене аудіо/відео)",
+
+  "adminRewardAnimatedFrameBundle": "Анімована рамка профілю + Зал засновників + 2 щомісячні токени серверу",
+
+  "adminRewardTitanGlow": "Постійне сяйво імені користувача \"Titan\"",
+
+  "adminRewardAnimatedFrame": "Анімована рамка",
+
+  "adminRewardFoundersHall": "Зал засновників",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, one{1 токен посилення/місяць} few{{count} токени посилення/місяць} many{{count} токенів посилення/місяць} other{{count} токена посилення/місяць}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "Без нагород",
+
+  "adminRegistrationOpenLabel": "Реєстрація відкрита для всіх",
+
+  "adminRegistrationInviteOnlyLabel": "Реєстрація лише за запрошенням (потрібен код бекера)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "{uses} використань",
   "adminSearchUsersHint": "Пошук користувачів за іменем...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "Пізніше",
   "tierBadgeSparkSubscriber": "Підписник Spark",
   "tierBadgePulseSubscriber": "Підписник Pulse",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Зал засновників",
+
+  "foundersHallSubtitle": "Найперші бекери, які зробили Koda можливою.",
+
+  "foundersHallEmptyState": "Поки немає засновників.",
+
+  "settingsFoundersHallTitle": "Зал засновників",
+
+  "settingsFoundersHallSubtitle": "Дивіться, хто допоміг створити Koda",
   "vispAvatarInDevelopment": "У РОЗРОБЦІ",
   "vispBoostAdvisorCouldNotAnswer": "Visp не зміг скласти відповідь.",
   "vispBoostAdvisorTitle": "Запитати Visp: Радник з ROI бустів",

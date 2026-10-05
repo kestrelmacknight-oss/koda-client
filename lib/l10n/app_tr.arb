@@ -135,6 +135,8 @@
   "authSignInButton": "Giriş Yap",
   "authUsernameHint": "Kullanıcı adı",
   "authConfirmPasswordHint": "Şifreyi onayla",
+
+  "authAccessCodeHint": "Erişim kodu (varsa)",
   "authAgreeToTerms": "Şartlar ve Koşulları ve Gizlilik Politikasını kabul ediyorum",
   "authCreateAccountButton": "Hesap Oluştur",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "Mesaj Sabitlemesini Kaldır",
   "homeReportMessageAction": "Mesajı Bildir",
   "homeReportSubmitted": "Bildirim gönderildi.",
+
+  "messageActionForward": "İlet",
+
+  "messageForwardedFromLabel": "{name} tarafından iletildi",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "Mesajı ilet",
+
+  "forwardDestinationPickerChannelsTab": "Kanallar",
+
+  "forwardDestinationPickerDmsTab": "Doğrudan Mesajlar",
+
+  "forwardDestinationPickerNoServers": "Henüz hiçbir sunucuda değilsin.",
+
+  "forwardDestinationPickerNoChannels": "Bu sunucuda metin kanalı yok.",
+
+  "forwardDestinationPickerNoConversations": "Henüz konuşma yok.",
+
+  "forwardSuccessToast": "Mesaj iletildi.",
+
+  "forwardFailedToast": "Mesaj iletilemedi -- tekrar deneyin.",
   "homeAddReactionTitle": "Tepki Ekle",
   "homeThreadCount": "{count, plural, one{{count} konu} other{{count} konu}}",
   "homeCategoryOptionsTooltip": "Kategori seçenekleri",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "Destekçi ve Ödül Kodları",
   "adminNewCodeButton": "Yeni Kod",
   "adminNoCodesYet": "Henüz kod yok",
+
+  "adminRewardsHeader": "Ödüller",
+
+  "adminRewardAlphaBetaAccess": "Alfa/Beta Erişimi + Alpha Spark Rozeti",
+
+  "adminRewardLifetimePulse": "Ömür Boyu Pulse Durumu + Founder Rozeti + Geliştirilmiş Bit Hızı",
+
+  "adminRewardMonthlyBoostTokenOne": "Aylık Sunucu Güçlendirme Jetonu (Geliştirilmiş Ses/Görüntü)",
+
+  "adminRewardAnimatedFrameBundle": "Animasyonlu Profil Çerçevesi + Founders Hall + Aylık 2 Sunucu Jetonu",
+
+  "adminRewardTitanGlow": "Kalıcı \"Titan\" Kullanıcı Adı Parıltısı",
+
+  "adminRewardAnimatedFrame": "Animasyonlu çerçeve",
+
+  "adminRewardFoundersHall": "Founders Hall",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, one{Ayda 1 güçlendirme jetonu} other{Ayda {count} güçlendirme jetonu}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "Ödül yok",
+
+  "adminRegistrationOpenLabel": "Kayıt herkese açık",
+
+  "adminRegistrationInviteOnlyLabel": "Kayıt yalnızca davetle (destekçi kodu gerekli)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "{uses} kullanım",
   "adminSearchUsersHint": "Kullanıcı adına göre ara...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "Sonra",
   "tierBadgeSparkSubscriber": "Spark abonesi",
   "tierBadgePulseSubscriber": "Pulse abonesi",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Founders Hall",
+
+  "foundersHallSubtitle": "Koda’yı mümkün kılan en eski destekçiler.",
+
+  "foundersHallEmptyState": "Henüz kurucu yok.",
+
+  "settingsFoundersHallTitle": "Founders Hall",
+
+  "settingsFoundersHallSubtitle": "Koda’yı kimin inşa etmeye yardım ettiğini gör",
   "vispAvatarInDevelopment": "GELİŞTİRİLİYOR",
   "vispBoostAdvisorCouldNotAnswer": "Visp bir yanıt hazırlayamadı.",
   "vispBoostAdvisorTitle": "Visp'e Sor: Boost Getiri Danışmanı",

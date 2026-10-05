@@ -135,6 +135,8 @@
   "authSignInButton": "Masuk",
   "authUsernameHint": "Nama pengguna",
   "authConfirmPasswordHint": "Konfirmasi kata sandi",
+
+  "authAccessCodeHint": "Kode akses (jika Anda punya)",
   "authAgreeToTerms": "Saya menyetujui Syarat & Ketentuan dan Kebijakan Privasi",
   "authCreateAccountButton": "Buat Akun",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "Lepas Sematan Pesan",
   "homeReportMessageAction": "Laporkan Pesan",
   "homeReportSubmitted": "Laporan terkirim.",
+
+  "messageActionForward": "Teruskan",
+
+  "messageForwardedFromLabel": "Diteruskan dari {name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "Teruskan pesan",
+
+  "forwardDestinationPickerChannelsTab": "Saluran",
+
+  "forwardDestinationPickerDmsTab": "Pesan Langsung",
+
+  "forwardDestinationPickerNoServers": "Anda belum bergabung dengan server mana pun.",
+
+  "forwardDestinationPickerNoChannels": "Tidak ada saluran teks di server ini.",
+
+  "forwardDestinationPickerNoConversations": "Belum ada percakapan.",
+
+  "forwardSuccessToast": "Pesan diteruskan.",
+
+  "forwardFailedToast": "Tidak dapat meneruskan pesan -- coba lagi.",
   "homeAddReactionTitle": "Tambah Reaksi",
   "homeThreadCount": "{count, plural, other{{count} utas}}",
   "homeCategoryOptionsTooltip": "Opsi kategori",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "Kode Pendukung & Hadiah",
   "adminNewCodeButton": "Kode Baru",
   "adminNoCodesYet": "Belum ada kode",
+
+  "adminRewardsHeader": "Hadiah",
+
+  "adminRewardAlphaBetaAccess": "Akses Alpha/Beta + Lencana Alpha Spark",
+
+  "adminRewardLifetimePulse": "Status Pulse seumur hidup + Lencana Founder + Bitrate yang ditingkatkan",
+
+  "adminRewardMonthlyBoostTokenOne": "Token boost server bulanan (Audio/Video yang ditingkatkan)",
+
+  "adminRewardAnimatedFrameBundle": "Bingkai profil animasi + Founders Hall + 2 token server bulanan",
+
+  "adminRewardTitanGlow": "Efek cahaya nama pengguna \"Titan\" permanen",
+
+  "adminRewardAnimatedFrame": "Bingkai animasi",
+
+  "adminRewardFoundersHall": "Founders Hall",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, one{1 token boost/bulan} other{{count} token boost/bulan}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "Tidak ada hadiah",
+
+  "adminRegistrationOpenLabel": "Pendaftaran terbuka untuk semua orang",
+
+  "adminRegistrationInviteOnlyLabel": "Pendaftaran hanya dengan undangan (kode backer diperlukan)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "{uses} penggunaan",
   "adminSearchUsersHint": "Cari pengguna berdasarkan nama pengguna...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "Nanti",
   "tierBadgeSparkSubscriber": "Pelanggan Spark",
   "tierBadgePulseSubscriber": "Pelanggan Pulse",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Founders Hall",
+
+  "foundersHallSubtitle": "Para pendukung paling awal yang membuat Koda mungkin terwujud.",
+
+  "foundersHallEmptyState": "Belum ada founder.",
+
+  "settingsFoundersHallTitle": "Founders Hall",
+
+  "settingsFoundersHallSubtitle": "Lihat siapa yang membantu membangun Koda",
   "vispAvatarInDevelopment": "DALAM PENGEMBANGAN",
   "vispBoostAdvisorCouldNotAnswer": "Visp tidak dapat menyusun jawaban.",
   "vispBoostAdvisorTitle": "Tanya Visp: Penasihat ROI Boost",

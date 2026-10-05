@@ -419,6 +419,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get authConfirmPasswordHint => 'パスワードの確認';
 
   @override
+  String get authAccessCodeHint => 'アクセスコード（お持ちの場合）';
+
+  @override
   String get authAgreeToTerms => '利用規約とプライバシーポリシーに同意します';
 
   @override
@@ -689,6 +692,38 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get homeReportSubmitted => '報告を送信しました。';
+
+  @override
+  String get messageActionForward => '転送';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return '$nameさんから転送';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => 'メッセージを転送';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => 'チャンネル';
+
+  @override
+  String get forwardDestinationPickerDmsTab => 'ダイレクトメッセージ';
+
+  @override
+  String get forwardDestinationPickerNoServers => 'まだどのサーバーにも参加していません。';
+
+  @override
+  String get forwardDestinationPickerNoChannels => 'このサーバーにテキストチャンネルがありません。';
+
+  @override
+  String get forwardDestinationPickerNoConversations => 'まだ会話がありません。';
+
+  @override
+  String get forwardSuccessToast => 'メッセージを転送しました。';
+
+  @override
+  String get forwardFailedToast => 'メッセージを転送できませんでした -- もう一度お試しください。';
 
   @override
   String get homeAddReactionTitle => 'リアクションを追加';
@@ -1445,6 +1480,50 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get adminNoCodesYet => 'コードはまだありません';
+
+  @override
+  String get adminRewardsHeader => 'リワード';
+
+  @override
+  String get adminRewardAlphaBetaAccess => 'アルファ/ベータアクセス + Alpha Sparkバッジ';
+
+  @override
+  String get adminRewardLifetimePulse => 'ライフタイムPulse + Founderバッジ + 強化ビットレート';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne => '月間サーバーブーストトークン（音声/映像の強化）';
+
+  @override
+  String get adminRewardAnimatedFrameBundle =>
+      'アニメーションプロフィールフレーム + Founders Hall + 月間サーバートークン2個';
+
+  @override
+  String get adminRewardTitanGlow => '永続的な\"Titan\"ユーザー名グロー';
+
+  @override
+  String get adminRewardAnimatedFrame => 'アニメーションフレーム';
+
+  @override
+  String get adminRewardFoundersHall => 'Founders Hall';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '月間$countブーストトークン',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => 'リワードなし';
+
+  @override
+  String get adminRegistrationOpenLabel => '登録は全員に開放されています';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel => '登録は招待制です（バッカーコードが必要）';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -3638,6 +3717,27 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get tierBadgePulseSubscriber => 'Pulse購読者';
+
+  @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => 'Founders Hall';
+
+  @override
+  String get foundersHallSubtitle => 'Kodaを実現させた最初の支援者たち。';
+
+  @override
+  String get foundersHallEmptyState => 'まだファウンダーはいません。';
+
+  @override
+  String get settingsFoundersHallTitle => 'Founders Hall';
+
+  @override
+  String get settingsFoundersHallSubtitle => 'Kodaの構築を助けた人を見る';
 
   @override
   String get vispAvatarInDevelopment => '開発中';

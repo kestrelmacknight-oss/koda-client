@@ -135,6 +135,8 @@
   "authSignInButton": "Σύνδεση",
   "authUsernameHint": "Όνομα χρήστη",
   "authConfirmPasswordHint": "Επιβεβαίωση κωδικού πρόσβασης",
+
+  "authAccessCodeHint": "Κωδικός πρόσβασης (αν έχετε)",
   "authAgreeToTerms": "Συμφωνώ με τους Όρους & Προϋποθέσεις και την Πολιτική Απορρήτου",
   "authCreateAccountButton": "Δημιουργία λογαριασμού",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "Ξεκαρφίτσωμα μηνύματος",
   "homeReportMessageAction": "Αναφορά μηνύματος",
   "homeReportSubmitted": "Η αναφορά υποβλήθηκε.",
+
+  "messageActionForward": "Προώθηση",
+
+  "messageForwardedFromLabel": "Προωθήθηκε από {name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "Προώθηση μηνύματος",
+
+  "forwardDestinationPickerChannelsTab": "Κανάλια",
+
+  "forwardDestinationPickerDmsTab": "Άμεσα μηνύματα",
+
+  "forwardDestinationPickerNoServers": "Δεν είστε ακόμα σε κανέναν διακομιστή.",
+
+  "forwardDestinationPickerNoChannels": "Δεν υπάρχουν κανάλια κειμένου σε αυτόν τον διακομιστή.",
+
+  "forwardDestinationPickerNoConversations": "Δεν υπάρχουν ακόμα συνομιλίες.",
+
+  "forwardSuccessToast": "Το μήνυμα προωθήθηκε.",
+
+  "forwardFailedToast": "Δεν ήταν δυνατή η προώθηση του μηνύματος -- δοκιμάστε ξανά.",
   "homeAddReactionTitle": "Προσθήκη αντίδρασης",
   "homeThreadCount": "{count, plural, one{{count} νήμα} other{{count} νήματα}}",
   "homeCategoryOptionsTooltip": "Επιλογές κατηγορίας",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "Κωδικοί υποστηρικτών & ανταμοιβών",
   "adminNewCodeButton": "Νέος κωδικός",
   "adminNoCodesYet": "Δεν υπάρχουν κωδικοί ακόμα",
+
+  "adminRewardsHeader": "Ανταμοιβές",
+
+  "adminRewardAlphaBetaAccess": "Πρόσβαση Alpha/Beta + Σήμα Alpha Spark",
+
+  "adminRewardLifetimePulse": "Μόνιμη κατάσταση Pulse + Σήμα Founder + Βελτιωμένος ρυθμός bit",
+
+  "adminRewardMonthlyBoostTokenOne": "Μηνιαίο token ενίσχυσης διακομιστή (Βελτιωμένο ήχο/βίντεο)",
+
+  "adminRewardAnimatedFrameBundle": "Κινούμενο πλαίσιο προφίλ + Αίθουσα Ιδρυτών + 2 μηνιαία tokens διακομιστή",
+
+  "adminRewardTitanGlow": "Μόνιμη λάμψη ονόματος χρήστη \"Titan\"",
+
+  "adminRewardAnimatedFrame": "Κινούμενο πλαίσιο",
+
+  "adminRewardFoundersHall": "Αίθουσα Ιδρυτών",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, one{1 token ενίσχυσης/μήνα} other{{count} tokens ενίσχυσης/μήνα}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "Καμία ανταμοιβή",
+
+  "adminRegistrationOpenLabel": "Η εγγραφή είναι ανοιχτή σε όλους",
+
+  "adminRegistrationInviteOnlyLabel": "Η εγγραφή γίνεται μόνο με πρόσκληση (απαιτείται κωδικός υποστηρικτή)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "{uses} χρήσεις",
   "adminSearchUsersHint": "Αναζήτηση χρηστών με βάση το όνομα...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "Αργότερα",
   "tierBadgeSparkSubscriber": "Συνδρομητής Spark",
   "tierBadgePulseSubscriber": "Συνδρομητής Pulse",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Αίθουσα Ιδρυτών",
+
+  "foundersHallSubtitle": "Οι πρώτοι υποστηρικτές που έκαναν το Koda δυνατό.",
+
+  "foundersHallEmptyState": "Δεν υπάρχουν ιδρυτές ακόμα.",
+
+  "settingsFoundersHallTitle": "Αίθουσα Ιδρυτών",
+
+  "settingsFoundersHallSubtitle": "Δείτε ποιοι βοήθησαν να χτιστεί το Koda",
   "vispAvatarInDevelopment": "ΥΠΟ ΑΝΑΠΤΥΞΗ",
   "vispBoostAdvisorCouldNotAnswer": "Ο Visp δεν κατάφερε να συνθέσει μια απάντηση.",
   "vispBoostAdvisorTitle": "Ερώτηση στον Visp: Σύμβουλος ROI ενισχύσεων",

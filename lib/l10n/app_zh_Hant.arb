@@ -135,6 +135,8 @@
   "authSignInButton": "登入",
   "authUsernameHint": "使用者名稱",
   "authConfirmPasswordHint": "確認密碼",
+
+  "authAccessCodeHint": "存取代碼（如果有）",
   "authAgreeToTerms": "我同意條款與細則及隱私權政策",
   "authCreateAccountButton": "建立帳戶",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "取消釘選",
   "homeReportMessageAction": "檢舉訊息",
   "homeReportSubmitted": "檢舉已送出。",
+
+  "messageActionForward": "轉發",
+
+  "messageForwardedFromLabel": "轉發自{name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "轉發訊息",
+
+  "forwardDestinationPickerChannelsTab": "頻道",
+
+  "forwardDestinationPickerDmsTab": "私訊",
+
+  "forwardDestinationPickerNoServers": "你還沒有加入任何伺服器。",
+
+  "forwardDestinationPickerNoChannels": "此伺服器中沒有文字頻道。",
+
+  "forwardDestinationPickerNoConversations": "還沒有對話。",
+
+  "forwardSuccessToast": "訊息已轉發。",
+
+  "forwardFailedToast": "無法轉發訊息 -- 請再試一次。",
   "homeAddReactionTitle": "新增表情回應",
   "homeThreadCount": "{count, plural, other{{count} 則討論串}}",
   "homeCategoryOptionsTooltip": "分類選項",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "贊助者與獎勵代碼",
   "adminNewCodeButton": "新增代碼",
   "adminNoCodesYet": "尚無代碼",
+
+  "adminRewardsHeader": "獎勵",
+
+  "adminRewardAlphaBetaAccess": "Alpha/Beta 測試資格 + Alpha Spark 徽章",
+
+  "adminRewardLifetimePulse": "永久 Pulse 狀態 + Founder 徽章 + 增強位元率",
+
+  "adminRewardMonthlyBoostTokenOne": "每月伺服器加成代幣（增強音視訊）",
+
+  "adminRewardAnimatedFrameBundle": "動態個人檔案邊框 + 創始人殿堂 + 每月 2 個伺服器代幣",
+
+  "adminRewardTitanGlow": "永久 \"Titan\" 使用者名稱光效",
+
+  "adminRewardAnimatedFrame": "動態邊框",
+
+  "adminRewardFoundersHall": "創始人殿堂",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, other{每月 {count} 個加成代幣}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "無獎勵",
+
+  "adminRegistrationOpenLabel": "註冊對所有人開放",
+
+  "adminRegistrationInviteOnlyLabel": "註冊僅限邀請（需要贊助者代碼）",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "已使用 {uses} 次",
   "adminSearchUsersHint": "依使用者名稱搜尋使用者...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "稍後再說",
   "tierBadgeSparkSubscriber": "Spark 訂閱者",
   "tierBadgePulseSubscriber": "Pulse 訂閱者",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "創始人殿堂",
+
+  "foundersHallSubtitle": "讓 Koda 得以實現的最早贊助者。",
+
+  "foundersHallEmptyState": "尚無創始人。",
+
+  "settingsFoundersHallTitle": "創始人殿堂",
+
+  "settingsFoundersHallSubtitle": "查看誰幫助建構了 Koda",
   "vispAvatarInDevelopment": "開發中",
   "vispBoostAdvisorCouldNotAnswer": "Visp 無法整理出答案。",
   "vispBoostAdvisorTitle": "詢問 Visp：加成投資報酬顧問",

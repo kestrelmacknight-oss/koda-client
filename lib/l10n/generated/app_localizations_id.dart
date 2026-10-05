@@ -434,6 +434,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get authConfirmPasswordHint => 'Konfirmasi kata sandi';
 
   @override
+  String get authAccessCodeHint => 'Kode akses (jika Anda punya)';
+
+  @override
   String get authAgreeToTerms =>
       'Saya menyetujui Syarat & Ketentuan dan Kebijakan Privasi';
 
@@ -707,6 +710,40 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get homeReportSubmitted => 'Laporan terkirim.';
+
+  @override
+  String get messageActionForward => 'Teruskan';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return 'Diteruskan dari $name';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => 'Teruskan pesan';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => 'Saluran';
+
+  @override
+  String get forwardDestinationPickerDmsTab => 'Pesan Langsung';
+
+  @override
+  String get forwardDestinationPickerNoServers =>
+      'Anda belum bergabung dengan server mana pun.';
+
+  @override
+  String get forwardDestinationPickerNoChannels =>
+      'Tidak ada saluran teks di server ini.';
+
+  @override
+  String get forwardDestinationPickerNoConversations => 'Belum ada percakapan.';
+
+  @override
+  String get forwardSuccessToast => 'Pesan diteruskan.';
+
+  @override
+  String get forwardFailedToast => 'Tidak dapat meneruskan pesan -- coba lagi.';
 
   @override
   String get homeAddReactionTitle => 'Tambah Reaksi';
@@ -1474,6 +1511,57 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get adminNoCodesYet => 'Belum ada kode';
+
+  @override
+  String get adminRewardsHeader => 'Hadiah';
+
+  @override
+  String get adminRewardAlphaBetaAccess =>
+      'Akses Alpha/Beta + Lencana Alpha Spark';
+
+  @override
+  String get adminRewardLifetimePulse =>
+      'Status Pulse seumur hidup + Lencana Founder + Bitrate yang ditingkatkan';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne =>
+      'Token boost server bulanan (Audio/Video yang ditingkatkan)';
+
+  @override
+  String get adminRewardAnimatedFrameBundle =>
+      'Bingkai profil animasi + Founders Hall + 2 token server bulanan';
+
+  @override
+  String get adminRewardTitanGlow =>
+      'Efek cahaya nama pengguna \"Titan\" permanen';
+
+  @override
+  String get adminRewardAnimatedFrame => 'Bingkai animasi';
+
+  @override
+  String get adminRewardFoundersHall => 'Founders Hall';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count token boost/bulan',
+      one: '1 token boost/bulan',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => 'Tidak ada hadiah';
+
+  @override
+  String get adminRegistrationOpenLabel =>
+      'Pendaftaran terbuka untuk semua orang';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel =>
+      'Pendaftaran hanya dengan undangan (kode backer diperlukan)';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -3724,6 +3812,29 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get tierBadgePulseSubscriber => 'Pelanggan Pulse';
+
+  @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => 'Founders Hall';
+
+  @override
+  String get foundersHallSubtitle =>
+      'Para pendukung paling awal yang membuat Koda mungkin terwujud.';
+
+  @override
+  String get foundersHallEmptyState => 'Belum ada founder.';
+
+  @override
+  String get settingsFoundersHallTitle => 'Founders Hall';
+
+  @override
+  String get settingsFoundersHallSubtitle =>
+      'Lihat siapa yang membantu membangun Koda';
 
   @override
   String get vispAvatarInDevelopment => 'DALAM PENGEMBANGAN';

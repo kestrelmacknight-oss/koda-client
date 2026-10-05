@@ -134,6 +134,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   // DmScreen's initialConversationId so it jumps straight to that
   // conversation once its list loads, instead of landing on the bare list.
   String? _pendingDmConversationId;
+  // Same idea, for a tapped friend_request notification -- there's no
+  // conversation yet, just the Requests tab (see DmScreen.initialTabIndex).
+  int? _pendingDmTabIndex;
   StreamSubscription<RemoteMessage>? _pushTapSub;
 
   @override
@@ -254,6 +257,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         setState(() {
           _showingDms = true;
           _pendingDmConversationId = conversationId;
+          _pendingDmTabIndex = null;
+        });
+        break;
+
+      case 'friend_request':
+        // No conversation to jump into yet -- land on the Requests tab
+        // (index 2) so the request is right there to accept or decline.
+        setState(() {
+          _showingDms = true;
+          _pendingDmConversationId = null;
+          _pendingDmTabIndex = 2;
         });
         break;
     }
@@ -2432,7 +2446,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             tooltip: t.homePinnedMessagesTooltip,
             onPressed: () => _showPinnedMessages(selectedChannel['id'] as String),
           ),
-          const NotificationBell(),
+          NotificationBell(onNavigate: _routeToNotification),
           IconButton(
             icon: Icon(
               _showMemberPanel
@@ -3034,9 +3048,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         // ── Main content ─────────────────────────────────────────────
         if (_showingDms)
           Expanded(child: DmScreen(
-            key: _pendingDmConversationId != null
-                ? ValueKey(_pendingDmConversationId) : null,
+            key: (_pendingDmConversationId != null || _pendingDmTabIndex != null)
+                ? ValueKey('$_pendingDmConversationId:$_pendingDmTabIndex') : null,
             initialConversationId: _pendingDmConversationId,
+            initialTabIndex: _pendingDmTabIndex,
           ))
         else ...[
           // Channel list

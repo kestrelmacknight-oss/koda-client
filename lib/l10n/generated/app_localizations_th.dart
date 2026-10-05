@@ -436,6 +436,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get authConfirmPasswordHint => 'ยืนยันรหัสผ่าน';
 
   @override
+  String get authAccessCodeHint => 'โค้ดการเข้าถึง (ถ้ามี)';
+
+  @override
   String get authAgreeToTerms =>
       'ฉันยอมรับข้อกำหนดและเงื่อนไข และนโยบายความเป็นส่วนตัว';
 
@@ -708,6 +711,40 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get homeReportSubmitted => 'ส่งรายงานแล้ว';
+
+  @override
+  String get messageActionForward => 'ส่งต่อ';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return 'ส่งต่อจาก $name';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => 'ส่งต่อข้อความ';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => 'ช่อง';
+
+  @override
+  String get forwardDestinationPickerDmsTab => 'ข้อความส่วนตัว';
+
+  @override
+  String get forwardDestinationPickerNoServers =>
+      'คุณยังไม่ได้เข้าร่วมเซิร์ฟเวอร์ใด ๆ';
+
+  @override
+  String get forwardDestinationPickerNoChannels =>
+      'ไม่มีช่องข้อความในเซิร์ฟเวอร์นี้';
+
+  @override
+  String get forwardDestinationPickerNoConversations => 'ยังไม่มีการสนทนา';
+
+  @override
+  String get forwardSuccessToast => 'ส่งต่อข้อความแล้ว';
+
+  @override
+  String get forwardFailedToast => 'ไม่สามารถส่งต่อข้อความได้ -- ลองอีกครั้ง';
 
   @override
   String get homeAddReactionTitle => 'เพิ่มรีแอกชัน';
@@ -1473,6 +1510,55 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get adminNoCodesYet => 'ยังไม่มีโค้ด';
+
+  @override
+  String get adminRewardsHeader => 'รางวัล';
+
+  @override
+  String get adminRewardAlphaBetaAccess =>
+      'สิทธิ์เข้าถึง Alpha/Beta + ตรา Alpha Spark';
+
+  @override
+  String get adminRewardLifetimePulse =>
+      'สถานะ Pulse ตลอดชีพ + ตรา Founder + บิตเรตที่เพิ่มขึ้นถาวร';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne =>
+      'โทเค็นเพิ่มพลังเซิร์ฟเวอร์รายเดือน (เสียง/วิดีโอที่ดีขึ้น)';
+
+  @override
+  String get adminRewardAnimatedFrameBundle =>
+      'เฟรมโปรไฟล์แบบแอนิเมชัน + Founders Hall + โทเค็นเซิร์ฟเวอร์รายเดือน 2 ชิ้น';
+
+  @override
+  String get adminRewardTitanGlow =>
+      'เอฟเฟกต์เรืองแสงชื่อผู้ใช้ \"Titan\" แบบถาวร';
+
+  @override
+  String get adminRewardAnimatedFrame => 'เฟรมแอนิเมชัน';
+
+  @override
+  String get adminRewardFoundersHall => 'Founders Hall';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count โทเค็นเพิ่มพลัง/เดือน',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => 'ไม่มีรางวัล';
+
+  @override
+  String get adminRegistrationOpenLabel => 'การลงทะเบียนเปิดให้ทุกคน';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel =>
+      'การลงทะเบียนแบบรับคำเชิญเท่านั้น (ต้องใช้โค้ดผู้สนับสนุน)';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -3719,6 +3805,28 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get tierBadgePulseSubscriber => 'ผู้สมัครสมาชิก Pulse';
+
+  @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => 'Founders Hall';
+
+  @override
+  String get foundersHallSubtitle =>
+      'ผู้สนับสนุนรุ่นแรกที่ทำให้ Koda เป็นไปได้';
+
+  @override
+  String get foundersHallEmptyState => 'ยังไม่มีผู้ก่อตั้ง';
+
+  @override
+  String get settingsFoundersHallTitle => 'Founders Hall';
+
+  @override
+  String get settingsFoundersHallSubtitle => 'ดูว่าใครช่วยสร้าง Koda';
 
   @override
   String get vispAvatarInDevelopment => 'อยู่ระหว่างการพัฒนา';

@@ -432,6 +432,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get authConfirmPasswordHint => 'Bekräfta lösenord';
 
   @override
+  String get authAccessCodeHint => 'Åtkomstkod (om du har en)';
+
+  @override
   String get authAgreeToTerms =>
       'Jag godkänner villkoren och integritetspolicyn';
 
@@ -706,6 +709,42 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get homeReportSubmitted => 'Rapporten har skickats.';
+
+  @override
+  String get messageActionForward => 'Vidarebefordra';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return 'Vidarebefordrat från $name';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => 'Vidarebefordra meddelande';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => 'Kanaler';
+
+  @override
+  String get forwardDestinationPickerDmsTab => 'Direktmeddelanden';
+
+  @override
+  String get forwardDestinationPickerNoServers =>
+      'Du är inte med i någon server än.';
+
+  @override
+  String get forwardDestinationPickerNoChannels =>
+      'Inga textkanaler i den här servern.';
+
+  @override
+  String get forwardDestinationPickerNoConversations =>
+      'Inga konversationer än.';
+
+  @override
+  String get forwardSuccessToast => 'Meddelandet vidarebefordrat.';
+
+  @override
+  String get forwardFailedToast =>
+      'Det gick inte att vidarebefordra meddelandet -- försök igen.';
 
   @override
   String get homeAddReactionTitle => 'Lägg till reaktion';
@@ -1477,6 +1516,55 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get adminNoCodesYet => 'Inga koder än';
+
+  @override
+  String get adminRewardsHeader => 'Belöningar';
+
+  @override
+  String get adminRewardAlphaBetaAccess =>
+      'Alpha/Beta-åtkomst + Alpha Spark-märke';
+
+  @override
+  String get adminRewardLifetimePulse =>
+      'Livstids Pulse-status + Founder-märke + förbättrad bitrate';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne =>
+      'Månatlig server-boost-token (förbättrat ljud/video)';
+
+  @override
+  String get adminRewardAnimatedFrameBundle =>
+      'Animerad profilram + Founders Hall + 2 månatliga servertokens';
+
+  @override
+  String get adminRewardTitanGlow => 'Permanent \"Titan\"-användarnamnsglöd';
+
+  @override
+  String get adminRewardAnimatedFrame => 'Animerad ram';
+
+  @override
+  String get adminRewardFoundersHall => 'Founders Hall';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count boost-tokens/månad',
+      one: '1 boost-token/månad',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => 'Inga belöningar';
+
+  @override
+  String get adminRegistrationOpenLabel => 'Registrering är öppen för alla';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel =>
+      'Registrering är endast på inbjudan (backer-kod krävs)';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -3742,6 +3830,28 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get tierBadgePulseSubscriber => 'Pulse-prenumerant';
+
+  @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => 'Founders Hall';
+
+  @override
+  String get foundersHallSubtitle =>
+      'De tidigaste backers som gjorde Koda möjligt.';
+
+  @override
+  String get foundersHallEmptyState => 'Inga founders än.';
+
+  @override
+  String get settingsFoundersHallTitle => 'Founders Hall';
+
+  @override
+  String get settingsFoundersHallSubtitle => 'Se vem som hjälpte bygga Koda';
 
   @override
   String get vispAvatarInDevelopment => 'UNDER UTVECKLING';

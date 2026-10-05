@@ -137,20 +137,25 @@ class KodaApi {
     } catch (e) { _log('resendVerification', e); return false; }
   }
 
-  Future<Map<String, dynamic>?> register({
+  Future<KodaApiResult<Map<String, dynamic>>> register({
     required String email,
     required String username,
     required String password,
+    String? accessCode,
   }) async {
     try {
       final res = await _dio.post('/auth/register', data: {
         'username': username, 'email': email, 'password': password,
         'password_confirmation': password,
+        if (accessCode != null && accessCode.isNotEmpty) 'access_code': accessCode,
       });
-      return res.data as Map<String, dynamic>;
+      return KodaApiResult(data: res.data as Map<String, dynamic>, statusCode: res.statusCode);
     } on DioException catch (e) {
       _log('register', e);
-      return null;
+      return KodaApiResult(
+        statusCode: e.response?.statusCode,
+        errorBody: e.response?.data is Map<String, dynamic> ? e.response?.data as Map<String, dynamic> : null,
+      );
     }
   }
 
@@ -1118,17 +1123,44 @@ class KodaApi {
   }
 
   Future<Map<String, dynamic>?> createBackerCode({
-    String? code, Map<String, dynamic>? flags,
+    String? code, Map<String, dynamic>? flags, Map<String, dynamic>? rewards,
     String? note, int? maxUses}) async {
     try {
       final res = await _dio.post('/backer_codes', data: {
         if (code != null)    'code':     code,
         if (flags != null)   'flags':    flags,
+        if (rewards != null) 'rewards':  rewards,
         if (note != null)    'note':     note,
         if (maxUses != null) 'max_uses': maxUses,
       });
       return res.data['backer_code'] as Map<String, dynamic>;
     } catch (e) { _log('createBackerCode', e); return null; }
+  }
+
+  // ── Founders Hall (public, no auth) ─────────────────────────────────────
+
+  Future<List<Map<String, dynamic>>> getFoundersHall() async {
+    try {
+      final res = await _dio.get('/founders_hall');
+      return List<Map<String, dynamic>>.from(res.data['founders'] ?? []);
+    } catch (e) { _log('getFoundersHall', e); return []; }
+  }
+
+  // ── Platform settings (admin only) ──────────────────────────────────────
+
+  Future<bool?> getRegistrationOpen() async {
+    try {
+      final res = await _dio.get('/admin/platform_settings');
+      return res.data['registration_open'] as bool?;
+    } catch (e) { _log('getRegistrationOpen', e); return null; }
+  }
+
+  Future<bool?> setRegistrationOpen(bool open) async {
+    try {
+      final res = await _dio.patch('/admin/platform_settings',
+          data: {'registration_open': open});
+      return res.data['registration_open'] as bool?;
+    } catch (e) { _log('setRegistrationOpen', e); return null; }
   }
 
   Future<List<Map<String, dynamic>>> searchUsers(String query) async {

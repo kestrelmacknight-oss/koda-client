@@ -42,6 +42,25 @@ class EncryptedAttachmentMeta {
       );
 }
 
+/// Carried inside a forwarded message's own encrypted envelope (never a
+/// server-visible field) -- deliberately just who sent it originally, not
+/// where it came from. Omitting the origin channel/server is a privacy
+/// choice, not an oversight: it keeps a forward from disclosing a source
+/// channel's existence (or name) to people in the destination who may have
+/// no access to or knowledge of it.
+class ForwardedFrom {
+  final String senderName;
+  final String originalSentAt; // ISO8601
+  const ForwardedFrom({required this.senderName, required this.originalSentAt});
+
+  Map<String, dynamic> toJson() => {'sender_name': senderName, 'original_sent_at': originalSentAt};
+
+  factory ForwardedFrom.fromJson(Map<String, dynamic> j) => ForwardedFrom(
+        senderName: j['sender_name'] as String,
+        originalSentAt: j['original_sent_at'] as String,
+      );
+}
+
 /// Encrypts [bytes] with a fresh random key and uploads the ciphertext.
 /// Returns the metadata needed to fetch and decrypt it later -- the
 /// caller is responsible for getting that metadata to the recipient via

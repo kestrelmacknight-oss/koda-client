@@ -130,6 +130,8 @@
   "authSignInButton": "Connexion",
   "authUsernameHint": "Nom d'utilisateur",
   "authConfirmPasswordHint": "Confirmer le mot de passe",
+
+  "authAccessCodeHint": "Code d’accès (si vous en avez un)",
   "authAgreeToTerms": "J'accepte les Conditions d'utilisation et la Politique de confidentialité",
   "authCreateAccountButton": "Créer un compte",
   "dmSafetyNumberChangedWarning": "Le numéro de sécurité de cette conversation a changé -- vérifiez-le avant d'envoyer.",
@@ -215,6 +217,28 @@
   "homeUnpinMessageAction": "Désépingler le message",
   "homeReportMessageAction": "Signaler le message",
   "homeReportSubmitted": "Signalement envoyé.",
+
+  "messageActionForward": "Transférer",
+
+  "messageForwardedFromLabel": "Transféré depuis {name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "Transférer le message",
+
+  "forwardDestinationPickerChannelsTab": "Salons",
+
+  "forwardDestinationPickerDmsTab": "Messages privés",
+
+  "forwardDestinationPickerNoServers": "Vous n'êtes encore sur aucun serveur.",
+
+  "forwardDestinationPickerNoChannels": "Aucun salon textuel sur ce serveur.",
+
+  "forwardDestinationPickerNoConversations": "Pas encore de conversations.",
+
+  "forwardSuccessToast": "Message transféré.",
+
+  "forwardFailedToast": "Impossible de transférer le message -- réessayez.",
   "homeAddReactionTitle": "Ajouter une réaction",
   "homeThreadCount": "{count, plural, one{{count} fil de discussion} other{{count} fils de discussion}}",
   "homeCategoryOptionsTooltip": "Options de la catégorie",
@@ -432,6 +456,32 @@
   "adminBackerCodesHeader": "Codes de soutien et de récompense",
   "adminNewCodeButton": "Nouveau code",
   "adminNoCodesYet": "Aucun code pour l'instant",
+
+  "adminRewardsHeader": "Récompenses",
+
+  "adminRewardAlphaBetaAccess": "Accès Alpha/Bêta + Badge Alpha Spark",
+
+  "adminRewardLifetimePulse": "Statut Pulse à vie + Badge Founder + Débit audio/vidéo amélioré",
+
+  "adminRewardMonthlyBoostTokenOne": "Jeton de boost de serveur mensuel (Audio/Vidéo amélioré)",
+
+  "adminRewardAnimatedFrameBundle": "Cadre de profil animé + Hall des Fondateurs + 2 jetons de serveur mensuels",
+
+  "adminRewardTitanGlow": "Lueur de nom d’utilisateur \"Titan\" permanente",
+
+  "adminRewardAnimatedFrame": "Cadre animé",
+
+  "adminRewardFoundersHall": "Hall des Fondateurs",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, one{1 jeton de boost/mois} other{{count} jetons de boost/mois}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "Aucune récompense",
+
+  "adminRegistrationOpenLabel": "L’inscription est ouverte à tous",
+
+  "adminRegistrationInviteOnlyLabel": "L’inscription se fait uniquement sur invitation (code de soutien requis)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "{uses} utilisations",
   "adminSearchUsersHint": "Rechercher des utilisateurs par nom d'utilisateur...",
@@ -1054,6 +1104,20 @@
   "updateNudgeLaterButton": "Plus tard",
   "tierBadgeSparkSubscriber": "Abonné Spark",
   "tierBadgePulseSubscriber": "Abonné Pulse",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Hall des Fondateurs",
+
+  "foundersHallSubtitle": "Les premiers soutiens qui ont rendu Koda possible.",
+
+  "foundersHallEmptyState": "Pas encore de fondateurs.",
+
+  "settingsFoundersHallTitle": "Hall des Fondateurs",
+
+  "settingsFoundersHallSubtitle": "Découvrez qui a aidé à construire Koda",
   "vispAvatarInDevelopment": "EN DÉVELOPPEMENT",
   "vispBoostAdvisorCouldNotAnswer": "Visp n'a pas pu formuler de réponse.",
   "vispBoostAdvisorTitle": "Demander à Visp : Conseiller ROI des boosts",

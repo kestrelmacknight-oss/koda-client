@@ -135,6 +135,8 @@
   "authSignInButton": "साइन इन करें",
   "authUsernameHint": "यूज़रनेम",
   "authConfirmPasswordHint": "पासवर्ड की पुष्टि करें",
+
+  "authAccessCodeHint": "एक्सेस कोड (यदि आपके पास है)",
   "authAgreeToTerms": "मैं नियम और शर्तों तथा गोपनीयता नीति से सहमत हूं",
   "authCreateAccountButton": "अकाउंट बनाएं",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "संदेश अनपिन करें",
   "homeReportMessageAction": "संदेश की रिपोर्ट करें",
   "homeReportSubmitted": "रिपोर्ट सबमिट हो गई।",
+
+  "messageActionForward": "आगे भेजें",
+
+  "messageForwardedFromLabel": "{name} द्वारा अग्रेषित",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "संदेश आगे भेजें",
+
+  "forwardDestinationPickerChannelsTab": "चैनल",
+
+  "forwardDestinationPickerDmsTab": "डायरेक्ट मैसेज",
+
+  "forwardDestinationPickerNoServers": "आप अभी तक किसी सर्वर में नहीं हैं।",
+
+  "forwardDestinationPickerNoChannels": "इस सर्वर में कोई टेक्स्ट चैनल नहीं है।",
+
+  "forwardDestinationPickerNoConversations": "अभी तक कोई बातचीत नहीं है।",
+
+  "forwardSuccessToast": "संदेश आगे भेज दिया गया।",
+
+  "forwardFailedToast": "संदेश आगे नहीं भेजा जा सका -- फिर से कोशिश करें।",
   "homeAddReactionTitle": "रिएक्शन जोड़ें",
   "homeThreadCount": "{count, plural, one{{count} थ्रेड} other{{count} थ्रेड्स}}",
   "homeCategoryOptionsTooltip": "कैटेगरी के विकल्प",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "बैकर और रिवॉर्ड कोड",
   "adminNewCodeButton": "नया कोड",
   "adminNoCodesYet": "अभी तक कोई कोड नहीं",
+
+  "adminRewardsHeader": "रिवॉर्ड्स",
+
+  "adminRewardAlphaBetaAccess": "अल्फा/बीटा एक्सेस + Alpha Spark बैज",
+
+  "adminRewardLifetimePulse": "लाइफटाइम Pulse + Founder बैज + बेहतर बिटरेट",
+
+  "adminRewardMonthlyBoostTokenOne": "मासिक सर्वर बूस्ट टोकन (बेहतर ऑडियो/वीडियो)",
+
+  "adminRewardAnimatedFrameBundle": "एनिमेटेड प्रोफाइल फ्रेम + Founders Hall + 2 मासिक सर्वर टोकन",
+
+  "adminRewardTitanGlow": "स्थायी \"Titan\" यूज़रनेम ग्लो",
+
+  "adminRewardAnimatedFrame": "एनिमेटेड फ्रेम",
+
+  "adminRewardFoundersHall": "Founders Hall",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, one{1 बूस्ट टोकन/माह} other{{count} बूस्ट टोकन/माह}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "कोई रिवॉर्ड नहीं",
+
+  "adminRegistrationOpenLabel": "रजिस्ट्रेशन सभी के लिए खुला है",
+
+  "adminRegistrationInviteOnlyLabel": "रजिस्ट्रेशन केवल आमंत्रण पर है (बैकर कोड आवश्यक)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "{uses} बार इस्तेमाल",
   "adminSearchUsersHint": "यूज़रनेम से यूज़र खोजें...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "बाद में",
   "tierBadgeSparkSubscriber": "Spark सब्सक्राइबर",
   "tierBadgePulseSubscriber": "Pulse सब्सक्राइबर",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Founders Hall",
+
+  "foundersHallSubtitle": "सबसे शुरुआती समर्थक जिन्होंने Koda को संभव बनाया।",
+
+  "foundersHallEmptyState": "अभी तक कोई फाउंडर नहीं है।",
+
+  "settingsFoundersHallTitle": "Founders Hall",
+
+  "settingsFoundersHallSubtitle": "देखें किसने Koda बनाने में मदद की",
   "vispAvatarInDevelopment": "डेवलपमेंट में",
   "vispBoostAdvisorCouldNotAnswer": "Visp कोई जवाब तैयार नहीं कर सका।",
   "vispBoostAdvisorTitle": "Visp से पूछें: बूस्ट ROI एडवाइज़र",

@@ -440,6 +440,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get authConfirmPasswordHint => 'Επιβεβαίωση κωδικού πρόσβασης';
 
   @override
+  String get authAccessCodeHint => 'Κωδικός πρόσβασης (αν έχετε)';
+
+  @override
   String get authAgreeToTerms =>
       'Συμφωνώ με τους Όρους & Προϋποθέσεις και την Πολιτική Απορρήτου';
 
@@ -716,6 +719,42 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get homeReportSubmitted => 'Η αναφορά υποβλήθηκε.';
+
+  @override
+  String get messageActionForward => 'Προώθηση';
+
+  @override
+  String messageForwardedFromLabel(String name) {
+    return 'Προωθήθηκε από $name';
+  }
+
+  @override
+  String get forwardDestinationPickerTitle => 'Προώθηση μηνύματος';
+
+  @override
+  String get forwardDestinationPickerChannelsTab => 'Κανάλια';
+
+  @override
+  String get forwardDestinationPickerDmsTab => 'Άμεσα μηνύματα';
+
+  @override
+  String get forwardDestinationPickerNoServers =>
+      'Δεν είστε ακόμα σε κανέναν διακομιστή.';
+
+  @override
+  String get forwardDestinationPickerNoChannels =>
+      'Δεν υπάρχουν κανάλια κειμένου σε αυτόν τον διακομιστή.';
+
+  @override
+  String get forwardDestinationPickerNoConversations =>
+      'Δεν υπάρχουν ακόμα συνομιλίες.';
+
+  @override
+  String get forwardSuccessToast => 'Το μήνυμα προωθήθηκε.';
+
+  @override
+  String get forwardFailedToast =>
+      'Δεν ήταν δυνατή η προώθηση του μηνύματος -- δοκιμάστε ξανά.';
 
   @override
   String get homeAddReactionTitle => 'Προσθήκη αντίδρασης';
@@ -1491,6 +1530,55 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get adminNoCodesYet => 'Δεν υπάρχουν κωδικοί ακόμα';
+
+  @override
+  String get adminRewardsHeader => 'Ανταμοιβές';
+
+  @override
+  String get adminRewardAlphaBetaAccess =>
+      'Πρόσβαση Alpha/Beta + Σήμα Alpha Spark';
+
+  @override
+  String get adminRewardLifetimePulse =>
+      'Μόνιμη κατάσταση Pulse + Σήμα Founder + Βελτιωμένος ρυθμός bit';
+
+  @override
+  String get adminRewardMonthlyBoostTokenOne =>
+      'Μηνιαίο token ενίσχυσης διακομιστή (Βελτιωμένο ήχο/βίντεο)';
+
+  @override
+  String get adminRewardAnimatedFrameBundle =>
+      'Κινούμενο πλαίσιο προφίλ + Αίθουσα Ιδρυτών + 2 μηνιαία tokens διακομιστή';
+
+  @override
+  String get adminRewardTitanGlow => 'Μόνιμη λάμψη ονόματος χρήστη \"Titan\"';
+
+  @override
+  String get adminRewardAnimatedFrame => 'Κινούμενο πλαίσιο';
+
+  @override
+  String get adminRewardFoundersHall => 'Αίθουσα Ιδρυτών';
+
+  @override
+  String adminRewardMonthlyBoostTokens(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tokens ενίσχυσης/μήνα',
+      one: '1 token ενίσχυσης/μήνα',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adminRewardsNone => 'Καμία ανταμοιβή';
+
+  @override
+  String get adminRegistrationOpenLabel => 'Η εγγραφή είναι ανοιχτή σε όλους';
+
+  @override
+  String get adminRegistrationInviteOnlyLabel =>
+      'Η εγγραφή γίνεται μόνο με πρόσκληση (απαιτείται κωδικός υποστηρικτή)';
 
   @override
   String adminUsesOfMax(int uses, int maxUses) {
@@ -3792,6 +3880,29 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get tierBadgePulseSubscriber => 'Συνδρομητής Pulse';
+
+  @override
+  String get tierBadgeAlphaSpark => 'Alpha Spark';
+
+  @override
+  String get tierBadgeFounder => 'Founder';
+
+  @override
+  String get foundersHallTitle => 'Αίθουσα Ιδρυτών';
+
+  @override
+  String get foundersHallSubtitle =>
+      'Οι πρώτοι υποστηρικτές που έκαναν το Koda δυνατό.';
+
+  @override
+  String get foundersHallEmptyState => 'Δεν υπάρχουν ιδρυτές ακόμα.';
+
+  @override
+  String get settingsFoundersHallTitle => 'Αίθουσα Ιδρυτών';
+
+  @override
+  String get settingsFoundersHallSubtitle =>
+      'Δείτε ποιοι βοήθησαν να χτιστεί το Koda';
 
   @override
   String get vispAvatarInDevelopment => 'ΥΠΟ ΑΝΑΠΤΥΞΗ';

@@ -10,6 +10,7 @@
 // still decode correctly instead of erroring or getting corrupted.
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:koda/core/crypto/attachment_crypto.dart' show ForwardedFrom;
 import 'package:koda/core/crypto/dm_attachments.dart';
 
 void main() {
@@ -65,6 +66,39 @@ void main() {
       final decoded = decodeDmPayload(raw);
       expect(decoded.text, raw);
       expect(decoded.attachment, isNull);
+    });
+
+    test('forwarded_from round-trips alongside text and an attachment', () {
+      const meta = DmAttachmentMeta(
+        url: 'https://cdn.koda.fyi/attachment/u1/789-ghi',
+        key: 'k', nonce: 'n', contentType: 'image/png', fileName: 'pic.png',
+      );
+      const forwardedFrom = ForwardedFrom(senderName: 'Alice', originalSentAt: '2026-01-01T00:00:00Z');
+      final payload = encodeDmPayload('fwd text', attachment: meta, forwardedFrom: forwardedFrom);
+      final decoded = decodeDmPayload(payload);
+
+      expect(decoded.text, 'fwd text');
+      expect(decoded.attachment!.fileName, 'pic.png');
+      expect(decoded.forwardedFrom, isNotNull);
+      expect(decoded.forwardedFrom!.senderName, 'Alice');
+      expect(decoded.forwardedFrom!.originalSentAt, '2026-01-01T00:00:00Z');
+    });
+
+    test('forwarded_from with no attachment still wraps the envelope rather than staying a bare string', () {
+      const forwardedFrom = ForwardedFrom(senderName: 'Bob', originalSentAt: '2026-01-01T00:00:00Z');
+      final payload = encodeDmPayload('just text', forwardedFrom: forwardedFrom);
+      expect(payload, isNot('just text')); // must wrap -- a bare string has nowhere to carry forwardedFrom
+
+      final decoded = decodeDmPayload(payload);
+      expect(decoded.text, 'just text');
+      expect(decoded.attachment, isNull);
+      expect(decoded.forwardedFrom!.senderName, 'Bob');
+    });
+
+    test('a message with no forwarded_from decodes with a null forwardedFrom', () {
+      final decoded = decodeDmPayload(encodeDmPayload('plain', attachment: const DmAttachmentMeta(
+          url: 'u', key: 'k', nonce: 'n', contentType: 'image/png', fileName: 'f')));
+      expect(decoded.forwardedFrom, isNull);
     });
   });
 }

@@ -130,6 +130,8 @@
   "authSignInButton": "התחברות",
   "authUsernameHint": "שם משתמש",
   "authConfirmPasswordHint": "אימות סיסמה",
+
+  "authAccessCodeHint": "קוד גישה (אם יש לך)",
   "authAgreeToTerms": "אני מסכים/ה לתנאים ולהגבלות ולמדיניות הפרטיות",
   "authCreateAccountButton": "יצירת חשבון",
   "dmSafetyNumberChangedWarning": "מספר האבטחה של שיחה זו השתנה -- אמתו אותו לפני השליחה.",
@@ -215,6 +217,28 @@
   "homeUnpinMessageAction": "ביטול נעיצת הודעה",
   "homeReportMessageAction": "דיווח על הודעה",
   "homeReportSubmitted": "הדיווח נשלח.",
+
+  "messageActionForward": "העבר הלאה",
+
+  "messageForwardedFromLabel": "הועבר מאת {name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "העברת הודעה",
+
+  "forwardDestinationPickerChannelsTab": "ערוצים",
+
+  "forwardDestinationPickerDmsTab": "הודעות ישירות",
+
+  "forwardDestinationPickerNoServers": "אינך חבר באף שרת עדיין.",
+
+  "forwardDestinationPickerNoChannels": "אין ערוצי טקסט בשרת זה.",
+
+  "forwardDestinationPickerNoConversations": "אין עדיין שיחות.",
+
+  "forwardSuccessToast": "ההודעה הועברה.",
+
+  "forwardFailedToast": "לא ניתן היה להעביר את ההודעה -- נסה שוב.",
   "homeAddReactionTitle": "הוספת תגובה",
   "homeThreadCount": "{count, plural, one{שרשור אחד} two{{count} שרשורים} many{{count} שרשורים} other{{count} שרשורים}}",
   "homeCategoryOptionsTooltip": "אפשרויות קטגוריה",
@@ -432,6 +456,32 @@
   "adminBackerCodesHeader": "קודי תומכים ותגמולים",
   "adminNewCodeButton": "קוד חדש",
   "adminNoCodesYet": "אין עדיין קודים",
+
+  "adminRewardsHeader": "תגמולים",
+
+  "adminRewardAlphaBetaAccess": "גישת אלפא/בטא + תג Alpha Spark",
+
+  "adminRewardLifetimePulse": "מעמד Pulse לכל החיים + תג Founder + קצב סיביות משופר לצמיד",
+
+  "adminRewardMonthlyBoostTokenOne": "אסימון חיזוק שרת חודשי (אודיו/וידאו משופרים)",
+
+  "adminRewardAnimatedFrameBundle": "מסגרת פרופיל מונפשת + היכל המייסדים + 2 אסימוני שרת חודשיים",
+
+  "adminRewardTitanGlow": "זוהר שם משתמש \"Titan\" קבוע",
+
+  "adminRewardAnimatedFrame": "מסגרת מונפשת",
+
+  "adminRewardFoundersHall": "היכל המייסדים",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, one{אסימון חיזוק אחד לחודש} other{{count} אסימוני חיזוק לחודש}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "אין תגמולים",
+
+  "adminRegistrationOpenLabel": "ההרשמה פתוחה לכולם",
+
+  "adminRegistrationInviteOnlyLabel": "ההרשמה היא בהזמנה בלבד (נדרש קוד תומך)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "{uses} שימושים",
   "adminSearchUsersHint": "חיפוש משתמשים לפי שם משתמש...",
@@ -1054,6 +1104,20 @@
   "updateNudgeLaterButton": "מאוחר יותר",
   "tierBadgeSparkSubscriber": "מנוי/ת Spark",
   "tierBadgePulseSubscriber": "מנוי/ת Pulse",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "היכל המייסדים",
+
+  "foundersHallSubtitle": "התומכים המוקדמים ביותר שאפשרו את Koda.",
+
+  "foundersHallEmptyState": "אין עדיין מייסדים.",
+
+  "settingsFoundersHallTitle": "היכל המייסדים",
+
+  "settingsFoundersHallSubtitle": "ראה מי עזר לבנות את Koda",
   "vispAvatarInDevelopment": "בפיתוח",
   "vispBoostAdvisorCouldNotAnswer": "Visp לא הצליח לגבש תשובה.",
   "vispBoostAdvisorTitle": "לשאול את Visp: יועץ ROI לחיזוקים",

@@ -1,6 +1,8 @@
 // lib/core/providers.dart
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'api.dart';
+import 'secure_storage.dart';
 class KodaUser {
   final String id;
   final String username;
@@ -11,6 +13,10 @@ class KodaUser {
   final bool friendsOnlyDms;
   final String kodaTier; // 'free' | 'spark' | 'pulse' -- see lib/shared/tier_badge.dart
   final String accountType; // 'standard' | 'child' -- see lib/features/parental
+  // Backer-reward state (see koda-server's Koda.Invites.apply_rewards/3) --
+  // badges/owned_frames/glows are string lists, union-additive across
+  // however many backer codes this account has redeemed.
+  final Map<String, dynamic> flags;
   KodaUser({
     required this.id,
     required this.username,
@@ -21,6 +27,7 @@ class KodaUser {
     this.friendsOnlyDms = false,
     this.kodaTier = 'free',
     this.accountType = 'standard',
+    this.flags = const {},
   });
   factory KodaUser.fromJson(Map<String, dynamic> j) => KodaUser(
         id:             j['id'] as String,
@@ -32,14 +39,21 @@ class KodaUser {
         friendsOnlyDms: j['friends_only_dms'] as bool? ?? false,
         kodaTier:       j['koda_tier'] as String? ?? 'free',
         accountType:    j['account_type'] as String? ?? 'standard',
+        flags:          Map<String, dynamic>.from(j['flags'] as Map? ?? {}),
       );
   bool get isChild => accountType == 'child';
+  List<String> get badges => List<String>.from(flags['badges'] as List? ?? []);
+  List<String> get ownedFrames => List<String>.from(flags['owned_frames'] as List? ?? []);
+  List<String> get glows => List<String>.from(flags['glows'] as List? ?? []);
+  bool get isFounder => flags['founders_hall'] == true;
+  bool get hasEnhancedBitrate => flags['enhanced_bitrate'] == true;
   KodaUser copyWith({bool? friendsOnlyDms, String? kodaTier}) => KodaUser(
         id: id, username: username, email: email, avatarUrl: avatarUrl,
         isAdmin: isAdmin, emailVerified: emailVerified,
         friendsOnlyDms: friendsOnlyDms ?? this.friendsOnlyDms,
         kodaTier: kodaTier ?? this.kodaTier,
         accountType: accountType,
+        flags: flags,
       );
 }
 class AuthState {
@@ -62,6 +76,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   AuthNotifier() : super(const AuthState());
   void setUser(Map<String, dynamic> json) {
     state = state.copyWith(user: KodaUser.fromJson(json), loading: false);
+    // Cached alongside the auth token (set at the same login/restore
+    // call sites) so background_sync.dart's push background handler --
+    // its own isolate, no Riverpod state -- can know whose messages
+    // it's decrypting. Fire-and-forget: this method's callers don't
+    // await it today and shouldn't need to start.
+    final id = state.user?.id;
+    if (id != null) unawaited(SecureStorage.saveUserId(id));
   }
   void setMustChangePassword(bool value) {
     state = state.copyWith(mustChangePassword: value);
@@ -76,6 +97,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
   void clear() {
     state = const AuthState(loading: false);
+    unawaited(SecureStorage.clearUserId());
   }
 }
 final authProvider =

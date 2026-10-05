@@ -135,6 +135,8 @@
   "authSignInButton": "登录",
   "authUsernameHint": "用户名",
   "authConfirmPasswordHint": "确认密码",
+
+  "authAccessCodeHint": "访问代码（如果有）",
   "authAgreeToTerms": "我同意条款与条件及隐私政策",
   "authCreateAccountButton": "创建账户",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "取消置顶",
   "homeReportMessageAction": "举报消息",
   "homeReportSubmitted": "举报已提交。",
+
+  "messageActionForward": "转发",
+
+  "messageForwardedFromLabel": "转发自{name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "转发消息",
+
+  "forwardDestinationPickerChannelsTab": "频道",
+
+  "forwardDestinationPickerDmsTab": "私信",
+
+  "forwardDestinationPickerNoServers": "你还没有加入任何服务器。",
+
+  "forwardDestinationPickerNoChannels": "此服务器中没有文字频道。",
+
+  "forwardDestinationPickerNoConversations": "还没有对话。",
+
+  "forwardSuccessToast": "消息已转发。",
+
+  "forwardFailedToast": "无法转发消息 -- 请重试。",
   "homeAddReactionTitle": "添加表情回应",
   "homeThreadCount": "{count, plural, other{{count} 个帖子}}",
   "homeCategoryOptionsTooltip": "分类选项",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "支持者与奖励代码",
   "adminNewCodeButton": "新建代码",
   "adminNoCodesYet": "暂无代码",
+
+  "adminRewardsHeader": "奖励",
+
+  "adminRewardAlphaBetaAccess": "Alpha/Beta 测试资格 + Alpha Spark 徽章",
+
+  "adminRewardLifetimePulse": "永久 Pulse 状态 + Founder 徽章 + 增强比特率",
+
+  "adminRewardMonthlyBoostTokenOne": "每月服务器加成令牌（增强音视频）",
+
+  "adminRewardAnimatedFrameBundle": "动态个人资料边框 + 创始人殿堂 + 每月 2 个服务器令牌",
+
+  "adminRewardTitanGlow": "永久 \"Titan\" 用户名光效",
+
+  "adminRewardAnimatedFrame": "动态边框",
+
+  "adminRewardFoundersHall": "创始人殿堂",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, other{每月 {count} 个加成令牌}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "无奖励",
+
+  "adminRegistrationOpenLabel": "注册对所有人开放",
+
+  "adminRegistrationInviteOnlyLabel": "注册仅限邀请（需要支持者代码）",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "已使用 {uses} 次",
   "adminSearchUsersHint": "按用户名搜索用户...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "以后再说",
   "tierBadgeSparkSubscriber": "Spark 订阅者",
   "tierBadgePulseSubscriber": "Pulse 订阅者",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "创始人殿堂",
+
+  "foundersHallSubtitle": "让 Koda 得以实现的最早支持者。",
+
+  "foundersHallEmptyState": "暂无创始人。",
+
+  "settingsFoundersHallTitle": "创始人殿堂",
+
+  "settingsFoundersHallSubtitle": "查看谁帮助构建了 Koda",
   "vispAvatarInDevelopment": "开发中",
   "vispBoostAdvisorCouldNotAnswer": "Visp 未能给出回答。",
   "vispBoostAdvisorTitle": "询问 Visp：助力投资回报顾问",

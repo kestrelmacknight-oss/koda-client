@@ -135,6 +135,8 @@
   "authSignInButton": "Đăng nhập",
   "authUsernameHint": "Tên người dùng",
   "authConfirmPasswordHint": "Xác nhận mật khẩu",
+
+  "authAccessCodeHint": "Mã truy cập (nếu có)",
   "authAgreeToTerms": "Tôi đồng ý với Điều khoản & Điều kiện và Chính sách quyền riêng tư",
   "authCreateAccountButton": "Tạo tài khoản",
 
@@ -222,6 +224,28 @@
   "homeUnpinMessageAction": "Bỏ ghim tin nhắn",
   "homeReportMessageAction": "Báo cáo tin nhắn",
   "homeReportSubmitted": "Đã gửi báo cáo.",
+
+  "messageActionForward": "Chuyển tiếp",
+
+  "messageForwardedFromLabel": "Đã chuyển tiếp từ {name}",
+
+  "@messageForwardedFromLabel": {"placeholders": {"name": {"type": "String"}}},
+
+  "forwardDestinationPickerTitle": "Chuyển tiếp tin nhắn",
+
+  "forwardDestinationPickerChannelsTab": "Kênh",
+
+  "forwardDestinationPickerDmsTab": "Tin nhắn trực tiếp",
+
+  "forwardDestinationPickerNoServers": "Bạn chưa tham gia máy chủ nào.",
+
+  "forwardDestinationPickerNoChannels": "Không có kênh văn bản nào trong máy chủ này.",
+
+  "forwardDestinationPickerNoConversations": "Chưa có cuộc trò chuyện nào.",
+
+  "forwardSuccessToast": "Đã chuyển tiếp tin nhắn.",
+
+  "forwardFailedToast": "Không thể chuyển tiếp tin nhắn -- hãy thử lại.",
   "homeAddReactionTitle": "Thêm biểu cảm",
   "homeThreadCount": "{count, plural, other{{count} chủ đề}}",
   "homeCategoryOptionsTooltip": "Tùy chọn danh mục",
@@ -440,6 +464,32 @@
   "adminBackerCodesHeader": "Mã người ủng hộ & phần thưởng",
   "adminNewCodeButton": "Mã mới",
   "adminNoCodesYet": "Chưa có mã nào",
+
+  "adminRewardsHeader": "Phần thưởng",
+
+  "adminRewardAlphaBetaAccess": "Quyền truy cập Alpha/Beta + Huy hiệu Alpha Spark",
+
+  "adminRewardLifetimePulse": "Trạng thái Pulse vĩnh viễn + Huy hiệu Founder + Bitrate nâng cao",
+
+  "adminRewardMonthlyBoostTokenOne": "Token tăng cường máy chủ hàng tháng (Âm thanh/Video nâng cao)",
+
+  "adminRewardAnimatedFrameBundle": "Khung hồ sơ hoạt hình + Founders Hall + 2 token máy chủ hàng tháng",
+
+  "adminRewardTitanGlow": "Hiệu ứng phát sáng tên người dùng \"Titan\" vĩnh viễn",
+
+  "adminRewardAnimatedFrame": "Khung hoạt hình",
+
+  "adminRewardFoundersHall": "Founders Hall",
+
+  "adminRewardMonthlyBoostTokens": "{count, plural, other{{count} token tăng cường/tháng}}",
+
+  "@adminRewardMonthlyBoostTokens": {"placeholders": {"count": {"type": "int"}}},
+
+  "adminRewardsNone": "Không có phần thưởng",
+
+  "adminRegistrationOpenLabel": "Đăng ký mở cho tất cả mọi người",
+
+  "adminRegistrationInviteOnlyLabel": "Đăng ký chỉ theo lời mời (yêu cầu mã người hậu thuẫn)",
   "adminUsesOfMax": "{uses} / {maxUses}",
   "adminUsesCount": "Đã dùng {uses} lần",
   "adminSearchUsersHint": "Tìm người dùng theo tên...",
@@ -1062,6 +1112,20 @@
   "updateNudgeLaterButton": "Để sau",
   "tierBadgeSparkSubscriber": "Người đăng ký Spark",
   "tierBadgePulseSubscriber": "Người đăng ký Pulse",
+
+  "tierBadgeAlphaSpark": "Alpha Spark",
+
+  "tierBadgeFounder": "Founder",
+
+  "foundersHallTitle": "Founders Hall",
+
+  "foundersHallSubtitle": "Những người hậu thuẫn sớm nhất đã giúp Koda trở thành hiện thực.",
+
+  "foundersHallEmptyState": "Chưa có người sáng lập nào.",
+
+  "settingsFoundersHallTitle": "Founders Hall",
+
+  "settingsFoundersHallSubtitle": "Xem ai đã giúp xây dựng Koda",
   "vispAvatarInDevelopment": "ĐANG PHÁT TRIỂN",
   "vispBoostAdvisorCouldNotAnswer": "Visp không thể tạo câu trả lời.",
   "vispBoostAdvisorTitle": "Hỏi Visp: Cố vấn ROI cho Boost",
