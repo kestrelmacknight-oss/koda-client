@@ -163,4 +163,142 @@ Copy-Item -Force (Join-Path $RnnoisePatchDir "audio_capture_chain.h") (Join-Path
 Copy-Item -Force (Join-Path $RnnoisePatchDir "audio_capture_chain.cc") (Join-Path $VendorDir "windows\audio_capture_chain.cc")
 Apply-VendorPatch (Join-Path $RnnoisePatchDir "rnnoise_hooks.patch") "rnnoise_hooks.patch"
 
+# Upstream RNNoise/Opus C source trips MSVC's /WX (warnings-as-errors,
+# set by apply_standard_settings in this same CMakeLists.txt) on
+# ordinary double<->float narrowing that upstream itself doesn't treat
+# as an error -- a plain text insertion here rather than another hunk
+# in rnnoise_hooks.patch, since this just needs to land right after the
+# source list that patch already adds, not interleave with it.
+Write-Host "Suppressing warnings-as-errors for vendored RNNoise/Opus sources ..."
+$CMakeListsPath = Join-Path $VendorDir "windows\CMakeLists.txt"
+$cmakeContent = Get-Content $CMakeListsPath -Raw
+$marker = 'PROPERTIES COMPILE_DEFINITIONS "USE_WEIGHTS_FILE"' + "`n)`n"
+if ($cmakeContent -notmatch [regex]::Escape($marker)) {
+    Write-Error "Could not find the USE_WEIGHTS_FILE block in $CMakeListsPath -- rnnoise_hooks.patch's shape may have changed."
+    exit 1
+}
+$suppression = @'
+
+# Upstream RNNoise/Opus C source is full of intentional double<->float
+# narrowing (routine, harmless in DSP code -- upstream itself doesn't
+# build with /WX) that apply_standard_settings' /WX above turns into
+# hard build failures on MSVC. Carved out for just these vendored files
+# -- never touch their math to silence this, and never relax warnings
+# for anything else in this shared plugin target.
+set_source_files_properties(
+  "rnnoise/src/denoise.c"
+  "rnnoise/src/rnn.c"
+  "rnnoise/src/pitch.c"
+  "rnnoise/src/kiss_fft.c"
+  "rnnoise/src/celt_lpc.c"
+  "rnnoise/src/nnet.c"
+  "rnnoise/src/nnet_default.c"
+  "rnnoise/src/parse_lpcnet_weights.c"
+  "rnnoise/src/rnnoise_tables.c"
+  "rnnoise/src/rnnoise_data.c"
+  PROPERTIES COMPILE_OPTIONS "/WX-"
+)
+
+'@
+$cmakeContent = $cmakeContent.Replace($marker, $marker + $suppression)
+Set-Content -Path $CMakeListsPath -Value $cmakeContent -NoNewline
+
+# flutter_webrtc_base.h's #include "audio_capture_chain.h" (added by
+# rnnoise_hooks.patch) is a *public*, shared header -- other plugins
+# that depend on flutter_webrtc's C++ API (livekit_client, concretely)
+# include it too, and their own CMake targets have no reason to carry
+# RNNoise's include path (rnnoise/include), so they fail with "cannot
+# open rnnoise.h". Fixed the same way as the /WX- carve-out above: a
+# plain text substitution rather than another rnnoise_hooks.patch hunk,
+# swapping the #include for a forward declaration (sufficient -- only a
+# pointer return type and a unique_ptr member need the name in this
+# header; ~FlutterWebRTCBase(), where the unique_ptr's deleter is
+# actually instantiated, is defined out-of-line in
+# flutter_webrtc_base.cc, which gets its own direct #include below).
+Write-Host "Forward-declaring AudioCaptureChain in the public base header ..."
+$BaseHeaderPath = Join-Path $VendorDir "common\cpp\include\flutter_webrtc_base.h"
+$baseHeaderContent = Get-Content $BaseHeaderPath -Raw
+$includeBlock = @"
+// Real mic EQ + RNNoise deep noise suppression -- Windows only for now,
+// see audio_capture_chain.h for why this lives there and why it's gated
+// behind _WIN32 in this otherwise cross-desktop-platform shared file.
+#if defined(_WIN32)
+#include "audio_capture_chain.h"
+#endif
+
+namespace flutter_webrtc_plugin {
+
+using namespace libwebrtc;
+
+class FlutterVideoRenderer;
+class FlutterRTCDataChannelObserver;
+class FlutterPeerConnectionObserver;
+"@
+if ($baseHeaderContent -notmatch [regex]::Escape($includeBlock)) {
+    Write-Error "Could not find the expected audio_capture_chain.h #include block in $BaseHeaderPath -- rnnoise_hooks.patch's shape may have changed."
+    exit 1
+}
+$forwardDeclBlock = @'
+namespace flutter_webrtc_plugin {
+
+using namespace libwebrtc;
+
+class FlutterVideoRenderer;
+class FlutterRTCDataChannelObserver;
+class FlutterPeerConnectionObserver;
+// Real mic EQ + RNNoise deep noise suppression -- Windows only for now,
+// see audio_capture_chain.h for why this lives there and why it's gated
+// behind _WIN32 in this otherwise cross-desktop-platform shared file. A
+// forward declaration, not #include "audio_capture_chain.h", on
+// purpose -- see this script's own comment just above for why.
+#if defined(_WIN32)
+class AudioCaptureChain;
+#endif
+'@
+$baseHeaderContent = $baseHeaderContent.Replace($includeBlock, $forwardDeclBlock)
+Set-Content -Path $BaseHeaderPath -Value $baseHeaderContent -NoNewline
+
+# The two .cc files that actually construct/destroy/call methods on an
+# AudioCaptureChain now need their own direct #include, since the
+# public header above no longer provides it transitively.
+Write-Host "Adding direct audio_capture_chain.h includes to flutter_webrtc_base.cc and flutter_webrtc.cc ..."
+$directIncludeComment = @'
+// flutter_webrtc_base.h only forward-declares AudioCaptureChain (see its
+// own comment) -- this file needs the full type to construct one and
+// to let ~FlutterWebRTCBase() destroy it via unique_ptr.
+#if defined(_WIN32)
+#include "audio_capture_chain.h"
+#endif
+
+'@
+$BaseCcPath = Join-Path $VendorDir "common\cpp\src\flutter_webrtc_base.cc"
+$baseCcContent = Get-Content $BaseCcPath -Raw
+$baseCcMarker = '#include "flutter_webrtc_base.h"' + "`n`n"
+if ($baseCcContent -notmatch [regex]::Escape($baseCcMarker)) {
+    Write-Error "Could not find the expected #include block in $BaseCcPath -- rnnoise_hooks.patch's shape may have changed."
+    exit 1
+}
+$baseCcContent = $baseCcContent.Replace($baseCcMarker, $baseCcMarker + $directIncludeComment)
+Set-Content -Path $BaseCcPath -Value $baseCcContent -NoNewline
+
+$webrtcCcDirectIncludeComment = @'
+// flutter_webrtc_base.h (included transitively via flutter_webrtc.h)
+// only forward-declares AudioCaptureChain -- this file calls real
+// methods on it (eq_processor()/noise_suppressor()) below, so it needs
+// the full type directly.
+#if defined(_WIN32)
+#include "audio_capture_chain.h"
+#endif
+
+'@
+$WebrtcCcPath = Join-Path $VendorDir "common\cpp\src\flutter_webrtc.cc"
+$webrtcCcContent = Get-Content $WebrtcCcPath -Raw
+$webrtcCcMarker = '#include "flutter_webrtc.h"' + "`n" + '#include "flutter_data_channel.h"' + "`n`n"
+if ($webrtcCcContent -notmatch [regex]::Escape($webrtcCcMarker)) {
+    Write-Error "Could not find the expected #include block in $WebrtcCcPath -- rnnoise_hooks.patch's shape may have changed."
+    exit 1
+}
+$webrtcCcContent = $webrtcCcContent.Replace($webrtcCcMarker, $webrtcCcMarker + $webrtcCcDirectIncludeComment)
+Set-Content -Path $WebrtcCcPath -Value $webrtcCcContent -NoNewline
+
 Write-Host "Done. Run 'flutter pub get' (dependency_overrides in pubspec.yaml already points at third_party/flutter_webrtc)."

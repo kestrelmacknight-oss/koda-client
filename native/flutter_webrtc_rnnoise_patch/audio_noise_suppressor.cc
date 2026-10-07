@@ -28,7 +28,13 @@ RNNModel* LoadEmbeddedModel() {
     return nullptr;
   }
 
-  HRSRC res = FindResourceA(module, "RNNOISE_WEIGHTS", RT_RCDATA);
+  // RT_RCDATA is MAKEINTRESOURCE(10), a TCHAR-aware macro -- under a
+  // UNICODE build it resolves to the MAKEINTRESOURCEW (LPWSTR) variant,
+  // which doesn't implicitly convert to FindResourceA's LPCSTR parameter.
+  // The reinterpret_cast is safe: RT_RCDATA is never a real string, just
+  // the integer 10 disguised as a pointer, so reinterpreting it between
+  // the A/W pointer types changes nothing about its actual value.
+  HRSRC res = FindResourceA(module, "RNNOISE_WEIGHTS", reinterpret_cast<LPCSTR>(RT_RCDATA));
   if (res == nullptr) return nullptr;
   HGLOBAL res_handle = LoadResource(module, res);
   if (res_handle == nullptr) return nullptr;
