@@ -145,6 +145,36 @@ function Apply-VendorPatch {
     }
 }
 
+# git apply respects core.autocrlf when it writes the patched file back
+# to disk -- on a Windows runner/machine with the (very common) default
+# core.autocrlf=true, that silently reintroduces CRLF into files
+# Apply-VendorPatch just normalized to LF going *into* the patch. Same
+# "line endings carry no meaning to CMake/C++ parsers, normalizing is a
+# safe permanent fix" stance as Apply-VendorPatch's own normalization --
+# re-applied after patching, right before the plain-text substitutions
+# below that depend on matching an exact (LF) marker string.
+function Normalize-ToLF {
+    param([string]$Path)
+    $text = [System.IO.File]::ReadAllText($Path)
+    $normalized = $text -replace "`r`n", "`n"
+    if ($normalized -ne $text) {
+        [System.IO.File]::WriteAllText($Path, $normalized, (New-Object System.Text.UTF8Encoding($false)))
+    }
+}
+
+# Every multi-line marker/insertion string below is built from a
+# PowerShell here-string literally embedded in *this* .ps1 file -- its
+# line endings come from however this script file itself happens to be
+# saved on disk (CRLF under the same core.autocrlf=true that
+# necessitates Normalize-ToLF above), not from any deliberate choice at
+# the call site. Routing every such string through this before matching
+# against/inserting into an already-LF-normalized target file keeps the
+# comparison byte-exact regardless of this script's own line endings.
+function ConvertTo-LF {
+    param([string]$Text)
+    return $Text -replace "`r`n", "`n"
+}
+
 Write-Host "Adding audio_eq_processor.h/.cc ..."
 Copy-Item -Force (Join-Path $EqPatchDir "audio_eq_processor.h") (Join-Path $VendorDir "windows\audio_eq_processor.h")
 Copy-Item -Force (Join-Path $EqPatchDir "audio_eq_processor.cc") (Join-Path $VendorDir "windows\audio_eq_processor.cc")
@@ -163,6 +193,19 @@ Copy-Item -Force (Join-Path $RnnoisePatchDir "audio_capture_chain.h") (Join-Path
 Copy-Item -Force (Join-Path $RnnoisePatchDir "audio_capture_chain.cc") (Join-Path $VendorDir "windows\audio_capture_chain.cc")
 Apply-VendorPatch (Join-Path $RnnoisePatchDir "rnnoise_hooks.patch") "rnnoise_hooks.patch"
 
+# The four files the substitutions below match against by exact (LF)
+# marker string -- see Normalize-ToLF's own comment for why this needs
+# re-running after git apply, not just before it.
+Write-Host "Re-normalizing line endings after patching (git apply/core.autocrlf can reintroduce CRLF) ..."
+foreach ($relPath in @(
+    "windows\CMakeLists.txt",
+    "common\cpp\include\flutter_webrtc_base.h",
+    "common\cpp\src\flutter_webrtc_base.cc",
+    "common\cpp\src\flutter_webrtc.cc"
+)) {
+    Normalize-ToLF (Join-Path $VendorDir $relPath)
+}
+
 # Upstream RNNoise/Opus C source trips MSVC's /WX (warnings-as-errors,
 # set by apply_standard_settings in this same CMakeLists.txt) on
 # ordinary double<->float narrowing that upstream itself doesn't treat
@@ -177,7 +220,7 @@ if ($cmakeContent -notmatch [regex]::Escape($marker)) {
     Write-Error "Could not find the USE_WEIGHTS_FILE block in $CMakeListsPath -- rnnoise_hooks.patch's shape may have changed."
     exit 1
 }
-$suppression = @'
+$suppression = ConvertTo-LF @'
 
 # Upstream RNNoise/Opus C source is full of intentional double<->float
 # narrowing (routine, harmless in DSP code -- upstream itself doesn't
@@ -218,7 +261,7 @@ Set-Content -Path $CMakeListsPath -Value $cmakeContent -NoNewline
 Write-Host "Forward-declaring AudioCaptureChain in the public base header ..."
 $BaseHeaderPath = Join-Path $VendorDir "common\cpp\include\flutter_webrtc_base.h"
 $baseHeaderContent = Get-Content $BaseHeaderPath -Raw
-$includeBlock = @"
+$includeBlock = ConvertTo-LF @"
 // Real mic EQ + RNNoise deep noise suppression -- Windows only for now,
 // see audio_capture_chain.h for why this lives there and why it's gated
 // behind _WIN32 in this otherwise cross-desktop-platform shared file.
@@ -238,7 +281,7 @@ if ($baseHeaderContent -notmatch [regex]::Escape($includeBlock)) {
     Write-Error "Could not find the expected audio_capture_chain.h #include block in $BaseHeaderPath -- rnnoise_hooks.patch's shape may have changed."
     exit 1
 }
-$forwardDeclBlock = @'
+$forwardDeclBlock = ConvertTo-LF @'
 namespace flutter_webrtc_plugin {
 
 using namespace libwebrtc;
@@ -262,7 +305,7 @@ Set-Content -Path $BaseHeaderPath -Value $baseHeaderContent -NoNewline
 # AudioCaptureChain now need their own direct #include, since the
 # public header above no longer provides it transitively.
 Write-Host "Adding direct audio_capture_chain.h includes to flutter_webrtc_base.cc and flutter_webrtc.cc ..."
-$directIncludeComment = @'
+$directIncludeComment = ConvertTo-LF @'
 // flutter_webrtc_base.h only forward-declares AudioCaptureChain (see its
 // own comment) -- this file needs the full type to construct one and
 // to let ~FlutterWebRTCBase() destroy it via unique_ptr.
@@ -281,7 +324,7 @@ if ($baseCcContent -notmatch [regex]::Escape($baseCcMarker)) {
 $baseCcContent = $baseCcContent.Replace($baseCcMarker, $baseCcMarker + $directIncludeComment)
 Set-Content -Path $BaseCcPath -Value $baseCcContent -NoNewline
 
-$webrtcCcDirectIncludeComment = @'
+$webrtcCcDirectIncludeComment = ConvertTo-LF @'
 // flutter_webrtc_base.h (included transitively via flutter_webrtc.h)
 // only forward-declares AudioCaptureChain -- this file calls real
 // methods on it (eq_processor()/noise_suppressor()) below, so it needs
