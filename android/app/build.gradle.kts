@@ -39,6 +39,11 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // flutter_local_notifications (background message sync's local
+        // notification, see lib/core/background_sync.dart) requires this
+        // on Android -- it ships Java 8+ APIs (java.time, etc.) that need
+        // desugaring to run on older API levels. See the dependency below.
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -74,6 +79,11 @@ android {
                 signingConfigs.getByName("debug")
         }
     }
+}
+
+dependencies {
+    // Required by compileOptions.isCoreLibraryDesugaringEnabled above.
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
 
 flutter {
