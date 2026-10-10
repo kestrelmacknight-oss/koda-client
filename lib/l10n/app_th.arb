@@ -55,6 +55,10 @@
   "settingsHighContrastSubtitle": "สีขาวดำล้วนที่มีคอนทราสต์สูงทั่วทั้งแอป -- การสลับจะโหลดหน้าจอปัจจุบันใหม่ชั่วครู่",
   "settingsDyslexiaFontTitle": "ฟอนต์ที่เป็นมิตรกับผู้มีภาวะดิสเล็กเซีย",
   "settingsDyslexiaFontSubtitle": "เปลี่ยนข้อความเนื้อหาเป็น OpenDyslexic ทั่วทั้งแอป",
+
+  "settingsNewestAtTopTitle": "แสดงข้อความล่าสุดไว้ด้านบน",
+
+  "settingsNewestAtTopSubtitle": "มีผลกับแชนเนล ข้อความส่วนตัว และแชทแชนเนลเสียงเหมือนกัน",
   "settingsFontSizeTitle": "ขนาดตัวอักษร",
   "settingsFontSizeSample": "เป็นมนุษย์สุดประเสริฐเลิศคุณค่า กว่าบรรดาฝูงสัตว์เดรัจฉาน",
   "settingsDensityTitle": "ความหนาแน่น",
@@ -75,6 +79,128 @@
   "settingsRefreshStatus": "เชื่อมต่อในเบราว์เซอร์แล้วหรือไม่? รีเฟรชสถานะ",
   "settingsStreamingConnectError": "ไม่สามารถเริ่มการเชื่อมต่อ {platform} ได้",
   "settingsStreamingFinishInBrowser": "เชื่อมต่อให้เสร็จสิ้นในเบราว์เซอร์ของคุณ แล้วกลับมารีเฟรชอีกครั้ง",
+
+  "settingsDeveloperPortalTitle": "พอร์ทัลนักพัฒนา",
+
+  "settingsDeveloperPortalSubtitle": "ลงทะเบียนบอทและแอปที่ใช้ Koda API",
+
+  "devPortalScreenTitle": "พอร์ทัลนักพัฒนา",
+
+  "devPortalNewAppTooltip": "แอปใหม่",
+
+  "devPortalEmptyState": "ยังไม่มีแอป สร้างแอปเพื่อรับคีย์ API สำหรับบอทของคุณ",
+
+  "devPortalNewAppTitle": "แอปใหม่",
+
+  "devPortalAppNameHint": "ชื่อแอป",
+
+  "devPortalAppDescriptionHint": "คำอธิบาย (ไม่บังคับ)",
+
+  "devPortalBotUsernameHint": "ชื่อผู้ใช้บอท",
+
+  "devPortalInteractionDataOnlyNote": "บอทของคุณจะได้รับเฉพาะคำสั่งและตัวเลือกที่ผู้ใช้ส่งถึงมันโดยชัดแจ้งเท่านั้น -- ไม่เคยได้รับประวัติข้อความของช่อง",
+
+  "devPortalCreateError": "ไม่สามารถสร้างแอปนี้ได้ในขณะนี้",
+
+  "devPortalKeyRevealTitle": "คีย์ API ของคุณ",
+
+  "devPortalKeyRevealWarning": "นี่เป็นครั้งเดียวที่จะแสดงคีย์นี้ คัดลอกตอนนี้เลย -- Koda ไม่ได้จัดเก็บในรูปแบบที่กู้คืนได้",
+
+  "devPortalCopyKeyTooltip": "คัดลอกคีย์",
+
+  "devPortalKeyCopiedToast": "คัดลอกคีย์ API แล้ว",
+
+  "devPortalKeySavedIt": "ฉันบันทึกไว้แล้ว",
+
+  "devPortalRegenerate": "สร้างใหม่",
+
+  "devPortalRegenerateConfirmTitle": "สร้างคีย์ API ใหม่หรือไม่?",
+
+  "devPortalRegenerateConfirmBody": "คีย์ปัจจุบันจะหยุดทำงานทันที -- สิ่งใดก็ตามที่ใช้คีย์นี้อยู่แล้วจะต้องใช้คีย์ใหม่",
+
+  "devPortalDeleteConfirmTitle": "ลบแอปนี้หรือไม่?",
+
+  "devPortalDeleteConfirmBody": "คีย์ API ของแอปจะถูกเพิกถอนและบัญชีบอทจะถูกปิดใช้งาน การดำเนินการนี้ไม่สามารถย้อนกลับได้",
+
+  "devPortalOAuthSectionTitle": "OAuth2 (เข้าสู่ระบบด้วย Koda)",
+
+  "devPortalNoRedirectUris": "ยังไม่มีการลงทะเบียน redirect URI",
+
+  "devPortalEditRedirectUris": "แก้ไข redirect URI",
+
+  "devPortalEditRedirectUrisTitle": "Redirect URI",
+
+  "devPortalRedirectUrisHelp": "หนึ่งรายการต่อบรรทัด redirect_uri ของคำขอความยินยอมต้องตรงกับรายการใดรายการหนึ่งเหล่านี้ทุกประการ",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "สร้าง client secret",
+
+  "devPortalRegenerateClientSecret": "สร้าง client secret ใหม่",
+
+  "devPortalClientSecretEndingIn": "Client secret ลงท้ายด้วย {lastFour}",
+
+  "oauthConsentTitle": "อนุญาตแอปพลิเคชัน",
+
+  "oauthConsentUnknownApp": "ไม่พบแอปพลิเคชันนี้",
+
+  "oauthConsentAllowQuestion": "อนุญาตให้ {appName} เข้าถึงบัญชี Koda ของคุณหรือไม่?",
+
+  "oauthConsentWillBeAbleTo": "สิ่งนี้จะอนุญาตให้แอป:",
+
+  "oauthConsentAllow": "อนุญาต",
+
+  "oauthConsentDeny": "ปฏิเสธ",
+
+  "oauthConsentError": "ไม่สามารถดำเนินการให้เสร็จสิ้นได้ -- โปรดลองอีกครั้ง",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "เชื่อมต่อ Steam เพื่อแชร์ว่าคุณกำลังเล่นอะไร และ/หรือเปรียบเทียบคลังเกมกับเพื่อน -- นี่คือสวิตช์อิสระสองตัว เปิดอันหนึ่งจะไม่เปิดอีกอันโดยอัตโนมัติ",
+
+  "settingsSteamConnected": "เชื่อมต่อ Steam ในชื่อ {personaName}",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "ยังไม่ได้เชื่อมต่อ Steam",
+
+  "settingsSteamSharePresence": "แชร์เกมที่กำลังเล่น",
+
+  "settingsSteamSharePresenceSubtitle": "เพื่อนและสมาชิกเซิร์ฟเวอร์จะเห็นเกมปัจจุบันของคุณข้างสถานะ",
+
+  "settingsSteamShareLibrary": "อนุญาตการเปรียบเทียบคลังเกม",
+
+  "settingsSteamShareLibrarySubtitle": "เพื่อนและสมาชิกเซิร์ฟเวอร์สามารถเปรียบเทียบคลังเกม Steam ของพวกเขากับของคุณ",
+
+  "profilePlayingGame": "กำลังเล่น {game}",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "เปรียบเทียบคลังเกม Steam",
+
+  "steamCompareScreenTitle": "คลังเกม Steam ที่มีร่วมกัน",
+
+  "steamCompareSharedCount": "คุณทั้งสองมี {count} เกมร่วมกัน",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "ยังไม่มีเกมที่เหมือนกัน",
+
+  "steamCompareError": "ไม่สามารถโหลดเกมที่มีร่วมกันได้ในขณะนี้",
+
+  "steamSyncNow": "ซิงค์ตอนนี้",
+
+  "steamSyncSuccess": "ซิงค์คลังเกม Steam แล้ว",
+
+  "steamSyncError": "ไม่สามารถซิงค์ได้ในขณะนี้ -- ลองใหม่อีกครั้งในอีกสักครู่",
+
+  "steamManageLibraryTitle": "จัดการเกมที่ซิงค์แล้ว",
+
+  "steamManageLibraryDescription": "เกมที่คุณทำเครื่องหมายว่าซ่อนที่นี่จะไม่แสดงในการเปรียบเทียบคลังเกมเลย แม้ Steam จะยังถือว่าเป็นสาธารณะ",
+
+  "steamManageLibraryEmptyState": "ยังไม่มีเกมที่ซิงค์ -- ลองซิงค์ตอนนี้",
+
+  "steamHiddenFromComparison": "ซ่อนจากการเปรียบเทียบ",
   "settingsThroneTitle": "เว็บฮุค Throne",
   "settingsThroneDescription": "วาง URL นี้ลงในการตั้งค่าเว็บฮุคของ Throne.com เพื่อรับการแจ้งเตือนใน Koda ทุกครั้งที่มีคนส่งของขวัญให้คุณ",
   "settingsThroneGetUrl": "รับ URL เว็บฮุคของฉัน",
@@ -861,6 +987,26 @@
   "calendarFallbackTitle": "ปฏิทิน",
   "calendarAskVispTooltip": "ถาม Visp",
   "calendarCreateEventTooltip": "สร้างกิจกรรม",
+
+  "calendarSyncTooltip": "ซิงค์กับแอปปฏิทินของคุณ",
+
+  "calendarSyncDialogTitle": "ซิงค์ปฏิทินนี้",
+
+  "calendarSyncDialogDescription": "สมัครรับ URL นี้จาก Google ปฏิทิน, Apple ปฏิทิน, Outlook หรือแอปใดก็ตามที่รองรับ \"สมัครรับผ่าน URL\" เพื่อดูกิจกรรมของเซิร์ฟเวอร์นี้ในปฏิทินของคุณเอง อ่านอย่างเดียว และรวมเฉพาะกิจกรรมจากช่องที่คุณมองเห็นได้",
+
+  "calendarSyncCopyTooltip": "คัดลอก URL",
+
+  "calendarSyncCopiedToast": "คัดลอก URL ปฏิทินแล้ว",
+
+  "calendarSyncRegenerateTooltip": "สร้าง URL ใหม่",
+
+  "calendarSyncRegenerate": "สร้างใหม่",
+
+  "calendarSyncRegenerateConfirmTitle": "สร้าง URL ปฏิทินใหม่หรือไม่?",
+
+  "calendarSyncRegenerateConfirmBody": "URL เดิมจะหยุดทำงานทันที -- ทุกที่ที่คุณสมัครรับไว้แล้วจะต้องใช้ URL ใหม่",
+
+  "calendarSyncInstructions": "Google ปฏิทิน: ปฏิทินอื่นๆ > จาก URL. Apple ปฏิทิน: ไฟล์ > การสมัครรับปฏิทินใหม่. Outlook: เพิ่มปฏิทิน > สมัครรับจากเว็บ",
   "calendarPreviousMonthTooltip": "เดือนก่อนหน้า",
   "calendarNextMonthTooltip": "เดือนถัดไป",
   "calendarTodayButton": "วันนี้",
@@ -1126,6 +1272,18 @@
   "settingsFoundersHallTitle": "Founders Hall",
 
   "settingsFoundersHallSubtitle": "ดูว่าใครช่วยสร้าง Koda",
+
+
+  "settingsWikiTitle": "ช่วยเหลือและวิกิ",
+
+
+  "settingsWikiSubtitle": "เรียกดูฐานความรู้ของ Koda",
+
+
+  "wikiScreenTitle": "ช่วยเหลือและวิกิ",
+
+
+  "wikiScreenEmptyState": "ยังไม่มีอะไรที่นี่",
   "vispAvatarInDevelopment": "อยู่ระหว่างการพัฒนา",
   "vispBoostAdvisorCouldNotAnswer": "Visp ไม่สามารถสร้างคำตอบได้",
   "vispBoostAdvisorTitle": "ถาม Visp: ที่ปรึกษา ROI ของบูสต์",

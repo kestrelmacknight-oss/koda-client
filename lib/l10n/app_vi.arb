@@ -55,6 +55,10 @@
   "settingsHighContrastSubtitle": "Màu đen/trắng thuần túy, tương phản cao trên toàn ứng dụng -- việc chuyển đổi sẽ tải lại ngắn gọn màn hình hiện tại.",
   "settingsDyslexiaFontTitle": "Phông chữ thân thiện với chứng khó đọc",
   "settingsDyslexiaFontSubtitle": "Chuyển văn bản nội dung sang OpenDyslexic trên toàn ứng dụng",
+
+  "settingsNewestAtTopTitle": "Hiển thị Tin nhắn Mới nhất ở Trên cùng",
+
+  "settingsNewestAtTopSubtitle": "Áp dụng cho kênh, tin nhắn trực tiếp và trò chuyện kênh thoại",
   "settingsFontSizeTitle": "Cỡ chữ",
   "settingsFontSizeSample": "Con cáo nâu nhanh nhẹn nhảy qua con chó lười biếng",
   "settingsDensityTitle": "Mật độ",
@@ -75,6 +79,128 @@
   "settingsRefreshStatus": "Đã kết nối trên trình duyệt? Làm mới trạng thái",
   "settingsStreamingConnectError": "Không thể bắt đầu kết nối {platform}.",
   "settingsStreamingFinishInBrowser": "Hoàn tất kết nối trong trình duyệt, sau đó quay lại và làm mới.",
+
+  "settingsDeveloperPortalTitle": "Cổng thông tin nhà phát triển",
+
+  "settingsDeveloperPortalSubtitle": "Đăng ký bot và ứng dụng sử dụng API Koda",
+
+  "devPortalScreenTitle": "Cổng thông tin nhà phát triển",
+
+  "devPortalNewAppTooltip": "Ứng dụng mới",
+
+  "devPortalEmptyState": "Chưa có ứng dụng nào. Tạo một ứng dụng để nhận khóa API cho bot của bạn.",
+
+  "devPortalNewAppTitle": "Ứng dụng mới",
+
+  "devPortalAppNameHint": "Tên ứng dụng",
+
+  "devPortalAppDescriptionHint": "Mô tả (tùy chọn)",
+
+  "devPortalBotUsernameHint": "Tên người dùng bot",
+
+  "devPortalInteractionDataOnlyNote": "Bot của bạn chỉ nhận lệnh và các tùy chọn mà người dùng gửi rõ ràng đến nó -- không bao giờ nhận lịch sử tin nhắn của kênh.",
+
+  "devPortalCreateError": "Hiện không thể tạo ứng dụng này.",
+
+  "devPortalKeyRevealTitle": "Khóa API của bạn",
+
+  "devPortalKeyRevealWarning": "Đây là lần duy nhất khóa này được hiển thị. Hãy sao chép ngay bây giờ -- Koda không lưu trữ nó ở dạng có thể khôi phục.",
+
+  "devPortalCopyKeyTooltip": "Sao chép khóa",
+
+  "devPortalKeyCopiedToast": "Đã sao chép khóa API.",
+
+  "devPortalKeySavedIt": "Tôi đã lưu nó",
+
+  "devPortalRegenerate": "Tạo Lại",
+
+  "devPortalRegenerateConfirmTitle": "Tạo lại khóa API?",
+
+  "devPortalRegenerateConfirmBody": "Khóa hiện tại sẽ ngừng hoạt động ngay lập tức -- bất cứ thứ gì đang dùng nó sẽ cần khóa mới.",
+
+  "devPortalDeleteConfirmTitle": "Xóa ứng dụng này?",
+
+  "devPortalDeleteConfirmBody": "Khóa API của nó sẽ bị thu hồi và tài khoản bot sẽ bị vô hiệu hóa. Không thể hoàn tác.",
+
+  "devPortalOAuthSectionTitle": "OAuth2 (Đăng nhập bằng Koda)",
+
+  "devPortalNoRedirectUris": "Chưa có redirect URI nào được đăng ký.",
+
+  "devPortalEditRedirectUris": "Chỉnh sửa redirect URI",
+
+  "devPortalEditRedirectUrisTitle": "Redirect URI",
+
+  "devPortalRedirectUrisHelp": "Mỗi dòng một URI. redirect_uri của yêu cầu đồng ý phải khớp chính xác với một trong số này.",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "Tạo client secret",
+
+  "devPortalRegenerateClientSecret": "Tạo lại client secret",
+
+  "devPortalClientSecretEndingIn": "Client secret kết thúc bằng {lastFour}",
+
+  "oauthConsentTitle": "Cấp quyền ứng dụng",
+
+  "oauthConsentUnknownApp": "Không tìm thấy ứng dụng này.",
+
+  "oauthConsentAllowQuestion": "Cho phép {appName} truy cập tài khoản Koda của bạn?",
+
+  "oauthConsentWillBeAbleTo": "Điều này sẽ cho phép ứng dụng:",
+
+  "oauthConsentAllow": "Cho phép",
+
+  "oauthConsentDeny": "Từ chối",
+
+  "oauthConsentError": "Không thể hoàn tất -- hãy thử lại.",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "Kết nối Steam để chia sẻ bạn đang chơi gì và/hoặc so sánh thư viện game với bạn bè -- đây là hai công tắc độc lập, bật một cái không bao giờ tự bật cái kia.",
+
+  "settingsSteamConnected": "Đã kết nối Steam với tên {personaName}",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "Chưa kết nối Steam",
+
+  "settingsSteamSharePresence": "Chia sẻ trò chơi tôi đang chơi",
+
+  "settingsSteamSharePresenceSubtitle": "Bạn bè và thành viên server thấy trò chơi hiện tại của bạn bên cạnh trạng thái",
+
+  "settingsSteamShareLibrary": "Cho phép so sánh thư viện",
+
+  "settingsSteamShareLibrarySubtitle": "Bạn bè và thành viên server có thể so sánh thư viện Steam của họ với bạn",
+
+  "profilePlayingGame": "Đang chơi {game}",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "So Sánh Thư Viện Steam",
+
+  "steamCompareScreenTitle": "Thư Viện Steam Chung",
+
+  "steamCompareSharedCount": "Cả hai bạn đều có {count} trò chơi",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "Chưa có trò chơi chung nào.",
+
+  "steamCompareError": "Không thể tải trò chơi chung lúc này.",
+
+  "steamSyncNow": "Đồng Bộ Ngay",
+
+  "steamSyncSuccess": "Đã đồng bộ thư viện Steam.",
+
+  "steamSyncError": "Không thể đồng bộ ngay bây giờ -- thử lại sau chút nữa.",
+
+  "steamManageLibraryTitle": "Quản lý trò chơi đã đồng bộ",
+
+  "steamManageLibraryDescription": "Các trò chơi bạn đánh dấu ẩn ở đây sẽ không bao giờ xuất hiện trong so sánh thư viện, ngay cả khi Steam vẫn coi chúng là công khai.",
+
+  "steamManageLibraryEmptyState": "Chưa có trò chơi đồng bộ nào -- hãy thử Đồng Bộ Ngay.",
+
+  "steamHiddenFromComparison": "Đã ẩn khỏi so sánh",
   "settingsThroneTitle": "Webhook Throne",
   "settingsThroneDescription": "Dán URL này vào cài đặt webhook Throne.com của bạn để nhận thông báo trong Koda mỗi khi có người tặng quà cho bạn.",
   "settingsThroneGetUrl": "Lấy URL webhook của tôi",
@@ -861,6 +987,26 @@
   "calendarFallbackTitle": "Lịch",
   "calendarAskVispTooltip": "Hỏi Visp",
   "calendarCreateEventTooltip": "Tạo sự kiện",
+
+  "calendarSyncTooltip": "Đồng bộ với ứng dụng lịch của bạn",
+
+  "calendarSyncDialogTitle": "Đồng bộ lịch này",
+
+  "calendarSyncDialogDescription": "Đăng ký URL này từ Google Lịch, Apple Lịch, Outlook hoặc bất kỳ ứng dụng nào hỗ trợ \"đăng ký qua URL\" để xem sự kiện của server này trong lịch của riêng bạn. Chỉ đọc, và chỉ bao gồm sự kiện từ các kênh bạn có thể xem.",
+
+  "calendarSyncCopyTooltip": "Sao chép URL",
+
+  "calendarSyncCopiedToast": "Đã sao chép URL lịch.",
+
+  "calendarSyncRegenerateTooltip": "Tạo lại URL",
+
+  "calendarSyncRegenerate": "Tạo Lại",
+
+  "calendarSyncRegenerateConfirmTitle": "Tạo lại URL lịch?",
+
+  "calendarSyncRegenerateConfirmBody": "URL cũ sẽ ngừng hoạt động ngay lập tức -- bất cứ nơi nào bạn đã đăng ký sẽ cần URL mới.",
+
+  "calendarSyncInstructions": "Google Lịch: Lịch khác > Từ URL. Apple Lịch: Tệp > Đăng Ký Lịch Mới. Outlook: Thêm lịch > Đăng ký từ web.",
   "calendarPreviousMonthTooltip": "Tháng trước",
   "calendarNextMonthTooltip": "Tháng sau",
   "calendarTodayButton": "Hôm nay",
@@ -1126,6 +1272,18 @@
   "settingsFoundersHallTitle": "Founders Hall",
 
   "settingsFoundersHallSubtitle": "Xem ai đã giúp xây dựng Koda",
+
+
+  "settingsWikiTitle": "Trợ giúp & Wiki",
+
+
+  "settingsWikiSubtitle": "Duyệt cơ sở kiến thức của Koda",
+
+
+  "wikiScreenTitle": "Trợ giúp & Wiki",
+
+
+  "wikiScreenEmptyState": "Chưa có gì ở đây.",
   "vispAvatarInDevelopment": "ĐANG PHÁT TRIỂN",
   "vispBoostAdvisorCouldNotAnswer": "Visp không thể tạo câu trả lời.",
   "vispBoostAdvisorTitle": "Hỏi Visp: Cố vấn ROI cho Boost",

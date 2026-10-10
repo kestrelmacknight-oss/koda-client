@@ -170,6 +170,12 @@ class AppLocalizationsKo extends AppLocalizations {
       '앱 전체의 본문 텍스트를 OpenDyslexic으로 전환합니다';
 
   @override
+  String get settingsNewestAtTopTitle => '최신 메시지를 상단에 표시';
+
+  @override
+  String get settingsNewestAtTopSubtitle => '채널, DM, 음성 채널 채팅에 동일하게 적용됩니다';
+
+  @override
   String get settingsFontSizeTitle => '글꼴 크기';
 
   @override
@@ -238,6 +244,200 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get settingsStreamingFinishInBrowser =>
       '브라우저에서 연결을 완료한 후 돌아와서 새로고침하세요.';
+
+  @override
+  String get settingsDeveloperPortalTitle => '개발자 포털';
+
+  @override
+  String get settingsDeveloperPortalSubtitle => 'Koda API를 사용하는 봇과 앱을 등록하세요';
+
+  @override
+  String get devPortalScreenTitle => '개발자 포털';
+
+  @override
+  String get devPortalNewAppTooltip => '새 애플리케이션';
+
+  @override
+  String get devPortalEmptyState => '아직 애플리케이션이 없습니다. 봇의 API 키를 받으려면 하나를 만드세요.';
+
+  @override
+  String get devPortalNewAppTitle => '새 애플리케이션';
+
+  @override
+  String get devPortalAppNameHint => '앱 이름';
+
+  @override
+  String get devPortalAppDescriptionHint => '설명(선택 사항)';
+
+  @override
+  String get devPortalBotUsernameHint => '봇 사용자 이름';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      '봇은 사용자가 명시적으로 제출한 명령어와 옵션만 받습니다 -- 채널의 메시지 기록은 절대 받지 않습니다.';
+
+  @override
+  String get devPortalCreateError => '지금은 이 애플리케이션을 만들 수 없습니다.';
+
+  @override
+  String get devPortalKeyRevealTitle => '내 API 키';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      '이 키는 이번 한 번만 표시됩니다. 지금 복사하세요 -- Koda는 복구 가능한 형태로 저장하지 않습니다.';
+
+  @override
+  String get devPortalCopyKeyTooltip => '키 복사';
+
+  @override
+  String get devPortalKeyCopiedToast => 'API 키가 복사되었습니다.';
+
+  @override
+  String get devPortalKeySavedIt => '저장했습니다';
+
+  @override
+  String get devPortalRegenerate => '재생성';
+
+  @override
+  String get devPortalRegenerateConfirmTitle => 'API 키를 재생성할까요?';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      '현재 키는 즉시 작동을 멈춥니다 -- 이미 사용 중인 모든 곳에 새 키가 필요합니다.';
+
+  @override
+  String get devPortalDeleteConfirmTitle => '이 애플리케이션을 삭제할까요?';
+
+  @override
+  String get devPortalDeleteConfirmBody =>
+      'API 키가 취소되고 봇 계정이 비활성화됩니다. 되돌릴 수 없습니다.';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2(Koda로 로그인)';
+
+  @override
+  String get devPortalNoRedirectUris => '아직 등록된 리디렉션 URI가 없습니다.';
+
+  @override
+  String get devPortalEditRedirectUris => '리디렉션 URI 편집';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => '리디렉션 URI';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      '한 줄에 하나씩. 동의 요청의 redirect_uri는 이 중 하나와 정확히 일치해야 합니다.';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => '클라이언트 시크릿 생성';
+
+  @override
+  String get devPortalRegenerateClientSecret => '클라이언트 시크릿 재생성';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return '$lastFour로 끝나는 클라이언트 시크릿';
+  }
+
+  @override
+  String get oauthConsentTitle => '애플리케이션 승인';
+
+  @override
+  String get oauthConsentUnknownApp => '이 애플리케이션을 찾을 수 없습니다.';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return '$appName이 회원님의 Koda 계정에 액세스하도록 허용하시겠습니까?';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo => '이렇게 하면 앱이 다음을 할 수 있습니다:';
+
+  @override
+  String get oauthConsentAllow => '허용';
+
+  @override
+  String get oauthConsentDeny => '거부';
+
+  @override
+  String get oauthConsentError => '완료할 수 없습니다 -- 다시 시도하세요.';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      'Steam을 연결하여 현재 플레이 중인 게임을 공유하거나 친구와 게임 라이브러리를 비교할 수 있습니다 -- 이 둘은 독립적인 스위치이며, 하나를 켜도 다른 하나가 자동으로 켜지지 않습니다.';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return '$personaName(으)로 Steam 연결됨';
+  }
+
+  @override
+  String get settingsSteamNotConnected => 'Steam 연결 안 됨';
+
+  @override
+  String get settingsSteamSharePresence => '현재 플레이 중인 게임 공유';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle =>
+      '친구와 서버 멤버가 상태 옆에서 현재 게임을 볼 수 있습니다';
+
+  @override
+  String get settingsSteamShareLibrary => '라이브러리 비교 허용';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      '친구와 서버 멤버가 자신의 Steam 라이브러리를 회원님과 비교할 수 있습니다';
+
+  @override
+  String profilePlayingGame(String game) {
+    return '$game 플레이 중';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => 'Steam 라이브러리 비교';
+
+  @override
+  String get steamCompareScreenTitle => '공유 Steam 라이브러리';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return '두 사람 모두 $count개의 게임을 보유 중';
+  }
+
+  @override
+  String get steamCompareEmptyState => '아직 공통 게임이 없습니다.';
+
+  @override
+  String get steamCompareError => '지금은 공유 게임을 불러올 수 없습니다.';
+
+  @override
+  String get steamSyncNow => '지금 동기화';
+
+  @override
+  String get steamSyncSuccess => 'Steam 라이브러리가 동기화되었습니다.';
+
+  @override
+  String get steamSyncError => '지금은 동기화할 수 없습니다 -- 잠시 후 다시 시도하세요.';
+
+  @override
+  String get steamManageLibraryTitle => '동기화된 게임 관리';
+
+  @override
+  String get steamManageLibraryDescription =>
+      '여기서 숨김으로 표시한 게임은 Steam에서 여전히 공개로 간주하더라도 라이브러리 비교에 표시되지 않습니다.';
+
+  @override
+  String get steamManageLibraryEmptyState =>
+      '아직 동기화된 게임이 없습니다 -- 지금 동기화를 시도해 보세요.';
+
+  @override
+  String get steamHiddenFromComparison => '비교에서 숨김';
 
   @override
   String get settingsThroneTitle => 'Throne 웹훅';
@@ -2844,6 +3044,39 @@ class AppLocalizationsKo extends AppLocalizations {
   String get calendarCreateEventTooltip => '이벤트 만들기';
 
   @override
+  String get calendarSyncTooltip => '캘린더 앱과 동기화';
+
+  @override
+  String get calendarSyncDialogTitle => '이 캘린더 동기화';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      'Google 캘린더, Apple 캘린더, Outlook 또는 \"URL로 구독\"을 지원하는 모든 앱에서 이 URL을 구독하면 이 서버의 일정을 본인 캘린더에서 볼 수 있습니다. 읽기 전용이며, 볼 수 있는 채널의 일정만 포함됩니다.';
+
+  @override
+  String get calendarSyncCopyTooltip => 'URL 복사';
+
+  @override
+  String get calendarSyncCopiedToast => '캘린더 URL이 복사되었습니다.';
+
+  @override
+  String get calendarSyncRegenerateTooltip => 'URL 재생성';
+
+  @override
+  String get calendarSyncRegenerate => '재생성';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle => '캘린더 URL을 재생성하시겠습니까?';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      '이전 URL은 즉시 작동을 멈춥니다 -- 이미 구독한 곳에서는 새 URL이 필요합니다.';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google 캘린더: 다른 캘린더 > URL로 추가. Apple 캘린더: 파일 > 새로운 캘린더 구독. Outlook: 캘린더 추가 > 웹에서 구독.';
+
+  @override
   String get calendarPreviousMonthTooltip => '이전 달';
 
   @override
@@ -3741,6 +3974,18 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get settingsFoundersHallSubtitle => 'Koda를 만드는 데 도움을 준 사람을 확인하세요';
+
+  @override
+  String get settingsWikiTitle => '도움말 및 위키';
+
+  @override
+  String get settingsWikiSubtitle => 'Koda의 지식 베이스 둘러보기';
+
+  @override
+  String get wikiScreenTitle => '도움말 및 위키';
+
+  @override
+  String get wikiScreenEmptyState => '아직 여기에 아무것도 없습니다.';
 
   @override
   String get vispAvatarInDevelopment => '개발 중';

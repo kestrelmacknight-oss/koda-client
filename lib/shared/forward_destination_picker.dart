@@ -215,6 +215,7 @@ class _ForwardDestinationPickerDialogState extends State<_ForwardDestinationPick
                   peerUserId: peerUserId,
                   text: widget.text,
                   originalAttachment: widget.originalAttachment,
+                  gifAttachment: widget.gifAttachment,
                   forwardedFrom: widget.forwardedFrom,
                   myUserId: widget.myUserId)),
             );

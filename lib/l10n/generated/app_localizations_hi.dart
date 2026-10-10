@@ -173,6 +173,13 @@ class AppLocalizationsHi extends AppLocalizations {
       'पूरे ऐप में बॉडी टेक्स्ट को OpenDyslexic में बदल देता है';
 
   @override
+  String get settingsNewestAtTopTitle => 'नवीनतम संदेश सबसे ऊपर दिखाएं';
+
+  @override
+  String get settingsNewestAtTopSubtitle =>
+      'चैनलों, डीएम और वॉइस-चैनल चैट सभी पर लागू होता है';
+
+  @override
   String get settingsFontSizeTitle => 'फ़ॉन्ट साइज़';
 
   @override
@@ -244,6 +251,204 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get settingsStreamingFinishInBrowser =>
       'अपने ब्राउज़र में कनेक्शन पूरा करें, फिर वापस आकर रिफ़्रेश करें।';
+
+  @override
+  String get settingsDeveloperPortalTitle => 'डेवलपर पोर्टल';
+
+  @override
+  String get settingsDeveloperPortalSubtitle =>
+      'Koda API का उपयोग करने वाले बॉट और ऐप्स पंजीकृत करें';
+
+  @override
+  String get devPortalScreenTitle => 'डेवलपर पोर्टल';
+
+  @override
+  String get devPortalNewAppTooltip => 'नया ऐप';
+
+  @override
+  String get devPortalEmptyState =>
+      'अभी तक कोई ऐप नहीं। अपने बॉट के लिए API कुंजी पाने हेतु एक बनाएं।';
+
+  @override
+  String get devPortalNewAppTitle => 'नया ऐप';
+
+  @override
+  String get devPortalAppNameHint => 'ऐप का नाम';
+
+  @override
+  String get devPortalAppDescriptionHint => 'विवरण (वैकल्पिक)';
+
+  @override
+  String get devPortalBotUsernameHint => 'बॉट उपयोगकर्ता नाम';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      'आपका बॉट केवल वह कमांड और विकल्प प्राप्त करता है जो उपयोगकर्ता स्पष्ट रूप से उसे भेजता है -- कभी भी चैनल का संदेश इतिहास नहीं।';
+
+  @override
+  String get devPortalCreateError => 'अभी यह ऐप नहीं बनाया जा सका।';
+
+  @override
+  String get devPortalKeyRevealTitle => 'आपकी API कुंजी';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      'यह एकमात्र बार है जब यह कुंजी दिखाई जाएगी। इसे अभी कॉपी करें -- Koda इसे पुनर्प्राप्त करने योग्य रूप में संग्रहीत नहीं करता।';
+
+  @override
+  String get devPortalCopyKeyTooltip => 'कुंजी कॉपी करें';
+
+  @override
+  String get devPortalKeyCopiedToast => 'API कुंजी कॉपी हो गई।';
+
+  @override
+  String get devPortalKeySavedIt => 'मैंने इसे सहेज लिया';
+
+  @override
+  String get devPortalRegenerate => 'पुनः बनाएं';
+
+  @override
+  String get devPortalRegenerateConfirmTitle => 'API कुंजी पुनः बनाएं?';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      'वर्तमान कुंजी तुरंत काम करना बंद कर देगी -- जो भी इसे पहले से उपयोग कर रहा है उसे नई कुंजी की आवश्यकता होगी।';
+
+  @override
+  String get devPortalDeleteConfirmTitle => 'इस ऐप को हटाएं?';
+
+  @override
+  String get devPortalDeleteConfirmBody =>
+      'इसकी API कुंजी रद्द कर दी जाएगी और बॉट खाता निष्क्रिय कर दिया जाएगा। इसे पूर्ववत नहीं किया जा सकता।';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2 (Koda से लॉगिन करें)';
+
+  @override
+  String get devPortalNoRedirectUris =>
+      'अभी तक कोई रीडायरेक्ट URI पंजीकृत नहीं है।';
+
+  @override
+  String get devPortalEditRedirectUris => 'रीडायरेक्ट URI संपादित करें';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => 'रीडायरेक्ट URI';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      'प्रति पंक्ति एक। सहमति अनुरोध का redirect_uri इनमें से किसी एक से ठीक मेल खाना चाहिए।';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => 'क्लाइंट सीक्रेट बनाएं';
+
+  @override
+  String get devPortalRegenerateClientSecret => 'क्लाइंट सीक्रेट फिर से बनाएं';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return 'क्लाइंट सीक्रेट $lastFour पर समाप्त होता है';
+  }
+
+  @override
+  String get oauthConsentTitle => 'एप्लिकेशन को अधिकृत करें';
+
+  @override
+  String get oauthConsentUnknownApp => 'यह एप्लिकेशन नहीं मिल सका।';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return 'क्या $appName को आपके Koda खाते तक पहुंचने की अनुमति दें?';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo => 'इससे ऐप यह कर सकेगा:';
+
+  @override
+  String get oauthConsentAllow => 'अनुमति दें';
+
+  @override
+  String get oauthConsentDeny => 'अस्वीकार करें';
+
+  @override
+  String get oauthConsentError => 'वह पूरा नहीं हो सका -- फिर से प्रयास करें।';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      'Steam कनेक्ट करें और बताएं कि आप क्या खेल रहे हैं और/या मित्रों के साथ गेम लाइब्रेरी की तुलना करें -- ये दो स्वतंत्र स्विच हैं, एक को चालू करने से दूसरा कभी चालू नहीं होता।';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return '$personaName के रूप में Steam कनेक्ट है';
+  }
+
+  @override
+  String get settingsSteamNotConnected => 'Steam कनेक्ट नहीं है';
+
+  @override
+  String get settingsSteamSharePresence => 'मैं क्या खेल रहा हूँ साझा करें';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle =>
+      'मित्र और सर्वर सदस्य आपकी स्थिति के पास आपका वर्तमान गेम देखते हैं';
+
+  @override
+  String get settingsSteamShareLibrary => 'लाइब्रेरी तुलना की अनुमति दें';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      'मित्र और सर्वर सदस्य अपनी Steam लाइब्रेरी की आपकी लाइब्रेरी से तुलना कर सकते हैं';
+
+  @override
+  String profilePlayingGame(String game) {
+    return '$game खेल रहे हैं';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => 'Steam लाइब्रेरी की तुलना करें';
+
+  @override
+  String get steamCompareScreenTitle => 'साझा Steam लाइब्रेरी';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return 'आप दोनों के पास $count गेम हैं';
+  }
+
+  @override
+  String get steamCompareEmptyState => 'अभी तक कोई साझा गेम नहीं।';
+
+  @override
+  String get steamCompareError => 'अभी साझा गेम लोड नहीं हो सके।';
+
+  @override
+  String get steamSyncNow => 'अभी सिंक करें';
+
+  @override
+  String get steamSyncSuccess => 'Steam लाइब्रेरी सिंक हो गई।';
+
+  @override
+  String get steamSyncError =>
+      'अभी सिंक नहीं हो सका -- थोड़ी देर बाद फिर से प्रयास करें।';
+
+  @override
+  String get steamManageLibraryTitle => 'सिंक किए गए गेम प्रबंधित करें';
+
+  @override
+  String get steamManageLibraryDescription =>
+      'यहां छिपे के रूप में चिह्नित गेम लाइब्रेरी तुलना में कभी नहीं दिखेंगे, भले ही Steam उन्हें अभी भी सार्वजनिक मानता हो।';
+
+  @override
+  String get steamManageLibraryEmptyState =>
+      'अभी तक कोई सिंक किया गया गेम नहीं -- अभी सिंक करें आज़माएं।';
+
+  @override
+  String get steamHiddenFromComparison => 'तुलना से छिपा हुआ';
 
   @override
   String get settingsThroneTitle => 'Throne वेबहुक';
@@ -2931,6 +3136,39 @@ class AppLocalizationsHi extends AppLocalizations {
   String get calendarCreateEventTooltip => 'इवेंट बनाएं';
 
   @override
+  String get calendarSyncTooltip => 'अपने कैलेंडर ऐप से सिंक करें';
+
+  @override
+  String get calendarSyncDialogTitle => 'यह कैलेंडर सिंक करें';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      'अपने कैलेंडर में इस सर्वर की घटनाएं देखने के लिए Google Calendar, Apple Calendar, Outlook, या \"URL से सदस्यता लें\" का समर्थन करने वाले किसी भी ऐप से इस URL की सदस्यता लें। केवल-पढ़ने के लिए, और इसमें केवल उन चैनलों की घटनाएं शामिल हैं जो आप देख सकते हैं।';
+
+  @override
+  String get calendarSyncCopyTooltip => 'URL कॉपी करें';
+
+  @override
+  String get calendarSyncCopiedToast => 'कैलेंडर URL कॉपी हो गया।';
+
+  @override
+  String get calendarSyncRegenerateTooltip => 'URL पुनः बनाएं';
+
+  @override
+  String get calendarSyncRegenerate => 'पुनः बनाएं';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle => 'कैलेंडर URL फिर से बनाएं?';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      'पुराना URL तुरंत काम करना बंद कर देगा -- जहां भी आपने इसकी सदस्यता ली है वहां नए की आवश्यकता होगी।';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google Calendar: अन्य कैलेंडर > URL से। Apple Calendar: फ़ाइल > नई कैलेंडर सदस्यता। Outlook: कैलेंडर जोड़ें > वेब से सदस्यता लें।';
+
+  @override
   String get calendarPreviousMonthTooltip => 'पिछला महीना';
 
   @override
@@ -3857,6 +4095,18 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get settingsFoundersHallSubtitle =>
       'देखें किसने Koda बनाने में मदद की';
+
+  @override
+  String get settingsWikiTitle => 'मदद और विकी';
+
+  @override
+  String get settingsWikiSubtitle => 'Koda के नॉलेज बेस को ब्राउज़ करें';
+
+  @override
+  String get wikiScreenTitle => 'मदद और विकी';
+
+  @override
+  String get wikiScreenEmptyState => 'अभी यहाँ कुछ नहीं है।';
 
   @override
   String get vispAvatarInDevelopment => 'डेवलपमेंट में';

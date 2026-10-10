@@ -55,6 +55,10 @@
   "settingsHighContrastSubtitle": "アプリ全体を純粋な白黒の高コントラスト配色にします -- 切り替えると現在の画面が一瞬再読み込みされます。",
   "settingsDyslexiaFontTitle": "ディスレクシア対応フォント",
   "settingsDyslexiaFontSubtitle": "アプリ全体の本文テキストをOpenDyslexicに切り替えます",
+
+  "settingsNewestAtTopTitle": "最新のメッセージを上部に表示",
+
+  "settingsNewestAtTopSubtitle": "チャンネル、DM、ボイスチャンネルのチャットすべてに適用されます",
   "settingsFontSizeTitle": "フォントサイズ",
   "settingsFontSizeSample": "いろはにほへと ちりぬるを",
   "settingsDensityTitle": "密度",
@@ -75,6 +79,128 @@
   "settingsRefreshStatus": "ブラウザで接続済みですか？ステータスを更新",
   "settingsStreamingConnectError": "{platform}への接続を開始できませんでした。",
   "settingsStreamingFinishInBrowser": "ブラウザで接続を完了してから戻り、更新してください。",
+
+  "settingsDeveloperPortalTitle": "デベロッパーポータル",
+
+  "settingsDeveloperPortalSubtitle": "Koda APIを使うボットやアプリを登録",
+
+  "devPortalScreenTitle": "デベロッパーポータル",
+
+  "devPortalNewAppTooltip": "新しいアプリ",
+
+  "devPortalEmptyState": "まだアプリがありません。ボット用のAPIキーを取得するには作成してください。",
+
+  "devPortalNewAppTitle": "新しいアプリ",
+
+  "devPortalAppNameHint": "アプリ名",
+
+  "devPortalAppDescriptionHint": "説明（任意）",
+
+  "devPortalBotUsernameHint": "ボットのユーザー名",
+
+  "devPortalInteractionDataOnlyNote": "あなたのボットは、ユーザーが明示的に送信したコマンドとオプションのみを受け取ります -- チャンネルのメッセージ履歴は一切受け取りません。",
+
+  "devPortalCreateError": "現在このアプリを作成できませんでした。",
+
+  "devPortalKeyRevealTitle": "あなたのAPIキー",
+
+  "devPortalKeyRevealWarning": "このキーが表示されるのはこれが最後です。今すぐコピーしてください -- Kodaは復元可能な形では保存しません。",
+
+  "devPortalCopyKeyTooltip": "キーをコピー",
+
+  "devPortalKeyCopiedToast": "APIキーをコピーしました。",
+
+  "devPortalKeySavedIt": "保存しました",
+
+  "devPortalRegenerate": "再生成",
+
+  "devPortalRegenerateConfirmTitle": "APIキーを再生成しますか？",
+
+  "devPortalRegenerateConfirmBody": "現在のキーはすぐに使えなくなります -- すでに使用している箇所には新しいキーが必要です。",
+
+  "devPortalDeleteConfirmTitle": "このアプリを削除しますか？",
+
+  "devPortalDeleteConfirmBody": "そのAPIキーは無効化され、ボットアカウントは無効になります。元に戻せません。",
+
+  "devPortalOAuthSectionTitle": "OAuth2（Kodaでログイン）",
+
+  "devPortalNoRedirectUris": "まだリダイレクトURIが登録されていません。",
+
+  "devPortalEditRedirectUris": "リダイレクトURIを編集",
+
+  "devPortalEditRedirectUrisTitle": "リダイレクトURI",
+
+  "devPortalRedirectUrisHelp": "1行に1つ。同意リクエストのredirect_uriはこれらのいずれかと完全に一致する必要があります。",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "クライアントシークレットを生成",
+
+  "devPortalRegenerateClientSecret": "クライアントシークレットを再生成",
+
+  "devPortalClientSecretEndingIn": "末尾が{lastFour}のクライアントシークレット",
+
+  "oauthConsentTitle": "アプリを承認",
+
+  "oauthConsentUnknownApp": "このアプリケーションは見つかりませんでした。",
+
+  "oauthConsentAllowQuestion": "{appName}がKodaアカウントにアクセスすることを許可しますか？",
+
+  "oauthConsentWillBeAbleTo": "これにより、アプリは次のことができます:",
+
+  "oauthConsentAllow": "許可",
+
+  "oauthConsentDeny": "拒否",
+
+  "oauthConsentError": "完了できませんでした -- もう一度お試しください。",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "Steamを連携して、今プレイしているゲームを共有したり、フレンドとゲームライブラリを比較したりできます -- これらは独立した2つのスイッチで、片方をオンにしても他方が自動でオンになることはありません。",
+
+  "settingsSteamConnected": "{personaName} としてSteamに接続済み",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "Steamは未接続",
+
+  "settingsSteamSharePresence": "今プレイ中のゲームを共有",
+
+  "settingsSteamSharePresenceSubtitle": "フレンドやサーバーメンバーがステータスの横に現在のゲームを確認できます",
+
+  "settingsSteamShareLibrary": "ライブラリ比較を許可",
+
+  "settingsSteamShareLibrarySubtitle": "フレンドやサーバーメンバーが自分のSteamライブラリと比較できます",
+
+  "profilePlayingGame": "{game} をプレイ中",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "Steamライブラリを比較",
+
+  "steamCompareScreenTitle": "共有Steamライブラリ",
+
+  "steamCompareSharedCount": "2人とも{count}本のゲームを所持しています",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "まだ共通のゲームはありません。",
+
+  "steamCompareError": "共有ゲームを読み込めませんでした。",
+
+  "steamSyncNow": "今すぐ同期",
+
+  "steamSyncSuccess": "Steamライブラリを同期しました。",
+
+  "steamSyncError": "今は同期できませんでした -- しばらくしてから再試行してください。",
+
+  "steamManageLibraryTitle": "同期済みゲームを管理",
+
+  "steamManageLibraryDescription": "ここで非表示にしたゲームは、Steam側で公開扱いのままでも、ライブラリ比較に表示されません。",
+
+  "steamManageLibraryEmptyState": "まだ同期済みのゲームがありません -- 今すぐ同期を試してください。",
+
+  "steamHiddenFromComparison": "比較から非表示",
   "settingsThroneTitle": "Throne Webhook",
   "settingsThroneDescription": "このURLをThrone.comのWebhook設定に貼り付けると、誰かがギフトを送るたびにKodaで通知を受け取れます。",
   "settingsThroneGetUrl": "WebhookのURLを取得",
@@ -861,6 +987,26 @@
   "calendarFallbackTitle": "カレンダー",
   "calendarAskVispTooltip": "Vispに聞く",
   "calendarCreateEventTooltip": "イベントを作成",
+
+  "calendarSyncTooltip": "カレンダーアプリと同期",
+
+  "calendarSyncDialogTitle": "このカレンダーを同期",
+
+  "calendarSyncDialogDescription": "Google カレンダー、Apple カレンダー、Outlook、または「URLで購読」に対応する任意のアプリでこのURLを購読すると、このサーバーの予定が自分のカレンダーに表示されます。読み取り専用で、閲覧できるチャンネルの予定のみが含まれます。",
+
+  "calendarSyncCopyTooltip": "URLをコピー",
+
+  "calendarSyncCopiedToast": "カレンダーURLをコピーしました。",
+
+  "calendarSyncRegenerateTooltip": "URLを再生成",
+
+  "calendarSyncRegenerate": "再生成",
+
+  "calendarSyncRegenerateConfirmTitle": "カレンダーURLを再生成しますか？",
+
+  "calendarSyncRegenerateConfirmBody": "古いURLはすぐに使えなくなります -- すでに登録している場所では新しいURLが必要です。",
+
+  "calendarSyncInstructions": "Google カレンダー: 他のカレンダー > URLで追加。Apple カレンダー: ファイル > 新規カレンダー登録。Outlook: カレンダーの追加 > Webから登録。",
   "calendarPreviousMonthTooltip": "前の月",
   "calendarNextMonthTooltip": "次の月",
   "calendarTodayButton": "今日",
@@ -1126,6 +1272,18 @@
   "settingsFoundersHallTitle": "Founders Hall",
 
   "settingsFoundersHallSubtitle": "Kodaの構築を助けた人を見る",
+
+
+  "settingsWikiTitle": "ヘルプとWiki",
+
+
+  "settingsWikiSubtitle": "Kodaのナレッジベースを閲覧",
+
+
+  "wikiScreenTitle": "ヘルプとWiki",
+
+
+  "wikiScreenEmptyState": "まだ何もありません。",
   "vispAvatarInDevelopment": "開発中",
   "vispBoostAdvisorCouldNotAnswer": "Vispは回答をまとめられませんでした。",
   "vispBoostAdvisorTitle": "Vispに聞く：ブーストROIアドバイザー",

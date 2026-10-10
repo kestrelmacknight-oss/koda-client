@@ -14,6 +14,7 @@ import '../../core/api.dart';
 import '../../core/language_options.dart';
 import '../../core/last_channel_prefs.dart';
 import '../../core/message_language.dart';
+import '../../core/message_order_prefs.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/platform.dart';
 import '../../core/theme.dart';
@@ -35,6 +36,8 @@ import '../server/server_settings_screen.dart';
 import '../voice/voice_bar.dart';
 import '../../core/voice_session.dart';
 import '../dm/dm_screen.dart';
+import '../developer/oauth_consent_screen.dart';
+import '../steam/steam_compare_screen.dart';
 import '../../core/socket.dart';
 import '../../core/link_preview.dart';
 import '../../core/message_utils.dart';
@@ -129,6 +132,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   final Map<String, List<Map<String, dynamic>>> _voiceOccupants = {};
   final Set<String> _voiceTopics = {};
   StreamSubscription<String>? _deepLinkSub;
+  StreamSubscription<OAuthAuthorizeRequest>? _oauthDeepLinkSub;
   // Set right before switching to the DM tab in response to a tapped
   // dm_message push/notification -- see _routeToNotification. Passed as
   // DmScreen's initialConversationId so it jumps straight to that
@@ -212,12 +216,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     _deepLinkSub = DeepLinks.instance.inviteCodes.listen(_handleInviteDeepLink);
     final pending = DeepLinks.instance.consumePendingInviteCode();
     if (pending != null) _handleInviteDeepLink(pending);
+
+    _oauthDeepLinkSub = DeepLinks.instance.oauthRequests.listen(_handleOAuthDeepLink);
+    final pendingOAuth = DeepLinks.instance.consumePendingOAuthRequest();
+    if (pendingOAuth != null) _handleOAuthDeepLink(pendingOAuth);
   }
 
   Future<void> _handleInviteDeepLink(String code) async {
     if (!mounted) return;
     final joined = await showInvitePreviewDialog(context, code);
     if (joined && mounted) _loadServers();
+  }
+
+  void _handleOAuthDeepLink(OAuthAuthorizeRequest request) {
+    if (!mounted) return;
+    Navigator.push(context, MaterialPageRoute(
+        builder: (_) => OAuthConsentScreen(request: request)));
   }
 
   // Routes a tapped push notification (see push_notifications.dart's
@@ -318,6 +332,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       KodaSocket.instance.leave(topic);
     }
     _deepLinkSub?.cancel();
+    _oauthDeepLinkSub?.cancel();
     _pushTapSub?.cancel();
     _messageController.dispose();
     _scroll.dispose();
@@ -395,15 +410,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         }
       } else if (msg.event == const PhoenixChannelEvent.custom('presence_update')) {
         // A fellow server member or friend changed their status/
-        // custom_status (see Koda.Auth.broadcast_presence_update/1) --
-        // patch the live overlay so the member list/DM list/profile
-        // popover pick it up without a refetch.
+        // custom_status (Koda.Auth.broadcast_presence_update/1) or their
+        // Steam "currently playing" game (Koda.Steam's own
+        // broadcast_presence/2) -- same event/topic, two independent
+        // sources, so only patch the field(s) this particular payload
+        // actually carries (see presence_provider.dart's merge-not-
+        // replace patch()).
         final payload = msg.payload as Map<String, dynamic>?;
         final userId = payload?['user_id'] as String?;
-        if (userId != null) {
+        if (userId != null && payload != null) {
           ref.read(presenceOverridesProvider.notifier).patch(userId,
-              status: payload?['status'] as String?,
-              customStatus: payload?['custom_status'] as String?);
+              status: payload['status'] as String?,
+              customStatus: payload['custom_status'] as String?,
+              playingGame: payload['playing_game'] as String?,
+              hasStatus: payload.containsKey('status'),
+              hasCustomStatus: payload.containsKey('custom_status'),
+              hasPlayingGame: payload.containsKey('playing_game'));
         }
       }
     });
@@ -750,7 +772,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       unawaited(ChannelKeyManager.instance.ensureReady(channelId,
           myUserId: myUserId, serverId: ref.read(selectedServerProvider)?['id'] as String?));
 
-      final decrypted = await _decryptMessages(messages.reversed.toList(),
+      // The API returns newest-first. A bottom-anchored list (default)
+      // needs that reversed to oldest-first before a normal
+      // top-to-bottom ListView reads correctly; a top-anchored list
+      // (see Settings > Accessibility) wants the API's own order as-is,
+      // since newest-first IS top-first there.
+      final newestAtTop = ref.read(messageOrderPrefsProvider).newestAtTop;
+      final ordered = newestAtTop ? messages : messages.reversed.toList();
+      final decrypted = await _decryptMessages(ordered,
           channelId: channelId, myUserId: myUserId);
       if (!mounted) return;
       setState(() {
@@ -759,6 +788,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         _channelUnread = {..._channelUnread, channelId: 0};
         _channelsWithMentions.remove(channelId);
       });
+      // Land on the most recent messages, not wherever offset 0 happens
+      // to put us -- deferred to a postFrameCallback so the list has
+      // actually laid out this (possibly much longer) _messages before
+      // maxScrollExtent is read, same pattern dm_screen.dart's
+      // _openConversation already uses correctly. Skipped in top-anchored
+      // mode: offset 0 (the default) is already correct there.
+      if (!newestAtTop) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (_scroll.hasClients) _scroll.jumpTo(_scroll.position.maxScrollExtent);
+        });
+      }
       KodaApi.instance.markChannelRead(channelId);
       final currentServerId = ref.read(selectedServerProvider)?['id'] as String?;
       if (currentServerId != null) {
@@ -773,7 +813,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
           final payload = msg.payload as Map<String, dynamic>?;
           if (payload != null) {
             decryptMessages([payload], channelId: channelId, myUserId: myUserId).then((decoded) {
-              if (mounted) setState(() => _messages.add(decoded.first));
+              if (mounted) setState(() => _insertNewMessage(decoded.first));
             });
             // This channel is open and visible -- the message is immediately read.
             KodaApi.instance.markChannelRead(channelId);
@@ -873,6 +913,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     return (everyone: everyone, here: here, userIds: userIds.toList(), roleIds: roleIds.toList());
   }
 
+  // Appends (bottom-anchored, default) or prepends (top-anchored, see
+  // Settings > Accessibility) a newly-arrived/just-sent message -- the
+  // insertion-point half of the message-order preference; see
+  // _scrollToLatest for the matching scroll half.
+  void _insertNewMessage(Map<String, dynamic> msg) {
+    if (ref.read(messageOrderPrefsProvider).newestAtTop) {
+      _messages.insert(0, msg);
+    } else {
+      _messages.add(msg);
+    }
+  }
+
+  void _scrollToLatest() {
+    if (!_scroll.hasClients) return;
+    final target = ref.read(messageOrderPrefsProvider).newestAtTop
+        ? 0.0
+        : _scroll.position.maxScrollExtent;
+    _scroll.animateTo(target, duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+  }
+
   Future<void> _sendMessage() async {
     final channel = ref.read(selectedChannelProvider);
     final text = _messageController.text.trim();
@@ -926,16 +986,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     if (msg != null && mounted) {
       await SecureStorage.cacheDecryptedContent(msg['id'] as String, payload);
       final lang = detectMessageLanguage(text);
-      setState(() => _messages.add({...msg, 'content': text,
+      setState(() => _insertNewMessage({...msg, 'content': text,
           if (fileAttachment != null) '_attachment': fileAttachment,
           if (lang != null) '_detectedLang': lang}));
-      Future.delayed(const Duration(milliseconds: 50), () {
-        if (_scroll.hasClients) {
-          _scroll.animateTo(_scroll.position.maxScrollExtent,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOut);
-        }
-      });
+      Future.delayed(const Duration(milliseconds: 50), _scrollToLatest);
       final url = firstUrl(text);
       if (url != null) _attachLinkPreview(channelId, msg['id'] as String, url);
     } else if (mounted) {
@@ -1295,6 +1349,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     if (!context.mounted) return;
     final isFriend = friendStatus?['friends'] == true;
     final canDm = friendStatus?['can_dm'] == true;
+    final steamLibraryShared = friendStatus?['steam_library_shared'] == true;
 
     showDialog(
       context: context,
@@ -1312,6 +1367,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               final override = ref.watch(presenceOverridesProvider)[userId];
               final presenceStatus = override?.status ?? baseStatus ?? 'offline';
               final customStatus = override?.customStatus ?? baseCustomStatus;
+              final playingGame = override?.playingGame ?? author['playing_game'] as String?;
               return Column(children: [
                 Stack(clipBehavior: Clip.none, children: [
                   KodaAvatar(username: username, size: 64, avatarUrl: avatarUrl),
@@ -1330,6 +1386,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 if (customStatus != null && customStatus.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text(customStatus,
+                      style: TextStyle(color: KodaColors.text3, fontSize: 12),
+                      textAlign: TextAlign.center),
+                ],
+                if (playingGame != null && playingGame.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text('🎮 ${t.profilePlayingGame(playingGame)}',
                       style: TextStyle(color: KodaColors.text3, fontSize: 12),
                       textAlign: TextAlign.center),
                 ],
@@ -1400,6 +1462,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 );
               },
             ),
+            // Only shown when the OTHER user has library sharing on --
+            // the compare call itself still separately requires the
+            // viewer's own share_library to be on too (see
+            // Koda.Steam.compare_libraries/2); this just avoids showing
+            // a button that would always fail for a viewer who hasn't
+            // opted in themselves.
+            if (steamLibraryShared) ...[
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: KodaColors.text2,
+                  side: BorderSide(color: KodaColors.border),
+                ),
+                icon: const Icon(Icons.sports_esports_outlined, size: 16),
+                label: Text(t.profileCompareSteamLibraries),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (_) => SteamCompareScreen(userId: userId, username: username)));
+                },
+              ),
+            ],
           ]),
         ),
         actions: [

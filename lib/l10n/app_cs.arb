@@ -55,6 +55,10 @@
   "settingsHighContrastSubtitle": "Čistě černobílé, vysoce kontrastní barvy v celé aplikaci -- přepnutí na chvíli znovu načte aktuální obrazovku.",
   "settingsDyslexiaFontTitle": "Písmo přívětivé pro dyslektiky",
   "settingsDyslexiaFontSubtitle": "Přepne text v celé aplikaci na OpenDyslexic",
+
+  "settingsNewestAtTopTitle": "Zobrazit nejnovější zprávy nahoře",
+
+  "settingsNewestAtTopSubtitle": "Platí pro kanály, DM i chat v hlasovém kanálu",
   "settingsFontSizeTitle": "Velikost písma",
   "settingsFontSizeSample": "Příliš žluťoučký kůň úpěl ďábelské ódy",
   "settingsDensityTitle": "Hustota",
@@ -75,6 +79,128 @@
   "settingsRefreshStatus": "Už jste připojeni v prohlížeči? Obnovit stav",
   "settingsStreamingConnectError": "Nepodařilo se zahájit připojení {platform}.",
   "settingsStreamingFinishInBrowser": "Dokončete připojení v prohlížeči a poté se vraťte a obnovte stránku.",
+
+  "settingsDeveloperPortalTitle": "Portál pro vývojáře",
+
+  "settingsDeveloperPortalSubtitle": "Registrujte boty a aplikace využívající Koda API",
+
+  "devPortalScreenTitle": "Portál pro vývojáře",
+
+  "devPortalNewAppTooltip": "Nová aplikace",
+
+  "devPortalEmptyState": "Zatím žádné aplikace. Vytvořte jednu a získejte API klíč pro svého bota.",
+
+  "devPortalNewAppTitle": "Nová aplikace",
+
+  "devPortalAppNameHint": "Název aplikace",
+
+  "devPortalAppDescriptionHint": "Popis (volitelné)",
+
+  "devPortalBotUsernameHint": "Uživatelské jméno bota",
+
+  "devPortalInteractionDataOnlyNote": "Váš bot dostává pouze příkaz a možnosti, které mu uživatel výslovně odešle -- nikdy historii zpráv kanálu.",
+
+  "devPortalCreateError": "Tuto aplikaci se teď nepodařilo vytvořit.",
+
+  "devPortalKeyRevealTitle": "Váš API klíč",
+
+  "devPortalKeyRevealWarning": "Tento klíč se zobrazí pouze jednou. Zkopírujte si ho teď -- Koda jej neukládá v obnovitelné podobě.",
+
+  "devPortalCopyKeyTooltip": "Kopírovat klíč",
+
+  "devPortalKeyCopiedToast": "API klíč zkopírován.",
+
+  "devPortalKeySavedIt": "Uložil(a) jsem si ho",
+
+  "devPortalRegenerate": "Obnovit",
+
+  "devPortalRegenerateConfirmTitle": "Obnovit API klíč?",
+
+  "devPortalRegenerateConfirmBody": "Současný klíč okamžitě přestane fungovat -- cokoliv, co ho již používá, bude potřebovat nový.",
+
+  "devPortalDeleteConfirmTitle": "Smazat tuto aplikaci?",
+
+  "devPortalDeleteConfirmBody": "Její API klíč bude zneplatněn a účet bota deaktivován. Toto nelze vrátit zpět.",
+
+  "devPortalOAuthSectionTitle": "OAuth2 (Přihlášení přes Koda)",
+
+  "devPortalNoRedirectUris": "Zatím nejsou registrovány žádné redirect URI.",
+
+  "devPortalEditRedirectUris": "Upravit redirect URI",
+
+  "devPortalEditRedirectUrisTitle": "Redirect URI",
+
+  "devPortalRedirectUrisHelp": "Jedna na řádek. redirect_uri žádosti o souhlas se musí přesně shodovat s jednou z nich.",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "Vygenerovat tajný klíč klienta",
+
+  "devPortalRegenerateClientSecret": "Vygenerovat nový tajný klíč klienta",
+
+  "devPortalClientSecretEndingIn": "Tajný klíč klienta končící na {lastFour}",
+
+  "oauthConsentTitle": "Autorizovat aplikaci",
+
+  "oauthConsentUnknownApp": "Tuto aplikaci se nepodařilo najít.",
+
+  "oauthConsentAllowQuestion": "Povolit aplikaci {appName} přístup k vašemu účtu Koda?",
+
+  "oauthConsentWillBeAbleTo": "Toto umožní aplikaci:",
+
+  "oauthConsentAllow": "Povolit",
+
+  "oauthConsentDeny": "Odepřít",
+
+  "oauthConsentError": "Nepodařilo se to dokončit -- zkuste to znovu.",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "Připojte Steam a sdílejte, co právě hrajete, a/nebo porovnávejte knihovny her s přáteli -- jde o dva nezávislé přepínače, zapnutí jednoho nikdy nezapne druhý.",
+
+  "settingsSteamConnected": "Steam připojen jako {personaName}",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "Steam nepřipojen",
+
+  "settingsSteamSharePresence": "Sdílet, co právě hraji",
+
+  "settingsSteamSharePresenceSubtitle": "Přátelé a členové serveru uvidí vaši aktuální hru u vašeho stavu",
+
+  "settingsSteamShareLibrary": "Povolit porovnání knihovny",
+
+  "settingsSteamShareLibrarySubtitle": "Přátelé a členové serveru mohou porovnat svou knihovnu Steam s vaší",
+
+  "profilePlayingGame": "Hraje {game}",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "Porovnat knihovny Steam",
+
+  "steamCompareScreenTitle": "Sdílená knihovna Steam",
+
+  "steamCompareSharedCount": "Oba vlastníte {count} her",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "Zatím žádné společné hry.",
+
+  "steamCompareError": "Sdílené hry se nyní nepodařilo načíst.",
+
+  "steamSyncNow": "Synchronizovat",
+
+  "steamSyncSuccess": "Knihovna Steam synchronizována.",
+
+  "steamSyncError": "Nelze nyní synchronizovat -- zkuste to za chvíli.",
+
+  "steamManageLibraryTitle": "Správa synchronizovaných her",
+
+  "steamManageLibraryDescription": "Hry, které zde označíte jako skryté, se nikdy nezobrazí v porovnání knihoven, i když je Steam stále považuje za veřejné.",
+
+  "steamManageLibraryEmptyState": "Zatím žádné synchronizované hry -- zkuste Synchronizovat.",
+
+  "steamHiddenFromComparison": "Skryto z porovnání",
   "settingsThroneTitle": "Webhook Throne",
   "settingsThroneDescription": "Vložte tuto adresu URL do nastavení webhooku na Throne.com, abyste v Kodě dostávali upozornění, kdykoli vám někdo pošle dárek.",
   "settingsThroneGetUrl": "Získat adresu URL mého webhooku",
@@ -861,6 +987,26 @@
   "calendarFallbackTitle": "Kalendář",
   "calendarAskVispTooltip": "Zeptat se Visp",
   "calendarCreateEventTooltip": "Vytvořit událost",
+
+  "calendarSyncTooltip": "Synchronizovat s vaší kalendářovou aplikací",
+
+  "calendarSyncDialogTitle": "Synchronizovat tento kalendář",
+
+  "calendarSyncDialogDescription": "Přihlaste se k odběru této adresy URL z Google Kalendáře, Apple Kalendáře, Outlooku nebo jakékoli aplikace, která podporuje \"odběr z URL\", a uvidíte události tohoto serveru ve svém kalendáři. Pouze pro čtení a obsahuje jen události z kanálů, které vidíte.",
+
+  "calendarSyncCopyTooltip": "Kopírovat URL",
+
+  "calendarSyncCopiedToast": "URL kalendáře zkopírována.",
+
+  "calendarSyncRegenerateTooltip": "Obnovit URL",
+
+  "calendarSyncRegenerate": "Obnovit",
+
+  "calendarSyncRegenerateConfirmTitle": "Obnovit URL kalendáře?",
+
+  "calendarSyncRegenerateConfirmBody": "Stará URL okamžitě přestane fungovat -- všude, kde jste ji už použili, bude potřeba nová.",
+
+  "calendarSyncInstructions": "Google Kalendář: Další kalendáře > Z URL. Apple Kalendář: Soubor > Nový odběr kalendáře. Outlook: Přidat kalendář > Přihlásit se z webu.",
   "calendarPreviousMonthTooltip": "Předchozí měsíc",
   "calendarNextMonthTooltip": "Další měsíc",
   "calendarTodayButton": "Dnes",
@@ -1126,6 +1272,18 @@
   "settingsFoundersHallTitle": "Síň zakladatelů",
 
   "settingsFoundersHallSubtitle": "Zjistěte, kdo pomohl Koda vytvořit",
+
+
+  "settingsWikiTitle": "Nápověda a wiki",
+
+
+  "settingsWikiSubtitle": "Procházet znalostní bázi Koda",
+
+
+  "wikiScreenTitle": "Nápověda a wiki",
+
+
+  "wikiScreenEmptyState": "Zatím zde nic není.",
   "vispAvatarInDevelopment": "VE VÝVOJI",
   "vispBoostAdvisorCouldNotAnswer": "Visp se nepodařilo sestavit odpověď.",
   "vispBoostAdvisorTitle": "Zeptat se Visp: Poradce ROI vylepšení",

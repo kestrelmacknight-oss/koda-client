@@ -173,6 +173,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'يبدّل نص المحتوى إلى خط OpenDyslexic في جميع أنحاء التطبيق';
 
   @override
+  String get settingsNewestAtTopTitle => 'إظهار أحدث الرسائل في الأعلى';
+
+  @override
+  String get settingsNewestAtTopSubtitle =>
+      'ينطبق على القنوات والرسائل المباشرة ودردشة القنوات الصوتية على حد سواء';
+
+  @override
   String get settingsFontSizeTitle => 'حجم الخط';
 
   @override
@@ -243,6 +250,202 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settingsStreamingFinishInBrowser =>
       'أكمل الاتصال في متصفحك، ثم عد وحدّث الحالة.';
+
+  @override
+  String get settingsDeveloperPortalTitle => 'بوابة المطورين';
+
+  @override
+  String get settingsDeveloperPortalSubtitle =>
+      'سجّل البوتات والتطبيقات التي تستخدم واجهة Koda البرمجية';
+
+  @override
+  String get devPortalScreenTitle => 'بوابة المطورين';
+
+  @override
+  String get devPortalNewAppTooltip => 'تطبيق جديد';
+
+  @override
+  String get devPortalEmptyState =>
+      'لا توجد تطبيقات بعد. أنشئ واحدًا للحصول على مفتاح API لبوتك.';
+
+  @override
+  String get devPortalNewAppTitle => 'تطبيق جديد';
+
+  @override
+  String get devPortalAppNameHint => 'اسم التطبيق';
+
+  @override
+  String get devPortalAppDescriptionHint => 'الوصف (اختياري)';
+
+  @override
+  String get devPortalBotUsernameHint => 'اسم مستخدم البوت';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      'يتلقى البوت الخاص بك فقط الأمر والخيارات التي يرسلها المستخدم صراحةً إليه -- أبدًا سجل رسائل القناة.';
+
+  @override
+  String get devPortalCreateError => 'تعذر إنشاء هذا التطبيق الآن.';
+
+  @override
+  String get devPortalKeyRevealTitle => 'مفتاح API الخاص بك';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      'هذه هي المرة الوحيدة التي سيظهر فيها هذا المفتاح. انسخه الآن -- لا يحتفظ Koda به بصيغة قابلة للاسترداد.';
+
+  @override
+  String get devPortalCopyKeyTooltip => 'نسخ المفتاح';
+
+  @override
+  String get devPortalKeyCopiedToast => 'تم نسخ مفتاح API.';
+
+  @override
+  String get devPortalKeySavedIt => 'لقد حفظته';
+
+  @override
+  String get devPortalRegenerate => 'إعادة الإنشاء';
+
+  @override
+  String get devPortalRegenerateConfirmTitle => 'إعادة إنشاء مفتاح API؟';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      'سيتوقف المفتاح الحالي عن العمل فورًا -- أي شيء يستخدمه بالفعل سيحتاج إلى المفتاح الجديد.';
+
+  @override
+  String get devPortalDeleteConfirmTitle => 'حذف هذا التطبيق؟';
+
+  @override
+  String get devPortalDeleteConfirmBody =>
+      'سيتم إبطال مفتاح API الخاص به وتعطيل حساب البوت. لا يمكن التراجع عن هذا.';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2 (تسجيل الدخول عبر Koda)';
+
+  @override
+  String get devPortalNoRedirectUris => 'لم تُسجَّل أي عناوين إعادة توجيه بعد.';
+
+  @override
+  String get devPortalEditRedirectUris => 'تعديل عناوين إعادة التوجيه';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => 'عناوين إعادة التوجيه';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      'واحد في كل سطر. يجب أن يطابق redirect_uri لطلب الموافقة أحد هذه العناوين تمامًا.';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => 'إنشاء رمز سري للعميل';
+
+  @override
+  String get devPortalRegenerateClientSecret => 'إعادة إنشاء رمز سري للعميل';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return 'الرمز السري ينتهي بـ $lastFour';
+  }
+
+  @override
+  String get oauthConsentTitle => 'تفويض التطبيق';
+
+  @override
+  String get oauthConsentUnknownApp => 'لم يتم العثور على هذا التطبيق.';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return 'السماح لـ $appName بالوصول إلى حسابك على Koda؟';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo => 'سيسمح ذلك للتطبيق بـ:';
+
+  @override
+  String get oauthConsentAllow => 'سماح';
+
+  @override
+  String get oauthConsentDeny => 'رفض';
+
+  @override
+  String get oauthConsentError => 'تعذر إكمال ذلك -- حاول مرة أخرى.';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      'اربط Steam لمشاركة ما تلعبه و/أو مقارنة مكتبات الألعاب مع الأصدقاء -- هذان مفتاحان مستقلان، تفعيل أحدهما لا يفعّل الآخر أبدًا.';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return 'متصل بـ Steam باسم $personaName';
+  }
+
+  @override
+  String get settingsSteamNotConnected => 'Steam غير متصل';
+
+  @override
+  String get settingsSteamSharePresence => 'مشاركة ما ألعبه حاليًا';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle =>
+      'يرى الأصدقاء وأعضاء الخادم لعبتك الحالية بجانب حالتك';
+
+  @override
+  String get settingsSteamShareLibrary => 'السماح بمقارنة المكتبة';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      'يمكن للأصدقاء وأعضاء الخادم مقارنة مكتبة Steam الخاصة بهم بمكتبتك';
+
+  @override
+  String profilePlayingGame(String game) {
+    return 'يلعب $game';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => 'مقارنة مكتبات Steam';
+
+  @override
+  String get steamCompareScreenTitle => 'مكتبة Steam المشتركة';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return 'كلاكما يملك $count لعبة';
+  }
+
+  @override
+  String get steamCompareEmptyState => 'لا توجد ألعاب مشتركة حتى الآن.';
+
+  @override
+  String get steamCompareError => 'تعذر تحميل الألعاب المشتركة الآن.';
+
+  @override
+  String get steamSyncNow => 'مزامنة الآن';
+
+  @override
+  String get steamSyncSuccess => 'تمت مزامنة مكتبة Steam.';
+
+  @override
+  String get steamSyncError => 'تعذرت المزامنة الآن -- حاول مرة أخرى بعد قليل.';
+
+  @override
+  String get steamManageLibraryTitle => 'إدارة الألعاب المتزامنة';
+
+  @override
+  String get steamManageLibraryDescription =>
+      'الألعاب التي تضعها كمخفية هنا لا تظهر أبدًا في مقارنة المكتبة، حتى لو كانت Steam لا تزال تعتبرها عامة.';
+
+  @override
+  String get steamManageLibraryEmptyState =>
+      'لا توجد ألعاب متزامنة بعد -- جرب المزامنة الآن.';
+
+  @override
+  String get steamHiddenFromComparison => 'مخفية من المقارنة';
 
   @override
   String get settingsThroneTitle => 'ويب هوك Throne';
@@ -2961,6 +3164,39 @@ class AppLocalizationsAr extends AppLocalizations {
   String get calendarCreateEventTooltip => 'إنشاء حدث';
 
   @override
+  String get calendarSyncTooltip => 'مزامنة مع تطبيق التقويم الخاص بك';
+
+  @override
+  String get calendarSyncDialogTitle => 'مزامنة هذا التقويم';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      'اشترك في هذا الرابط من Google Calendar أو Apple Calendar أو Outlook أو أي تطبيق يدعم \"الاشتراك عبر رابط\" لرؤية أحداث هذا الخادم في تقويمك. للقراءة فقط، ويتضمن فقط أحداث القنوات التي يمكنك رؤيتها.';
+
+  @override
+  String get calendarSyncCopyTooltip => 'نسخ الرابط';
+
+  @override
+  String get calendarSyncCopiedToast => 'تم نسخ رابط التقويم.';
+
+  @override
+  String get calendarSyncRegenerateTooltip => 'إعادة إنشاء الرابط';
+
+  @override
+  String get calendarSyncRegenerate => 'إعادة الإنشاء';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle => 'إعادة إنشاء رابط التقويم؟';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      'سيتوقف الرابط القديم عن العمل فورًا -- أي مكان اشتركت فيه بالفعل سيحتاج إلى الرابط الجديد.';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google Calendar: التقويمات الأخرى > من رابط URL. Apple Calendar: ملف > اشتراك تقويم جديد. Outlook: إضافة تقويم > الاشتراك من الويب.';
+
+  @override
   String get calendarPreviousMonthTooltip => 'الشهر السابق';
 
   @override
@@ -3903,6 +4139,18 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsFoundersHallSubtitle => 'شاهد من ساعد في بناء Koda';
+
+  @override
+  String get settingsWikiTitle => 'المساعدة والويكي';
+
+  @override
+  String get settingsWikiSubtitle => 'تصفح قاعدة معارف Koda';
+
+  @override
+  String get wikiScreenTitle => 'المساعدة والويكي';
+
+  @override
+  String get wikiScreenEmptyState => 'لا يوجد شيء هنا بعد.';
 
   @override
   String get vispAvatarInDevelopment => 'قيد التطوير';

@@ -52,6 +52,10 @@
   "settingsHighContrastSubtitle": "צבעים שחור/לבן טהורים בניגודיות גבוהה בכל האפליקציה -- המעבר טוען מחדש בקצרה את המסך הנוכחי.",
   "settingsDyslexiaFontTitle": "גופן ידידותי לדיסלקציה",
   "settingsDyslexiaFontSubtitle": "מחליף את טקסט הגוף ל-OpenDyslexic בכל האפליקציה",
+
+  "settingsNewestAtTopTitle": "הצג את ההודעות האחרונות למעלה",
+
+  "settingsNewestAtTopSubtitle": "חל על ערוצים, הודעות ישירות וצ׳אט ערוץ קולי כאחד",
   "settingsFontSizeTitle": "גודל גופן",
   "settingsFontSizeSample": "דג סקרן שט בים מאוכזב ולפתע מצא חברה",
   "settingsDensityTitle": "צפיפות",
@@ -72,6 +76,128 @@
   "settingsRefreshStatus": "כבר מחוברים בדפדפן? רעננו את הסטטוס",
   "settingsStreamingConnectError": "לא ניתן היה להתחיל את חיבור {platform}.",
   "settingsStreamingFinishInBrowser": "סיימו את החיבור בדפדפן שלכם, ואז חזרו ורעננו.",
+
+  "settingsDeveloperPortalTitle": "פורטל מפתחים",
+
+  "settingsDeveloperPortalSubtitle": "רשמו בוטים ואפליקציות המשתמשים ב-API של Koda",
+
+  "devPortalScreenTitle": "פורטל מפתחים",
+
+  "devPortalNewAppTooltip": "אפליקציה חדשה",
+
+  "devPortalEmptyState": "אין עדיין אפליקציות. צרו אחת כדי לקבל מפתח API לבוט שלכם.",
+
+  "devPortalNewAppTitle": "אפליקציה חדשה",
+
+  "devPortalAppNameHint": "שם האפליקציה",
+
+  "devPortalAppDescriptionHint": "תיאור (אופציונלי)",
+
+  "devPortalBotUsernameHint": "שם משתמש של הבוט",
+
+  "devPortalInteractionDataOnlyNote": "הבוט שלכם מקבל רק את הפקודה והאפשרויות שמשתמש שולח אליו במפורש -- לעולם לא את היסטוריית ההודעות של ערוץ.",
+
+  "devPortalCreateError": "לא ניתן היה ליצור את האפליקציה כרגע.",
+
+  "devPortalKeyRevealTitle": "מפתח ה-API שלכם",
+
+  "devPortalKeyRevealWarning": "זו הפעם היחידה שבה מפתח זה יוצג. העתיקו אותו עכשיו -- Koda לא שומר אותו בצורה הניתנת לשחזור.",
+
+  "devPortalCopyKeyTooltip": "העתק מפתח",
+
+  "devPortalKeyCopiedToast": "מפתח ה-API הועתק.",
+
+  "devPortalKeySavedIt": "שמרתי אותו",
+
+  "devPortalRegenerate": "צור מחדש",
+
+  "devPortalRegenerateConfirmTitle": "ליצור מפתח API חדש?",
+
+  "devPortalRegenerateConfirmBody": "המפתח הנוכחי יפסיק לעבוד מיידית -- כל מה שכבר משתמש בו יזדקק לחדש.",
+
+  "devPortalDeleteConfirmTitle": "למחוק את האפליקציה הזו?",
+
+  "devPortalDeleteConfirmBody": "מפתח ה-API שלה יבוטל וחשבון הבוט יושבת. לא ניתן לבטל פעולה זו.",
+
+  "devPortalOAuthSectionTitle": "OAuth2 (התחברות עם Koda)",
+
+  "devPortalNoRedirectUris": "עדיין לא נרשמו כתובות הפניה.",
+
+  "devPortalEditRedirectUris": "ערוך כתובות הפניה",
+
+  "devPortalEditRedirectUrisTitle": "כתובות הפניה",
+
+  "devPortalRedirectUrisHelp": "אחת בכל שורה. ה-redirect_uri של בקשת הסכמה חייב להתאים בדיוק לאחת מהן.",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "צור סוד לקוח",
+
+  "devPortalRegenerateClientSecret": "צור סוד לקוח מחדש",
+
+  "devPortalClientSecretEndingIn": "סוד הלקוח מסתיים ב-{lastFour}",
+
+  "oauthConsentTitle": "אשר אפליקציה",
+
+  "oauthConsentUnknownApp": "לא ניתן למצוא אפליקציה זו.",
+
+  "oauthConsentAllowQuestion": "לאפשר ל-{appName} לגשת לחשבון Koda שלך?",
+
+  "oauthConsentWillBeAbleTo": "זה יאפשר לאפליקציה:",
+
+  "oauthConsentAllow": "אפשר",
+
+  "oauthConsentDeny": "דחה",
+
+  "oauthConsentError": "לא ניתן להשלים -- נסה שוב.",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "חברו את Steam כדי לשתף במה אתם משחקים כרגע ו/או להשוות ספריות משחקים עם חברים -- אלו שני מתגים עצמאיים, הפעלת אחד אינה מפעילה את השני.",
+
+  "settingsSteamConnected": "Steam מחובר בשם {personaName}",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "Steam לא מחובר",
+
+  "settingsSteamSharePresence": "שתף במה אני משחק",
+
+  "settingsSteamSharePresenceSubtitle": "חברים וחברי השרת רואים את המשחק הנוכחי שלך לצד הסטטוס שלך",
+
+  "settingsSteamShareLibrary": "אפשר השוואת ספרייה",
+
+  "settingsSteamShareLibrarySubtitle": "חברים וחברי השרת יכולים להשוות את ספריית ה-Steam שלהם לשלך",
+
+  "profilePlayingGame": "משחק ב-{game}",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "השוואת ספריות Steam",
+
+  "steamCompareScreenTitle": "ספריית Steam משותפת",
+
+  "steamCompareSharedCount": "לשניכם יש {count} משחקים",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "אין עדיין משחקים משותפים.",
+
+  "steamCompareError": "לא ניתן לטעון משחקים משותפים כרגע.",
+
+  "steamSyncNow": "סנכרן עכשיו",
+
+  "steamSyncSuccess": "ספריית Steam סונכרנה.",
+
+  "steamSyncError": "לא ניתן לסנכרן כרגע -- נסה שוב בעוד רגע.",
+
+  "steamManageLibraryTitle": "ניהול משחקים מסונכרנים",
+
+  "steamManageLibraryDescription": "משחקים שתסמן כמוסתרים כאן לעולם לא יופיעו בהשוואת ספריות, אפילו אם Steam עדיין רואה אותם כציבוריים.",
+
+  "steamManageLibraryEmptyState": "אין עדיין משחקים מסונכרנים -- נסה סנכרן עכשיו.",
+
+  "steamHiddenFromComparison": "מוסתר מההשוואה",
   "settingsThroneTitle": "Webhook של Throne",
   "settingsThroneDescription": "הדביקו כתובת URL זו בהגדרות ה-webhook של Throne.com כדי לקבל התראות ב-Koda בכל פעם שמישהו שולח לכם מתנה.",
   "settingsThroneGetUrl": "קבלת כתובת ה-webhook שלי",
@@ -853,6 +979,26 @@
   "calendarFallbackTitle": "לוח שנה",
   "calendarAskVispTooltip": "לשאול את Visp",
   "calendarCreateEventTooltip": "יצירת אירוע",
+
+  "calendarSyncTooltip": "סנכרן עם אפליקציית היומן שלך",
+
+  "calendarSyncDialogTitle": "סנכרן יומן זה",
+
+  "calendarSyncDialogDescription": "הירשם לכתובת URL זו מ-Google Calendar, Apple Calendar, Outlook או כל אפליקציה שתומכת ב\"הרשמה לפי URL\" כדי לראות את האירועים של שרת זה ביומן שלך. לקריאה בלבד, וכולל רק אירועים מערוצים שאתה יכול לראות.",
+
+  "calendarSyncCopyTooltip": "העתק URL",
+
+  "calendarSyncCopiedToast": "כתובת URL של היומן הועתקה.",
+
+  "calendarSyncRegenerateTooltip": "צור URL חדש",
+
+  "calendarSyncRegenerate": "צור חדש",
+
+  "calendarSyncRegenerateConfirmTitle": "ליצור כתובת URL חדשה ליומן?",
+
+  "calendarSyncRegenerateConfirmBody": "כתובת ה-URL הישנה תפסיק לעבוד מיידית -- בכל מקום שבו נרשמת אליה כבר, יהיה צורך בחדשה.",
+
+  "calendarSyncInstructions": "Google Calendar: יומנים אחרים > מ-URL. Apple Calendar: קובץ > הרשמה חדשה ליומן. Outlook: הוסף יומן > הירשם מהאינטרנט.",
   "calendarPreviousMonthTooltip": "חודש קודם",
   "calendarNextMonthTooltip": "חודש הבא",
   "calendarTodayButton": "היום",
@@ -1118,6 +1264,18 @@
   "settingsFoundersHallTitle": "היכל המייסדים",
 
   "settingsFoundersHallSubtitle": "ראה מי עזר לבנות את Koda",
+
+
+  "settingsWikiTitle": "עזרה ו-Wiki",
+
+
+  "settingsWikiSubtitle": "עיין במאגר הידע של Koda",
+
+
+  "wikiScreenTitle": "עזרה ו-Wiki",
+
+
+  "wikiScreenEmptyState": "אין כאן כלום עדיין.",
   "vispAvatarInDevelopment": "בפיתוח",
   "vispBoostAdvisorCouldNotAnswer": "Visp לא הצליח לגבש תשובה.",
   "vispBoostAdvisorTitle": "לשאול את Visp: יועץ ROI לחיזוקים",

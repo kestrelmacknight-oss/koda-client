@@ -173,6 +173,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Switches body text to OpenDyslexic app-wide';
 
   @override
+  String get settingsNewestAtTopTitle => 'Show Newest Messages at the Top';
+
+  @override
+  String get settingsNewestAtTopSubtitle =>
+      'Applies to channels, DMs, and voice-channel chat alike';
+
+  @override
   String get settingsFontSizeTitle => 'Font size';
 
   @override
@@ -244,6 +251,204 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsStreamingFinishInBrowser =>
       'Finish connecting in your browser, then come back and refresh.';
+
+  @override
+  String get settingsDeveloperPortalTitle => 'Developer Portal';
+
+  @override
+  String get settingsDeveloperPortalSubtitle =>
+      'Register bots and apps that use the Koda API';
+
+  @override
+  String get devPortalScreenTitle => 'Developer Portal';
+
+  @override
+  String get devPortalNewAppTooltip => 'New Application';
+
+  @override
+  String get devPortalEmptyState =>
+      'No applications yet. Create one to get an API key for your bot.';
+
+  @override
+  String get devPortalNewAppTitle => 'New Application';
+
+  @override
+  String get devPortalAppNameHint => 'App name';
+
+  @override
+  String get devPortalAppDescriptionHint => 'Description (optional)';
+
+  @override
+  String get devPortalBotUsernameHint => 'Bot username';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      'Your bot only ever receives the command and options a user explicitly submits to it -- never a channel\'s message history.';
+
+  @override
+  String get devPortalCreateError =>
+      'Couldn\'t create that application right now.';
+
+  @override
+  String get devPortalKeyRevealTitle => 'Your API key';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      'This is the only time this key will be shown. Copy it now -- Koda doesn\'t store it in a recoverable form.';
+
+  @override
+  String get devPortalCopyKeyTooltip => 'Copy key';
+
+  @override
+  String get devPortalKeyCopiedToast => 'API key copied.';
+
+  @override
+  String get devPortalKeySavedIt => 'I\'ve saved it';
+
+  @override
+  String get devPortalRegenerate => 'Regenerate';
+
+  @override
+  String get devPortalRegenerateConfirmTitle => 'Regenerate API key?';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      'The current key will stop working immediately -- anything already using it will need the new one.';
+
+  @override
+  String get devPortalDeleteConfirmTitle => 'Delete this application?';
+
+  @override
+  String get devPortalDeleteConfirmBody =>
+      'Its API key will be revoked and its bot account deactivated. This can\'t be undone.';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2 (Login with Koda)';
+
+  @override
+  String get devPortalNoRedirectUris => 'No redirect URIs registered yet.';
+
+  @override
+  String get devPortalEditRedirectUris => 'Edit redirect URIs';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => 'Redirect URIs';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      'One per line. A consent request\'s redirect_uri must match one of these exactly.';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => 'Generate client secret';
+
+  @override
+  String get devPortalRegenerateClientSecret => 'Regenerate client secret';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return 'Client secret ending in $lastFour';
+  }
+
+  @override
+  String get oauthConsentTitle => 'Authorize Application';
+
+  @override
+  String get oauthConsentUnknownApp => 'This application couldn\'t be found.';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return 'Allow $appName to access your Koda account?';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo => 'This will let the app:';
+
+  @override
+  String get oauthConsentAllow => 'Allow';
+
+  @override
+  String get oauthConsentDeny => 'Deny';
+
+  @override
+  String get oauthConsentError => 'Couldn\'t complete that -- try again.';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      'Connect Steam to share what you\'re playing and/or compare game libraries with friends -- these are two separate switches, turning one on never turns on the other.';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return 'Steam connected as $personaName';
+  }
+
+  @override
+  String get settingsSteamNotConnected => 'Steam not connected';
+
+  @override
+  String get settingsSteamSharePresence => 'Share what I\'m playing';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle =>
+      'Friends and server members see your current game next to your status';
+
+  @override
+  String get settingsSteamShareLibrary => 'Allow library comparison';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      'Friends and server members can compare their Steam library with yours';
+
+  @override
+  String profilePlayingGame(String game) {
+    return 'Playing $game';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => 'Compare Steam Libraries';
+
+  @override
+  String get steamCompareScreenTitle => 'Shared Steam Library';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return 'You both own $count games';
+  }
+
+  @override
+  String get steamCompareEmptyState => 'No games in common yet.';
+
+  @override
+  String get steamCompareError => 'Couldn\'t load shared games right now.';
+
+  @override
+  String get steamSyncNow => 'Sync Now';
+
+  @override
+  String get steamSyncSuccess => 'Steam library synced.';
+
+  @override
+  String get steamSyncError =>
+      'Couldn\'t sync right now -- try again in a bit.';
+
+  @override
+  String get steamManageLibraryTitle => 'Manage synced games';
+
+  @override
+  String get steamManageLibraryDescription =>
+      'Games you mark hidden here never show up in a library comparison, even for games Steam itself still considers public.';
+
+  @override
+  String get steamManageLibraryEmptyState =>
+      'No synced games yet -- try Sync Now.';
+
+  @override
+  String get steamHiddenFromComparison => 'Hidden from comparison';
 
   @override
   String get settingsThroneTitle => 'Throne Webhook';
@@ -2917,6 +3122,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calendarCreateEventTooltip => 'Create Event';
 
   @override
+  String get calendarSyncTooltip => 'Sync to your calendar app';
+
+  @override
+  String get calendarSyncDialogTitle => 'Sync This Calendar';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      'Subscribe to this URL from Google Calendar, Apple Calendar, Outlook, or any app that supports \"subscribe by URL\" to see this server\'s events in your own calendar. Read-only, and it only includes events from channels you can see.';
+
+  @override
+  String get calendarSyncCopyTooltip => 'Copy URL';
+
+  @override
+  String get calendarSyncCopiedToast => 'Calendar URL copied.';
+
+  @override
+  String get calendarSyncRegenerateTooltip => 'Regenerate URL';
+
+  @override
+  String get calendarSyncRegenerate => 'Regenerate';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle => 'Regenerate calendar URL?';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      'The old URL will stop working immediately -- anywhere you\'ve already subscribed to it will need the new one.';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google Calendar: Other calendars > From URL. Apple Calendar: File > New Calendar Subscription. Outlook: Add calendar > Subscribe from web.';
+
+  @override
   String get calendarPreviousMonthTooltip => 'Previous month';
 
   @override
@@ -3836,6 +4074,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsFoundersHallSubtitle => 'See who helped build Koda';
+
+  @override
+  String get settingsWikiTitle => 'Help & Wiki';
+
+  @override
+  String get settingsWikiSubtitle => 'Browse Koda\'s knowledge base';
+
+  @override
+  String get wikiScreenTitle => 'Help & Wiki';
+
+  @override
+  String get wikiScreenEmptyState => 'Nothing here yet.';
 
   @override
   String get vispAvatarInDevelopment => 'IN DEVELOPMENT';

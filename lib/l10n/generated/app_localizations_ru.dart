@@ -175,6 +175,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Переключает основной текст на OpenDyslexic во всём приложении';
 
   @override
+  String get settingsNewestAtTopTitle => 'Показывать новые сообщения сверху';
+
+  @override
+  String get settingsNewestAtTopSubtitle =>
+      'Применяется к каналам, личным сообщениям и чату голосового канала';
+
+  @override
   String get settingsFontSizeTitle => 'Размер шрифта';
 
   @override
@@ -246,6 +253,205 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get settingsStreamingFinishInBrowser =>
       'Завершите подключение в браузере, затем вернитесь и обновите страницу.';
+
+  @override
+  String get settingsDeveloperPortalTitle => 'Портал разработчика';
+
+  @override
+  String get settingsDeveloperPortalSubtitle =>
+      'Регистрируйте ботов и приложения, использующие API Koda';
+
+  @override
+  String get devPortalScreenTitle => 'Портал разработчика';
+
+  @override
+  String get devPortalNewAppTooltip => 'Новое приложение';
+
+  @override
+  String get devPortalEmptyState =>
+      'Пока нет приложений. Создайте одно, чтобы получить ключ API для вашего бота.';
+
+  @override
+  String get devPortalNewAppTitle => 'Новое приложение';
+
+  @override
+  String get devPortalAppNameHint => 'Название приложения';
+
+  @override
+  String get devPortalAppDescriptionHint => 'Описание (необязательно)';
+
+  @override
+  String get devPortalBotUsernameHint => 'Имя пользователя бота';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      'Ваш бот получает только команду и параметры, которые пользователь явно ему отправляет -- никогда историю сообщений канала.';
+
+  @override
+  String get devPortalCreateError =>
+      'Не удалось создать это приложение сейчас.';
+
+  @override
+  String get devPortalKeyRevealTitle => 'Ваш ключ API';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      'Это единственный раз, когда этот ключ будет показан. Скопируйте его сейчас -- Koda не хранит его в восстанавливаемом виде.';
+
+  @override
+  String get devPortalCopyKeyTooltip => 'Скопировать ключ';
+
+  @override
+  String get devPortalKeyCopiedToast => 'Ключ API скопирован.';
+
+  @override
+  String get devPortalKeySavedIt => 'Я его сохранил';
+
+  @override
+  String get devPortalRegenerate => 'Обновить';
+
+  @override
+  String get devPortalRegenerateConfirmTitle => 'Обновить ключ API?';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      'Текущий ключ немедленно перестанет работать -- всё, что уже его использует, потребует нового.';
+
+  @override
+  String get devPortalDeleteConfirmTitle => 'Удалить это приложение?';
+
+  @override
+  String get devPortalDeleteConfirmBody =>
+      'Его ключ API будет аннулирован, а аккаунт бота деактивирован. Это нельзя отменить.';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2 (Вход через Koda)';
+
+  @override
+  String get devPortalNoRedirectUris =>
+      'Пока не зарегистрировано ни одного redirect URI.';
+
+  @override
+  String get devPortalEditRedirectUris => 'Изменить redirect URI';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => 'Redirect URI';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      'По одному на строку. redirect_uri запроса согласия должен точно совпадать с одним из них.';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => 'Создать секрет клиента';
+
+  @override
+  String get devPortalRegenerateClientSecret => 'Создать новый секрет клиента';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return 'Секрет клиента заканчивается на $lastFour';
+  }
+
+  @override
+  String get oauthConsentTitle => 'Авторизовать приложение';
+
+  @override
+  String get oauthConsentUnknownApp => 'Это приложение не найдено.';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return 'Разрешить $appName доступ к вашей учётной записи Koda?';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo => 'Это позволит приложению:';
+
+  @override
+  String get oauthConsentAllow => 'Разрешить';
+
+  @override
+  String get oauthConsentDeny => 'Отказать';
+
+  @override
+  String get oauthConsentError => 'Не удалось завершить -- попробуйте снова.';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      'Подключите Steam, чтобы делиться тем, во что вы сейчас играете, и/или сравнивать библиотеки игр с друзьями -- это два независимых переключателя, включение одного никогда не включает другой.';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return 'Steam подключён как $personaName';
+  }
+
+  @override
+  String get settingsSteamNotConnected => 'Steam не подключён';
+
+  @override
+  String get settingsSteamSharePresence => 'Делиться тем, во что я играю';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle =>
+      'Друзья и участники сервера видят вашу текущую игру рядом со статусом';
+
+  @override
+  String get settingsSteamShareLibrary => 'Разрешить сравнение библиотек';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      'Друзья и участники сервера могут сравнить свою библиотеку Steam с вашей';
+
+  @override
+  String profilePlayingGame(String game) {
+    return 'Играет в $game';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => 'Сравнить библиотеки Steam';
+
+  @override
+  String get steamCompareScreenTitle => 'Общая библиотека Steam';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return 'У вас обоих $count игр';
+  }
+
+  @override
+  String get steamCompareEmptyState => 'Пока нет общих игр.';
+
+  @override
+  String get steamCompareError => 'Не удалось загрузить общие игры сейчас.';
+
+  @override
+  String get steamSyncNow => 'Синхронизировать сейчас';
+
+  @override
+  String get steamSyncSuccess => 'Библиотека Steam синхронизирована.';
+
+  @override
+  String get steamSyncError =>
+      'Не удалось синхронизировать сейчас -- попробуйте снова через минуту.';
+
+  @override
+  String get steamManageLibraryTitle => 'Управление синхронизированными играми';
+
+  @override
+  String get steamManageLibraryDescription =>
+      'Игры, которые вы здесь отметите как скрытые, никогда не появятся в сравнении библиотек, даже если Steam всё ещё считает их публичными.';
+
+  @override
+  String get steamManageLibraryEmptyState =>
+      'Пока нет синхронизированных игр -- попробуйте Синхронизировать сейчас.';
+
+  @override
+  String get steamHiddenFromComparison => 'Скрыто из сравнения';
 
   @override
   String get settingsThroneTitle => 'Вебхук Throne';
@@ -2973,6 +3179,39 @@ class AppLocalizationsRu extends AppLocalizations {
   String get calendarCreateEventTooltip => 'Создать событие';
 
   @override
+  String get calendarSyncTooltip => 'Синхронизировать с вашим календарём';
+
+  @override
+  String get calendarSyncDialogTitle => 'Синхронизировать этот календарь';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      'Подпишитесь на этот URL в Google Календаре, Apple Календаре, Outlook или любом приложении с поддержкой \"подписки по URL\", чтобы видеть события этого сервера в своём календаре. Только для чтения, включает только события из каналов, которые вы можете видеть.';
+
+  @override
+  String get calendarSyncCopyTooltip => 'Скопировать URL';
+
+  @override
+  String get calendarSyncCopiedToast => 'URL календаря скопирован.';
+
+  @override
+  String get calendarSyncRegenerateTooltip => 'Обновить URL';
+
+  @override
+  String get calendarSyncRegenerate => 'Обновить';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle => 'Обновить URL календаря?';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      'Старый URL сразу перестанет работать -- везде, где вы уже подписались, понадобится новый.';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google Календарь: Другие календари > По URL. Apple Календарь: Файл > Новая подписка на календарь. Outlook: Добавить календарь > Подписаться из интернета.';
+
+  @override
   String get calendarPreviousMonthTooltip => 'Предыдущий месяц';
 
   @override
@@ -3916,6 +4155,18 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get settingsFoundersHallSubtitle => 'Узнайте, кто помог создать Koda';
+
+  @override
+  String get settingsWikiTitle => 'Помощь и вики';
+
+  @override
+  String get settingsWikiSubtitle => 'Просмотрите базу знаний Koda';
+
+  @override
+  String get wikiScreenTitle => 'Помощь и вики';
+
+  @override
+  String get wikiScreenEmptyState => 'Здесь пока ничего нет.';
 
   @override
   String get vispAvatarInDevelopment => 'В РАЗРАБОТКЕ';

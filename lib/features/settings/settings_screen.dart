@@ -7,11 +7,15 @@ import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/accessibility_prefs.dart';
+import '../../core/message_order_prefs.dart';
 import '../../core/language_prefs.dart';
 import '../../core/language_options.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config.dart';
 import '../founders/founders_hall_screen.dart';
+import '../developer/developer_portal_screen.dart';
+import '../steam/steam_library_manage_screen.dart';
+import '../wiki/wiki_screen.dart';
 import '../../core/api.dart';
 import '../../core/push_notifications.dart';
 import '../../core/socket.dart';
@@ -62,6 +66,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final Map<String, bool> _loadingStreaming = {'twitch': true, 'youtube': true};
   final Map<String, bool> _connectingStreaming = {'twitch': false, 'youtube': false};
 
+  // Steam: a different shape from the Twitch/YouTube map above on
+  // purpose -- it has two independent opt-in switches (share_presence,
+  // share_library) instead of one announce_enabled toggle, so it isn't
+  // forced into the same generic platform-keyed helpers.
+  Map<String, dynamic>? _steamStatus;
+  bool _loadingSteam = true;
+  bool _connectingSteam = false;
+  bool _syncingSteamLibrary = false;
+
   // Not static const -- section labels are localized, which needs a
   // BuildContext (see AppLocalizations.of(context) below).
   List<(String, IconData)> _sections(AppLocalizations t) => [
@@ -104,6 +117,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     });
     _loadStreamingStatus('twitch');
     _loadStreamingStatus('youtube');
+    _loadSteamStatus();
   }
 
   String _platformLabel(String platform) => platform == 'twitch' ? 'Twitch' : 'YouTube';
@@ -157,6 +171,63 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ? await KodaApi.instance.setTwitchAnnounceEnabled(enabled)
         : await KodaApi.instance.setYoutubeAnnounceEnabled(enabled);
     if (!ok && mounted) setState(() => _streamingStatus[platform] = previous);
+  }
+
+  Future<void> _loadSteamStatus() async {
+    final status = await KodaApi.instance.getSteamStatus();
+    if (mounted) setState(() { _steamStatus = status; _loadingSteam = false; });
+  }
+
+  Future<void> _connectSteam() async {
+    setState(() => _connectingSteam = true);
+    final url = await KodaApi.instance.connectSteam();
+    if (!mounted) return;
+    setState(() => _connectingSteam = false);
+    final t = AppLocalizations.of(context);
+    if (url == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(t.settingsStreamingConnectError('Steam'))));
+      return;
+    }
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+          t.settingsStreamingFinishInBrowser)));
+    }
+  }
+
+  Future<void> _disconnectSteam() async {
+    final ok = await KodaApi.instance.disconnectSteam();
+    if (ok && mounted) setState(() => _steamStatus = null);
+  }
+
+  // Two independent setters -- neither ever touches the other's flag,
+  // on the server or here, matching the "separate opt-in" requirement.
+  Future<void> _setSteamPresenceSharing(bool enabled) async {
+    final previous = _steamStatus;
+    setState(() => _steamStatus = {...?_steamStatus, 'share_presence': enabled});
+    final ok = await KodaApi.instance.setSteamPresenceSharing(enabled);
+    if (!ok && mounted) setState(() => _steamStatus = previous);
+  }
+
+  Future<void> _setSteamLibrarySharing(bool enabled) async {
+    final previous = _steamStatus;
+    setState(() => _steamStatus = {...?_steamStatus, 'share_library': enabled});
+    final ok = await KodaApi.instance.setSteamLibrarySharing(enabled);
+    if (!ok && mounted) setState(() => _steamStatus = previous);
+  }
+
+  Future<void> _syncSteamLibraryNow() async {
+    setState(() => _syncingSteamLibrary = true);
+    final ok = await KodaApi.instance.syncSteamLibraryNow();
+    if (ok) await _loadSteamStatus();
+    if (!mounted) return;
+    setState(() => _syncingSteamLibrary = false);
+    final t = AppLocalizations.of(context);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+        ok ? t.steamSyncSuccess : t.steamSyncError)));
   }
 
   @override
@@ -464,6 +535,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(height: 20),
           _tile(Icons.auto_awesome_outlined, t.settingsFoundersHallTitle, t.settingsFoundersHallSubtitle,
               () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FoundersHallScreen()))),
+          _tile(Icons.menu_book_outlined, t.settingsWikiTitle, t.settingsWikiSubtitle,
+              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WikiScreen()))),
+          _tile(Icons.terminal_outlined, t.settingsDeveloperPortalTitle, t.settingsDeveloperPortalSubtitle,
+              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DeveloperPortalScreen()))),
           _tile(Icons.gavel_outlined, t.settingsTermsTitle, 'koda.fyi/terms.html',
               () => _openUrl(KodaConfig.termsUrl)),
           _tile(Icons.privacy_tip_outlined, t.settingsPrivacyTitle, 'koda.fyi/privacy.html',
@@ -510,6 +585,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget _buildAccessibilitySection() {
     final a11y = ref.watch(accessibilityPrefsProvider);
     final notifier = ref.read(accessibilityPrefsProvider.notifier);
+    final messageOrder = ref.watch(messageOrderPrefsProvider);
+    final messageOrderNotifier = ref.read(messageOrderPrefsProvider.notifier);
     final t = AppLocalizations.of(context);
 
     return _shell(t.settingsSectionAccessibility, Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -543,6 +620,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           activeThumbColor: KodaColors.koda,
           value: a11y.dyslexiaFont,
           onChanged: notifier.setDyslexiaFont,
+        ),
+      ),
+      Container(
+        margin: const EdgeInsets.only(bottom: 6),
+        decoration: BoxDecoration(
+            color: KodaColors.card, borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: KodaColors.border)),
+        child: SwitchListTile(
+          secondary: Icon(Icons.vertical_align_top, color: KodaColors.text3, size: 18),
+          title: Text(t.settingsNewestAtTopTitle,
+              style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+          subtitle: Text(t.settingsNewestAtTopSubtitle,
+              style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+          activeThumbColor: KodaColors.koda,
+          value: messageOrder.newestAtTop,
+          onChanged: messageOrderNotifier.setNewestAtTop,
         ),
       ),
       Container(
@@ -716,6 +809,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       _buildThroneCard(),
       const SizedBox(height: 16),
       _buildStreamingCard(),
+      const SizedBox(height: 16),
+      _buildSteamCard(),
     ]);
   }
 
@@ -801,6 +896,104 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
         ),
     ]);
+  }
+
+  Widget _buildSteamCard() {
+    final t = AppLocalizations.of(context);
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+          color: KodaColors.card, borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: KodaColors.border)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(Icons.sports_esports_outlined, size: 16, color: KodaColors.accent),
+          const SizedBox(width: 8),
+          Text(t.settingsSteamTitle,
+              style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w600)),
+        ]),
+        const SizedBox(height: 6),
+        Text(t.settingsSteamDescription,
+            style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+        const SizedBox(height: 12),
+        if (_loadingSteam)
+          Center(child: SizedBox(width: 18, height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda)))
+        else ...[
+          Row(children: [
+            Icon(_steamStatus?['connected'] == true ? Icons.check_circle : Icons.circle_outlined,
+                size: 16, color: _steamStatus?['connected'] == true ? KodaColors.mint : KodaColors.text3),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                  _steamStatus?['connected'] == true
+                      ? t.settingsSteamConnected(_steamStatus?['persona_name'] ?? '')
+                      : t.settingsSteamNotConnected,
+                  style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+            ),
+            if (_steamStatus?['connected'] == true)
+              TextButton(onPressed: _disconnectSteam, child: Text(t.commonDisconnect))
+            else
+              TextButton.icon(
+                icon: _connectingSteam
+                    ? SizedBox(width: 12, height: 12,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
+                    : const Icon(Icons.link, size: 14),
+                label: Text(_connectingSteam ? t.settingsStreamingConnecting : t.settingsStreamingConnect),
+                onPressed: _connectingSteam ? null : _connectSteam,
+              ),
+          ]),
+          if (_steamStatus?['connected'] == true) ...[
+            // Two fully independent switches -- enabling one never
+            // enables or implies the other, both server- and client-side.
+            SwitchListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              title: Text(t.settingsSteamSharePresence,
+                  style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+              subtitle: Text(t.settingsSteamSharePresenceSubtitle,
+                  style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+              value: _steamStatus?['share_presence'] == true,
+              activeColor: KodaColors.koda,
+              onChanged: _setSteamPresenceSharing,
+            ),
+            SwitchListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              title: Text(t.settingsSteamShareLibrary,
+                  style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+              subtitle: Text(t.settingsSteamShareLibrarySubtitle,
+                  style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+              value: _steamStatus?['share_library'] == true,
+              activeColor: KodaColors.koda,
+              onChanged: _setSteamLibrarySharing,
+            ),
+            const SizedBox(height: 4),
+            Row(children: [
+              TextButton.icon(
+                icon: _syncingSteamLibrary
+                    ? SizedBox(width: 12, height: 12,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
+                    : const Icon(Icons.sync, size: 14),
+                label: Text(t.steamSyncNow),
+                onPressed: _syncingSteamLibrary ? null : _syncSteamLibraryNow,
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () => Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => const SteamLibraryManageScreen())),
+                child: Text(t.steamManageLibraryTitle),
+              ),
+            ]),
+          ] else
+            TextButton(
+              onPressed: _loadSteamStatus,
+              child: Text(t.settingsRefreshStatus,
+                  style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+            ),
+        ],
+      ]),
+    );
   }
 
   Widget _buildThroneCard() {

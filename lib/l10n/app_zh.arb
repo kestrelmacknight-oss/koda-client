@@ -55,6 +55,10 @@
   "settingsHighContrastSubtitle": "整个应用使用纯黑白高对比度配色 -- 切换时会短暂重新加载当前界面。",
   "settingsDyslexiaFontTitle": "易读障碍友好字体",
   "settingsDyslexiaFontSubtitle": "将应用内正文文本切换为 OpenDyslexic 字体",
+
+  "settingsNewestAtTopTitle": "在顶部显示最新消息",
+
+  "settingsNewestAtTopSubtitle": "同样适用于频道、私信和语音频道聊天",
   "settingsFontSizeTitle": "字体大小",
   "settingsFontSizeSample": "视风漫卷云舒，落霞与孤鹜齐飞",
   "settingsDensityTitle": "密度",
@@ -75,6 +79,128 @@
   "settingsRefreshStatus": "已在浏览器中连接？刷新状态",
   "settingsStreamingConnectError": "无法开始连接 {platform}。",
   "settingsStreamingFinishInBrowser": "请在浏览器中完成连接，然后返回并刷新。",
+
+  "settingsDeveloperPortalTitle": "开发者门户",
+
+  "settingsDeveloperPortalSubtitle": "注册使用 Koda API 的机器人和应用",
+
+  "devPortalScreenTitle": "开发者门户",
+
+  "devPortalNewAppTooltip": "新建应用",
+
+  "devPortalEmptyState": "还没有应用。创建一个即可获取你的机器人的 API 密钥。",
+
+  "devPortalNewAppTitle": "新建应用",
+
+  "devPortalAppNameHint": "应用名称",
+
+  "devPortalAppDescriptionHint": "描述（可选）",
+
+  "devPortalBotUsernameHint": "机器人用户名",
+
+  "devPortalInteractionDataOnlyNote": "你的机器人只会收到用户明确提交给它的命令和选项 -- 绝不会收到频道的消息历史记录。",
+
+  "devPortalCreateError": "目前无法创建此应用。",
+
+  "devPortalKeyRevealTitle": "你的 API 密钥",
+
+  "devPortalKeyRevealWarning": "此密钥仅显示这一次。请立即复制 -- Koda 不会以可恢复的形式存储它。",
+
+  "devPortalCopyKeyTooltip": "复制密钥",
+
+  "devPortalKeyCopiedToast": "API 密钥已复制。",
+
+  "devPortalKeySavedIt": "我已保存",
+
+  "devPortalRegenerate": "重新生成",
+
+  "devPortalRegenerateConfirmTitle": "重新生成 API 密钥？",
+
+  "devPortalRegenerateConfirmBody": "当前密钥将立即失效 -- 任何已在使用它的地方都需要换成新密钥。",
+
+  "devPortalDeleteConfirmTitle": "删除此应用？",
+
+  "devPortalDeleteConfirmBody": "其 API 密钥将被吊销，机器人账户将被停用。此操作无法撤销。",
+
+  "devPortalOAuthSectionTitle": "OAuth2（使用 Koda 登录）",
+
+  "devPortalNoRedirectUris": "尚未注册重定向 URI。",
+
+  "devPortalEditRedirectUris": "编辑重定向 URI",
+
+  "devPortalEditRedirectUrisTitle": "重定向 URI",
+
+  "devPortalRedirectUrisHelp": "每行一个。授权请求的 redirect_uri 必须与其中一个完全匹配。",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "生成客户端密钥",
+
+  "devPortalRegenerateClientSecret": "重新生成客户端密钥",
+
+  "devPortalClientSecretEndingIn": "客户端密钥以 {lastFour} 结尾",
+
+  "oauthConsentTitle": "授权应用",
+
+  "oauthConsentUnknownApp": "找不到此应用。",
+
+  "oauthConsentAllowQuestion": "允许 {appName} 访问你的 Koda 账户吗？",
+
+  "oauthConsentWillBeAbleTo": "这将允许该应用：",
+
+  "oauthConsentAllow": "允许",
+
+  "oauthConsentDeny": "拒绝",
+
+  "oauthConsentError": "无法完成 -- 请重试。",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "连接 Steam 即可分享你正在玩的游戏，和/或与好友比较游戏库 -- 这是两个独立的开关，开启一个绝不会自动开启另一个。",
+
+  "settingsSteamConnected": "已以 {personaName} 身份连接 Steam",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "未连接 Steam",
+
+  "settingsSteamSharePresence": "分享我正在玩的游戏",
+
+  "settingsSteamSharePresenceSubtitle": "好友和服务器成员会在你的状态旁看到你当前的游戏",
+
+  "settingsSteamShareLibrary": "允许游戏库比较",
+
+  "settingsSteamShareLibrarySubtitle": "好友和服务器成员可以将他们的 Steam 游戏库与你的进行比较",
+
+  "profilePlayingGame": "正在玩 {game}",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "比较 Steam 游戏库",
+
+  "steamCompareScreenTitle": "共同的 Steam 游戏库",
+
+  "steamCompareSharedCount": "你们都拥有 {count} 款游戏",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "暂无共同游戏。",
+
+  "steamCompareError": "目前无法加载共同游戏。",
+
+  "steamSyncNow": "立即同步",
+
+  "steamSyncSuccess": "Steam 游戏库已同步。",
+
+  "steamSyncError": "目前无法同步 -- 请稍后重试。",
+
+  "steamManageLibraryTitle": "管理已同步的游戏",
+
+  "steamManageLibraryDescription": "你在此标记为隐藏的游戏绝不会出现在游戏库比较中，即使 Steam 仍将其视为公开。",
+
+  "steamManageLibraryEmptyState": "尚无已同步的游戏 -- 试试立即同步。",
+
+  "steamHiddenFromComparison": "已从比较中隐藏",
   "settingsThroneTitle": "Throne Webhook",
   "settingsThroneDescription": "将此网址粘贴到你的 Throne.com Webhook 设置中，这样有人送出礼物时你就能在 Koda 收到通知。",
   "settingsThroneGetUrl": "获取我的 Webhook 网址",
@@ -861,6 +987,26 @@
   "calendarFallbackTitle": "日历",
   "calendarAskVispTooltip": "询问 Visp",
   "calendarCreateEventTooltip": "创建活动",
+
+  "calendarSyncTooltip": "与你的日历应用同步",
+
+  "calendarSyncDialogTitle": "同步此日历",
+
+  "calendarSyncDialogDescription": "在 Google 日历、Apple 日历、Outlook 或任何支持\"通过 URL 订阅\"的应用中订阅此 URL，即可在你自己的日历中看到此服务器的活动。只读，且仅包含你可见频道中的活动。",
+
+  "calendarSyncCopyTooltip": "复制 URL",
+
+  "calendarSyncCopiedToast": "日历 URL 已复制。",
+
+  "calendarSyncRegenerateTooltip": "重新生成 URL",
+
+  "calendarSyncRegenerate": "重新生成",
+
+  "calendarSyncRegenerateConfirmTitle": "重新生成日历 URL？",
+
+  "calendarSyncRegenerateConfirmBody": "旧的 URL 将立即失效 -- 任何已经订阅它的地方都需要换成新的。",
+
+  "calendarSyncInstructions": "Google 日历：其他日历 > 通过网址. Apple 日历：文件 > 新建日历订阅. Outlook：添加日历 > 从网络订阅.",
   "calendarPreviousMonthTooltip": "上个月",
   "calendarNextMonthTooltip": "下个月",
   "calendarTodayButton": "今天",
@@ -1126,6 +1272,18 @@
   "settingsFoundersHallTitle": "创始人殿堂",
 
   "settingsFoundersHallSubtitle": "查看谁帮助构建了 Koda",
+
+
+  "settingsWikiTitle": "帮助与百科",
+
+
+  "settingsWikiSubtitle": "浏览 Koda 的知识库",
+
+
+  "wikiScreenTitle": "帮助与百科",
+
+
+  "wikiScreenEmptyState": "这里还没有内容。",
   "vispAvatarInDevelopment": "开发中",
   "vispBoostAdvisorCouldNotAnswer": "Visp 未能给出回答。",
   "vispBoostAdvisorTitle": "询问 Visp：助力投资回报顾问",

@@ -173,6 +173,13 @@ class AppLocalizationsId extends AppLocalizations {
       'Mengganti teks isi ke OpenDyslexic di seluruh aplikasi';
 
   @override
+  String get settingsNewestAtTopTitle => 'Tampilkan Pesan Terbaru di Atas';
+
+  @override
+  String get settingsNewestAtTopSubtitle =>
+      'Berlaku untuk saluran, DM, dan obrolan saluran suara';
+
+  @override
   String get settingsFontSizeTitle => 'Ukuran font';
 
   @override
@@ -244,6 +251,206 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get settingsStreamingFinishInBrowser =>
       'Selesaikan koneksi di browser Anda, lalu kembali dan segarkan.';
+
+  @override
+  String get settingsDeveloperPortalTitle => 'Portal Pengembang';
+
+  @override
+  String get settingsDeveloperPortalSubtitle =>
+      'Daftarkan bot dan aplikasi yang menggunakan API Koda';
+
+  @override
+  String get devPortalScreenTitle => 'Portal Pengembang';
+
+  @override
+  String get devPortalNewAppTooltip => 'Aplikasi Baru';
+
+  @override
+  String get devPortalEmptyState =>
+      'Belum ada aplikasi. Buat satu untuk mendapatkan kunci API bagi bot Anda.';
+
+  @override
+  String get devPortalNewAppTitle => 'Aplikasi Baru';
+
+  @override
+  String get devPortalAppNameHint => 'Nama aplikasi';
+
+  @override
+  String get devPortalAppDescriptionHint => 'Deskripsi (opsional)';
+
+  @override
+  String get devPortalBotUsernameHint => 'Nama pengguna bot';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      'Bot Anda hanya menerima perintah dan opsi yang secara eksplisit dikirim pengguna kepadanya -- tidak pernah riwayat pesan saluran.';
+
+  @override
+  String get devPortalCreateError =>
+      'Tidak dapat membuat aplikasi ini sekarang.';
+
+  @override
+  String get devPortalKeyRevealTitle => 'Kunci API Anda';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      'Ini satu-satunya saat kunci ini akan ditampilkan. Salin sekarang -- Koda tidak menyimpannya dalam bentuk yang dapat dipulihkan.';
+
+  @override
+  String get devPortalCopyKeyTooltip => 'Salin kunci';
+
+  @override
+  String get devPortalKeyCopiedToast => 'Kunci API disalin.';
+
+  @override
+  String get devPortalKeySavedIt => 'Sudah saya simpan';
+
+  @override
+  String get devPortalRegenerate => 'Buat Ulang';
+
+  @override
+  String get devPortalRegenerateConfirmTitle => 'Buat ulang kunci API?';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      'Kunci saat ini akan langsung berhenti berfungsi -- apa pun yang sudah menggunakannya akan memerlukan yang baru.';
+
+  @override
+  String get devPortalDeleteConfirmTitle => 'Hapus aplikasi ini?';
+
+  @override
+  String get devPortalDeleteConfirmBody =>
+      'Kunci API-nya akan dicabut dan akun bot dinonaktifkan. Ini tidak dapat dibatalkan.';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2 (Masuk dengan Koda)';
+
+  @override
+  String get devPortalNoRedirectUris =>
+      'Belum ada redirect URI yang terdaftar.';
+
+  @override
+  String get devPortalEditRedirectUris => 'Edit redirect URI';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => 'Redirect URI';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      'Satu per baris. redirect_uri permintaan izin harus cocok persis dengan salah satu ini.';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => 'Buat client secret';
+
+  @override
+  String get devPortalRegenerateClientSecret => 'Buat ulang client secret';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return 'Client secret berakhiran $lastFour';
+  }
+
+  @override
+  String get oauthConsentTitle => 'Otorisasi Aplikasi';
+
+  @override
+  String get oauthConsentUnknownApp => 'Aplikasi ini tidak dapat ditemukan.';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return 'Izinkan $appName mengakses akun Koda Anda?';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo =>
+      'Ini akan memungkinkan aplikasi untuk:';
+
+  @override
+  String get oauthConsentAllow => 'Izinkan';
+
+  @override
+  String get oauthConsentDeny => 'Tolak';
+
+  @override
+  String get oauthConsentError => 'Tidak dapat menyelesaikannya -- coba lagi.';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      'Hubungkan Steam untuk membagikan apa yang sedang kamu mainkan dan/atau membandingkan pustaka game dengan teman -- ini dua sakelar independen, mengaktifkan satu tidak pernah mengaktifkan yang lain.';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return 'Steam terhubung sebagai $personaName';
+  }
+
+  @override
+  String get settingsSteamNotConnected => 'Steam tidak terhubung';
+
+  @override
+  String get settingsSteamSharePresence => 'Bagikan apa yang saya mainkan';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle =>
+      'Teman dan anggota server melihat game yang sedang kamu mainkan di samping statusmu';
+
+  @override
+  String get settingsSteamShareLibrary => 'Izinkan perbandingan pustaka';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      'Teman dan anggota server dapat membandingkan pustaka Steam mereka dengan milikmu';
+
+  @override
+  String profilePlayingGame(String game) {
+    return 'Memainkan $game';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => 'Bandingkan Pustaka Steam';
+
+  @override
+  String get steamCompareScreenTitle => 'Pustaka Steam Bersama';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return 'Kalian berdua punya $count game';
+  }
+
+  @override
+  String get steamCompareEmptyState => 'Belum ada game yang sama.';
+
+  @override
+  String get steamCompareError => 'Tidak dapat memuat game bersama saat ini.';
+
+  @override
+  String get steamSyncNow => 'Sinkronkan Sekarang';
+
+  @override
+  String get steamSyncSuccess => 'Pustaka Steam disinkronkan.';
+
+  @override
+  String get steamSyncError =>
+      'Tidak dapat menyinkronkan sekarang -- coba lagi sebentar.';
+
+  @override
+  String get steamManageLibraryTitle => 'Kelola game yang disinkronkan';
+
+  @override
+  String get steamManageLibraryDescription =>
+      'Game yang kamu tandai tersembunyi di sini tidak akan pernah muncul di perbandingan pustaka, bahkan jika Steam masih menganggapnya publik.';
+
+  @override
+  String get steamManageLibraryEmptyState =>
+      'Belum ada game yang disinkronkan -- coba Sinkronkan Sekarang.';
+
+  @override
+  String get steamHiddenFromComparison => 'Disembunyikan dari perbandingan';
 
   @override
   String get settingsThroneTitle => 'Webhook Throne';
@@ -2917,6 +3124,39 @@ class AppLocalizationsId extends AppLocalizations {
   String get calendarCreateEventTooltip => 'Buat Acara';
 
   @override
+  String get calendarSyncTooltip => 'Sinkronkan dengan aplikasi kalender Anda';
+
+  @override
+  String get calendarSyncDialogTitle => 'Sinkronkan kalender ini';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      'Berlangganan URL ini dari Google Calendar, Apple Calendar, Outlook, atau aplikasi apa pun yang mendukung \"berlangganan lewat URL\" untuk melihat acara server ini di kalender Anda sendiri. Hanya baca, dan hanya mencakup acara dari channel yang dapat Anda lihat.';
+
+  @override
+  String get calendarSyncCopyTooltip => 'Salin URL';
+
+  @override
+  String get calendarSyncCopiedToast => 'URL kalender disalin.';
+
+  @override
+  String get calendarSyncRegenerateTooltip => 'Buat ulang URL';
+
+  @override
+  String get calendarSyncRegenerate => 'Buat Ulang';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle => 'Buat ulang URL kalender?';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      'URL lama akan langsung berhenti berfungsi -- di mana pun Anda sudah berlangganan, Anda perlu URL yang baru.';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google Calendar: Kalender lain > Dari URL. Apple Calendar: File > Langganan Kalender Baru. Outlook: Tambah kalender > Berlangganan dari web.';
+
+  @override
   String get calendarPreviousMonthTooltip => 'Bulan sebelumnya';
 
   @override
@@ -3835,6 +4075,18 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get settingsFoundersHallSubtitle =>
       'Lihat siapa yang membantu membangun Koda';
+
+  @override
+  String get settingsWikiTitle => 'Bantuan & Wiki';
+
+  @override
+  String get settingsWikiSubtitle => 'Jelajahi basis pengetahuan Koda';
+
+  @override
+  String get wikiScreenTitle => 'Bantuan & Wiki';
+
+  @override
+  String get wikiScreenEmptyState => 'Belum ada apa-apa di sini.';
 
   @override
   String get vispAvatarInDevelopment => 'DALAM PENGEMBANGAN';

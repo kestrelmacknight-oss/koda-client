@@ -28,6 +28,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 import '../core/api.dart';
 import '../core/message_language.dart';
+import '../core/message_order_prefs.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../core/theme.dart';
 import '../core/providers.dart';
@@ -134,8 +135,13 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
     unawaited(ChannelKeyManager.instance.ensureReady(channelId,
         myUserId: myUserId, serverId: widget.serverId));
 
+    // See message_order_prefs.dart: newest-first API order is already
+    // correct for a top-anchored list; a bottom-anchored one (default)
+    // needs it reversed to oldest-first for a normal ListView.
+    final newestAtTop = ref.read(messageOrderPrefsProvider).newestAtTop;
     final messages = results[0];
-    final decrypted = await decryptMessages(messages.reversed.toList(),
+    final ordered = newestAtTop ? messages : messages.reversed.toList();
+    final decrypted = await decryptMessages(ordered,
         channelId: channelId, myUserId: myUserId);
     if (!mounted || widget.channelId != channelId) return;
     setState(() {
@@ -144,6 +150,16 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
       _roles = results[2];
       _loading = false;
     });
+    // Land on the most recent messages on open, same pattern
+    // dm_screen.dart's _openConversation already uses correctly --
+    // deferred to a postFrameCallback so the list has actually laid out
+    // before maxScrollExtent is read. Skipped top-anchored: offset 0
+    // (the default) is already correct there.
+    if (!newestAtTop) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scroll.hasClients) _scroll.jumpTo(_scroll.position.maxScrollExtent);
+      });
+    }
     KodaApi.instance.markChannelRead(channelId);
 
     final ch = await KodaSocket.instance.channelAsync('channel:$channelId');
@@ -153,7 +169,7 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
         final payload = msg.payload as Map<String, dynamic>?;
         if (payload != null) {
           decryptMessages([payload], channelId: channelId, myUserId: myUserId).then((decoded) {
-            if (mounted) setState(() => _messages.add(decoded.first));
+            if (mounted) setState(() => _insertNewMessage(decoded.first));
           });
           KodaApi.instance.markChannelRead(channelId);
         }
@@ -241,6 +257,25 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
     return (everyone: everyone, here: here, userIds: userIds.toList(), roleIds: roleIds.toList());
   }
 
+  // See home_screen.dart's identical pair -- appends (bottom-anchored,
+  // default) or prepends (top-anchored) a newly-arrived/just-sent
+  // message, and scrolls to whichever end is "latest" in that mode.
+  void _insertNewMessage(Map<String, dynamic> msg) {
+    if (ref.read(messageOrderPrefsProvider).newestAtTop) {
+      _messages.insert(0, msg);
+    } else {
+      _messages.add(msg);
+    }
+  }
+
+  void _scrollToLatest() {
+    if (!_scroll.hasClients) return;
+    final target = ref.read(messageOrderPrefsProvider).newestAtTop
+        ? 0.0
+        : _scroll.position.maxScrollExtent;
+    _scroll.animateTo(target, duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+  }
+
   Future<void> _sendMessage() async {
     final channelId = widget.channelId;
     final text = _messageController.text.trim();
@@ -286,16 +321,10 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
     if (msg != null && mounted) {
       await SecureStorage.cacheDecryptedContent(msg['id'] as String, payload);
       final lang = detectMessageLanguage(text);
-      setState(() => _messages.add({...msg, 'content': text,
+      setState(() => _insertNewMessage({...msg, 'content': text,
           if (fileAttachment != null) '_attachment': fileAttachment,
           if (lang != null) '_detectedLang': lang}));
-      Future.delayed(const Duration(milliseconds: 50), () {
-        if (_scroll.hasClients) {
-          _scroll.animateTo(_scroll.position.maxScrollExtent,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOut);
-        }
-      });
+      Future.delayed(const Duration(milliseconds: 50), _scrollToLatest);
       final url = firstUrl(text);
       if (url != null) _attachLinkPreview(channelId, msg['id'] as String, url);
     } else if (mounted) {
@@ -741,11 +770,35 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
     );
   }
 
+  // 'live' | 'ended' | null -- set only on Koda's own Twitch go-live
+  // announcements (see koda-server's Koda.Streaming.announce_live/3 and
+  // mark_live_ended/1), absent on an ordinary manually-pasted link.
+  // Flips in place via the same link_preview_updated broadcast every
+  // other preview update already goes through -- no new client wiring
+  // beyond this badge.
+  Widget? _statusBadge(String? status) {
+    if (status == null) return null;
+    final isLive = status == 'live';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: isLive ? KodaColors.accent : Colors.black.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        isLive ? 'LIVE' : 'ENDED',
+        style: const TextStyle(
+            color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+      ),
+    );
+  }
+
   Widget _buildLinkPreview(Map<String, dynamic> preview) {
     final url = preview['url'] as String? ?? '';
     final title = preview['title'] as String?;
     final description = preview['description'] as String?;
     final imageUrl = preview['image_url'] as String?;
+    final badge = _statusBadge(preview['status'] as String?);
     if (title == null) return const SizedBox.shrink();
 
     return InkWell(
@@ -760,14 +813,26 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           if (imageUrl != null)
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
-              child: Image.network(imageUrl, fit: BoxFit.cover, height: 140, width: double.infinity,
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink()),
-            ),
+            Stack(children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+                child: Image.network(imageUrl, fit: BoxFit.cover, height: 140, width: double.infinity,
+                    errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+              ),
+              if (badge != null) Positioned(top: 6, left: 6, child: badge),
+            ]),
           Padding(
             padding: const EdgeInsets.all(10),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              // Thumbnail fetch can fail (see Koda.Twitch.fetch_stream_details/2's
+              // own fallback-to-nil) without the status itself being
+              // absent -- the whole point of this feature is surfacing
+              // live/ended state, so it still needs to show somewhere
+              // when there's no image to overlay it on.
+              if (imageUrl == null && badge != null) ...[
+                badge,
+                const SizedBox(height: 4),
+              ],
               Text(title,
                   style: TextStyle(color: KodaColors.koda, fontSize: 13, fontWeight: FontWeight.w600),
                   maxLines: 2, overflow: TextOverflow.ellipsis),

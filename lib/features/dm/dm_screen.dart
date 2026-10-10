@@ -14,6 +14,7 @@ import '../../core/api.dart';
 import '../../core/language_options.dart';
 import '../../core/language_prefs.dart';
 import '../../core/message_language.dart';
+import '../../core/message_order_prefs.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/socket.dart';
 import '../../core/theme.dart';
@@ -208,6 +209,26 @@ class _DmScreenState extends ConsumerState<DmScreen>
     return result;
   }
 
+  // See home_screen.dart's/channel_chat_panel.dart's identical pair --
+  // appends (bottom-anchored, default) or prepends (top-anchored) a
+  // newly-arrived/just-sent message, and scrolls to whichever end is
+  // "latest" in that mode.
+  void _insertNewMessage(Map<String, dynamic> msg) {
+    if (ref.read(messageOrderPrefsProvider).newestAtTop) {
+      _messages.insert(0, msg);
+    } else {
+      _messages.add(msg);
+    }
+  }
+
+  void _scrollToLatest() {
+    if (!_scroll.hasClients) return;
+    final target = ref.read(messageOrderPrefsProvider).newestAtTop
+        ? 0.0
+        : _scroll.position.maxScrollExtent;
+    _scroll.animateTo(target, duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+  }
+
   /// Decrypted DM content is a [DmPayload] envelope, not a bare string --
   /// this splits it back into the text (for the bubble) and the optional
   /// attachment metadata (for [_buildAttachment]). Legacy messages sent
@@ -249,15 +270,22 @@ class _DmScreenState extends ConsumerState<DmScreen>
         ? msgs
         : await Future.wait(msgs.map((m) => _decryptForDisplay(m, conversationId)));
     if (!mounted) return;
+    // See message_order_prefs.dart: newest-first API order is already
+    // correct for a top-anchored list; a bottom-anchored one (default)
+    // needs it reversed to oldest-first for a normal ListView.
+    final newestAtTop = ref.read(messageOrderPrefsProvider).newestAtTop;
     setState(() {
-      _messages = _dedupeByGroup(decrypted.reversed.toList());
+      _messages = _dedupeByGroup(newestAtTop ? decrypted : decrypted.reversed.toList());
       _loadingMessages = false;
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scroll.hasClients) {
-        _scroll.jumpTo(_scroll.position.maxScrollExtent);
-      }
-    });
+    // Skipped top-anchored: offset 0 (the default) is already correct there.
+    if (!newestAtTop) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scroll.hasClients) {
+          _scroll.jumpTo(_scroll.position.maxScrollExtent);
+        }
+      });
+    }
 
     KodaApi.instance.markDmRead(conversationId);
     setState(() => _unreadCounts = {..._unreadCounts, conversationId: 0});
@@ -291,13 +319,8 @@ class _DmScreenState extends ConsumerState<DmScreen>
               ? payload
               : await _decryptForDisplay(payload, conversationId);
           if (!mounted || _activeConversationId != conversationId) return;
-          setState(() => _messages.add(display));
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (_scroll.hasClients) {
-              _scroll.animateTo(_scroll.position.maxScrollExtent,
-                  duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
-            }
-          });
+          setState(() => _insertNewMessage(display));
+          WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToLatest());
           // Conversation is open -- the incoming message is immediately seen.
           KodaApi.instance.markDmRead(conversationId);
         }();
@@ -353,7 +376,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
         // reload (SecureStorage cache lookup by message_group_id, see
         // _decryptForDisplay).
         await SecureStorage.cacheDecryptedContent(groupId, payload);
-        setState(() => _messages.add({
+        setState(() => _insertNewMessage({
               'id': groupId,
               'message_group_id': groupId,
               'conversation_id': convo['id'],
@@ -364,13 +387,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
               'content': text,
               if (attachment != null) '_attachment': attachment,
             }));
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (_scroll.hasClients) {
-            _scroll.animateTo(_scroll.position.maxScrollExtent,
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOut);
-          }
-        });
+        WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToLatest());
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(t.dmMessageNotSent)));

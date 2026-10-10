@@ -174,6 +174,13 @@ class AppLocalizationsTr extends AppLocalizations {
       'Gövde metnini uygulama genelinde OpenDyslexic\'e çevirir';
 
   @override
+  String get settingsNewestAtTopTitle => 'En Yeni Mesajları Üstte Göster';
+
+  @override
+  String get settingsNewestAtTopSubtitle =>
+      'Kanallar, DM\'ler ve ses kanalı sohbeti için aynı şekilde geçerlidir';
+
+  @override
   String get settingsFontSizeTitle => 'Yazı tipi boyutu';
 
   @override
@@ -245,6 +252,207 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get settingsStreamingFinishInBrowser =>
       'Bağlantıyı tarayıcınızda tamamlayın, sonra geri dönüp yenileyin.';
+
+  @override
+  String get settingsDeveloperPortalTitle => 'Geliştirici Portalı';
+
+  @override
+  String get settingsDeveloperPortalSubtitle =>
+      'Koda API\'sini kullanan bot ve uygulamaları kaydet';
+
+  @override
+  String get devPortalScreenTitle => 'Geliştirici Portalı';
+
+  @override
+  String get devPortalNewAppTooltip => 'Yeni Uygulama';
+
+  @override
+  String get devPortalEmptyState =>
+      'Henüz uygulama yok. Botun için bir API anahtarı almak üzere bir tane oluştur.';
+
+  @override
+  String get devPortalNewAppTitle => 'Yeni Uygulama';
+
+  @override
+  String get devPortalAppNameHint => 'Uygulama adı';
+
+  @override
+  String get devPortalAppDescriptionHint => 'Açıklama (isteğe bağlı)';
+
+  @override
+  String get devPortalBotUsernameHint => 'Bot kullanıcı adı';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      'Botun yalnızca bir kullanıcının açıkça gönderdiği komutu ve seçenekleri alır -- bir kanalın mesaj geçmişini asla almaz.';
+
+  @override
+  String get devPortalCreateError => 'Bu uygulama şu anda oluşturulamadı.';
+
+  @override
+  String get devPortalKeyRevealTitle => 'API anahtarın';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      'Bu anahtar yalnızca bu sefer gösterilecek. Şimdi kopyala -- Koda onu kurtarılabilir biçimde saklamaz.';
+
+  @override
+  String get devPortalCopyKeyTooltip => 'Anahtarı kopyala';
+
+  @override
+  String get devPortalKeyCopiedToast => 'API anahtarı kopyalandı.';
+
+  @override
+  String get devPortalKeySavedIt => 'Kaydettim';
+
+  @override
+  String get devPortalRegenerate => 'Yeniden Oluştur';
+
+  @override
+  String get devPortalRegenerateConfirmTitle =>
+      'API anahtarı yeniden oluşturulsun mu?';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      'Mevcut anahtar hemen çalışmayı durduracak -- onu zaten kullanan her şey yenisine ihtiyaç duyacak.';
+
+  @override
+  String get devPortalDeleteConfirmTitle => 'Bu uygulama silinsin mi?';
+
+  @override
+  String get devPortalDeleteConfirmBody =>
+      'API anahtarı iptal edilecek ve bot hesabı devre dışı bırakılacak. Bu geri alınamaz.';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2 (Koda ile Giriş Yap)';
+
+  @override
+  String get devPortalNoRedirectUris =>
+      'Henüz kayıtlı yönlendirme URI\'si yok.';
+
+  @override
+  String get devPortalEditRedirectUris => 'Yönlendirme URI\'lerini düzenle';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => 'Yönlendirme URI\'leri';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      'Her satıra bir tane. Bir onay isteğinin redirect_uri\'si bunlardan biriyle tam olarak eşleşmelidir.';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => 'İstemci sırrı oluştur';
+
+  @override
+  String get devPortalRegenerateClientSecret =>
+      'İstemci sırrını yeniden oluştur';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return '$lastFour ile biten istemci sırrı';
+  }
+
+  @override
+  String get oauthConsentTitle => 'Uygulamayı Yetkilendir';
+
+  @override
+  String get oauthConsentUnknownApp => 'Bu uygulama bulunamadı.';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return '$appName uygulamasının Koda hesabına erişmesine izin verilsin mi?';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo =>
+      'Bu, uygulamanın şunları yapmasına izin verecek:';
+
+  @override
+  String get oauthConsentAllow => 'İzin Ver';
+
+  @override
+  String get oauthConsentDeny => 'Reddet';
+
+  @override
+  String get oauthConsentError => 'Bu tamamlanamadı -- tekrar deneyin.';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      'Şu an ne oynadığını paylaşmak ve/veya arkadaşlarla oyun kitaplıklarını karşılaştırmak için Steam\'i bağla -- bunlar birbirinden bağımsız iki anahtardır, birini açmak diğerini asla açmaz.';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return 'Steam $personaName olarak bağlandı';
+  }
+
+  @override
+  String get settingsSteamNotConnected => 'Steam bağlı değil';
+
+  @override
+  String get settingsSteamSharePresence => 'Ne oynadığımı paylaş';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle =>
+      'Arkadaşlar ve sunucu üyeleri durumunun yanında şu anki oyununu görür';
+
+  @override
+  String get settingsSteamShareLibrary => 'Kitaplık karşılaştırmasına izin ver';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      'Arkadaşlar ve sunucu üyeleri Steam kitaplıklarını seninkiyle karşılaştırabilir';
+
+  @override
+  String profilePlayingGame(String game) {
+    return '$game oynuyor';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => 'Steam Kitaplıklarını Karşılaştır';
+
+  @override
+  String get steamCompareScreenTitle => 'Paylaşılan Steam Kitaplığı';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return 'İkinizin de $count oyunu var';
+  }
+
+  @override
+  String get steamCompareEmptyState => 'Henüz ortak oyun yok.';
+
+  @override
+  String get steamCompareError => 'Paylaşılan oyunlar şu anda yüklenemedi.';
+
+  @override
+  String get steamSyncNow => 'Şimdi Senkronize Et';
+
+  @override
+  String get steamSyncSuccess => 'Steam kitaplığı senkronize edildi.';
+
+  @override
+  String get steamSyncError =>
+      'Şimdi senkronize edilemedi -- bir süre sonra tekrar deneyin.';
+
+  @override
+  String get steamManageLibraryTitle => 'Senkronize oyunları yönet';
+
+  @override
+  String get steamManageLibraryDescription =>
+      'Burada gizli olarak işaretlediğin oyunlar, Steam onları hâlâ herkese açık görse bile kitaplık karşılaştırmasında asla görünmez.';
+
+  @override
+  String get steamManageLibraryEmptyState =>
+      'Henüz senkronize oyun yok -- Şimdi Senkronize Et\'i dene.';
+
+  @override
+  String get steamHiddenFromComparison => 'Karşılaştırmadan gizlendi';
 
   @override
   String get settingsThroneTitle => 'Throne Webhook';
@@ -2930,6 +3138,40 @@ class AppLocalizationsTr extends AppLocalizations {
   String get calendarCreateEventTooltip => 'Etkinlik Oluştur';
 
   @override
+  String get calendarSyncTooltip => 'Takvim uygulamanla senkronize et';
+
+  @override
+  String get calendarSyncDialogTitle => 'Bu takvimi senkronize et';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      'Bu sunucunun etkinliklerini kendi takviminde görmek için bu URL\'ye Google Takvim, Apple Takvim, Outlook veya \"URL ile abone ol\"u destekleyen herhangi bir uygulamadan abone ol. Salt okunur ve yalnızca görebildiğin kanallardaki etkinlikleri içerir.';
+
+  @override
+  String get calendarSyncCopyTooltip => 'URL\'yi kopyala';
+
+  @override
+  String get calendarSyncCopiedToast => 'Takvim URL\'si kopyalandı.';
+
+  @override
+  String get calendarSyncRegenerateTooltip => 'URL\'yi yeniden oluştur';
+
+  @override
+  String get calendarSyncRegenerate => 'Yeniden Oluştur';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle =>
+      'Takvim URL\'si yeniden oluşturulsun mu?';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      'Eski URL hemen çalışmayı durduracak -- zaten abone olduğun her yerde yenisi gerekecek.';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google Takvim: Diğer takvimler > URL\'den. Apple Takvim: Dosya > Yeni Takvim Aboneliği. Outlook: Takvim ekle > Web\'den abone ol.';
+
+  @override
   String get calendarPreviousMonthTooltip => 'Önceki ay';
 
   @override
@@ -3857,6 +4099,18 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get settingsFoundersHallSubtitle =>
       'Koda’yı kimin inşa etmeye yardım ettiğini gör';
+
+  @override
+  String get settingsWikiTitle => 'Yardım ve Wiki';
+
+  @override
+  String get settingsWikiSubtitle => 'Koda\'nın bilgi bankasına göz atın';
+
+  @override
+  String get wikiScreenTitle => 'Yardım ve Wiki';
+
+  @override
+  String get wikiScreenEmptyState => 'Henüz burada bir şey yok.';
 
   @override
   String get vispAvatarInDevelopment => 'GELİŞTİRİLİYOR';

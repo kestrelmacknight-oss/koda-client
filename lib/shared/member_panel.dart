@@ -233,6 +233,7 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
     final userId = member['user_id'] as String?;
     final override = userId != null ? ref.watch(presenceOverridesProvider)[userId] : null;
     final customStatus = override?.customStatus ?? member['custom_status'] as String?;
+    final playingGame = override?.playingGame ?? member['playing_game'] as String?;
     final effective = effectiveStatus(
         online: !isOffline, selfReported: override?.status ?? member['status'] as String?);
 
@@ -311,6 +312,12 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
                   if (customStatus != null && customStatus.isNotEmpty)
                     Text(
                       customStatus,
+                      style: TextStyle(color: KodaColors.text3, fontSize: 11),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  if (playingGame != null && playingGame.isNotEmpty)
+                    Text(
+                      '🎮 ${t.profilePlayingGame(playingGame)}',
                       style: TextStyle(color: KodaColors.text3, fontSize: 11),
                       overflow: TextOverflow.ellipsis,
                     ),

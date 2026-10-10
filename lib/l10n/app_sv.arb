@@ -55,6 +55,10 @@
   "settingsHighContrastSubtitle": "Rent svartvitt, högkontrastfärger i hela appen -- att växla laddar kort om den aktuella skärmen.",
   "settingsDyslexiaFontTitle": "Dyslexivänligt typsnitt",
   "settingsDyslexiaFontSubtitle": "Byter brödtext till OpenDyslexic i hela appen",
+
+  "settingsNewestAtTopTitle": "Visa senaste meddelanden högst upp",
+
+  "settingsNewestAtTopSubtitle": "Gäller kanaler, DM och röstkanalschatt på samma sätt",
   "settingsFontSizeTitle": "Teckenstorlek",
   "settingsFontSizeSample": "Flygande bäckasiner söka hwila på mjuka tuvor",
   "settingsDensityTitle": "Densitet",
@@ -75,6 +79,128 @@
   "settingsRefreshStatus": "Redan ansluten i webbläsaren? Uppdatera status",
   "settingsStreamingConnectError": "Kunde inte starta {platform}-anslutningen.",
   "settingsStreamingFinishInBrowser": "Slutför anslutningen i webbläsaren och kom sedan tillbaka och uppdatera.",
+
+  "settingsDeveloperPortalTitle": "Utvecklarportal",
+
+  "settingsDeveloperPortalSubtitle": "Registrera bottar och appar som använder Koda-API:et",
+
+  "devPortalScreenTitle": "Utvecklarportal",
+
+  "devPortalNewAppTooltip": "Ny app",
+
+  "devPortalEmptyState": "Inga appar än. Skapa en för att få en API-nyckel till din bot.",
+
+  "devPortalNewAppTitle": "Ny app",
+
+  "devPortalAppNameHint": "Appnamn",
+
+  "devPortalAppDescriptionHint": "Beskrivning (valfritt)",
+
+  "devPortalBotUsernameHint": "Bot-användarnamn",
+
+  "devPortalInteractionDataOnlyNote": "Din bot får bara kommandot och alternativen som en användare uttryckligen skickar till den -- aldrig en kanals meddelandehistorik.",
+
+  "devPortalCreateError": "Kunde inte skapa den här appen just nu.",
+
+  "devPortalKeyRevealTitle": "Din API-nyckel",
+
+  "devPortalKeyRevealWarning": "Det här är enda gången nyckeln visas. Kopiera den nu -- Koda sparar den inte i återställningsbar form.",
+
+  "devPortalCopyKeyTooltip": "Kopiera nyckel",
+
+  "devPortalKeyCopiedToast": "API-nyckel kopierad.",
+
+  "devPortalKeySavedIt": "Jag har sparat den",
+
+  "devPortalRegenerate": "Generera ny",
+
+  "devPortalRegenerateConfirmTitle": "Generera ny API-nyckel?",
+
+  "devPortalRegenerateConfirmBody": "Den nuvarande nyckeln slutar fungera omedelbart -- allt som redan använder den behöver den nya.",
+
+  "devPortalDeleteConfirmTitle": "Ta bort den här appen?",
+
+  "devPortalDeleteConfirmBody": "Dess API-nyckel återkallas och bot-kontot inaktiveras. Detta kan inte ångras.",
+
+  "devPortalOAuthSectionTitle": "OAuth2 (Logga in med Koda)",
+
+  "devPortalNoRedirectUris": "Inga redirect-URI:er registrerade än.",
+
+  "devPortalEditRedirectUris": "Redigera redirect-URI:er",
+
+  "devPortalEditRedirectUrisTitle": "Redirect-URI:er",
+
+  "devPortalRedirectUrisHelp": "En per rad. En samtyckesbegärans redirect_uri måste matcha exakt en av dessa.",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "Generera klienthemlighet",
+
+  "devPortalRegenerateClientSecret": "Generera ny klienthemlighet",
+
+  "devPortalClientSecretEndingIn": "Klienthemlighet som slutar på {lastFour}",
+
+  "oauthConsentTitle": "Auktorisera app",
+
+  "oauthConsentUnknownApp": "Den här appen kunde inte hittas.",
+
+  "oauthConsentAllowQuestion": "Tillåt {appName} att komma åt ditt Koda-konto?",
+
+  "oauthConsentWillBeAbleTo": "Detta tillåter appen att:",
+
+  "oauthConsentAllow": "Tillåt",
+
+  "oauthConsentDeny": "Neka",
+
+  "oauthConsentError": "Kunde inte slutföra det -- försök igen.",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "Anslut Steam för att dela vad du spelar och/eller jämföra spelbibliotek med vänner -- det är två oberoende reglage, att slå på ett slår aldrig på det andra.",
+
+  "settingsSteamConnected": "Steam ansluten som {personaName}",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "Steam inte anslutet",
+
+  "settingsSteamSharePresence": "Dela vad jag spelar",
+
+  "settingsSteamSharePresenceSubtitle": "Vänner och servermedlemmar ser ditt nuvarande spel bredvid din status",
+
+  "settingsSteamShareLibrary": "Tillåt biblioteksjämförelse",
+
+  "settingsSteamShareLibrarySubtitle": "Vänner och servermedlemmar kan jämföra sitt Steam-bibliotek med ditt",
+
+  "profilePlayingGame": "Spelar {game}",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "Jämför Steam-bibliotek",
+
+  "steamCompareScreenTitle": "Delat Steam-bibliotek",
+
+  "steamCompareSharedCount": "Ni har båda {count} spel",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "Inga gemensamma spel än.",
+
+  "steamCompareError": "Kunde inte läsa in delade spel just nu.",
+
+  "steamSyncNow": "Synka nu",
+
+  "steamSyncSuccess": "Steam-bibliotek synkat.",
+
+  "steamSyncError": "Kunde inte synka just nu -- försök igen strax.",
+
+  "steamManageLibraryTitle": "Hantera synkade spel",
+
+  "steamManageLibraryDescription": "Spel du markerar som dolda här visas aldrig i en biblioteksjämförelse, även om Steam fortfarande ser dem som offentliga.",
+
+  "steamManageLibraryEmptyState": "Inga synkade spel än -- försök med Synka nu.",
+
+  "steamHiddenFromComparison": "Dold från jämförelse",
   "settingsThroneTitle": "Throne-webhook",
   "settingsThroneDescription": "Klistra in den här URL:en i dina webhook-inställningar på Throne.com för att få aviseringar i Koda varje gång någon skickar dig en gåva.",
   "settingsThroneGetUrl": "Hämta min webhook-URL",
@@ -861,6 +987,26 @@
   "calendarFallbackTitle": "Kalender",
   "calendarAskVispTooltip": "Fråga Visp",
   "calendarCreateEventTooltip": "Skapa händelse",
+
+  "calendarSyncTooltip": "Synka med din kalenderapp",
+
+  "calendarSyncDialogTitle": "Synka denna kalender",
+
+  "calendarSyncDialogDescription": "Prenumerera på den här URL:en från Google Kalender, Apple Kalender, Outlook eller någon app som stöder \"prenumerera via URL\" för att se den här serverns händelser i din egen kalender. Skrivskyddad, och innehåller bara händelser från kanaler du kan se.",
+
+  "calendarSyncCopyTooltip": "Kopiera URL",
+
+  "calendarSyncCopiedToast": "Kalender-URL kopierad.",
+
+  "calendarSyncRegenerateTooltip": "Generera ny URL",
+
+  "calendarSyncRegenerate": "Generera ny",
+
+  "calendarSyncRegenerateConfirmTitle": "Generera ny kalender-URL?",
+
+  "calendarSyncRegenerateConfirmBody": "Den gamla URL:en slutar fungera omedelbart -- där du redan prenumererar behövs den nya.",
+
+  "calendarSyncInstructions": "Google Kalender: Andra kalendrar > Via URL. Apple Kalender: Arkiv > Ny kalenderprenumeration. Outlook: Lägg till kalender > Prenumerera från webben.",
   "calendarPreviousMonthTooltip": "Föregående månad",
   "calendarNextMonthTooltip": "Nästa månad",
   "calendarTodayButton": "Idag",
@@ -1126,6 +1272,18 @@
   "settingsFoundersHallTitle": "Founders Hall",
 
   "settingsFoundersHallSubtitle": "Se vem som hjälpte bygga Koda",
+
+
+  "settingsWikiTitle": "Hjälp & Wiki",
+
+
+  "settingsWikiSubtitle": "Bläddra i Kodas kunskapsbas",
+
+
+  "wikiScreenTitle": "Hjälp & Wiki",
+
+
+  "wikiScreenEmptyState": "Inget här än.",
   "vispAvatarInDevelopment": "UNDER UTVECKLING",
   "vispBoostAdvisorCouldNotAnswer": "Visp kunde inte sätta ihop ett svar.",
   "vispBoostAdvisorTitle": "Fråga Visp: Boost-ROI-rådgivare",

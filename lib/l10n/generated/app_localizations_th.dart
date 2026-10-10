@@ -176,6 +176,13 @@ class AppLocalizationsTh extends AppLocalizations {
       'เปลี่ยนข้อความเนื้อหาเป็น OpenDyslexic ทั่วทั้งแอป';
 
   @override
+  String get settingsNewestAtTopTitle => 'แสดงข้อความล่าสุดไว้ด้านบน';
+
+  @override
+  String get settingsNewestAtTopSubtitle =>
+      'มีผลกับแชนเนล ข้อความส่วนตัว และแชทแชนเนลเสียงเหมือนกัน';
+
+  @override
   String get settingsFontSizeTitle => 'ขนาดตัวอักษร';
 
   @override
@@ -247,6 +254,204 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get settingsStreamingFinishInBrowser =>
       'เชื่อมต่อให้เสร็จสิ้นในเบราว์เซอร์ของคุณ แล้วกลับมารีเฟรชอีกครั้ง';
+
+  @override
+  String get settingsDeveloperPortalTitle => 'พอร์ทัลนักพัฒนา';
+
+  @override
+  String get settingsDeveloperPortalSubtitle =>
+      'ลงทะเบียนบอทและแอปที่ใช้ Koda API';
+
+  @override
+  String get devPortalScreenTitle => 'พอร์ทัลนักพัฒนา';
+
+  @override
+  String get devPortalNewAppTooltip => 'แอปใหม่';
+
+  @override
+  String get devPortalEmptyState =>
+      'ยังไม่มีแอป สร้างแอปเพื่อรับคีย์ API สำหรับบอทของคุณ';
+
+  @override
+  String get devPortalNewAppTitle => 'แอปใหม่';
+
+  @override
+  String get devPortalAppNameHint => 'ชื่อแอป';
+
+  @override
+  String get devPortalAppDescriptionHint => 'คำอธิบาย (ไม่บังคับ)';
+
+  @override
+  String get devPortalBotUsernameHint => 'ชื่อผู้ใช้บอท';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      'บอทของคุณจะได้รับเฉพาะคำสั่งและตัวเลือกที่ผู้ใช้ส่งถึงมันโดยชัดแจ้งเท่านั้น -- ไม่เคยได้รับประวัติข้อความของช่อง';
+
+  @override
+  String get devPortalCreateError => 'ไม่สามารถสร้างแอปนี้ได้ในขณะนี้';
+
+  @override
+  String get devPortalKeyRevealTitle => 'คีย์ API ของคุณ';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      'นี่เป็นครั้งเดียวที่จะแสดงคีย์นี้ คัดลอกตอนนี้เลย -- Koda ไม่ได้จัดเก็บในรูปแบบที่กู้คืนได้';
+
+  @override
+  String get devPortalCopyKeyTooltip => 'คัดลอกคีย์';
+
+  @override
+  String get devPortalKeyCopiedToast => 'คัดลอกคีย์ API แล้ว';
+
+  @override
+  String get devPortalKeySavedIt => 'ฉันบันทึกไว้แล้ว';
+
+  @override
+  String get devPortalRegenerate => 'สร้างใหม่';
+
+  @override
+  String get devPortalRegenerateConfirmTitle => 'สร้างคีย์ API ใหม่หรือไม่?';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      'คีย์ปัจจุบันจะหยุดทำงานทันที -- สิ่งใดก็ตามที่ใช้คีย์นี้อยู่แล้วจะต้องใช้คีย์ใหม่';
+
+  @override
+  String get devPortalDeleteConfirmTitle => 'ลบแอปนี้หรือไม่?';
+
+  @override
+  String get devPortalDeleteConfirmBody =>
+      'คีย์ API ของแอปจะถูกเพิกถอนและบัญชีบอทจะถูกปิดใช้งาน การดำเนินการนี้ไม่สามารถย้อนกลับได้';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2 (เข้าสู่ระบบด้วย Koda)';
+
+  @override
+  String get devPortalNoRedirectUris => 'ยังไม่มีการลงทะเบียน redirect URI';
+
+  @override
+  String get devPortalEditRedirectUris => 'แก้ไข redirect URI';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => 'Redirect URI';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      'หนึ่งรายการต่อบรรทัด redirect_uri ของคำขอความยินยอมต้องตรงกับรายการใดรายการหนึ่งเหล่านี้ทุกประการ';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => 'สร้าง client secret';
+
+  @override
+  String get devPortalRegenerateClientSecret => 'สร้าง client secret ใหม่';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return 'Client secret ลงท้ายด้วย $lastFour';
+  }
+
+  @override
+  String get oauthConsentTitle => 'อนุญาตแอปพลิเคชัน';
+
+  @override
+  String get oauthConsentUnknownApp => 'ไม่พบแอปพลิเคชันนี้';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return 'อนุญาตให้ $appName เข้าถึงบัญชี Koda ของคุณหรือไม่?';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo => 'สิ่งนี้จะอนุญาตให้แอป:';
+
+  @override
+  String get oauthConsentAllow => 'อนุญาต';
+
+  @override
+  String get oauthConsentDeny => 'ปฏิเสธ';
+
+  @override
+  String get oauthConsentError =>
+      'ไม่สามารถดำเนินการให้เสร็จสิ้นได้ -- โปรดลองอีกครั้ง';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      'เชื่อมต่อ Steam เพื่อแชร์ว่าคุณกำลังเล่นอะไร และ/หรือเปรียบเทียบคลังเกมกับเพื่อน -- นี่คือสวิตช์อิสระสองตัว เปิดอันหนึ่งจะไม่เปิดอีกอันโดยอัตโนมัติ';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return 'เชื่อมต่อ Steam ในชื่อ $personaName';
+  }
+
+  @override
+  String get settingsSteamNotConnected => 'ยังไม่ได้เชื่อมต่อ Steam';
+
+  @override
+  String get settingsSteamSharePresence => 'แชร์เกมที่กำลังเล่น';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle =>
+      'เพื่อนและสมาชิกเซิร์ฟเวอร์จะเห็นเกมปัจจุบันของคุณข้างสถานะ';
+
+  @override
+  String get settingsSteamShareLibrary => 'อนุญาตการเปรียบเทียบคลังเกม';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      'เพื่อนและสมาชิกเซิร์ฟเวอร์สามารถเปรียบเทียบคลังเกม Steam ของพวกเขากับของคุณ';
+
+  @override
+  String profilePlayingGame(String game) {
+    return 'กำลังเล่น $game';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => 'เปรียบเทียบคลังเกม Steam';
+
+  @override
+  String get steamCompareScreenTitle => 'คลังเกม Steam ที่มีร่วมกัน';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return 'คุณทั้งสองมี $count เกมร่วมกัน';
+  }
+
+  @override
+  String get steamCompareEmptyState => 'ยังไม่มีเกมที่เหมือนกัน';
+
+  @override
+  String get steamCompareError => 'ไม่สามารถโหลดเกมที่มีร่วมกันได้ในขณะนี้';
+
+  @override
+  String get steamSyncNow => 'ซิงค์ตอนนี้';
+
+  @override
+  String get steamSyncSuccess => 'ซิงค์คลังเกม Steam แล้ว';
+
+  @override
+  String get steamSyncError =>
+      'ไม่สามารถซิงค์ได้ในขณะนี้ -- ลองใหม่อีกครั้งในอีกสักครู่';
+
+  @override
+  String get steamManageLibraryTitle => 'จัดการเกมที่ซิงค์แล้ว';
+
+  @override
+  String get steamManageLibraryDescription =>
+      'เกมที่คุณทำเครื่องหมายว่าซ่อนที่นี่จะไม่แสดงในการเปรียบเทียบคลังเกมเลย แม้ Steam จะยังถือว่าเป็นสาธารณะ';
+
+  @override
+  String get steamManageLibraryEmptyState =>
+      'ยังไม่มีเกมที่ซิงค์ -- ลองซิงค์ตอนนี้';
+
+  @override
+  String get steamHiddenFromComparison => 'ซ่อนจากการเปรียบเทียบ';
 
   @override
   String get settingsThroneTitle => 'เว็บฮุค Throne';
@@ -2917,6 +3122,40 @@ class AppLocalizationsTh extends AppLocalizations {
   String get calendarCreateEventTooltip => 'สร้างกิจกรรม';
 
   @override
+  String get calendarSyncTooltip => 'ซิงค์กับแอปปฏิทินของคุณ';
+
+  @override
+  String get calendarSyncDialogTitle => 'ซิงค์ปฏิทินนี้';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      'สมัครรับ URL นี้จาก Google ปฏิทิน, Apple ปฏิทิน, Outlook หรือแอปใดก็ตามที่รองรับ \"สมัครรับผ่าน URL\" เพื่อดูกิจกรรมของเซิร์ฟเวอร์นี้ในปฏิทินของคุณเอง อ่านอย่างเดียว และรวมเฉพาะกิจกรรมจากช่องที่คุณมองเห็นได้';
+
+  @override
+  String get calendarSyncCopyTooltip => 'คัดลอก URL';
+
+  @override
+  String get calendarSyncCopiedToast => 'คัดลอก URL ปฏิทินแล้ว';
+
+  @override
+  String get calendarSyncRegenerateTooltip => 'สร้าง URL ใหม่';
+
+  @override
+  String get calendarSyncRegenerate => 'สร้างใหม่';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle =>
+      'สร้าง URL ปฏิทินใหม่หรือไม่?';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      'URL เดิมจะหยุดทำงานทันที -- ทุกที่ที่คุณสมัครรับไว้แล้วจะต้องใช้ URL ใหม่';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google ปฏิทิน: ปฏิทินอื่นๆ > จาก URL. Apple ปฏิทิน: ไฟล์ > การสมัครรับปฏิทินใหม่. Outlook: เพิ่มปฏิทิน > สมัครรับจากเว็บ';
+
+  @override
   String get calendarPreviousMonthTooltip => 'เดือนก่อนหน้า';
 
   @override
@@ -3827,6 +4066,18 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get settingsFoundersHallSubtitle => 'ดูว่าใครช่วยสร้าง Koda';
+
+  @override
+  String get settingsWikiTitle => 'ช่วยเหลือและวิกิ';
+
+  @override
+  String get settingsWikiSubtitle => 'เรียกดูฐานความรู้ของ Koda';
+
+  @override
+  String get wikiScreenTitle => 'ช่วยเหลือและวิกิ';
+
+  @override
+  String get wikiScreenEmptyState => 'ยังไม่มีอะไรที่นี่';
 
   @override
   String get vispAvatarInDevelopment => 'อยู่ระหว่างการพัฒนา';

@@ -173,6 +173,13 @@ class AppLocalizationsSv extends AppLocalizations {
       'Byter brödtext till OpenDyslexic i hela appen';
 
   @override
+  String get settingsNewestAtTopTitle => 'Visa senaste meddelanden högst upp';
+
+  @override
+  String get settingsNewestAtTopSubtitle =>
+      'Gäller kanaler, DM och röstkanalschatt på samma sätt';
+
+  @override
   String get settingsFontSizeTitle => 'Teckenstorlek';
 
   @override
@@ -244,6 +251,202 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get settingsStreamingFinishInBrowser =>
       'Slutför anslutningen i webbläsaren och kom sedan tillbaka och uppdatera.';
+
+  @override
+  String get settingsDeveloperPortalTitle => 'Utvecklarportal';
+
+  @override
+  String get settingsDeveloperPortalSubtitle =>
+      'Registrera bottar och appar som använder Koda-API:et';
+
+  @override
+  String get devPortalScreenTitle => 'Utvecklarportal';
+
+  @override
+  String get devPortalNewAppTooltip => 'Ny app';
+
+  @override
+  String get devPortalEmptyState =>
+      'Inga appar än. Skapa en för att få en API-nyckel till din bot.';
+
+  @override
+  String get devPortalNewAppTitle => 'Ny app';
+
+  @override
+  String get devPortalAppNameHint => 'Appnamn';
+
+  @override
+  String get devPortalAppDescriptionHint => 'Beskrivning (valfritt)';
+
+  @override
+  String get devPortalBotUsernameHint => 'Bot-användarnamn';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      'Din bot får bara kommandot och alternativen som en användare uttryckligen skickar till den -- aldrig en kanals meddelandehistorik.';
+
+  @override
+  String get devPortalCreateError => 'Kunde inte skapa den här appen just nu.';
+
+  @override
+  String get devPortalKeyRevealTitle => 'Din API-nyckel';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      'Det här är enda gången nyckeln visas. Kopiera den nu -- Koda sparar den inte i återställningsbar form.';
+
+  @override
+  String get devPortalCopyKeyTooltip => 'Kopiera nyckel';
+
+  @override
+  String get devPortalKeyCopiedToast => 'API-nyckel kopierad.';
+
+  @override
+  String get devPortalKeySavedIt => 'Jag har sparat den';
+
+  @override
+  String get devPortalRegenerate => 'Generera ny';
+
+  @override
+  String get devPortalRegenerateConfirmTitle => 'Generera ny API-nyckel?';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      'Den nuvarande nyckeln slutar fungera omedelbart -- allt som redan använder den behöver den nya.';
+
+  @override
+  String get devPortalDeleteConfirmTitle => 'Ta bort den här appen?';
+
+  @override
+  String get devPortalDeleteConfirmBody =>
+      'Dess API-nyckel återkallas och bot-kontot inaktiveras. Detta kan inte ångras.';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2 (Logga in med Koda)';
+
+  @override
+  String get devPortalNoRedirectUris => 'Inga redirect-URI:er registrerade än.';
+
+  @override
+  String get devPortalEditRedirectUris => 'Redigera redirect-URI:er';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => 'Redirect-URI:er';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      'En per rad. En samtyckesbegärans redirect_uri måste matcha exakt en av dessa.';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => 'Generera klienthemlighet';
+
+  @override
+  String get devPortalRegenerateClientSecret => 'Generera ny klienthemlighet';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return 'Klienthemlighet som slutar på $lastFour';
+  }
+
+  @override
+  String get oauthConsentTitle => 'Auktorisera app';
+
+  @override
+  String get oauthConsentUnknownApp => 'Den här appen kunde inte hittas.';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return 'Tillåt $appName att komma åt ditt Koda-konto?';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo => 'Detta tillåter appen att:';
+
+  @override
+  String get oauthConsentAllow => 'Tillåt';
+
+  @override
+  String get oauthConsentDeny => 'Neka';
+
+  @override
+  String get oauthConsentError => 'Kunde inte slutföra det -- försök igen.';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      'Anslut Steam för att dela vad du spelar och/eller jämföra spelbibliotek med vänner -- det är två oberoende reglage, att slå på ett slår aldrig på det andra.';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return 'Steam ansluten som $personaName';
+  }
+
+  @override
+  String get settingsSteamNotConnected => 'Steam inte anslutet';
+
+  @override
+  String get settingsSteamSharePresence => 'Dela vad jag spelar';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle =>
+      'Vänner och servermedlemmar ser ditt nuvarande spel bredvid din status';
+
+  @override
+  String get settingsSteamShareLibrary => 'Tillåt biblioteksjämförelse';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      'Vänner och servermedlemmar kan jämföra sitt Steam-bibliotek med ditt';
+
+  @override
+  String profilePlayingGame(String game) {
+    return 'Spelar $game';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => 'Jämför Steam-bibliotek';
+
+  @override
+  String get steamCompareScreenTitle => 'Delat Steam-bibliotek';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return 'Ni har båda $count spel';
+  }
+
+  @override
+  String get steamCompareEmptyState => 'Inga gemensamma spel än.';
+
+  @override
+  String get steamCompareError => 'Kunde inte läsa in delade spel just nu.';
+
+  @override
+  String get steamSyncNow => 'Synka nu';
+
+  @override
+  String get steamSyncSuccess => 'Steam-bibliotek synkat.';
+
+  @override
+  String get steamSyncError => 'Kunde inte synka just nu -- försök igen strax.';
+
+  @override
+  String get steamManageLibraryTitle => 'Hantera synkade spel';
+
+  @override
+  String get steamManageLibraryDescription =>
+      'Spel du markerar som dolda här visas aldrig i en biblioteksjämförelse, även om Steam fortfarande ser dem som offentliga.';
+
+  @override
+  String get steamManageLibraryEmptyState =>
+      'Inga synkade spel än -- försök med Synka nu.';
+
+  @override
+  String get steamHiddenFromComparison => 'Dold från jämförelse';
 
   @override
   String get settingsThroneTitle => 'Throne-webhook';
@@ -2930,6 +3133,39 @@ class AppLocalizationsSv extends AppLocalizations {
   String get calendarCreateEventTooltip => 'Skapa händelse';
 
   @override
+  String get calendarSyncTooltip => 'Synka med din kalenderapp';
+
+  @override
+  String get calendarSyncDialogTitle => 'Synka denna kalender';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      'Prenumerera på den här URL:en från Google Kalender, Apple Kalender, Outlook eller någon app som stöder \"prenumerera via URL\" för att se den här serverns händelser i din egen kalender. Skrivskyddad, och innehåller bara händelser från kanaler du kan se.';
+
+  @override
+  String get calendarSyncCopyTooltip => 'Kopiera URL';
+
+  @override
+  String get calendarSyncCopiedToast => 'Kalender-URL kopierad.';
+
+  @override
+  String get calendarSyncRegenerateTooltip => 'Generera ny URL';
+
+  @override
+  String get calendarSyncRegenerate => 'Generera ny';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle => 'Generera ny kalender-URL?';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      'Den gamla URL:en slutar fungera omedelbart -- där du redan prenumererar behövs den nya.';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google Kalender: Andra kalendrar > Via URL. Apple Kalender: Arkiv > Ny kalenderprenumeration. Outlook: Lägg till kalender > Prenumerera från webben.';
+
+  @override
   String get calendarPreviousMonthTooltip => 'Föregående månad';
 
   @override
@@ -3852,6 +4088,18 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get settingsFoundersHallSubtitle => 'Se vem som hjälpte bygga Koda';
+
+  @override
+  String get settingsWikiTitle => 'Hjälp & Wiki';
+
+  @override
+  String get settingsWikiSubtitle => 'Bläddra i Kodas kunskapsbas';
+
+  @override
+  String get wikiScreenTitle => 'Hjälp & Wiki';
+
+  @override
+  String get wikiScreenEmptyState => 'Inget här än.';
 
   @override
   String get vispAvatarInDevelopment => 'UNDER UTVECKLING';

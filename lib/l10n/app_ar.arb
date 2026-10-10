@@ -55,6 +55,10 @@
   "settingsHighContrastSubtitle": "ألوان أبيض وأسود خالصة عالية التباين في جميع أنحاء التطبيق -- التبديل يعيد تحميل الشاشة الحالية للحظة.",
   "settingsDyslexiaFontTitle": "خط مناسب لعسر القراءة",
   "settingsDyslexiaFontSubtitle": "يبدّل نص المحتوى إلى خط OpenDyslexic في جميع أنحاء التطبيق",
+
+  "settingsNewestAtTopTitle": "إظهار أحدث الرسائل في الأعلى",
+
+  "settingsNewestAtTopSubtitle": "ينطبق على القنوات والرسائل المباشرة ودردشة القنوات الصوتية على حد سواء",
   "settingsFontSizeTitle": "حجم الخط",
   "settingsFontSizeSample": "نص تجريبي لعرض حجم الخط وشكله بوضوح",
   "settingsDensityTitle": "الكثافة",
@@ -75,6 +79,128 @@
   "settingsRefreshStatus": "هل اتصلت بالفعل من المتصفح؟ تحديث الحالة",
   "settingsStreamingConnectError": "تعذّر بدء الاتصال بـ {platform}.",
   "settingsStreamingFinishInBrowser": "أكمل الاتصال في متصفحك، ثم عد وحدّث الحالة.",
+
+  "settingsDeveloperPortalTitle": "بوابة المطورين",
+
+  "settingsDeveloperPortalSubtitle": "سجّل البوتات والتطبيقات التي تستخدم واجهة Koda البرمجية",
+
+  "devPortalScreenTitle": "بوابة المطورين",
+
+  "devPortalNewAppTooltip": "تطبيق جديد",
+
+  "devPortalEmptyState": "لا توجد تطبيقات بعد. أنشئ واحدًا للحصول على مفتاح API لبوتك.",
+
+  "devPortalNewAppTitle": "تطبيق جديد",
+
+  "devPortalAppNameHint": "اسم التطبيق",
+
+  "devPortalAppDescriptionHint": "الوصف (اختياري)",
+
+  "devPortalBotUsernameHint": "اسم مستخدم البوت",
+
+  "devPortalInteractionDataOnlyNote": "يتلقى البوت الخاص بك فقط الأمر والخيارات التي يرسلها المستخدم صراحةً إليه -- أبدًا سجل رسائل القناة.",
+
+  "devPortalCreateError": "تعذر إنشاء هذا التطبيق الآن.",
+
+  "devPortalKeyRevealTitle": "مفتاح API الخاص بك",
+
+  "devPortalKeyRevealWarning": "هذه هي المرة الوحيدة التي سيظهر فيها هذا المفتاح. انسخه الآن -- لا يحتفظ Koda به بصيغة قابلة للاسترداد.",
+
+  "devPortalCopyKeyTooltip": "نسخ المفتاح",
+
+  "devPortalKeyCopiedToast": "تم نسخ مفتاح API.",
+
+  "devPortalKeySavedIt": "لقد حفظته",
+
+  "devPortalRegenerate": "إعادة الإنشاء",
+
+  "devPortalRegenerateConfirmTitle": "إعادة إنشاء مفتاح API؟",
+
+  "devPortalRegenerateConfirmBody": "سيتوقف المفتاح الحالي عن العمل فورًا -- أي شيء يستخدمه بالفعل سيحتاج إلى المفتاح الجديد.",
+
+  "devPortalDeleteConfirmTitle": "حذف هذا التطبيق؟",
+
+  "devPortalDeleteConfirmBody": "سيتم إبطال مفتاح API الخاص به وتعطيل حساب البوت. لا يمكن التراجع عن هذا.",
+
+  "devPortalOAuthSectionTitle": "OAuth2 (تسجيل الدخول عبر Koda)",
+
+  "devPortalNoRedirectUris": "لم تُسجَّل أي عناوين إعادة توجيه بعد.",
+
+  "devPortalEditRedirectUris": "تعديل عناوين إعادة التوجيه",
+
+  "devPortalEditRedirectUrisTitle": "عناوين إعادة التوجيه",
+
+  "devPortalRedirectUrisHelp": "واحد في كل سطر. يجب أن يطابق redirect_uri لطلب الموافقة أحد هذه العناوين تمامًا.",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "إنشاء رمز سري للعميل",
+
+  "devPortalRegenerateClientSecret": "إعادة إنشاء رمز سري للعميل",
+
+  "devPortalClientSecretEndingIn": "الرمز السري ينتهي بـ {lastFour}",
+
+  "oauthConsentTitle": "تفويض التطبيق",
+
+  "oauthConsentUnknownApp": "لم يتم العثور على هذا التطبيق.",
+
+  "oauthConsentAllowQuestion": "السماح لـ {appName} بالوصول إلى حسابك على Koda؟",
+
+  "oauthConsentWillBeAbleTo": "سيسمح ذلك للتطبيق بـ:",
+
+  "oauthConsentAllow": "سماح",
+
+  "oauthConsentDeny": "رفض",
+
+  "oauthConsentError": "تعذر إكمال ذلك -- حاول مرة أخرى.",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "اربط Steam لمشاركة ما تلعبه و/أو مقارنة مكتبات الألعاب مع الأصدقاء -- هذان مفتاحان مستقلان، تفعيل أحدهما لا يفعّل الآخر أبدًا.",
+
+  "settingsSteamConnected": "متصل بـ Steam باسم {personaName}",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "Steam غير متصل",
+
+  "settingsSteamSharePresence": "مشاركة ما ألعبه حاليًا",
+
+  "settingsSteamSharePresenceSubtitle": "يرى الأصدقاء وأعضاء الخادم لعبتك الحالية بجانب حالتك",
+
+  "settingsSteamShareLibrary": "السماح بمقارنة المكتبة",
+
+  "settingsSteamShareLibrarySubtitle": "يمكن للأصدقاء وأعضاء الخادم مقارنة مكتبة Steam الخاصة بهم بمكتبتك",
+
+  "profilePlayingGame": "يلعب {game}",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "مقارنة مكتبات Steam",
+
+  "steamCompareScreenTitle": "مكتبة Steam المشتركة",
+
+  "steamCompareSharedCount": "كلاكما يملك {count} لعبة",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "لا توجد ألعاب مشتركة حتى الآن.",
+
+  "steamCompareError": "تعذر تحميل الألعاب المشتركة الآن.",
+
+  "steamSyncNow": "مزامنة الآن",
+
+  "steamSyncSuccess": "تمت مزامنة مكتبة Steam.",
+
+  "steamSyncError": "تعذرت المزامنة الآن -- حاول مرة أخرى بعد قليل.",
+
+  "steamManageLibraryTitle": "إدارة الألعاب المتزامنة",
+
+  "steamManageLibraryDescription": "الألعاب التي تضعها كمخفية هنا لا تظهر أبدًا في مقارنة المكتبة، حتى لو كانت Steam لا تزال تعتبرها عامة.",
+
+  "steamManageLibraryEmptyState": "لا توجد ألعاب متزامنة بعد -- جرب المزامنة الآن.",
+
+  "steamHiddenFromComparison": "مخفية من المقارنة",
   "settingsThroneTitle": "ويب هوك Throne",
   "settingsThroneDescription": "الصق هذا الرابط في إعدادات ويب هوك Throne.com لتصلك إشعارات في Koda كلما أرسل لك أحد هدية.",
   "settingsThroneGetUrl": "الحصول على رابط الويب هوك الخاص بي",
@@ -861,6 +987,26 @@
   "calendarFallbackTitle": "التقويم",
   "calendarAskVispTooltip": "اسأل Visp",
   "calendarCreateEventTooltip": "إنشاء حدث",
+
+  "calendarSyncTooltip": "مزامنة مع تطبيق التقويم الخاص بك",
+
+  "calendarSyncDialogTitle": "مزامنة هذا التقويم",
+
+  "calendarSyncDialogDescription": "اشترك في هذا الرابط من Google Calendar أو Apple Calendar أو Outlook أو أي تطبيق يدعم \"الاشتراك عبر رابط\" لرؤية أحداث هذا الخادم في تقويمك. للقراءة فقط، ويتضمن فقط أحداث القنوات التي يمكنك رؤيتها.",
+
+  "calendarSyncCopyTooltip": "نسخ الرابط",
+
+  "calendarSyncCopiedToast": "تم نسخ رابط التقويم.",
+
+  "calendarSyncRegenerateTooltip": "إعادة إنشاء الرابط",
+
+  "calendarSyncRegenerate": "إعادة الإنشاء",
+
+  "calendarSyncRegenerateConfirmTitle": "إعادة إنشاء رابط التقويم؟",
+
+  "calendarSyncRegenerateConfirmBody": "سيتوقف الرابط القديم عن العمل فورًا -- أي مكان اشتركت فيه بالفعل سيحتاج إلى الرابط الجديد.",
+
+  "calendarSyncInstructions": "Google Calendar: التقويمات الأخرى > من رابط URL. Apple Calendar: ملف > اشتراك تقويم جديد. Outlook: إضافة تقويم > الاشتراك من الويب.",
   "calendarPreviousMonthTooltip": "الشهر السابق",
   "calendarNextMonthTooltip": "الشهر التالي",
   "calendarTodayButton": "اليوم",
@@ -1126,6 +1272,18 @@
   "settingsFoundersHallTitle": "قاعة المؤسسين",
 
   "settingsFoundersHallSubtitle": "شاهد من ساعد في بناء Koda",
+
+
+  "settingsWikiTitle": "المساعدة والويكي",
+
+
+  "settingsWikiSubtitle": "تصفح قاعدة معارف Koda",
+
+
+  "wikiScreenTitle": "المساعدة والويكي",
+
+
+  "wikiScreenEmptyState": "لا يوجد شيء هنا بعد.",
   "vispAvatarInDevelopment": "قيد التطوير",
   "vispBoostAdvisorCouldNotAnswer": "تعذّر على Visp تجهيز إجابة.",
   "vispBoostAdvisorTitle": "اسأل Visp: مستشار عائد استثمار التعزيز",

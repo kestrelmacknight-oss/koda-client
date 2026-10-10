@@ -175,6 +175,13 @@ class AppLocalizationsCs extends AppLocalizations {
       'Přepne text v celé aplikaci na OpenDyslexic';
 
   @override
+  String get settingsNewestAtTopTitle => 'Zobrazit nejnovější zprávy nahoře';
+
+  @override
+  String get settingsNewestAtTopSubtitle =>
+      'Platí pro kanály, DM i chat v hlasovém kanálu';
+
+  @override
   String get settingsFontSizeTitle => 'Velikost písma';
 
   @override
@@ -245,6 +252,207 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get settingsStreamingFinishInBrowser =>
       'Dokončete připojení v prohlížeči a poté se vraťte a obnovte stránku.';
+
+  @override
+  String get settingsDeveloperPortalTitle => 'Portál pro vývojáře';
+
+  @override
+  String get settingsDeveloperPortalSubtitle =>
+      'Registrujte boty a aplikace využívající Koda API';
+
+  @override
+  String get devPortalScreenTitle => 'Portál pro vývojáře';
+
+  @override
+  String get devPortalNewAppTooltip => 'Nová aplikace';
+
+  @override
+  String get devPortalEmptyState =>
+      'Zatím žádné aplikace. Vytvořte jednu a získejte API klíč pro svého bota.';
+
+  @override
+  String get devPortalNewAppTitle => 'Nová aplikace';
+
+  @override
+  String get devPortalAppNameHint => 'Název aplikace';
+
+  @override
+  String get devPortalAppDescriptionHint => 'Popis (volitelné)';
+
+  @override
+  String get devPortalBotUsernameHint => 'Uživatelské jméno bota';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      'Váš bot dostává pouze příkaz a možnosti, které mu uživatel výslovně odešle -- nikdy historii zpráv kanálu.';
+
+  @override
+  String get devPortalCreateError =>
+      'Tuto aplikaci se teď nepodařilo vytvořit.';
+
+  @override
+  String get devPortalKeyRevealTitle => 'Váš API klíč';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      'Tento klíč se zobrazí pouze jednou. Zkopírujte si ho teď -- Koda jej neukládá v obnovitelné podobě.';
+
+  @override
+  String get devPortalCopyKeyTooltip => 'Kopírovat klíč';
+
+  @override
+  String get devPortalKeyCopiedToast => 'API klíč zkopírován.';
+
+  @override
+  String get devPortalKeySavedIt => 'Uložil(a) jsem si ho';
+
+  @override
+  String get devPortalRegenerate => 'Obnovit';
+
+  @override
+  String get devPortalRegenerateConfirmTitle => 'Obnovit API klíč?';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      'Současný klíč okamžitě přestane fungovat -- cokoliv, co ho již používá, bude potřebovat nový.';
+
+  @override
+  String get devPortalDeleteConfirmTitle => 'Smazat tuto aplikaci?';
+
+  @override
+  String get devPortalDeleteConfirmBody =>
+      'Její API klíč bude zneplatněn a účet bota deaktivován. Toto nelze vrátit zpět.';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2 (Přihlášení přes Koda)';
+
+  @override
+  String get devPortalNoRedirectUris =>
+      'Zatím nejsou registrovány žádné redirect URI.';
+
+  @override
+  String get devPortalEditRedirectUris => 'Upravit redirect URI';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => 'Redirect URI';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      'Jedna na řádek. redirect_uri žádosti o souhlas se musí přesně shodovat s jednou z nich.';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => 'Vygenerovat tajný klíč klienta';
+
+  @override
+  String get devPortalRegenerateClientSecret =>
+      'Vygenerovat nový tajný klíč klienta';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return 'Tajný klíč klienta končící na $lastFour';
+  }
+
+  @override
+  String get oauthConsentTitle => 'Autorizovat aplikaci';
+
+  @override
+  String get oauthConsentUnknownApp => 'Tuto aplikaci se nepodařilo najít.';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return 'Povolit aplikaci $appName přístup k vašemu účtu Koda?';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo => 'Toto umožní aplikaci:';
+
+  @override
+  String get oauthConsentAllow => 'Povolit';
+
+  @override
+  String get oauthConsentDeny => 'Odepřít';
+
+  @override
+  String get oauthConsentError =>
+      'Nepodařilo se to dokončit -- zkuste to znovu.';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      'Připojte Steam a sdílejte, co právě hrajete, a/nebo porovnávejte knihovny her s přáteli -- jde o dva nezávislé přepínače, zapnutí jednoho nikdy nezapne druhý.';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return 'Steam připojen jako $personaName';
+  }
+
+  @override
+  String get settingsSteamNotConnected => 'Steam nepřipojen';
+
+  @override
+  String get settingsSteamSharePresence => 'Sdílet, co právě hraji';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle =>
+      'Přátelé a členové serveru uvidí vaši aktuální hru u vašeho stavu';
+
+  @override
+  String get settingsSteamShareLibrary => 'Povolit porovnání knihovny';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      'Přátelé a členové serveru mohou porovnat svou knihovnu Steam s vaší';
+
+  @override
+  String profilePlayingGame(String game) {
+    return 'Hraje $game';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => 'Porovnat knihovny Steam';
+
+  @override
+  String get steamCompareScreenTitle => 'Sdílená knihovna Steam';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return 'Oba vlastníte $count her';
+  }
+
+  @override
+  String get steamCompareEmptyState => 'Zatím žádné společné hry.';
+
+  @override
+  String get steamCompareError => 'Sdílené hry se nyní nepodařilo načíst.';
+
+  @override
+  String get steamSyncNow => 'Synchronizovat';
+
+  @override
+  String get steamSyncSuccess => 'Knihovna Steam synchronizována.';
+
+  @override
+  String get steamSyncError =>
+      'Nelze nyní synchronizovat -- zkuste to za chvíli.';
+
+  @override
+  String get steamManageLibraryTitle => 'Správa synchronizovaných her';
+
+  @override
+  String get steamManageLibraryDescription =>
+      'Hry, které zde označíte jako skryté, se nikdy nezobrazí v porovnání knihoven, i když je Steam stále považuje za veřejné.';
+
+  @override
+  String get steamManageLibraryEmptyState =>
+      'Zatím žádné synchronizované hry -- zkuste Synchronizovat.';
+
+  @override
+  String get steamHiddenFromComparison => 'Skryto z porovnání';
 
   @override
   String get settingsThroneTitle => 'Webhook Throne';
@@ -2961,6 +3169,40 @@ class AppLocalizationsCs extends AppLocalizations {
   String get calendarCreateEventTooltip => 'Vytvořit událost';
 
   @override
+  String get calendarSyncTooltip =>
+      'Synchronizovat s vaší kalendářovou aplikací';
+
+  @override
+  String get calendarSyncDialogTitle => 'Synchronizovat tento kalendář';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      'Přihlaste se k odběru této adresy URL z Google Kalendáře, Apple Kalendáře, Outlooku nebo jakékoli aplikace, která podporuje \"odběr z URL\", a uvidíte události tohoto serveru ve svém kalendáři. Pouze pro čtení a obsahuje jen události z kanálů, které vidíte.';
+
+  @override
+  String get calendarSyncCopyTooltip => 'Kopírovat URL';
+
+  @override
+  String get calendarSyncCopiedToast => 'URL kalendáře zkopírována.';
+
+  @override
+  String get calendarSyncRegenerateTooltip => 'Obnovit URL';
+
+  @override
+  String get calendarSyncRegenerate => 'Obnovit';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle => 'Obnovit URL kalendáře?';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      'Stará URL okamžitě přestane fungovat -- všude, kde jste ji už použili, bude potřeba nová.';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google Kalendář: Další kalendáře > Z URL. Apple Kalendář: Soubor > Nový odběr kalendáře. Outlook: Přidat kalendář > Přihlásit se z webu.';
+
+  @override
   String get calendarPreviousMonthTooltip => 'Předchozí měsíc';
 
   @override
@@ -3903,6 +4145,18 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get settingsFoundersHallSubtitle =>
       'Zjistěte, kdo pomohl Koda vytvořit';
+
+  @override
+  String get settingsWikiTitle => 'Nápověda a wiki';
+
+  @override
+  String get settingsWikiSubtitle => 'Procházet znalostní bázi Koda';
+
+  @override
+  String get wikiScreenTitle => 'Nápověda a wiki';
+
+  @override
+  String get wikiScreenEmptyState => 'Zatím zde nic není.';
 
   @override
   String get vispAvatarInDevelopment => 'VE VÝVOJI';

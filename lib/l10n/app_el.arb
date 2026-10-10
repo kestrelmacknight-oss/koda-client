@@ -55,6 +55,10 @@
   "settingsHighContrastSubtitle": "Καθαρά μαύρο/λευκό, χρώματα υψηλής αντίθεσης σε όλη την εφαρμογή -- η εναλλαγή επαναφορτώνει σύντομα την τρέχουσα οθόνη.",
   "settingsDyslexiaFontTitle": "Γραμματοσειρά φιλική προς δυσλεξία",
   "settingsDyslexiaFontSubtitle": "Αλλάζει το κύριο κείμενο σε OpenDyslexic σε όλη την εφαρμογή",
+
+  "settingsNewestAtTopTitle": "Εμφάνιση των πιο πρόσφατων μηνυμάτων επάνω",
+
+  "settingsNewestAtTopSubtitle": "Ισχύει εξίσου για κανάλια, άμεσα μηνύματα και συνομιλία καναλιού φωνής",
   "settingsFontSizeTitle": "Μέγεθος γραμματοσειράς",
   "settingsFontSizeSample": "Ξεσκεπάζω την ψυχοφθόρα βδελυγμία",
   "settingsDensityTitle": "Πυκνότητα",
@@ -75,6 +79,128 @@
   "settingsRefreshStatus": "Ήδη συνδεδεμένοι στο πρόγραμμα περιήγησης; Ανανέωση κατάστασης",
   "settingsStreamingConnectError": "Δεν ήταν δυνατή η έναρξη της σύνδεσης {platform}.",
   "settingsStreamingFinishInBrowser": "Ολοκληρώστε τη σύνδεση στο πρόγραμμα περιήγησής σας και μετά επιστρέψτε και ανανεώστε.",
+
+  "settingsDeveloperPortalTitle": "Πύλη προγραμματιστών",
+
+  "settingsDeveloperPortalSubtitle": "Καταχωρίστε bots και εφαρμογές που χρησιμοποιούν το API του Koda",
+
+  "devPortalScreenTitle": "Πύλη προγραμματιστών",
+
+  "devPortalNewAppTooltip": "Νέα εφαρμογή",
+
+  "devPortalEmptyState": "Δεν υπάρχουν ακόμα εφαρμογές. Δημιουργήστε μία για να λάβετε κλειδί API για το bot σας.",
+
+  "devPortalNewAppTitle": "Νέα εφαρμογή",
+
+  "devPortalAppNameHint": "Όνομα εφαρμογής",
+
+  "devPortalAppDescriptionHint": "Περιγραφή (προαιρετικό)",
+
+  "devPortalBotUsernameHint": "Όνομα χρήστη bot",
+
+  "devPortalInteractionDataOnlyNote": "Το bot σας λαμβάνει μόνο την εντολή και τις επιλογές που υποβάλλει ρητά ένας χρήστης -- ποτέ το ιστορικό μηνυμάτων ενός καναλιού.",
+
+  "devPortalCreateError": "Δεν ήταν δυνατή η δημιουργία αυτής της εφαρμογής τώρα.",
+
+  "devPortalKeyRevealTitle": "Το κλειδί API σας",
+
+  "devPortalKeyRevealWarning": "Αυτή είναι η μόνη φορά που θα εμφανιστεί αυτό το κλειδί. Αντιγράψτε το τώρα -- το Koda δεν το αποθηκεύει σε ανακτήσιμη μορφή.",
+
+  "devPortalCopyKeyTooltip": "Αντιγραφή κλειδιού",
+
+  "devPortalKeyCopiedToast": "Το κλειδί API αντιγράφηκε.",
+
+  "devPortalKeySavedIt": "Το αποθήκευσα",
+
+  "devPortalRegenerate": "Δημιουργία νέου",
+
+  "devPortalRegenerateConfirmTitle": "Δημιουργία νέου κλειδιού API;",
+
+  "devPortalRegenerateConfirmBody": "Το τρέχον κλειδί θα σταματήσει να λειτουργεί αμέσως -- οτιδήποτε το χρησιμοποιεί ήδη θα χρειαστεί το νέο.",
+
+  "devPortalDeleteConfirmTitle": "Διαγραφή αυτής της εφαρμογής;",
+
+  "devPortalDeleteConfirmBody": "Το κλειδί API της θα ανακληθεί και ο λογαριασμός bot θα απενεργοποιηθεί. Αυτό δεν αναιρείται.",
+
+  "devPortalOAuthSectionTitle": "OAuth2 (Σύνδεση με Koda)",
+
+  "devPortalNoRedirectUris": "Δεν έχουν καταχωριστεί ακόμα διευθύνσεις ανακατεύθυνσης.",
+
+  "devPortalEditRedirectUris": "Επεξεργασία διευθύνσεων ανακατεύθυνσης",
+
+  "devPortalEditRedirectUrisTitle": "Διευθύνσεις ανακατεύθυνσης",
+
+  "devPortalRedirectUrisHelp": "Μία ανά γραμμή. Το redirect_uri ενός αιτήματος συναίνεσης πρέπει να ταιριάζει ακριβώς με μία από αυτές.",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "Δημιουργία μυστικού πελάτη",
+
+  "devPortalRegenerateClientSecret": "Δημιουργία νέου μυστικού πελάτη",
+
+  "devPortalClientSecretEndingIn": "Το μυστικό πελάτη λήγει σε {lastFour}",
+
+  "oauthConsentTitle": "Εξουσιοδότηση εφαρμογής",
+
+  "oauthConsentUnknownApp": "Αυτή η εφαρμογή δεν βρέθηκε.",
+
+  "oauthConsentAllowQuestion": "Να επιτραπεί στο {appName} η πρόσβαση στον λογαριασμό σας Koda;",
+
+  "oauthConsentWillBeAbleTo": "Αυτό θα επιτρέψει στην εφαρμογή να:",
+
+  "oauthConsentAllow": "Επιτρέπεται",
+
+  "oauthConsentDeny": "Άρνηση",
+
+  "oauthConsentError": "Δεν ήταν δυνατή η ολοκλήρωση -- δοκιμάστε ξανά.",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "Συνδέστε το Steam για να μοιραστείτε τι παίζετε τώρα και/ή να συγκρίνετε βιβλιοθήκες παιχνιδιών με φίλους -- πρόκειται για δύο ανεξάρτητους διακόπτες, η ενεργοποίηση του ενός δεν ενεργοποιεί ποτέ τον άλλο.",
+
+  "settingsSteamConnected": "Το Steam συνδέθηκε ως {personaName}",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "Το Steam δεν είναι συνδεδεμένο",
+
+  "settingsSteamSharePresence": "Κοινή χρήση του τι παίζω",
+
+  "settingsSteamSharePresenceSubtitle": "Φίλοι και μέλη του διακομιστή βλέπουν το τρέχον παιχνίδι σας δίπλα στην κατάστασή σας",
+
+  "settingsSteamShareLibrary": "Να επιτρέπεται η σύγκριση βιβλιοθήκης",
+
+  "settingsSteamShareLibrarySubtitle": "Φίλοι και μέλη του διακομιστή μπορούν να συγκρίνουν τη βιβλιοθήκη Steam τους με τη δική σας",
+
+  "profilePlayingGame": "Παίζει {game}",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "Σύγκριση βιβλιοθηκών Steam",
+
+  "steamCompareScreenTitle": "Κοινή βιβλιοθήκη Steam",
+
+  "steamCompareSharedCount": "Έχετε και οι δύο {count} παιχνίδια",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "Δεν υπάρχουν κοινά παιχνίδια ακόμα.",
+
+  "steamCompareError": "Δεν ήταν δυνατή η φόρτωση κοινών παιχνιδιών αυτήν τη στιγμή.",
+
+  "steamSyncNow": "Συγχρονισμός τώρα",
+
+  "steamSyncSuccess": "Η βιβλιοθήκη Steam συγχρονίστηκε.",
+
+  "steamSyncError": "Δεν ήταν δυνατός ο συγχρονισμός τώρα -- δοκιμάστε ξανά σε λίγο.",
+
+  "steamManageLibraryTitle": "Διαχείριση συγχρονισμένων παιχνιδιών",
+
+  "steamManageLibraryDescription": "Τα παιχνίδια που επισημαίνετε ως κρυφά εδώ δεν εμφανίζονται ποτέ σε σύγκριση βιβλιοθήκης, ακόμη και αν το Steam τα θεωρεί ακόμη δημόσια.",
+
+  "steamManageLibraryEmptyState": "Δεν υπάρχουν συγχρονισμένα παιχνίδια ακόμα -- δοκιμάστε Συγχρονισμός τώρα.",
+
+  "steamHiddenFromComparison": "Κρυφό από τη σύγκριση",
   "settingsThroneTitle": "Webhook Throne",
   "settingsThroneDescription": "Επικολλήστε αυτό το URL στις ρυθμίσεις webhook του Throne.com για να λαμβάνετε ειδοποιήσεις στο Koda κάθε φορά που κάποιος σας στέλνει δώρο.",
   "settingsThroneGetUrl": "Λήψη του URL webhook μου",
@@ -861,6 +987,26 @@
   "calendarFallbackTitle": "Ημερολόγιο",
   "calendarAskVispTooltip": "Ερώτηση στον Visp",
   "calendarCreateEventTooltip": "Δημιουργία εκδήλωσης",
+
+  "calendarSyncTooltip": "Συγχρονισμός με την εφαρμογή ημερολογίου σας",
+
+  "calendarSyncDialogTitle": "Συγχρονισμός αυτού του ημερολογίου",
+
+  "calendarSyncDialogDescription": "Εγγραφείτε σε αυτή τη διεύθυνση URL από το Google Calendar, το Apple Calendar, το Outlook ή οποιαδήποτε εφαρμογή που υποστηρίζει \"εγγραφή μέσω URL\" για να δείτε τα συμβάντα αυτού του διακομιστή στο δικό σας ημερολόγιο. Μόνο για ανάγνωση, και περιλαμβάνει μόνο συμβάντα από κανάλια που μπορείτε να δείτε.",
+
+  "calendarSyncCopyTooltip": "Αντιγραφή URL",
+
+  "calendarSyncCopiedToast": "Το URL του ημερολογίου αντιγράφηκε.",
+
+  "calendarSyncRegenerateTooltip": "Δημιουργία νέου URL",
+
+  "calendarSyncRegenerate": "Δημιουργία νέου",
+
+  "calendarSyncRegenerateConfirmTitle": "Δημιουργία νέου URL ημερολογίου;",
+
+  "calendarSyncRegenerateConfirmBody": "Το παλιό URL θα σταματήσει να λειτουργεί αμέσως -- όπου το έχετε ήδη εγγραφεί θα χρειαστεί το νέο.",
+
+  "calendarSyncInstructions": "Google Calendar: Άλλα ημερολόγια > Από URL. Apple Calendar: Αρχείο > Νέα εγγραφή ημερολογίου. Outlook: Προσθήκη ημερολογίου > Εγγραφή από τον ιστό.",
   "calendarPreviousMonthTooltip": "Προηγούμενος μήνας",
   "calendarNextMonthTooltip": "Επόμενος μήνας",
   "calendarTodayButton": "Σήμερα",
@@ -1126,6 +1272,18 @@
   "settingsFoundersHallTitle": "Αίθουσα Ιδρυτών",
 
   "settingsFoundersHallSubtitle": "Δείτε ποιοι βοήθησαν να χτιστεί το Koda",
+
+
+  "settingsWikiTitle": "Βοήθεια & Wiki",
+
+
+  "settingsWikiSubtitle": "Περιηγηθείτε στη βάση γνώσεων του Koda",
+
+
+  "wikiScreenTitle": "Βοήθεια & Wiki",
+
+
+  "wikiScreenEmptyState": "Δεν υπάρχει τίποτα εδώ ακόμα.",
   "vispAvatarInDevelopment": "ΥΠΟ ΑΝΑΠΤΥΞΗ",
   "vispBoostAdvisorCouldNotAnswer": "Ο Visp δεν κατάφερε να συνθέσει μια απάντηση.",
   "vispBoostAdvisorTitle": "Ερώτηση στον Visp: Σύμβουλος ROI ενισχύσεων",

@@ -172,6 +172,13 @@ class AppLocalizationsHe extends AppLocalizations {
       'מחליף את טקסט הגוף ל-OpenDyslexic בכל האפליקציה';
 
   @override
+  String get settingsNewestAtTopTitle => 'הצג את ההודעות האחרונות למעלה';
+
+  @override
+  String get settingsNewestAtTopSubtitle =>
+      'חל על ערוצים, הודעות ישירות וצ׳אט ערוץ קולי כאחד';
+
+  @override
   String get settingsFontSizeTitle => 'גודל גופן';
 
   @override
@@ -241,6 +248,202 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settingsStreamingFinishInBrowser =>
       'סיימו את החיבור בדפדפן שלכם, ואז חזרו ורעננו.';
+
+  @override
+  String get settingsDeveloperPortalTitle => 'פורטל מפתחים';
+
+  @override
+  String get settingsDeveloperPortalSubtitle =>
+      'רשמו בוטים ואפליקציות המשתמשים ב-API של Koda';
+
+  @override
+  String get devPortalScreenTitle => 'פורטל מפתחים';
+
+  @override
+  String get devPortalNewAppTooltip => 'אפליקציה חדשה';
+
+  @override
+  String get devPortalEmptyState =>
+      'אין עדיין אפליקציות. צרו אחת כדי לקבל מפתח API לבוט שלכם.';
+
+  @override
+  String get devPortalNewAppTitle => 'אפליקציה חדשה';
+
+  @override
+  String get devPortalAppNameHint => 'שם האפליקציה';
+
+  @override
+  String get devPortalAppDescriptionHint => 'תיאור (אופציונלי)';
+
+  @override
+  String get devPortalBotUsernameHint => 'שם משתמש של הבוט';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      'הבוט שלכם מקבל רק את הפקודה והאפשרויות שמשתמש שולח אליו במפורש -- לעולם לא את היסטוריית ההודעות של ערוץ.';
+
+  @override
+  String get devPortalCreateError => 'לא ניתן היה ליצור את האפליקציה כרגע.';
+
+  @override
+  String get devPortalKeyRevealTitle => 'מפתח ה-API שלכם';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      'זו הפעם היחידה שבה מפתח זה יוצג. העתיקו אותו עכשיו -- Koda לא שומר אותו בצורה הניתנת לשחזור.';
+
+  @override
+  String get devPortalCopyKeyTooltip => 'העתק מפתח';
+
+  @override
+  String get devPortalKeyCopiedToast => 'מפתח ה-API הועתק.';
+
+  @override
+  String get devPortalKeySavedIt => 'שמרתי אותו';
+
+  @override
+  String get devPortalRegenerate => 'צור מחדש';
+
+  @override
+  String get devPortalRegenerateConfirmTitle => 'ליצור מפתח API חדש?';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      'המפתח הנוכחי יפסיק לעבוד מיידית -- כל מה שכבר משתמש בו יזדקק לחדש.';
+
+  @override
+  String get devPortalDeleteConfirmTitle => 'למחוק את האפליקציה הזו?';
+
+  @override
+  String get devPortalDeleteConfirmBody =>
+      'מפתח ה-API שלה יבוטל וחשבון הבוט יושבת. לא ניתן לבטל פעולה זו.';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2 (התחברות עם Koda)';
+
+  @override
+  String get devPortalNoRedirectUris => 'עדיין לא נרשמו כתובות הפניה.';
+
+  @override
+  String get devPortalEditRedirectUris => 'ערוך כתובות הפניה';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => 'כתובות הפניה';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      'אחת בכל שורה. ה-redirect_uri של בקשת הסכמה חייב להתאים בדיוק לאחת מהן.';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => 'צור סוד לקוח';
+
+  @override
+  String get devPortalRegenerateClientSecret => 'צור סוד לקוח מחדש';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return 'סוד הלקוח מסתיים ב-$lastFour';
+  }
+
+  @override
+  String get oauthConsentTitle => 'אשר אפליקציה';
+
+  @override
+  String get oauthConsentUnknownApp => 'לא ניתן למצוא אפליקציה זו.';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return 'לאפשר ל-$appName לגשת לחשבון Koda שלך?';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo => 'זה יאפשר לאפליקציה:';
+
+  @override
+  String get oauthConsentAllow => 'אפשר';
+
+  @override
+  String get oauthConsentDeny => 'דחה';
+
+  @override
+  String get oauthConsentError => 'לא ניתן להשלים -- נסה שוב.';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      'חברו את Steam כדי לשתף במה אתם משחקים כרגע ו/או להשוות ספריות משחקים עם חברים -- אלו שני מתגים עצמאיים, הפעלת אחד אינה מפעילה את השני.';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return 'Steam מחובר בשם $personaName';
+  }
+
+  @override
+  String get settingsSteamNotConnected => 'Steam לא מחובר';
+
+  @override
+  String get settingsSteamSharePresence => 'שתף במה אני משחק';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle =>
+      'חברים וחברי השרת רואים את המשחק הנוכחי שלך לצד הסטטוס שלך';
+
+  @override
+  String get settingsSteamShareLibrary => 'אפשר השוואת ספרייה';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      'חברים וחברי השרת יכולים להשוות את ספריית ה-Steam שלהם לשלך';
+
+  @override
+  String profilePlayingGame(String game) {
+    return 'משחק ב-$game';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => 'השוואת ספריות Steam';
+
+  @override
+  String get steamCompareScreenTitle => 'ספריית Steam משותפת';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return 'לשניכם יש $count משחקים';
+  }
+
+  @override
+  String get steamCompareEmptyState => 'אין עדיין משחקים משותפים.';
+
+  @override
+  String get steamCompareError => 'לא ניתן לטעון משחקים משותפים כרגע.';
+
+  @override
+  String get steamSyncNow => 'סנכרן עכשיו';
+
+  @override
+  String get steamSyncSuccess => 'ספריית Steam סונכרנה.';
+
+  @override
+  String get steamSyncError => 'לא ניתן לסנכרן כרגע -- נסה שוב בעוד רגע.';
+
+  @override
+  String get steamManageLibraryTitle => 'ניהול משחקים מסונכרנים';
+
+  @override
+  String get steamManageLibraryDescription =>
+      'משחקים שתסמן כמוסתרים כאן לעולם לא יופיעו בהשוואת ספריות, אפילו אם Steam עדיין רואה אותם כציבוריים.';
+
+  @override
+  String get steamManageLibraryEmptyState =>
+      'אין עדיין משחקים מסונכרנים -- נסה סנכרן עכשיו.';
+
+  @override
+  String get steamHiddenFromComparison => 'מוסתר מההשוואה';
 
   @override
   String get settingsThroneTitle => 'Webhook של Throne';
@@ -2923,6 +3126,40 @@ class AppLocalizationsHe extends AppLocalizations {
   String get calendarCreateEventTooltip => 'יצירת אירוע';
 
   @override
+  String get calendarSyncTooltip => 'סנכרן עם אפליקציית היומן שלך';
+
+  @override
+  String get calendarSyncDialogTitle => 'סנכרן יומן זה';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      'הירשם לכתובת URL זו מ-Google Calendar, Apple Calendar, Outlook או כל אפליקציה שתומכת ב\"הרשמה לפי URL\" כדי לראות את האירועים של שרת זה ביומן שלך. לקריאה בלבד, וכולל רק אירועים מערוצים שאתה יכול לראות.';
+
+  @override
+  String get calendarSyncCopyTooltip => 'העתק URL';
+
+  @override
+  String get calendarSyncCopiedToast => 'כתובת URL של היומן הועתקה.';
+
+  @override
+  String get calendarSyncRegenerateTooltip => 'צור URL חדש';
+
+  @override
+  String get calendarSyncRegenerate => 'צור חדש';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle =>
+      'ליצור כתובת URL חדשה ליומן?';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      'כתובת ה-URL הישנה תפסיק לעבוד מיידית -- בכל מקום שבו נרשמת אליה כבר, יהיה צורך בחדשה.';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google Calendar: יומנים אחרים > מ-URL. Apple Calendar: קובץ > הרשמה חדשה ליומן. Outlook: הוסף יומן > הירשם מהאינטרנט.';
+
+  @override
   String get calendarPreviousMonthTooltip => 'חודש קודם';
 
   @override
@@ -3852,6 +4089,18 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsFoundersHallSubtitle => 'ראה מי עזר לבנות את Koda';
+
+  @override
+  String get settingsWikiTitle => 'עזרה ו-Wiki';
+
+  @override
+  String get settingsWikiSubtitle => 'עיין במאגר הידע של Koda';
+
+  @override
+  String get wikiScreenTitle => 'עזרה ו-Wiki';
+
+  @override
+  String get wikiScreenEmptyState => 'אין כאן כלום עדיין.';
 
   @override
   String get vispAvatarInDevelopment => 'בפיתוח';

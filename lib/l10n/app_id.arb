@@ -55,6 +55,10 @@
   "settingsHighContrastSubtitle": "Warna hitam/putih murni berkontras tinggi di seluruh aplikasi -- beralih akan memuat ulang layar saat ini sebentar.",
   "settingsDyslexiaFontTitle": "Font ramah disleksia",
   "settingsDyslexiaFontSubtitle": "Mengganti teks isi ke OpenDyslexic di seluruh aplikasi",
+
+  "settingsNewestAtTopTitle": "Tampilkan Pesan Terbaru di Atas",
+
+  "settingsNewestAtTopSubtitle": "Berlaku untuk saluran, DM, dan obrolan saluran suara",
   "settingsFontSizeTitle": "Ukuran font",
   "settingsFontSizeSample": "Rubah cerdik melompati anjing yang malas",
   "settingsDensityTitle": "Kepadatan",
@@ -75,6 +79,128 @@
   "settingsRefreshStatus": "Sudah terhubung di browser Anda? Segarkan status",
   "settingsStreamingConnectError": "Tidak dapat memulai koneksi {platform}.",
   "settingsStreamingFinishInBrowser": "Selesaikan koneksi di browser Anda, lalu kembali dan segarkan.",
+
+  "settingsDeveloperPortalTitle": "Portal Pengembang",
+
+  "settingsDeveloperPortalSubtitle": "Daftarkan bot dan aplikasi yang menggunakan API Koda",
+
+  "devPortalScreenTitle": "Portal Pengembang",
+
+  "devPortalNewAppTooltip": "Aplikasi Baru",
+
+  "devPortalEmptyState": "Belum ada aplikasi. Buat satu untuk mendapatkan kunci API bagi bot Anda.",
+
+  "devPortalNewAppTitle": "Aplikasi Baru",
+
+  "devPortalAppNameHint": "Nama aplikasi",
+
+  "devPortalAppDescriptionHint": "Deskripsi (opsional)",
+
+  "devPortalBotUsernameHint": "Nama pengguna bot",
+
+  "devPortalInteractionDataOnlyNote": "Bot Anda hanya menerima perintah dan opsi yang secara eksplisit dikirim pengguna kepadanya -- tidak pernah riwayat pesan saluran.",
+
+  "devPortalCreateError": "Tidak dapat membuat aplikasi ini sekarang.",
+
+  "devPortalKeyRevealTitle": "Kunci API Anda",
+
+  "devPortalKeyRevealWarning": "Ini satu-satunya saat kunci ini akan ditampilkan. Salin sekarang -- Koda tidak menyimpannya dalam bentuk yang dapat dipulihkan.",
+
+  "devPortalCopyKeyTooltip": "Salin kunci",
+
+  "devPortalKeyCopiedToast": "Kunci API disalin.",
+
+  "devPortalKeySavedIt": "Sudah saya simpan",
+
+  "devPortalRegenerate": "Buat Ulang",
+
+  "devPortalRegenerateConfirmTitle": "Buat ulang kunci API?",
+
+  "devPortalRegenerateConfirmBody": "Kunci saat ini akan langsung berhenti berfungsi -- apa pun yang sudah menggunakannya akan memerlukan yang baru.",
+
+  "devPortalDeleteConfirmTitle": "Hapus aplikasi ini?",
+
+  "devPortalDeleteConfirmBody": "Kunci API-nya akan dicabut dan akun bot dinonaktifkan. Ini tidak dapat dibatalkan.",
+
+  "devPortalOAuthSectionTitle": "OAuth2 (Masuk dengan Koda)",
+
+  "devPortalNoRedirectUris": "Belum ada redirect URI yang terdaftar.",
+
+  "devPortalEditRedirectUris": "Edit redirect URI",
+
+  "devPortalEditRedirectUrisTitle": "Redirect URI",
+
+  "devPortalRedirectUrisHelp": "Satu per baris. redirect_uri permintaan izin harus cocok persis dengan salah satu ini.",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "Buat client secret",
+
+  "devPortalRegenerateClientSecret": "Buat ulang client secret",
+
+  "devPortalClientSecretEndingIn": "Client secret berakhiran {lastFour}",
+
+  "oauthConsentTitle": "Otorisasi Aplikasi",
+
+  "oauthConsentUnknownApp": "Aplikasi ini tidak dapat ditemukan.",
+
+  "oauthConsentAllowQuestion": "Izinkan {appName} mengakses akun Koda Anda?",
+
+  "oauthConsentWillBeAbleTo": "Ini akan memungkinkan aplikasi untuk:",
+
+  "oauthConsentAllow": "Izinkan",
+
+  "oauthConsentDeny": "Tolak",
+
+  "oauthConsentError": "Tidak dapat menyelesaikannya -- coba lagi.",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "Hubungkan Steam untuk membagikan apa yang sedang kamu mainkan dan/atau membandingkan pustaka game dengan teman -- ini dua sakelar independen, mengaktifkan satu tidak pernah mengaktifkan yang lain.",
+
+  "settingsSteamConnected": "Steam terhubung sebagai {personaName}",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "Steam tidak terhubung",
+
+  "settingsSteamSharePresence": "Bagikan apa yang saya mainkan",
+
+  "settingsSteamSharePresenceSubtitle": "Teman dan anggota server melihat game yang sedang kamu mainkan di samping statusmu",
+
+  "settingsSteamShareLibrary": "Izinkan perbandingan pustaka",
+
+  "settingsSteamShareLibrarySubtitle": "Teman dan anggota server dapat membandingkan pustaka Steam mereka dengan milikmu",
+
+  "profilePlayingGame": "Memainkan {game}",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "Bandingkan Pustaka Steam",
+
+  "steamCompareScreenTitle": "Pustaka Steam Bersama",
+
+  "steamCompareSharedCount": "Kalian berdua punya {count} game",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "Belum ada game yang sama.",
+
+  "steamCompareError": "Tidak dapat memuat game bersama saat ini.",
+
+  "steamSyncNow": "Sinkronkan Sekarang",
+
+  "steamSyncSuccess": "Pustaka Steam disinkronkan.",
+
+  "steamSyncError": "Tidak dapat menyinkronkan sekarang -- coba lagi sebentar.",
+
+  "steamManageLibraryTitle": "Kelola game yang disinkronkan",
+
+  "steamManageLibraryDescription": "Game yang kamu tandai tersembunyi di sini tidak akan pernah muncul di perbandingan pustaka, bahkan jika Steam masih menganggapnya publik.",
+
+  "steamManageLibraryEmptyState": "Belum ada game yang disinkronkan -- coba Sinkronkan Sekarang.",
+
+  "steamHiddenFromComparison": "Disembunyikan dari perbandingan",
   "settingsThroneTitle": "Webhook Throne",
   "settingsThroneDescription": "Tempel URL ini ke pengaturan webhook Throne.com Anda untuk mendapat notifikasi di Koda setiap kali seseorang mengirimi Anda hadiah.",
   "settingsThroneGetUrl": "Dapatkan URL webhook saya",
@@ -861,6 +987,26 @@
   "calendarFallbackTitle": "Kalender",
   "calendarAskVispTooltip": "Tanya Visp",
   "calendarCreateEventTooltip": "Buat Acara",
+
+  "calendarSyncTooltip": "Sinkronkan dengan aplikasi kalender Anda",
+
+  "calendarSyncDialogTitle": "Sinkronkan kalender ini",
+
+  "calendarSyncDialogDescription": "Berlangganan URL ini dari Google Calendar, Apple Calendar, Outlook, atau aplikasi apa pun yang mendukung \"berlangganan lewat URL\" untuk melihat acara server ini di kalender Anda sendiri. Hanya baca, dan hanya mencakup acara dari channel yang dapat Anda lihat.",
+
+  "calendarSyncCopyTooltip": "Salin URL",
+
+  "calendarSyncCopiedToast": "URL kalender disalin.",
+
+  "calendarSyncRegenerateTooltip": "Buat ulang URL",
+
+  "calendarSyncRegenerate": "Buat Ulang",
+
+  "calendarSyncRegenerateConfirmTitle": "Buat ulang URL kalender?",
+
+  "calendarSyncRegenerateConfirmBody": "URL lama akan langsung berhenti berfungsi -- di mana pun Anda sudah berlangganan, Anda perlu URL yang baru.",
+
+  "calendarSyncInstructions": "Google Calendar: Kalender lain > Dari URL. Apple Calendar: File > Langganan Kalender Baru. Outlook: Tambah kalender > Berlangganan dari web.",
   "calendarPreviousMonthTooltip": "Bulan sebelumnya",
   "calendarNextMonthTooltip": "Bulan berikutnya",
   "calendarTodayButton": "Hari Ini",
@@ -1126,6 +1272,18 @@
   "settingsFoundersHallTitle": "Founders Hall",
 
   "settingsFoundersHallSubtitle": "Lihat siapa yang membantu membangun Koda",
+
+
+  "settingsWikiTitle": "Bantuan & Wiki",
+
+
+  "settingsWikiSubtitle": "Jelajahi basis pengetahuan Koda",
+
+
+  "wikiScreenTitle": "Bantuan & Wiki",
+
+
+  "wikiScreenEmptyState": "Belum ada apa-apa di sini.",
   "vispAvatarInDevelopment": "DALAM PENGEMBANGAN",
   "vispBoostAdvisorCouldNotAnswer": "Visp tidak dapat menyusun jawaban.",
   "vispBoostAdvisorTitle": "Tanya Visp: Penasihat ROI Boost",

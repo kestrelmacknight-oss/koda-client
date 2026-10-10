@@ -15,6 +15,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'core/accessibility_prefs.dart';
 import 'core/background_sync.dart';
 import 'core/language_prefs.dart';
+import 'core/message_order_prefs.dart';
 import 'core/language_options.dart';
 import 'core/api.dart';
 import 'l10n/generated/app_localizations.dart';
@@ -293,9 +294,11 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       if (!hadUser && hasUser) {
         ref.read(accessibilityPrefsProvider.notifier).load();
         ref.read(languagePrefsProvider.notifier).load();
+        ref.read(messageOrderPrefsProvider.notifier).load();
       } else if (hadUser && !hasUser) {
         ref.read(accessibilityPrefsProvider.notifier).reset();
         ref.read(languagePrefsProvider.notifier).reset();
+        ref.read(messageOrderPrefsProvider.notifier).reset();
       }
     });
     final auth = ref.watch(authProvider);

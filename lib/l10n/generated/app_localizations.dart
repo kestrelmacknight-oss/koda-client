@@ -453,6 +453,18 @@ abstract class AppLocalizations {
   /// **'Switches body text to OpenDyslexic app-wide'**
   String get settingsDyslexiaFontSubtitle;
 
+  /// No description provided for @settingsNewestAtTopTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Newest Messages at the Top'**
+  String get settingsNewestAtTopTitle;
+
+  /// No description provided for @settingsNewestAtTopSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Applies to channels, DMs, and voice-channel chat alike'**
+  String get settingsNewestAtTopSubtitle;
+
   /// No description provided for @settingsFontSizeTitle.
   ///
   /// In en, this message translates to:
@@ -573,6 +585,354 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Finish connecting in your browser, then come back and refresh.'**
   String get settingsStreamingFinishInBrowser;
+
+  /// No description provided for @settingsDeveloperPortalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer Portal'**
+  String get settingsDeveloperPortalTitle;
+
+  /// No description provided for @settingsDeveloperPortalSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Register bots and apps that use the Koda API'**
+  String get settingsDeveloperPortalSubtitle;
+
+  /// No description provided for @devPortalScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer Portal'**
+  String get devPortalScreenTitle;
+
+  /// No description provided for @devPortalNewAppTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'New Application'**
+  String get devPortalNewAppTooltip;
+
+  /// No description provided for @devPortalEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No applications yet. Create one to get an API key for your bot.'**
+  String get devPortalEmptyState;
+
+  /// No description provided for @devPortalNewAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Application'**
+  String get devPortalNewAppTitle;
+
+  /// No description provided for @devPortalAppNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'App name'**
+  String get devPortalAppNameHint;
+
+  /// No description provided for @devPortalAppDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get devPortalAppDescriptionHint;
+
+  /// No description provided for @devPortalBotUsernameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Bot username'**
+  String get devPortalBotUsernameHint;
+
+  /// No description provided for @devPortalInteractionDataOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your bot only ever receives the command and options a user explicitly submits to it -- never a channel\'s message history.'**
+  String get devPortalInteractionDataOnlyNote;
+
+  /// No description provided for @devPortalCreateError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t create that application right now.'**
+  String get devPortalCreateError;
+
+  /// No description provided for @devPortalKeyRevealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your API key'**
+  String get devPortalKeyRevealTitle;
+
+  /// No description provided for @devPortalKeyRevealWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the only time this key will be shown. Copy it now -- Koda doesn\'t store it in a recoverable form.'**
+  String get devPortalKeyRevealWarning;
+
+  /// No description provided for @devPortalCopyKeyTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy key'**
+  String get devPortalCopyKeyTooltip;
+
+  /// No description provided for @devPortalKeyCopiedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'API key copied.'**
+  String get devPortalKeyCopiedToast;
+
+  /// No description provided for @devPortalKeySavedIt.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ve saved it'**
+  String get devPortalKeySavedIt;
+
+  /// No description provided for @devPortalRegenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate'**
+  String get devPortalRegenerate;
+
+  /// No description provided for @devPortalRegenerateConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate API key?'**
+  String get devPortalRegenerateConfirmTitle;
+
+  /// No description provided for @devPortalRegenerateConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The current key will stop working immediately -- anything already using it will need the new one.'**
+  String get devPortalRegenerateConfirmBody;
+
+  /// No description provided for @devPortalDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this application?'**
+  String get devPortalDeleteConfirmTitle;
+
+  /// No description provided for @devPortalDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Its API key will be revoked and its bot account deactivated. This can\'t be undone.'**
+  String get devPortalDeleteConfirmBody;
+
+  /// No description provided for @devPortalOAuthSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'OAuth2 (Login with Koda)'**
+  String get devPortalOAuthSectionTitle;
+
+  /// No description provided for @devPortalNoRedirectUris.
+  ///
+  /// In en, this message translates to:
+  /// **'No redirect URIs registered yet.'**
+  String get devPortalNoRedirectUris;
+
+  /// No description provided for @devPortalEditRedirectUris.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit redirect URIs'**
+  String get devPortalEditRedirectUris;
+
+  /// No description provided for @devPortalEditRedirectUrisTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Redirect URIs'**
+  String get devPortalEditRedirectUrisTitle;
+
+  /// No description provided for @devPortalRedirectUrisHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'One per line. A consent request\'s redirect_uri must match one of these exactly.'**
+  String get devPortalRedirectUrisHelp;
+
+  /// No description provided for @devPortalRedirectUrisHint.
+  ///
+  /// In en, this message translates to:
+  /// **'https://example.com/callback'**
+  String get devPortalRedirectUrisHint;
+
+  /// No description provided for @devPortalGenerateClientSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate client secret'**
+  String get devPortalGenerateClientSecret;
+
+  /// No description provided for @devPortalRegenerateClientSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate client secret'**
+  String get devPortalRegenerateClientSecret;
+
+  /// No description provided for @devPortalClientSecretEndingIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Client secret ending in {lastFour}'**
+  String devPortalClientSecretEndingIn(String lastFour);
+
+  /// No description provided for @oauthConsentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Authorize Application'**
+  String get oauthConsentTitle;
+
+  /// No description provided for @oauthConsentUnknownApp.
+  ///
+  /// In en, this message translates to:
+  /// **'This application couldn\'t be found.'**
+  String get oauthConsentUnknownApp;
+
+  /// No description provided for @oauthConsentAllowQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow {appName} to access your Koda account?'**
+  String oauthConsentAllowQuestion(String appName);
+
+  /// No description provided for @oauthConsentWillBeAbleTo.
+  ///
+  /// In en, this message translates to:
+  /// **'This will let the app:'**
+  String get oauthConsentWillBeAbleTo;
+
+  /// No description provided for @oauthConsentAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get oauthConsentAllow;
+
+  /// No description provided for @oauthConsentDeny.
+  ///
+  /// In en, this message translates to:
+  /// **'Deny'**
+  String get oauthConsentDeny;
+
+  /// No description provided for @oauthConsentError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t complete that -- try again.'**
+  String get oauthConsentError;
+
+  /// No description provided for @settingsSteamTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Steam'**
+  String get settingsSteamTitle;
+
+  /// No description provided for @settingsSteamDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect Steam to share what you\'re playing and/or compare game libraries with friends -- these are two separate switches, turning one on never turns on the other.'**
+  String get settingsSteamDescription;
+
+  /// No description provided for @settingsSteamConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Steam connected as {personaName}'**
+  String settingsSteamConnected(String personaName);
+
+  /// No description provided for @settingsSteamNotConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Steam not connected'**
+  String get settingsSteamNotConnected;
+
+  /// No description provided for @settingsSteamSharePresence.
+  ///
+  /// In en, this message translates to:
+  /// **'Share what I\'m playing'**
+  String get settingsSteamSharePresence;
+
+  /// No description provided for @settingsSteamSharePresenceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends and server members see your current game next to your status'**
+  String get settingsSteamSharePresenceSubtitle;
+
+  /// No description provided for @settingsSteamShareLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow library comparison'**
+  String get settingsSteamShareLibrary;
+
+  /// No description provided for @settingsSteamShareLibrarySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends and server members can compare their Steam library with yours'**
+  String get settingsSteamShareLibrarySubtitle;
+
+  /// No description provided for @profilePlayingGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Playing {game}'**
+  String profilePlayingGame(String game);
+
+  /// No description provided for @profileCompareSteamLibraries.
+  ///
+  /// In en, this message translates to:
+  /// **'Compare Steam Libraries'**
+  String get profileCompareSteamLibraries;
+
+  /// No description provided for @steamCompareScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared Steam Library'**
+  String get steamCompareScreenTitle;
+
+  /// No description provided for @steamCompareSharedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'You both own {count} games'**
+  String steamCompareSharedCount(int count);
+
+  /// No description provided for @steamCompareEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No games in common yet.'**
+  String get steamCompareEmptyState;
+
+  /// No description provided for @steamCompareError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load shared games right now.'**
+  String get steamCompareError;
+
+  /// No description provided for @steamSyncNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Now'**
+  String get steamSyncNow;
+
+  /// No description provided for @steamSyncSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Steam library synced.'**
+  String get steamSyncSuccess;
+
+  /// No description provided for @steamSyncError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t sync right now -- try again in a bit.'**
+  String get steamSyncError;
+
+  /// No description provided for @steamManageLibraryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage synced games'**
+  String get steamManageLibraryTitle;
+
+  /// No description provided for @steamManageLibraryDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Games you mark hidden here never show up in a library comparison, even for games Steam itself still considers public.'**
+  String get steamManageLibraryDescription;
+
+  /// No description provided for @steamManageLibraryEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No synced games yet -- try Sync Now.'**
+  String get steamManageLibraryEmptyState;
+
+  /// No description provided for @steamHiddenFromComparison.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden from comparison'**
+  String get steamHiddenFromComparison;
 
   /// No description provided for @settingsThroneTitle.
   ///
@@ -5141,6 +5501,66 @@ abstract class AppLocalizations {
   /// **'Create Event'**
   String get calendarCreateEventTooltip;
 
+  /// No description provided for @calendarSyncTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync to your calendar app'**
+  String get calendarSyncTooltip;
+
+  /// No description provided for @calendarSyncDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync This Calendar'**
+  String get calendarSyncDialogTitle;
+
+  /// No description provided for @calendarSyncDialogDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe to this URL from Google Calendar, Apple Calendar, Outlook, or any app that supports \"subscribe by URL\" to see this server\'s events in your own calendar. Read-only, and it only includes events from channels you can see.'**
+  String get calendarSyncDialogDescription;
+
+  /// No description provided for @calendarSyncCopyTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy URL'**
+  String get calendarSyncCopyTooltip;
+
+  /// No description provided for @calendarSyncCopiedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar URL copied.'**
+  String get calendarSyncCopiedToast;
+
+  /// No description provided for @calendarSyncRegenerateTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate URL'**
+  String get calendarSyncRegenerateTooltip;
+
+  /// No description provided for @calendarSyncRegenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate'**
+  String get calendarSyncRegenerate;
+
+  /// No description provided for @calendarSyncRegenerateConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate calendar URL?'**
+  String get calendarSyncRegenerateConfirmTitle;
+
+  /// No description provided for @calendarSyncRegenerateConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The old URL will stop working immediately -- anywhere you\'ve already subscribed to it will need the new one.'**
+  String get calendarSyncRegenerateConfirmBody;
+
+  /// No description provided for @calendarSyncInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Calendar: Other calendars > From URL. Apple Calendar: File > New Calendar Subscription. Outlook: Add calendar > Subscribe from web.'**
+  String get calendarSyncInstructions;
+
   /// No description provided for @calendarPreviousMonthTooltip.
   ///
   /// In en, this message translates to:
@@ -6701,6 +7121,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'See who helped build Koda'**
   String get settingsFoundersHallSubtitle;
+
+  /// No description provided for @settingsWikiTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & Wiki'**
+  String get settingsWikiTitle;
+
+  /// No description provided for @settingsWikiSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse Koda\'s knowledge base'**
+  String get settingsWikiSubtitle;
+
+  /// No description provided for @wikiScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & Wiki'**
+  String get wikiScreenTitle;
+
+  /// No description provided for @wikiScreenEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here yet.'**
+  String get wikiScreenEmptyState;
 
   /// No description provided for @vispAvatarInDevelopment.
   ///

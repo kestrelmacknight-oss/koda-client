@@ -173,6 +173,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Verandert de hoofdtekst naar OpenDyslexic in de hele app';
 
   @override
+  String get settingsNewestAtTopTitle => 'Nieuwste berichten bovenaan tonen';
+
+  @override
+  String get settingsNewestAtTopSubtitle =>
+      'Geldt voor kanalen, DM\'s en voice-kanaalchat';
+
+  @override
   String get settingsFontSizeTitle => 'Tekstgrootte';
 
   @override
@@ -244,6 +251,207 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settingsStreamingFinishInBrowser =>
       'Rond het verbinden af in je browser en kom dan terug om te vernieuwen.';
+
+  @override
+  String get settingsDeveloperPortalTitle => 'Ontwikkelaarsportaal';
+
+  @override
+  String get settingsDeveloperPortalSubtitle =>
+      'Registreer bots en apps die de Koda API gebruiken';
+
+  @override
+  String get devPortalScreenTitle => 'Ontwikkelaarsportaal';
+
+  @override
+  String get devPortalNewAppTooltip => 'Nieuwe app';
+
+  @override
+  String get devPortalEmptyState =>
+      'Nog geen apps. Maak er een om een API-sleutel voor je bot te krijgen.';
+
+  @override
+  String get devPortalNewAppTitle => 'Nieuwe app';
+
+  @override
+  String get devPortalAppNameHint => 'App-naam';
+
+  @override
+  String get devPortalAppDescriptionHint => 'Beschrijving (optioneel)';
+
+  @override
+  String get devPortalBotUsernameHint => 'Bot-gebruikersnaam';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      'Je bot ontvangt alleen het commando en de opties die een gebruiker er expliciet naartoe stuurt -- nooit de berichtgeschiedenis van een kanaal.';
+
+  @override
+  String get devPortalCreateError => 'Kon deze app nu niet maken.';
+
+  @override
+  String get devPortalKeyRevealTitle => 'Je API-sleutel';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      'Dit is de enige keer dat deze sleutel wordt getoond. Kopieer hem nu -- Koda bewaart hem niet in herstelbare vorm.';
+
+  @override
+  String get devPortalCopyKeyTooltip => 'Sleutel kopiëren';
+
+  @override
+  String get devPortalKeyCopiedToast => 'API-sleutel gekopieerd.';
+
+  @override
+  String get devPortalKeySavedIt => 'Ik heb het opgeslagen';
+
+  @override
+  String get devPortalRegenerate => 'Opnieuw genereren';
+
+  @override
+  String get devPortalRegenerateConfirmTitle =>
+      'API-sleutel opnieuw genereren?';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      'De huidige sleutel werkt direct niet meer -- alles wat hem al gebruikt heeft de nieuwe nodig.';
+
+  @override
+  String get devPortalDeleteConfirmTitle => 'Deze app verwijderen?';
+
+  @override
+  String get devPortalDeleteConfirmBody =>
+      'De API-sleutel wordt ingetrokken en het bot-account gedeactiveerd. Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2 (Inloggen met Koda)';
+
+  @override
+  String get devPortalNoRedirectUris =>
+      'Nog geen redirect-URI\'s geregistreerd.';
+
+  @override
+  String get devPortalEditRedirectUris => 'Redirect-URI\'s bewerken';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => 'Redirect-URI\'s';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      'Eén per regel. De redirect_uri van een toestemmingsverzoek moet exact overeenkomen met één hiervan.';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => 'Clientgeheim genereren';
+
+  @override
+  String get devPortalRegenerateClientSecret =>
+      'Clientgeheim opnieuw genereren';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return 'Clientgeheim eindigend op $lastFour';
+  }
+
+  @override
+  String get oauthConsentTitle => 'Applicatie autoriseren';
+
+  @override
+  String get oauthConsentUnknownApp => 'Deze applicatie is niet gevonden.';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return '$appName toegang geven tot je Koda-account?';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo => 'Dit geeft de app toestemming om:';
+
+  @override
+  String get oauthConsentAllow => 'Toestaan';
+
+  @override
+  String get oauthConsentDeny => 'Weigeren';
+
+  @override
+  String get oauthConsentError =>
+      'Kon dit niet voltooien -- probeer het opnieuw.';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      'Koppel Steam om te delen wat je speelt en/of gamebibliotheken met vrienden te vergelijken -- dit zijn twee onafhankelijke schakelaars, de ene inschakelen schakelt de andere nooit automatisch in.';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return 'Steam verbonden als $personaName';
+  }
+
+  @override
+  String get settingsSteamNotConnected => 'Steam niet verbonden';
+
+  @override
+  String get settingsSteamSharePresence => 'Delen wat ik speel';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle =>
+      'Vrienden en serverleden zien je huidige game naast je status';
+
+  @override
+  String get settingsSteamShareLibrary => 'Bibliotheekvergelijking toestaan';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      'Vrienden en serverleden kunnen hun Steam-bibliotheek met die van jou vergelijken';
+
+  @override
+  String profilePlayingGame(String game) {
+    return 'Speelt $game';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => 'Steam-bibliotheken vergelijken';
+
+  @override
+  String get steamCompareScreenTitle => 'Gedeelde Steam-bibliotheek';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return 'Jullie hebben beide $count games';
+  }
+
+  @override
+  String get steamCompareEmptyState => 'Nog geen gedeelde games.';
+
+  @override
+  String get steamCompareError => 'Kan gedeelde games nu niet laden.';
+
+  @override
+  String get steamSyncNow => 'Nu synchroniseren';
+
+  @override
+  String get steamSyncSuccess => 'Steam-bibliotheek gesynchroniseerd.';
+
+  @override
+  String get steamSyncError =>
+      'Kon nu niet synchroniseren -- probeer het straks opnieuw.';
+
+  @override
+  String get steamManageLibraryTitle => 'Gesynchroniseerde games beheren';
+
+  @override
+  String get steamManageLibraryDescription =>
+      'Games die je hier als verborgen markeert, verschijnen nooit in een bibliotheekvergelijking, ook als Steam ze nog als openbaar beschouwt.';
+
+  @override
+  String get steamManageLibraryEmptyState =>
+      'Nog geen gesynchroniseerde games -- probeer Nu synchroniseren.';
+
+  @override
+  String get steamHiddenFromComparison => 'Verborgen voor vergelijking';
 
   @override
   String get settingsThroneTitle => 'Throne-webhook';
@@ -2940,6 +3148,40 @@ class AppLocalizationsNl extends AppLocalizations {
   String get calendarCreateEventTooltip => 'Evenement aanmaken';
 
   @override
+  String get calendarSyncTooltip => 'Synchroniseren met je agenda-app';
+
+  @override
+  String get calendarSyncDialogTitle => 'Deze agenda synchroniseren';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      'Abonneer je op deze URL vanuit Google Agenda, Apple Agenda, Outlook of een app die \"abonneren via URL\" ondersteunt om de evenementen van deze server in je eigen agenda te zien. Alleen-lezen, en bevat alleen evenementen van kanalen die je kunt zien.';
+
+  @override
+  String get calendarSyncCopyTooltip => 'URL kopiëren';
+
+  @override
+  String get calendarSyncCopiedToast => 'Agenda-URL gekopieerd.';
+
+  @override
+  String get calendarSyncRegenerateTooltip => 'URL opnieuw genereren';
+
+  @override
+  String get calendarSyncRegenerate => 'Opnieuw genereren';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle =>
+      'Agenda-URL opnieuw genereren?';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      'De oude URL werkt direct niet meer -- overal waar je je al hebt geabonneerd is de nieuwe nodig.';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google Agenda: Andere agenda\'s > Via URL. Apple Agenda: Archief > Nieuw agenda-abonnement. Outlook: Agenda toevoegen > Abonneren vanaf internet.';
+
+  @override
   String get calendarPreviousMonthTooltip => 'Vorige maand';
 
   @override
@@ -3866,6 +4108,18 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settingsFoundersHallSubtitle =>
       'Bekijk wie heeft meegeholpen aan Koda';
+
+  @override
+  String get settingsWikiTitle => 'Help & Wiki';
+
+  @override
+  String get settingsWikiSubtitle => 'Blader door Koda\'s kennisbank';
+
+  @override
+  String get wikiScreenTitle => 'Help & Wiki';
+
+  @override
+  String get wikiScreenEmptyState => 'Hier is nog niets.';
 
   @override
   String get vispAvatarInDevelopment => 'IN ONTWIKKELING';

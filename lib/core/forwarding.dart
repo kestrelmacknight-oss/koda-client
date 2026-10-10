@@ -82,6 +82,7 @@ Future<bool> forwardMessageToDm({
   required String peerUserId,
   required String text,
   EncryptedAttachmentMeta? originalAttachment,
+  Map<String, dynamic>? gifAttachment,
   required ForwardedFrom forwardedFrom,
   required String myUserId,
 }) async {
@@ -92,7 +93,18 @@ Future<bool> forwardMessageToDm({
     return false;
   }
 
-  final payload = encodeDmPayload(text, attachment: attachment, forwardedFrom: forwardedFrom);
+  // DMs have no plaintext-attachment field the way channels do (GIFs
+  // ride a public CDN URL, never encrypted -- see channel_chat_panel.dart's
+  // _pickGif) and no DM compose path ever grew one (confirmed: no GIF
+  // picker exists in dm_screen.dart). Rather than silently dropping a
+  // forwarded GIF -- which forwardMessageToChannel's gifAttachment
+  // param exists specifically to avoid -- fold its URL into the text
+  // itself, a graceful degradation to "here's a link" instead of an
+  // inline image.
+  final gifUrl = gifAttachment?['url'] as String?;
+  final textWithGif = gifUrl == null ? text : (text.isEmpty ? gifUrl : '$text\n$gifUrl');
+
+  final payload = encodeDmPayload(textWithGif, attachment: attachment, forwardedFrom: forwardedFrom);
   final fanOut = await DmSessionManager.instance.encryptForSend(
     conversationId: conversationId,
     peerUserId: peerUserId,

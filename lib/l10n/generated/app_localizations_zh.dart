@@ -167,6 +167,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsDyslexiaFontSubtitle => '将应用内正文文本切换为 OpenDyslexic 字体';
 
   @override
+  String get settingsNewestAtTopTitle => '在顶部显示最新消息';
+
+  @override
+  String get settingsNewestAtTopSubtitle => '同样适用于频道、私信和语音频道聊天';
+
+  @override
   String get settingsFontSizeTitle => '字体大小';
 
   @override
@@ -233,6 +239,197 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsStreamingFinishInBrowser => '请在浏览器中完成连接，然后返回并刷新。';
+
+  @override
+  String get settingsDeveloperPortalTitle => '开发者门户';
+
+  @override
+  String get settingsDeveloperPortalSubtitle => '注册使用 Koda API 的机器人和应用';
+
+  @override
+  String get devPortalScreenTitle => '开发者门户';
+
+  @override
+  String get devPortalNewAppTooltip => '新建应用';
+
+  @override
+  String get devPortalEmptyState => '还没有应用。创建一个即可获取你的机器人的 API 密钥。';
+
+  @override
+  String get devPortalNewAppTitle => '新建应用';
+
+  @override
+  String get devPortalAppNameHint => '应用名称';
+
+  @override
+  String get devPortalAppDescriptionHint => '描述（可选）';
+
+  @override
+  String get devPortalBotUsernameHint => '机器人用户名';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      '你的机器人只会收到用户明确提交给它的命令和选项 -- 绝不会收到频道的消息历史记录。';
+
+  @override
+  String get devPortalCreateError => '目前无法创建此应用。';
+
+  @override
+  String get devPortalKeyRevealTitle => '你的 API 密钥';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      '此密钥仅显示这一次。请立即复制 -- Koda 不会以可恢复的形式存储它。';
+
+  @override
+  String get devPortalCopyKeyTooltip => '复制密钥';
+
+  @override
+  String get devPortalKeyCopiedToast => 'API 密钥已复制。';
+
+  @override
+  String get devPortalKeySavedIt => '我已保存';
+
+  @override
+  String get devPortalRegenerate => '重新生成';
+
+  @override
+  String get devPortalRegenerateConfirmTitle => '重新生成 API 密钥？';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      '当前密钥将立即失效 -- 任何已在使用它的地方都需要换成新密钥。';
+
+  @override
+  String get devPortalDeleteConfirmTitle => '删除此应用？';
+
+  @override
+  String get devPortalDeleteConfirmBody => '其 API 密钥将被吊销，机器人账户将被停用。此操作无法撤销。';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2（使用 Koda 登录）';
+
+  @override
+  String get devPortalNoRedirectUris => '尚未注册重定向 URI。';
+
+  @override
+  String get devPortalEditRedirectUris => '编辑重定向 URI';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => '重定向 URI';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      '每行一个。授权请求的 redirect_uri 必须与其中一个完全匹配。';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => '生成客户端密钥';
+
+  @override
+  String get devPortalRegenerateClientSecret => '重新生成客户端密钥';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return '客户端密钥以 $lastFour 结尾';
+  }
+
+  @override
+  String get oauthConsentTitle => '授权应用';
+
+  @override
+  String get oauthConsentUnknownApp => '找不到此应用。';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return '允许 $appName 访问你的 Koda 账户吗？';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo => '这将允许该应用：';
+
+  @override
+  String get oauthConsentAllow => '允许';
+
+  @override
+  String get oauthConsentDeny => '拒绝';
+
+  @override
+  String get oauthConsentError => '无法完成 -- 请重试。';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      '连接 Steam 即可分享你正在玩的游戏，和/或与好友比较游戏库 -- 这是两个独立的开关，开启一个绝不会自动开启另一个。';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return '已以 $personaName 身份连接 Steam';
+  }
+
+  @override
+  String get settingsSteamNotConnected => '未连接 Steam';
+
+  @override
+  String get settingsSteamSharePresence => '分享我正在玩的游戏';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle => '好友和服务器成员会在你的状态旁看到你当前的游戏';
+
+  @override
+  String get settingsSteamShareLibrary => '允许游戏库比较';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      '好友和服务器成员可以将他们的 Steam 游戏库与你的进行比较';
+
+  @override
+  String profilePlayingGame(String game) {
+    return '正在玩 $game';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => '比较 Steam 游戏库';
+
+  @override
+  String get steamCompareScreenTitle => '共同的 Steam 游戏库';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return '你们都拥有 $count 款游戏';
+  }
+
+  @override
+  String get steamCompareEmptyState => '暂无共同游戏。';
+
+  @override
+  String get steamCompareError => '目前无法加载共同游戏。';
+
+  @override
+  String get steamSyncNow => '立即同步';
+
+  @override
+  String get steamSyncSuccess => 'Steam 游戏库已同步。';
+
+  @override
+  String get steamSyncError => '目前无法同步 -- 请稍后重试。';
+
+  @override
+  String get steamManageLibraryTitle => '管理已同步的游戏';
+
+  @override
+  String get steamManageLibraryDescription =>
+      '你在此标记为隐藏的游戏绝不会出现在游戏库比较中，即使 Steam 仍将其视为公开。';
+
+  @override
+  String get steamManageLibraryEmptyState => '尚无已同步的游戏 -- 试试立即同步。';
+
+  @override
+  String get steamHiddenFromComparison => '已从比较中隐藏';
 
   @override
   String get settingsThroneTitle => 'Throne Webhook';
@@ -2812,6 +3009,39 @@ class AppLocalizationsZh extends AppLocalizations {
   String get calendarCreateEventTooltip => '创建活动';
 
   @override
+  String get calendarSyncTooltip => '与你的日历应用同步';
+
+  @override
+  String get calendarSyncDialogTitle => '同步此日历';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      '在 Google 日历、Apple 日历、Outlook 或任何支持\"通过 URL 订阅\"的应用中订阅此 URL，即可在你自己的日历中看到此服务器的活动。只读，且仅包含你可见频道中的活动。';
+
+  @override
+  String get calendarSyncCopyTooltip => '复制 URL';
+
+  @override
+  String get calendarSyncCopiedToast => '日历 URL 已复制。';
+
+  @override
+  String get calendarSyncRegenerateTooltip => '重新生成 URL';
+
+  @override
+  String get calendarSyncRegenerate => '重新生成';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle => '重新生成日历 URL？';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      '旧的 URL 将立即失效 -- 任何已经订阅它的地方都需要换成新的。';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google 日历：其他日历 > 通过网址. Apple 日历：文件 > 新建日历订阅. Outlook：添加日历 > 从网络订阅.';
+
+  @override
   String get calendarPreviousMonthTooltip => '上个月';
 
   @override
@@ -3702,6 +3932,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsFoundersHallSubtitle => '查看谁帮助构建了 Koda';
 
   @override
+  String get settingsWikiTitle => '帮助与百科';
+
+  @override
+  String get settingsWikiSubtitle => '浏览 Koda 的知识库';
+
+  @override
+  String get wikiScreenTitle => '帮助与百科';
+
+  @override
+  String get wikiScreenEmptyState => '这里还没有内容。';
+
+  @override
   String get vispAvatarInDevelopment => '开发中';
 
   @override
@@ -4510,6 +4752,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get settingsDyslexiaFontSubtitle => '將應用程式內文字全部切換為 OpenDyslexic 字型';
 
   @override
+  String get settingsNewestAtTopTitle => '在頂部顯示最新訊息';
+
+  @override
+  String get settingsNewestAtTopSubtitle => '同樣適用於頻道、私訊和語音頻道聊天';
+
+  @override
   String get settingsFontSizeTitle => '字型大小';
 
   @override
@@ -4577,6 +4825,197 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get settingsStreamingFinishInBrowser => '請在瀏覽器中完成連結，然後回來重新整理。';
+
+  @override
+  String get settingsDeveloperPortalTitle => '開發者入口';
+
+  @override
+  String get settingsDeveloperPortalSubtitle => '註冊使用 Koda API 的機器人和應用程式';
+
+  @override
+  String get devPortalScreenTitle => '開發者入口';
+
+  @override
+  String get devPortalNewAppTooltip => '新增應用程式';
+
+  @override
+  String get devPortalEmptyState => '還沒有應用程式。建立一個即可取得你的機器人的 API 金鑰。';
+
+  @override
+  String get devPortalNewAppTitle => '新增應用程式';
+
+  @override
+  String get devPortalAppNameHint => '應用程式名稱';
+
+  @override
+  String get devPortalAppDescriptionHint => '描述（選填）';
+
+  @override
+  String get devPortalBotUsernameHint => '機器人使用者名稱';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      '你的機器人只會收到使用者明確提交給它的指令和選項 -- 絕不會收到頻道的訊息歷史記錄。';
+
+  @override
+  String get devPortalCreateError => '目前無法建立此應用程式。';
+
+  @override
+  String get devPortalKeyRevealTitle => '你的 API 金鑰';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      '此金鑰僅顯示這一次。請立即複製 -- Koda 不會以可還原的形式儲存它。';
+
+  @override
+  String get devPortalCopyKeyTooltip => '複製金鑰';
+
+  @override
+  String get devPortalKeyCopiedToast => 'API 金鑰已複製。';
+
+  @override
+  String get devPortalKeySavedIt => '我已儲存';
+
+  @override
+  String get devPortalRegenerate => '重新產生';
+
+  @override
+  String get devPortalRegenerateConfirmTitle => '重新產生 API 金鑰？';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      '目前的金鑰將立即失效 -- 任何已經使用它的地方都需要換成新的。';
+
+  @override
+  String get devPortalDeleteConfirmTitle => '刪除此應用程式？';
+
+  @override
+  String get devPortalDeleteConfirmBody => '其 API 金鑰將被撤銷，機器人帳號將被停用。此操作無法復原。';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2（使用 Koda 登入）';
+
+  @override
+  String get devPortalNoRedirectUris => '尚未註冊重新導向 URI。';
+
+  @override
+  String get devPortalEditRedirectUris => '編輯重新導向 URI';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => '重新導向 URI';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      '每行一個。授權請求的 redirect_uri 必須與其中一個完全相符。';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => '產生用戶端密碼';
+
+  @override
+  String get devPortalRegenerateClientSecret => '重新產生用戶端密碼';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return '用戶端密碼以 $lastFour 結尾';
+  }
+
+  @override
+  String get oauthConsentTitle => '授權應用程式';
+
+  @override
+  String get oauthConsentUnknownApp => '找不到此應用程式。';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return '允許 $appName 存取你的 Koda 帳戶嗎？';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo => '這將允許該應用程式：';
+
+  @override
+  String get oauthConsentAllow => '允許';
+
+  @override
+  String get oauthConsentDeny => '拒絕';
+
+  @override
+  String get oauthConsentError => '無法完成 -- 請再試一次。';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      '連接 Steam 即可分享你正在玩的遊戲，和/或與好友比較遊戲庫 -- 這是兩個獨立的開關，開啟一個絕不會自動開啟另一個。';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return '已以 $personaName 身份連接 Steam';
+  }
+
+  @override
+  String get settingsSteamNotConnected => '未連接 Steam';
+
+  @override
+  String get settingsSteamSharePresence => '分享我正在玩的遊戲';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle => '好友和伺服器成員會在你的狀態旁看到你目前的遊戲';
+
+  @override
+  String get settingsSteamShareLibrary => '允許遊戲庫比較';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      '好友和伺服器成員可以將他們的 Steam 遊戲庫與你的進行比較';
+
+  @override
+  String profilePlayingGame(String game) {
+    return '正在玩 $game';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => '比較 Steam 遊戲庫';
+
+  @override
+  String get steamCompareScreenTitle => '共同的 Steam 遊戲庫';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return '你們都擁有 $count 款遊戲';
+  }
+
+  @override
+  String get steamCompareEmptyState => '暫無共同遊戲。';
+
+  @override
+  String get steamCompareError => '目前無法載入共同遊戲。';
+
+  @override
+  String get steamSyncNow => '立即同步';
+
+  @override
+  String get steamSyncSuccess => 'Steam 遊戲庫已同步。';
+
+  @override
+  String get steamSyncError => '目前無法同步 -- 請稍後重試。';
+
+  @override
+  String get steamManageLibraryTitle => '管理已同步的遊戲';
+
+  @override
+  String get steamManageLibraryDescription =>
+      '你在此標記為隱藏的遊戲絕不會出現在遊戲庫比較中，即使 Steam 仍將其視為公開。';
+
+  @override
+  String get steamManageLibraryEmptyState => '尚無已同步的遊戲 -- 試試立即同步。';
+
+  @override
+  String get steamHiddenFromComparison => '已從比較中隱藏';
 
   @override
   String get settingsThroneTitle => 'Throne Webhook';
@@ -7158,6 +7597,39 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get calendarCreateEventTooltip => '建立活動';
 
   @override
+  String get calendarSyncTooltip => '與你的日曆應用程式同步';
+
+  @override
+  String get calendarSyncDialogTitle => '同步此日曆';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      '在 Google 日曆、Apple 日曆、Outlook 或任何支援「透過 URL 訂閱」的應用程式中訂閱此 URL，即可在你自己的日曆中看到此伺服器的活動。僅供讀取，且僅包含你可見頻道中的活動。';
+
+  @override
+  String get calendarSyncCopyTooltip => '複製 URL';
+
+  @override
+  String get calendarSyncCopiedToast => '日曆 URL 已複製。';
+
+  @override
+  String get calendarSyncRegenerateTooltip => '重新產生 URL';
+
+  @override
+  String get calendarSyncRegenerate => '重新產生';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle => '重新產生日曆 URL？';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      '舊的 URL 將立即失效 -- 任何已經訂閱它的地方都需要換成新的。';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google 日曆：其他日曆 > 透過網址. Apple 日曆：檔案 > 新增日曆訂閱. Outlook：新增日曆 > 從網路訂閱.';
+
+  @override
   String get calendarPreviousMonthTooltip => '上個月';
 
   @override
@@ -8046,6 +8518,18 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get settingsFoundersHallSubtitle => '查看誰幫助建構了 Koda';
+
+  @override
+  String get settingsWikiTitle => '說明與百科';
+
+  @override
+  String get settingsWikiSubtitle => '瀏覽 Koda 的知識庫';
+
+  @override
+  String get wikiScreenTitle => '說明與百科';
+
+  @override
+  String get wikiScreenEmptyState => '這裡還沒有內容。';
 
   @override
   String get vispAvatarInDevelopment => '開發中';

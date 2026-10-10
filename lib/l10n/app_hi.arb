@@ -55,6 +55,10 @@
   "settingsHighContrastSubtitle": "पूरे ऐप में शुद्ध काले/सफ़ेद, हाई-कॉन्ट्रास्ट रंग -- बदलने पर मौजूदा स्क्रीन कुछ देर के लिए फिर से लोड होगी।",
   "settingsDyslexiaFontTitle": "डिस्लेक्सिया-फ्रेंडली फ़ॉन्ट",
   "settingsDyslexiaFontSubtitle": "पूरे ऐप में बॉडी टेक्स्ट को OpenDyslexic में बदल देता है",
+
+  "settingsNewestAtTopTitle": "नवीनतम संदेश सबसे ऊपर दिखाएं",
+
+  "settingsNewestAtTopSubtitle": "चैनलों, डीएम और वॉइस-चैनल चैट सभी पर लागू होता है",
   "settingsFontSizeTitle": "फ़ॉन्ट साइज़",
   "settingsFontSizeSample": "तेज़ भूरी लोमड़ी आलसी कुत्ते के ऊपर से कूद गई",
   "settingsDensityTitle": "डेंसिटी",
@@ -75,6 +79,128 @@
   "settingsRefreshStatus": "क्या आप पहले से ही अपने ब्राउज़र में कनेक्ट हैं? स्टेटस रिफ़्रेश करें",
   "settingsStreamingConnectError": "{platform} कनेक्शन शुरू नहीं हो सका।",
   "settingsStreamingFinishInBrowser": "अपने ब्राउज़र में कनेक्शन पूरा करें, फिर वापस आकर रिफ़्रेश करें।",
+
+  "settingsDeveloperPortalTitle": "डेवलपर पोर्टल",
+
+  "settingsDeveloperPortalSubtitle": "Koda API का उपयोग करने वाले बॉट और ऐप्स पंजीकृत करें",
+
+  "devPortalScreenTitle": "डेवलपर पोर्टल",
+
+  "devPortalNewAppTooltip": "नया ऐप",
+
+  "devPortalEmptyState": "अभी तक कोई ऐप नहीं। अपने बॉट के लिए API कुंजी पाने हेतु एक बनाएं।",
+
+  "devPortalNewAppTitle": "नया ऐप",
+
+  "devPortalAppNameHint": "ऐप का नाम",
+
+  "devPortalAppDescriptionHint": "विवरण (वैकल्पिक)",
+
+  "devPortalBotUsernameHint": "बॉट उपयोगकर्ता नाम",
+
+  "devPortalInteractionDataOnlyNote": "आपका बॉट केवल वह कमांड और विकल्प प्राप्त करता है जो उपयोगकर्ता स्पष्ट रूप से उसे भेजता है -- कभी भी चैनल का संदेश इतिहास नहीं।",
+
+  "devPortalCreateError": "अभी यह ऐप नहीं बनाया जा सका।",
+
+  "devPortalKeyRevealTitle": "आपकी API कुंजी",
+
+  "devPortalKeyRevealWarning": "यह एकमात्र बार है जब यह कुंजी दिखाई जाएगी। इसे अभी कॉपी करें -- Koda इसे पुनर्प्राप्त करने योग्य रूप में संग्रहीत नहीं करता।",
+
+  "devPortalCopyKeyTooltip": "कुंजी कॉपी करें",
+
+  "devPortalKeyCopiedToast": "API कुंजी कॉपी हो गई।",
+
+  "devPortalKeySavedIt": "मैंने इसे सहेज लिया",
+
+  "devPortalRegenerate": "पुनः बनाएं",
+
+  "devPortalRegenerateConfirmTitle": "API कुंजी पुनः बनाएं?",
+
+  "devPortalRegenerateConfirmBody": "वर्तमान कुंजी तुरंत काम करना बंद कर देगी -- जो भी इसे पहले से उपयोग कर रहा है उसे नई कुंजी की आवश्यकता होगी।",
+
+  "devPortalDeleteConfirmTitle": "इस ऐप को हटाएं?",
+
+  "devPortalDeleteConfirmBody": "इसकी API कुंजी रद्द कर दी जाएगी और बॉट खाता निष्क्रिय कर दिया जाएगा। इसे पूर्ववत नहीं किया जा सकता।",
+
+  "devPortalOAuthSectionTitle": "OAuth2 (Koda से लॉगिन करें)",
+
+  "devPortalNoRedirectUris": "अभी तक कोई रीडायरेक्ट URI पंजीकृत नहीं है।",
+
+  "devPortalEditRedirectUris": "रीडायरेक्ट URI संपादित करें",
+
+  "devPortalEditRedirectUrisTitle": "रीडायरेक्ट URI",
+
+  "devPortalRedirectUrisHelp": "प्रति पंक्ति एक। सहमति अनुरोध का redirect_uri इनमें से किसी एक से ठीक मेल खाना चाहिए।",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "क्लाइंट सीक्रेट बनाएं",
+
+  "devPortalRegenerateClientSecret": "क्लाइंट सीक्रेट फिर से बनाएं",
+
+  "devPortalClientSecretEndingIn": "क्लाइंट सीक्रेट {lastFour} पर समाप्त होता है",
+
+  "oauthConsentTitle": "एप्लिकेशन को अधिकृत करें",
+
+  "oauthConsentUnknownApp": "यह एप्लिकेशन नहीं मिल सका।",
+
+  "oauthConsentAllowQuestion": "क्या {appName} को आपके Koda खाते तक पहुंचने की अनुमति दें?",
+
+  "oauthConsentWillBeAbleTo": "इससे ऐप यह कर सकेगा:",
+
+  "oauthConsentAllow": "अनुमति दें",
+
+  "oauthConsentDeny": "अस्वीकार करें",
+
+  "oauthConsentError": "वह पूरा नहीं हो सका -- फिर से प्रयास करें।",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "Steam कनेक्ट करें और बताएं कि आप क्या खेल रहे हैं और/या मित्रों के साथ गेम लाइब्रेरी की तुलना करें -- ये दो स्वतंत्र स्विच हैं, एक को चालू करने से दूसरा कभी चालू नहीं होता।",
+
+  "settingsSteamConnected": "{personaName} के रूप में Steam कनेक्ट है",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "Steam कनेक्ट नहीं है",
+
+  "settingsSteamSharePresence": "मैं क्या खेल रहा हूँ साझा करें",
+
+  "settingsSteamSharePresenceSubtitle": "मित्र और सर्वर सदस्य आपकी स्थिति के पास आपका वर्तमान गेम देखते हैं",
+
+  "settingsSteamShareLibrary": "लाइब्रेरी तुलना की अनुमति दें",
+
+  "settingsSteamShareLibrarySubtitle": "मित्र और सर्वर सदस्य अपनी Steam लाइब्रेरी की आपकी लाइब्रेरी से तुलना कर सकते हैं",
+
+  "profilePlayingGame": "{game} खेल रहे हैं",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "Steam लाइब्रेरी की तुलना करें",
+
+  "steamCompareScreenTitle": "साझा Steam लाइब्रेरी",
+
+  "steamCompareSharedCount": "आप दोनों के पास {count} गेम हैं",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "अभी तक कोई साझा गेम नहीं।",
+
+  "steamCompareError": "अभी साझा गेम लोड नहीं हो सके।",
+
+  "steamSyncNow": "अभी सिंक करें",
+
+  "steamSyncSuccess": "Steam लाइब्रेरी सिंक हो गई।",
+
+  "steamSyncError": "अभी सिंक नहीं हो सका -- थोड़ी देर बाद फिर से प्रयास करें।",
+
+  "steamManageLibraryTitle": "सिंक किए गए गेम प्रबंधित करें",
+
+  "steamManageLibraryDescription": "यहां छिपे के रूप में चिह्नित गेम लाइब्रेरी तुलना में कभी नहीं दिखेंगे, भले ही Steam उन्हें अभी भी सार्वजनिक मानता हो।",
+
+  "steamManageLibraryEmptyState": "अभी तक कोई सिंक किया गया गेम नहीं -- अभी सिंक करें आज़माएं।",
+
+  "steamHiddenFromComparison": "तुलना से छिपा हुआ",
   "settingsThroneTitle": "Throne वेबहुक",
   "settingsThroneDescription": "जब भी कोई आपको गिफ़्ट भेजे तो Koda में सूचना पाने के लिए इस URL को अपनी Throne.com वेबहुक सेटिंग्स में पेस्ट करें।",
   "settingsThroneGetUrl": "मेरा वेबहुक URL पाएं",
@@ -861,6 +987,26 @@
   "calendarFallbackTitle": "कैलेंडर",
   "calendarAskVispTooltip": "Visp से पूछें",
   "calendarCreateEventTooltip": "इवेंट बनाएं",
+
+  "calendarSyncTooltip": "अपने कैलेंडर ऐप से सिंक करें",
+
+  "calendarSyncDialogTitle": "यह कैलेंडर सिंक करें",
+
+  "calendarSyncDialogDescription": "अपने कैलेंडर में इस सर्वर की घटनाएं देखने के लिए Google Calendar, Apple Calendar, Outlook, या \"URL से सदस्यता लें\" का समर्थन करने वाले किसी भी ऐप से इस URL की सदस्यता लें। केवल-पढ़ने के लिए, और इसमें केवल उन चैनलों की घटनाएं शामिल हैं जो आप देख सकते हैं।",
+
+  "calendarSyncCopyTooltip": "URL कॉपी करें",
+
+  "calendarSyncCopiedToast": "कैलेंडर URL कॉपी हो गया।",
+
+  "calendarSyncRegenerateTooltip": "URL पुनः बनाएं",
+
+  "calendarSyncRegenerate": "पुनः बनाएं",
+
+  "calendarSyncRegenerateConfirmTitle": "कैलेंडर URL फिर से बनाएं?",
+
+  "calendarSyncRegenerateConfirmBody": "पुराना URL तुरंत काम करना बंद कर देगा -- जहां भी आपने इसकी सदस्यता ली है वहां नए की आवश्यकता होगी।",
+
+  "calendarSyncInstructions": "Google Calendar: अन्य कैलेंडर > URL से। Apple Calendar: फ़ाइल > नई कैलेंडर सदस्यता। Outlook: कैलेंडर जोड़ें > वेब से सदस्यता लें।",
   "calendarPreviousMonthTooltip": "पिछला महीना",
   "calendarNextMonthTooltip": "अगला महीना",
   "calendarTodayButton": "आज",
@@ -1126,6 +1272,18 @@
   "settingsFoundersHallTitle": "Founders Hall",
 
   "settingsFoundersHallSubtitle": "देखें किसने Koda बनाने में मदद की",
+
+
+  "settingsWikiTitle": "मदद और विकी",
+
+
+  "settingsWikiSubtitle": "Koda के नॉलेज बेस को ब्राउज़ करें",
+
+
+  "wikiScreenTitle": "मदद और विकी",
+
+
+  "wikiScreenEmptyState": "अभी यहाँ कुछ नहीं है।",
   "vispAvatarInDevelopment": "डेवलपमेंट में",
   "vispBoostAdvisorCouldNotAnswer": "Visp कोई जवाब तैयार नहीं कर सका।",
   "vispBoostAdvisorTitle": "Visp से पूछें: बूस्ट ROI एडवाइज़र",

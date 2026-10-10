@@ -1146,6 +1146,18 @@ class KodaApi {
     } catch (e) { _log('getFoundersHall', e); return []; }
   }
 
+  // ── Wiki (in-app Help/Wiki viewer, public, no auth) ──────────────────────
+  //
+  // Distinct from the admin-only wiki CRUD methods further down -- this
+  // is WikiController.public_index/2's read-only path.
+
+  Future<List<Map<String, dynamic>>> getWikiArticles() async {
+    try {
+      final res = await _dio.get('/wiki');
+      return List<Map<String, dynamic>>.from(res.data['articles'] ?? []);
+    } catch (e) { _log('getWikiArticles', e); return []; }
+  }
+
   // ── Platform settings (admin only) ──────────────────────────────────────
 
   Future<bool?> getRegistrationOpen() async {
@@ -1733,6 +1745,114 @@ class KodaApi {
     } catch (e) { _log('purchaseEventTicket', e); return null; }
   }
 
+  /// The per-(you, this server) read-only ICS feed URL -- paste it into
+  /// Google Calendar/Apple Calendar/Outlook's "subscribe by URL"
+  /// feature (see koda-server's Koda.CalendarFeed). Distinct from
+  /// subscribeToEvent/unsubscribeFromEvent above, which is a single
+  /// event's in-app notification bell, not a calendar-app sync.
+  Future<String?> getCalendarFeedUrl(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/calendar_feed_url');
+      return res.data['url'] as String?;
+    } catch (e) { _log('getCalendarFeedUrl', e); return null; }
+  }
+
+  /// Rotates the feed URL above -- the old one stops working immediately.
+  Future<String?> regenerateCalendarFeedUrl(String serverId) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/calendar_feed_url/regenerate');
+      return res.data['url'] as String?;
+    } catch (e) { _log('regenerateCalendarFeedUrl', e); return null; }
+  }
+
+  // -- Developer portal (third-party bot platform, Phase 1) --------------------
+  // Managing your own registered Applications -- distinct from the
+  // versioned public bot API those Applications themselves call with
+  // their own API key (see koda-server's Koda.Developers).
+
+  Future<List<Map<String, dynamic>>> listDeveloperApps() async {
+    try {
+      final res = await _dio.get('/developer/apps');
+      return List<Map<String, dynamic>>.from(res.data['apps'] ?? []);
+    } catch (e) { _log('listDeveloperApps', e); return []; }
+  }
+
+  /// Returns `{'app': {...}, 'api_key': '...'}` on success -- the raw
+  /// key is shown exactly once, here and nowhere else; it cannot be
+  /// recovered after this call returns. Returns null on failure.
+  Future<Map<String, dynamic>?> createDeveloperApp({
+    required String name, String? description, required String botUsername,
+  }) async {
+    try {
+      final res = await _dio.post('/developer/apps', data: {
+        'name': name,
+        if (description != null) 'description': description,
+        'bot_username': botUsername,
+      });
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('createDeveloperApp', e); return null; }
+  }
+
+  Future<bool> deleteDeveloperApp(String appId) async {
+    try {
+      await _dio.delete('/developer/apps/$appId');
+      return true;
+    } catch (e) { _log('deleteDeveloperApp', e); return false; }
+  }
+
+  /// Revokes the app's current key and returns the new raw key --
+  /// again shown exactly once.
+  Future<String?> regenerateDeveloperAppKey(String appId) async {
+    try {
+      final res = await _dio.post('/developer/apps/$appId/keys/regenerate');
+      return res.data['api_key'] as String?;
+    } catch (e) { _log('regenerateDeveloperAppKey', e); return null; }
+  }
+
+  /// OAuth2 (Phase 2) -- replaces the app's redirect URI allowlist
+  /// wholesale, checked at the /oauth/authorize/approve step.
+  Future<bool> setDeveloperAppRedirectUris(String appId, List<String> uris) async {
+    try {
+      await _dio.put('/developer/apps/$appId/redirect_uris', data: {'redirect_uris': uris});
+      return true;
+    } catch (e) { _log('setDeveloperAppRedirectUris', e); return false; }
+  }
+
+  /// Rotates the app's OAuth client secret -- shown exactly once, same
+  /// discipline as the API key above.
+  Future<String?> regenerateDeveloperAppClientSecret(String appId) async {
+    try {
+      final res = await _dio.post('/developer/apps/$appId/client_secret/regenerate');
+      return res.data['client_secret'] as String?;
+    } catch (e) { _log('regenerateDeveloperAppClientSecret', e); return null; }
+  }
+
+  /// Public app metadata for the OAuth consent screen -- name/
+  /// description only, never the secret.
+  Future<Map<String, dynamic>?> getOAuthAppInfo(String clientId) async {
+    try {
+      final res = await _dio.get('/oauth/apps/$clientId');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getOAuthAppInfo', e); return null; }
+  }
+
+  /// The consent step -- the client's own JWT is already attached, no
+  /// extra login. Returns the redirect_to URL to open via url_launcher
+  /// on success, or null on failure (e.g. an unregistered redirect_uri).
+  Future<String?> approveOAuthAuthorize({
+    required String clientId, required String redirectUri, required String scope,
+    String? state, String? codeChallenge,
+  }) async {
+    try {
+      final res = await _dio.post('/oauth/authorize/approve', data: {
+        'client_id': clientId, 'redirect_uri': redirectUri, 'scope': scope,
+        if (state != null) 'state': state,
+        if (codeChallenge != null) 'code_challenge': codeChallenge,
+      });
+      return res.data['redirect_to'] as String?;
+    } catch (e) { _log('approveOAuthAuthorize', e); return null; }
+  }
+
   // -- Marketplace --------------------------------------------------------------
 
   Future<Map<String, dynamic>?> getConnectAccount() async {
@@ -2019,6 +2139,81 @@ class KodaApi {
       await _dio.patch('/users/me/youtube', data: {'announce_enabled': enabled});
       return true;
     } catch (e) { _log('setYoutubeAnnounceEnabled', e); return false; }
+  }
+
+  // -- Steam (per-user account connection: presence + library comparison) ----
+  // share_presence ("currently playing") and share_library (comparison)
+  // are two fully independent opt-ins -- set*Sharing below never touches
+  // the other one's flag, by design (see koda-server's Koda.Steam).
+
+  /// Returns the URL to open in a browser to start connecting a Steam
+  /// account -- the OpenID 2.0 handshake happens server-side (see
+  /// koda-server's SteamController.callback/2).
+  Future<String?> connectSteam() async {
+    try {
+      final res = await _dio.post('/users/me/steam/connect');
+      return res.data['authorize_url'] as String?;
+    } catch (e) { _log('connectSteam', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> getSteamStatus() async {
+    try {
+      final res = await _dio.get('/users/me/steam/status');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getSteamStatus', e); return null; }
+  }
+
+  Future<bool> disconnectSteam() async {
+    try {
+      await _dio.delete('/users/me/steam');
+      return true;
+    } catch (e) { _log('disconnectSteam', e); return false; }
+  }
+
+  Future<bool> setSteamPresenceSharing(bool enabled) async {
+    try {
+      await _dio.patch('/users/me/steam/presence', data: {'enabled': enabled});
+      return true;
+    } catch (e) { _log('setSteamPresenceSharing', e); return false; }
+  }
+
+  Future<bool> setSteamLibrarySharing(bool enabled) async {
+    try {
+      await _dio.patch('/users/me/steam/library', data: {'enabled': enabled});
+      return true;
+    } catch (e) { _log('setSteamLibrarySharing', e); return false; }
+  }
+
+  /// Shared Steam appids between the caller and [userId] -- only
+  /// succeeds when both have library sharing on and are eligible to see
+  /// each other (see koda-server's Koda.Steam.compare_libraries/2).
+  Future<List<int>?> compareSteamLibraries(String userId) async {
+    try {
+      final res = await _dio.get('/users/$userId/steam/compare');
+      return List<int>.from(res.data['shared_app_ids'] ?? []);
+    } catch (e) { _log('compareSteamLibraries', e); return null; }
+  }
+
+  /// "Sync Now" -- re-syncs the owned-games list on demand rather than
+  /// waiting for the daily sweeper. Throttled server-side (429 if
+  /// synced too recently); returns false either way the caller should
+  /// surface via a snackbar, not just on a hard failure.
+  Future<bool> syncSteamLibraryNow() async {
+    try {
+      await _dio.post('/users/me/steam/library/sync');
+      return true;
+    } catch (e) { _log('syncSteamLibraryNow', e); return false; }
+  }
+
+  /// Koda-side per-game "pretend I don't own this" toggle -- independent
+  /// of whatever Steam's own per-game privacy already filters out (see
+  /// koda-server's Koda.Steam.set_hidden/3).
+  Future<bool> setSteamGameHidden(int appId, bool hidden) async {
+    try {
+      await _dio.patch('/users/me/steam/library/hidden',
+          data: {'app_id': appId, 'hidden': hidden});
+      return true;
+    } catch (e) { _log('setSteamGameHidden', e); return false; }
   }
 
   // -- Tiltify (per-server charity campaign display) ---------------------------

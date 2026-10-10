@@ -55,6 +55,10 @@
   "settingsHighContrastSubtitle": "Puur zwart-wit, hoogcontrastkleuren in de hele app -- wisselen laadt het huidige scherm kort opnieuw.",
   "settingsDyslexiaFontTitle": "Dyslexievriendelijk lettertype",
   "settingsDyslexiaFontSubtitle": "Verandert de hoofdtekst naar OpenDyslexic in de hele app",
+
+  "settingsNewestAtTopTitle": "Nieuwste berichten bovenaan tonen",
+
+  "settingsNewestAtTopSubtitle": "Geldt voor kanalen, DM's en voice-kanaalchat",
   "settingsFontSizeTitle": "Tekstgrootte",
   "settingsFontSizeSample": "Pa's wijze lynx bezag vroom het fikse aquaduct",
   "settingsDensityTitle": "Dichtheid",
@@ -75,6 +79,128 @@
   "settingsRefreshStatus": "Al verbonden in je browser? Vernieuw status",
   "settingsStreamingConnectError": "Kan verbinding met {platform} niet starten.",
   "settingsStreamingFinishInBrowser": "Rond het verbinden af in je browser en kom dan terug om te vernieuwen.",
+
+  "settingsDeveloperPortalTitle": "Ontwikkelaarsportaal",
+
+  "settingsDeveloperPortalSubtitle": "Registreer bots en apps die de Koda API gebruiken",
+
+  "devPortalScreenTitle": "Ontwikkelaarsportaal",
+
+  "devPortalNewAppTooltip": "Nieuwe app",
+
+  "devPortalEmptyState": "Nog geen apps. Maak er een om een API-sleutel voor je bot te krijgen.",
+
+  "devPortalNewAppTitle": "Nieuwe app",
+
+  "devPortalAppNameHint": "App-naam",
+
+  "devPortalAppDescriptionHint": "Beschrijving (optioneel)",
+
+  "devPortalBotUsernameHint": "Bot-gebruikersnaam",
+
+  "devPortalInteractionDataOnlyNote": "Je bot ontvangt alleen het commando en de opties die een gebruiker er expliciet naartoe stuurt -- nooit de berichtgeschiedenis van een kanaal.",
+
+  "devPortalCreateError": "Kon deze app nu niet maken.",
+
+  "devPortalKeyRevealTitle": "Je API-sleutel",
+
+  "devPortalKeyRevealWarning": "Dit is de enige keer dat deze sleutel wordt getoond. Kopieer hem nu -- Koda bewaart hem niet in herstelbare vorm.",
+
+  "devPortalCopyKeyTooltip": "Sleutel kopiëren",
+
+  "devPortalKeyCopiedToast": "API-sleutel gekopieerd.",
+
+  "devPortalKeySavedIt": "Ik heb het opgeslagen",
+
+  "devPortalRegenerate": "Opnieuw genereren",
+
+  "devPortalRegenerateConfirmTitle": "API-sleutel opnieuw genereren?",
+
+  "devPortalRegenerateConfirmBody": "De huidige sleutel werkt direct niet meer -- alles wat hem al gebruikt heeft de nieuwe nodig.",
+
+  "devPortalDeleteConfirmTitle": "Deze app verwijderen?",
+
+  "devPortalDeleteConfirmBody": "De API-sleutel wordt ingetrokken en het bot-account gedeactiveerd. Dit kan niet ongedaan worden gemaakt.",
+
+  "devPortalOAuthSectionTitle": "OAuth2 (Inloggen met Koda)",
+
+  "devPortalNoRedirectUris": "Nog geen redirect-URI's geregistreerd.",
+
+  "devPortalEditRedirectUris": "Redirect-URI's bewerken",
+
+  "devPortalEditRedirectUrisTitle": "Redirect-URI's",
+
+  "devPortalRedirectUrisHelp": "Eén per regel. De redirect_uri van een toestemmingsverzoek moet exact overeenkomen met één hiervan.",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "Clientgeheim genereren",
+
+  "devPortalRegenerateClientSecret": "Clientgeheim opnieuw genereren",
+
+  "devPortalClientSecretEndingIn": "Clientgeheim eindigend op {lastFour}",
+
+  "oauthConsentTitle": "Applicatie autoriseren",
+
+  "oauthConsentUnknownApp": "Deze applicatie is niet gevonden.",
+
+  "oauthConsentAllowQuestion": "{appName} toegang geven tot je Koda-account?",
+
+  "oauthConsentWillBeAbleTo": "Dit geeft de app toestemming om:",
+
+  "oauthConsentAllow": "Toestaan",
+
+  "oauthConsentDeny": "Weigeren",
+
+  "oauthConsentError": "Kon dit niet voltooien -- probeer het opnieuw.",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "Koppel Steam om te delen wat je speelt en/of gamebibliotheken met vrienden te vergelijken -- dit zijn twee onafhankelijke schakelaars, de ene inschakelen schakelt de andere nooit automatisch in.",
+
+  "settingsSteamConnected": "Steam verbonden als {personaName}",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "Steam niet verbonden",
+
+  "settingsSteamSharePresence": "Delen wat ik speel",
+
+  "settingsSteamSharePresenceSubtitle": "Vrienden en serverleden zien je huidige game naast je status",
+
+  "settingsSteamShareLibrary": "Bibliotheekvergelijking toestaan",
+
+  "settingsSteamShareLibrarySubtitle": "Vrienden en serverleden kunnen hun Steam-bibliotheek met die van jou vergelijken",
+
+  "profilePlayingGame": "Speelt {game}",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "Steam-bibliotheken vergelijken",
+
+  "steamCompareScreenTitle": "Gedeelde Steam-bibliotheek",
+
+  "steamCompareSharedCount": "Jullie hebben beide {count} games",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "Nog geen gedeelde games.",
+
+  "steamCompareError": "Kan gedeelde games nu niet laden.",
+
+  "steamSyncNow": "Nu synchroniseren",
+
+  "steamSyncSuccess": "Steam-bibliotheek gesynchroniseerd.",
+
+  "steamSyncError": "Kon nu niet synchroniseren -- probeer het straks opnieuw.",
+
+  "steamManageLibraryTitle": "Gesynchroniseerde games beheren",
+
+  "steamManageLibraryDescription": "Games die je hier als verborgen markeert, verschijnen nooit in een bibliotheekvergelijking, ook als Steam ze nog als openbaar beschouwt.",
+
+  "steamManageLibraryEmptyState": "Nog geen gesynchroniseerde games -- probeer Nu synchroniseren.",
+
+  "steamHiddenFromComparison": "Verborgen voor vergelijking",
   "settingsThroneTitle": "Throne-webhook",
   "settingsThroneDescription": "Plak deze URL in je Throne.com-webhookinstellingen om in Koda een melding te krijgen wanneer iemand je een cadeau stuurt.",
   "settingsThroneGetUrl": "Mijn webhook-URL ophalen",
@@ -861,6 +987,26 @@
   "calendarFallbackTitle": "Kalender",
   "calendarAskVispTooltip": "Vraag het Visp",
   "calendarCreateEventTooltip": "Evenement aanmaken",
+
+  "calendarSyncTooltip": "Synchroniseren met je agenda-app",
+
+  "calendarSyncDialogTitle": "Deze agenda synchroniseren",
+
+  "calendarSyncDialogDescription": "Abonneer je op deze URL vanuit Google Agenda, Apple Agenda, Outlook of een app die \"abonneren via URL\" ondersteunt om de evenementen van deze server in je eigen agenda te zien. Alleen-lezen, en bevat alleen evenementen van kanalen die je kunt zien.",
+
+  "calendarSyncCopyTooltip": "URL kopiëren",
+
+  "calendarSyncCopiedToast": "Agenda-URL gekopieerd.",
+
+  "calendarSyncRegenerateTooltip": "URL opnieuw genereren",
+
+  "calendarSyncRegenerate": "Opnieuw genereren",
+
+  "calendarSyncRegenerateConfirmTitle": "Agenda-URL opnieuw genereren?",
+
+  "calendarSyncRegenerateConfirmBody": "De oude URL werkt direct niet meer -- overal waar je je al hebt geabonneerd is de nieuwe nodig.",
+
+  "calendarSyncInstructions": "Google Agenda: Andere agenda's > Via URL. Apple Agenda: Archief > Nieuw agenda-abonnement. Outlook: Agenda toevoegen > Abonneren vanaf internet.",
   "calendarPreviousMonthTooltip": "Vorige maand",
   "calendarNextMonthTooltip": "Volgende maand",
   "calendarTodayButton": "Vandaag",
@@ -1126,6 +1272,18 @@
   "settingsFoundersHallTitle": "Founders Hall",
 
   "settingsFoundersHallSubtitle": "Bekijk wie heeft meegeholpen aan Koda",
+
+
+  "settingsWikiTitle": "Help & Wiki",
+
+
+  "settingsWikiSubtitle": "Blader door Koda's kennisbank",
+
+
+  "wikiScreenTitle": "Help & Wiki",
+
+
+  "wikiScreenEmptyState": "Hier is nog niets.",
   "vispAvatarInDevelopment": "IN ONTWIKKELING",
   "vispBoostAdvisorCouldNotAnswer": "Visp kon geen antwoord samenstellen.",
   "vispBoostAdvisorTitle": "Vraag het Visp: Boost ROI-adviseur",

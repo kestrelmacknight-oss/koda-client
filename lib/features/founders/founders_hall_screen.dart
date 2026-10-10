@@ -3,7 +3,8 @@
 // Public list of backers with the "Founders Hall" reward (see
 // koda-server's Koda.Invites.apply_rewards/3 and list_founders_hall/0) --
 // no auth needed to view, same as server discovery. Reachable from
-// Settings and the Koda Marketplace screen's footer.
+// Settings -- a Marketplace-screen link was considered but never
+// actually added; don't assume it exists elsewhere in this codebase.
 
 import 'package:flutter/material.dart';
 import '../../core/api.dart';

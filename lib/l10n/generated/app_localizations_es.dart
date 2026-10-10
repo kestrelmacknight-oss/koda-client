@@ -174,6 +174,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Cambia el texto del cuerpo a OpenDyslexic en toda la app';
 
   @override
+  String get settingsNewestAtTopTitle =>
+      'Mostrar los mensajes más recientes arriba';
+
+  @override
+  String get settingsNewestAtTopSubtitle =>
+      'Se aplica a canales, MD y al chat de canales de voz por igual';
+
+  @override
   String get settingsFontSizeTitle => 'Tamaño de fuente';
 
   @override
@@ -245,6 +253,205 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settingsStreamingFinishInBrowser =>
       'Termina de conectar en tu navegador y luego vuelve y actualiza.';
+
+  @override
+  String get settingsDeveloperPortalTitle => 'Portal de desarrolladores';
+
+  @override
+  String get settingsDeveloperPortalSubtitle =>
+      'Registra bots y apps que usen la API de Koda';
+
+  @override
+  String get devPortalScreenTitle => 'Portal de desarrolladores';
+
+  @override
+  String get devPortalNewAppTooltip => 'Nueva aplicación';
+
+  @override
+  String get devPortalEmptyState =>
+      'Aún no hay aplicaciones. Crea una para obtener una clave de API para tu bot.';
+
+  @override
+  String get devPortalNewAppTitle => 'Nueva aplicación';
+
+  @override
+  String get devPortalAppNameHint => 'Nombre de la app';
+
+  @override
+  String get devPortalAppDescriptionHint => 'Descripción (opcional)';
+
+  @override
+  String get devPortalBotUsernameHint => 'Nombre de usuario del bot';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      'Tu bot solo recibe el comando y las opciones que un usuario le envía explícitamente -- nunca el historial de mensajes de un canal.';
+
+  @override
+  String get devPortalCreateError => 'No se pudo crear esta aplicación ahora.';
+
+  @override
+  String get devPortalKeyRevealTitle => 'Tu clave de API';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      'Esta es la única vez que se mostrará esta clave. Cópiala ahora -- Koda no la guarda de forma recuperable.';
+
+  @override
+  String get devPortalCopyKeyTooltip => 'Copiar clave';
+
+  @override
+  String get devPortalKeyCopiedToast => 'Clave de API copiada.';
+
+  @override
+  String get devPortalKeySavedIt => 'Ya la guardé';
+
+  @override
+  String get devPortalRegenerate => 'Regenerar';
+
+  @override
+  String get devPortalRegenerateConfirmTitle => '¿Regenerar la clave de API?';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      'La clave actual dejará de funcionar inmediatamente -- lo que ya la use necesitará la nueva.';
+
+  @override
+  String get devPortalDeleteConfirmTitle => '¿Eliminar esta aplicación?';
+
+  @override
+  String get devPortalDeleteConfirmBody =>
+      'Su clave de API será revocada y la cuenta del bot desactivada. Esto no se puede deshacer.';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2 (Iniciar sesión con Koda)';
+
+  @override
+  String get devPortalNoRedirectUris =>
+      'Aún no hay URIs de redirección registradas.';
+
+  @override
+  String get devPortalEditRedirectUris => 'Editar URIs de redirección';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => 'URIs de redirección';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      'Una por línea. El redirect_uri de una solicitud de consentimiento debe coincidir exactamente con una de estas.';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => 'Generar secreto de cliente';
+
+  @override
+  String get devPortalRegenerateClientSecret => 'Regenerar secreto de cliente';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return 'Secreto de cliente que termina en $lastFour';
+  }
+
+  @override
+  String get oauthConsentTitle => 'Autorizar aplicación';
+
+  @override
+  String get oauthConsentUnknownApp => 'No se pudo encontrar esta aplicación.';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return '¿Permitir que $appName acceda a tu cuenta de Koda?';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo => 'Esto permitirá que la app:';
+
+  @override
+  String get oauthConsentAllow => 'Permitir';
+
+  @override
+  String get oauthConsentDeny => 'Denegar';
+
+  @override
+  String get oauthConsentError => 'No se pudo completar -- intenta de nuevo.';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      'Conecta Steam para compartir a qué estás jugando y/o comparar bibliotecas de juegos con amigos -- son dos interruptores independientes, activar uno nunca activa el otro.';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return 'Steam conectado como $personaName';
+  }
+
+  @override
+  String get settingsSteamNotConnected => 'Steam no conectado';
+
+  @override
+  String get settingsSteamSharePresence => 'Compartir a qué estoy jugando';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle =>
+      'Amigos y miembros del servidor ven tu juego actual junto a tu estado';
+
+  @override
+  String get settingsSteamShareLibrary => 'Permitir comparación de biblioteca';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      'Amigos y miembros del servidor pueden comparar su biblioteca de Steam con la tuya';
+
+  @override
+  String profilePlayingGame(String game) {
+    return 'Jugando $game';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => 'Comparar bibliotecas de Steam';
+
+  @override
+  String get steamCompareScreenTitle => 'Biblioteca de Steam compartida';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return 'Ambos tienen $count juegos';
+  }
+
+  @override
+  String get steamCompareEmptyState => 'Aún no hay juegos en común.';
+
+  @override
+  String get steamCompareError =>
+      'No se pudieron cargar los juegos compartidos ahora.';
+
+  @override
+  String get steamSyncNow => 'Sincronizar ahora';
+
+  @override
+  String get steamSyncSuccess => 'Biblioteca de Steam sincronizada.';
+
+  @override
+  String get steamSyncError =>
+      'No se pudo sincronizar ahora -- intenta de nuevo en un momento.';
+
+  @override
+  String get steamManageLibraryTitle => 'Administrar juegos sincronizados';
+
+  @override
+  String get steamManageLibraryDescription =>
+      'Los juegos que marques como ocultos aquí nunca aparecerán en una comparación de bibliotecas, incluso si Steam todavía los considera públicos.';
+
+  @override
+  String get steamManageLibraryEmptyState =>
+      'Aún no hay juegos sincronizados -- prueba Sincronizar ahora.';
+
+  @override
+  String get steamHiddenFromComparison => 'Oculto de la comparación';
 
   @override
   String get settingsThroneTitle => 'Webhook de Throne';
@@ -2951,6 +3158,40 @@ class AppLocalizationsEs extends AppLocalizations {
   String get calendarCreateEventTooltip => 'Crear Evento';
 
   @override
+  String get calendarSyncTooltip => 'Sincronizar con tu app de calendario';
+
+  @override
+  String get calendarSyncDialogTitle => 'Sincronizar este calendario';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      'Suscríbete a esta URL desde Google Calendar, Apple Calendar, Outlook o cualquier app que admita \"suscribirse por URL\" para ver los eventos de este servidor en tu propio calendario. Solo lectura, e incluye solo eventos de canales que puedes ver.';
+
+  @override
+  String get calendarSyncCopyTooltip => 'Copiar URL';
+
+  @override
+  String get calendarSyncCopiedToast => 'URL del calendario copiada.';
+
+  @override
+  String get calendarSyncRegenerateTooltip => 'Regenerar URL';
+
+  @override
+  String get calendarSyncRegenerate => 'Regenerar';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle =>
+      '¿Regenerar la URL del calendario?';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      'La URL antigua dejará de funcionar inmediatamente -- donde ya la hayas suscrito necesitará la nueva.';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google Calendar: Otros calendarios > Desde URL. Apple Calendar: Archivo > Nueva suscripción de calendario. Outlook: Agregar calendario > Suscribirse desde la web.';
+
+  @override
   String get calendarPreviousMonthTooltip => 'Mes anterior';
 
   @override
@@ -3882,6 +4123,18 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsFoundersHallSubtitle => 'Ve quién ayudó a construir Koda';
+
+  @override
+  String get settingsWikiTitle => 'Ayuda y Wiki';
+
+  @override
+  String get settingsWikiSubtitle => 'Explora la base de conocimientos de Koda';
+
+  @override
+  String get wikiScreenTitle => 'Ayuda y Wiki';
+
+  @override
+  String get wikiScreenEmptyState => 'Todavía no hay nada aquí.';
 
   @override
   String get vispAvatarInDevelopment => 'EN DESARROLLO';

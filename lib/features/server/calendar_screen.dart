@@ -5,6 +5,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/api.dart';
@@ -72,6 +73,20 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     setState(() { _events = events; _loading = false; });
   }
 
+  // Per-(user, server) read-only ICS feed URL -- see koda-server's
+  // Koda.CalendarFeed. Separate from the per-event notification bell
+  // (_showEventDialog's subscribe toggle) -- this syncs the whole
+  // server's calendar into an external app, not one event's reminder.
+  Future<void> _showCalendarSyncDialog() async {
+    final server = ref.read(selectedServerProvider);
+    final serverId = server?['id'] as String?;
+    if (serverId == null) return;
+    await showDialog(
+      context: context,
+      builder: (_) => _CalendarSyncDialog(serverId: serverId),
+    );
+  }
+
   void _changeMonth(int delta) {
     setState(() => _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month + delta));
     _loadEvents();
@@ -123,6 +138,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             icon: Icon(Icons.add, color: KodaColors.koda, size: 20),
             tooltip: t.calendarCreateEventTooltip,
             onPressed: () => _showEventDialog(),
+          ),
+          IconButton(
+            icon: Icon(Icons.sync, color: KodaColors.text3, size: 20),
+            tooltip: t.calendarSyncTooltip,
+            onPressed: _showCalendarSyncDialog,
           ),
         ]),
       ),
@@ -736,6 +756,112 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+// Read-only ICS feed URL for this server, scoped to the viewer (see
+// koda-server's Koda.CalendarFeed) -- mirrors the Throne webhook-URL
+// card's structure (settings_screen.dart's _buildThroneCard) almost
+// exactly: a copyable URL field plus a regenerate button gated behind
+// a confirm dialog, since regenerating breaks any subscription already
+// pasted into an external calendar app.
+class _CalendarSyncDialog extends StatefulWidget {
+  final String serverId;
+  const _CalendarSyncDialog({required this.serverId});
+
+  @override
+  State<_CalendarSyncDialog> createState() => _CalendarSyncDialogState();
+}
+
+class _CalendarSyncDialogState extends State<_CalendarSyncDialog> {
+  String? _url;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final url = await KodaApi.instance.getCalendarFeedUrl(widget.serverId);
+    if (mounted) setState(() { _url = url; _loading = false; });
+  }
+
+  Future<void> _regenerate() async {
+    final t = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: Text(t.calendarSyncRegenerateConfirmTitle,
+            style: TextStyle(color: KodaColors.text1)),
+        content: Text(t.calendarSyncRegenerateConfirmBody,
+            style: TextStyle(color: KodaColors.text3)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.commonCancel)),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text(t.calendarSyncRegenerate)),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    setState(() => _loading = true);
+    final url = await KodaApi.instance.regenerateCalendarFeedUrl(widget.serverId);
+    if (mounted) setState(() { _url = url; _loading = false; });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    return AlertDialog(
+      backgroundColor: KodaColors.card,
+      title: Text(t.calendarSyncDialogTitle, style: TextStyle(color: KodaColors.text1)),
+      content: SizedBox(
+        width: 360,
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(t.calendarSyncDialogDescription,
+              style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+          const SizedBox(height: 12),
+          if (_loading)
+            Center(child: SizedBox(width: 18, height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda)))
+          else if (_url != null) ...[
+            Row(children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                      color: KodaColors.elevated, borderRadius: BorderRadius.circular(8)),
+                  child: Text(_url!,
+                      style: TextStyle(color: KodaColors.text2, fontSize: 11),
+                      overflow: TextOverflow.ellipsis),
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.copy, size: 16, color: KodaColors.text3),
+                tooltip: t.calendarSyncCopyTooltip,
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: _url!));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(t.calendarSyncCopiedToast)));
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.refresh, size: 16, color: KodaColors.text3),
+                tooltip: t.calendarSyncRegenerateTooltip,
+                onPressed: _regenerate,
+              ),
+            ]),
+            const SizedBox(height: 12),
+            Text(t.calendarSyncInstructions,
+                style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+          ],
+        ]),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(t.commonClose)),
+      ],
     );
   }
 }

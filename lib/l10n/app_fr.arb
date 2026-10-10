@@ -52,6 +52,10 @@
   "settingsHighContrastSubtitle": "Couleurs noir et blanc pur à contraste élevé dans toute l'application -- le changement recharge brièvement l'écran actuel.",
   "settingsDyslexiaFontTitle": "Police adaptée à la dyslexie",
   "settingsDyslexiaFontSubtitle": "Bascule le texte principal vers OpenDyslexic dans toute l'application",
+
+  "settingsNewestAtTopTitle": "Afficher les messages les plus récents en haut",
+
+  "settingsNewestAtTopSubtitle": "S'applique aux salons, aux messages privés et au chat des salons vocaux",
   "settingsFontSizeTitle": "Taille de police",
   "settingsFontSizeSample": "Portez ce vieux whisky au juge blond qui fume",
   "settingsDensityTitle": "Densité",
@@ -72,6 +76,128 @@
   "settingsRefreshStatus": "Déjà connecté depuis votre navigateur ? Actualisez le statut",
   "settingsStreamingConnectError": "Impossible de démarrer la connexion à {platform}.",
   "settingsStreamingFinishInBrowser": "Terminez la connexion dans votre navigateur, puis revenez et actualisez.",
+
+  "settingsDeveloperPortalTitle": "Portail développeur",
+
+  "settingsDeveloperPortalSubtitle": "Enregistrez des bots et des apps qui utilisent l'API Koda",
+
+  "devPortalScreenTitle": "Portail développeur",
+
+  "devPortalNewAppTooltip": "Nouvelle application",
+
+  "devPortalEmptyState": "Aucune application pour le moment. Créez-en une pour obtenir une clé API pour votre bot.",
+
+  "devPortalNewAppTitle": "Nouvelle application",
+
+  "devPortalAppNameHint": "Nom de l'app",
+
+  "devPortalAppDescriptionHint": "Description (facultatif)",
+
+  "devPortalBotUsernameHint": "Nom d'utilisateur du bot",
+
+  "devPortalInteractionDataOnlyNote": "Votre bot ne reçoit que la commande et les options qu'un utilisateur lui soumet explicitement -- jamais l'historique des messages d'un salon.",
+
+  "devPortalCreateError": "Impossible de créer cette application pour le moment.",
+
+  "devPortalKeyRevealTitle": "Votre clé API",
+
+  "devPortalKeyRevealWarning": "C'est la seule fois où cette clé sera affichée. Copiez-la maintenant -- Koda ne la stocke pas sous une forme récupérable.",
+
+  "devPortalCopyKeyTooltip": "Copier la clé",
+
+  "devPortalKeyCopiedToast": "Clé API copiée.",
+
+  "devPortalKeySavedIt": "Je l'ai enregistrée",
+
+  "devPortalRegenerate": "Régénérer",
+
+  "devPortalRegenerateConfirmTitle": "Régénérer la clé API ?",
+
+  "devPortalRegenerateConfirmBody": "La clé actuelle cessera immédiatement de fonctionner -- tout ce qui l'utilise déjà aura besoin de la nouvelle.",
+
+  "devPortalDeleteConfirmTitle": "Supprimer cette application ?",
+
+  "devPortalDeleteConfirmBody": "Sa clé API sera révoquée et le compte du bot désactivé. Cette action est irréversible.",
+
+  "devPortalOAuthSectionTitle": "OAuth2 (Connexion avec Koda)",
+
+  "devPortalNoRedirectUris": "Aucune URI de redirection enregistrée pour l'instant.",
+
+  "devPortalEditRedirectUris": "Modifier les URI de redirection",
+
+  "devPortalEditRedirectUrisTitle": "URI de redirection",
+
+  "devPortalRedirectUrisHelp": "Une par ligne. Le redirect_uri d'une demande de consentement doit correspondre exactement à l'une d'elles.",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "Générer un secret client",
+
+  "devPortalRegenerateClientSecret": "Régénérer le secret client",
+
+  "devPortalClientSecretEndingIn": "Secret client se terminant par {lastFour}",
+
+  "oauthConsentTitle": "Autoriser l'application",
+
+  "oauthConsentUnknownApp": "Cette application est introuvable.",
+
+  "oauthConsentAllowQuestion": "Autoriser {appName} à accéder à votre compte Koda ?",
+
+  "oauthConsentWillBeAbleTo": "Cela permettra à l'app de :",
+
+  "oauthConsentAllow": "Autoriser",
+
+  "oauthConsentDeny": "Refuser",
+
+  "oauthConsentError": "Impossible de terminer -- réessayez.",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "Connectez Steam pour partager à quoi vous jouez et/ou comparer vos bibliothèques de jeux avec des amis -- ce sont deux interrupteurs indépendants, activer l'un n'active jamais l'autre.",
+
+  "settingsSteamConnected": "Steam connecté en tant que {personaName}",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "Steam non connecté",
+
+  "settingsSteamSharePresence": "Partager à quoi je joue",
+
+  "settingsSteamSharePresenceSubtitle": "Les amis et membres du serveur voient votre jeu actuel près de votre statut",
+
+  "settingsSteamShareLibrary": "Autoriser la comparaison de bibliothèque",
+
+  "settingsSteamShareLibrarySubtitle": "Les amis et membres du serveur peuvent comparer leur bibliothèque Steam à la vôtre",
+
+  "profilePlayingGame": "Joue à {game}",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "Comparer les bibliothèques Steam",
+
+  "steamCompareScreenTitle": "Bibliothèque Steam partagée",
+
+  "steamCompareSharedCount": "Vous possédez tous les deux {count} jeux",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "Aucun jeu en commun pour le moment.",
+
+  "steamCompareError": "Impossible de charger les jeux partagés pour l'instant.",
+
+  "steamSyncNow": "Synchroniser maintenant",
+
+  "steamSyncSuccess": "Bibliothèque Steam synchronisée.",
+
+  "steamSyncError": "Impossible de synchroniser maintenant -- réessayez dans un instant.",
+
+  "steamManageLibraryTitle": "Gérer les jeux synchronisés",
+
+  "steamManageLibraryDescription": "Les jeux que vous marquez comme masqués ici n'apparaissent jamais dans une comparaison de bibliothèque, même si Steam les considère encore publics.",
+
+  "steamManageLibraryEmptyState": "Aucun jeu synchronisé pour le moment -- essayez Synchroniser maintenant.",
+
+  "steamHiddenFromComparison": "Masqué de la comparaison",
   "settingsThroneTitle": "Webhook Throne",
   "settingsThroneDescription": "Collez cette URL dans les paramètres de webhook de Throne.com pour être averti dans Koda chaque fois que quelqu'un vous envoie un cadeau.",
   "settingsThroneGetUrl": "Obtenir mon URL de webhook",
@@ -853,6 +979,26 @@
   "calendarFallbackTitle": "Calendrier",
   "calendarAskVispTooltip": "Demander à Visp",
   "calendarCreateEventTooltip": "Créer un événement",
+
+  "calendarSyncTooltip": "Synchroniser avec votre app de calendrier",
+
+  "calendarSyncDialogTitle": "Synchroniser ce calendrier",
+
+  "calendarSyncDialogDescription": "Abonnez-vous à cette URL depuis Google Agenda, Apple Calendrier, Outlook ou toute app prenant en charge \"s'abonner par URL\" pour voir les événements de ce serveur dans votre propre calendrier. Lecture seule, et inclut uniquement les événements des salons que vous pouvez voir.",
+
+  "calendarSyncCopyTooltip": "Copier l'URL",
+
+  "calendarSyncCopiedToast": "URL du calendrier copiée.",
+
+  "calendarSyncRegenerateTooltip": "Régénérer l'URL",
+
+  "calendarSyncRegenerate": "Régénérer",
+
+  "calendarSyncRegenerateConfirmTitle": "Régénérer l'URL du calendrier ?",
+
+  "calendarSyncRegenerateConfirmBody": "L'ancienne URL cessera immédiatement de fonctionner -- partout où vous l'avez déjà ajoutée, il faudra la nouvelle.",
+
+  "calendarSyncInstructions": "Google Agenda : Autres agendas > Par URL. Apple Calendrier : Fichier > Nouvel abonnement au calendrier. Outlook : Ajouter un calendrier > S'abonner depuis le web.",
   "calendarPreviousMonthTooltip": "Mois précédent",
   "calendarNextMonthTooltip": "Mois suivant",
   "calendarTodayButton": "Aujourd'hui",
@@ -1118,6 +1264,18 @@
   "settingsFoundersHallTitle": "Hall des Fondateurs",
 
   "settingsFoundersHallSubtitle": "Découvrez qui a aidé à construire Koda",
+
+
+  "settingsWikiTitle": "Aide et Wiki",
+
+
+  "settingsWikiSubtitle": "Parcourez la base de connaissances de Koda",
+
+
+  "wikiScreenTitle": "Aide et Wiki",
+
+
+  "wikiScreenEmptyState": "Rien ici pour l'instant.",
   "vispAvatarInDevelopment": "EN DÉVELOPPEMENT",
   "vispBoostAdvisorCouldNotAnswer": "Visp n'a pas pu formuler de réponse.",
   "vispBoostAdvisorTitle": "Demander à Visp : Conseiller ROI des boosts",

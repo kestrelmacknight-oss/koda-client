@@ -55,6 +55,10 @@
   "settingsHighContrastSubtitle": "Чёрно-белые цвета высокой контрастности во всём приложении -- при переключении текущий экран ненадолго перезагрузится.",
   "settingsDyslexiaFontTitle": "Шрифт для дислексии",
   "settingsDyslexiaFontSubtitle": "Переключает основной текст на OpenDyslexic во всём приложении",
+
+  "settingsNewestAtTopTitle": "Показывать новые сообщения сверху",
+
+  "settingsNewestAtTopSubtitle": "Применяется к каналам, личным сообщениям и чату голосового канала",
   "settingsFontSizeTitle": "Размер шрифта",
   "settingsFontSizeSample": "Съешь же ещё этих мягких французских булок, да выпей чаю",
   "settingsDensityTitle": "Плотность",
@@ -75,6 +79,128 @@
   "settingsRefreshStatus": "Уже подключились в браузере? Обновить статус",
   "settingsStreamingConnectError": "Не удалось начать подключение к {platform}.",
   "settingsStreamingFinishInBrowser": "Завершите подключение в браузере, затем вернитесь и обновите страницу.",
+
+  "settingsDeveloperPortalTitle": "Портал разработчика",
+
+  "settingsDeveloperPortalSubtitle": "Регистрируйте ботов и приложения, использующие API Koda",
+
+  "devPortalScreenTitle": "Портал разработчика",
+
+  "devPortalNewAppTooltip": "Новое приложение",
+
+  "devPortalEmptyState": "Пока нет приложений. Создайте одно, чтобы получить ключ API для вашего бота.",
+
+  "devPortalNewAppTitle": "Новое приложение",
+
+  "devPortalAppNameHint": "Название приложения",
+
+  "devPortalAppDescriptionHint": "Описание (необязательно)",
+
+  "devPortalBotUsernameHint": "Имя пользователя бота",
+
+  "devPortalInteractionDataOnlyNote": "Ваш бот получает только команду и параметры, которые пользователь явно ему отправляет -- никогда историю сообщений канала.",
+
+  "devPortalCreateError": "Не удалось создать это приложение сейчас.",
+
+  "devPortalKeyRevealTitle": "Ваш ключ API",
+
+  "devPortalKeyRevealWarning": "Это единственный раз, когда этот ключ будет показан. Скопируйте его сейчас -- Koda не хранит его в восстанавливаемом виде.",
+
+  "devPortalCopyKeyTooltip": "Скопировать ключ",
+
+  "devPortalKeyCopiedToast": "Ключ API скопирован.",
+
+  "devPortalKeySavedIt": "Я его сохранил",
+
+  "devPortalRegenerate": "Обновить",
+
+  "devPortalRegenerateConfirmTitle": "Обновить ключ API?",
+
+  "devPortalRegenerateConfirmBody": "Текущий ключ немедленно перестанет работать -- всё, что уже его использует, потребует нового.",
+
+  "devPortalDeleteConfirmTitle": "Удалить это приложение?",
+
+  "devPortalDeleteConfirmBody": "Его ключ API будет аннулирован, а аккаунт бота деактивирован. Это нельзя отменить.",
+
+  "devPortalOAuthSectionTitle": "OAuth2 (Вход через Koda)",
+
+  "devPortalNoRedirectUris": "Пока не зарегистрировано ни одного redirect URI.",
+
+  "devPortalEditRedirectUris": "Изменить redirect URI",
+
+  "devPortalEditRedirectUrisTitle": "Redirect URI",
+
+  "devPortalRedirectUrisHelp": "По одному на строку. redirect_uri запроса согласия должен точно совпадать с одним из них.",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "Создать секрет клиента",
+
+  "devPortalRegenerateClientSecret": "Создать новый секрет клиента",
+
+  "devPortalClientSecretEndingIn": "Секрет клиента заканчивается на {lastFour}",
+
+  "oauthConsentTitle": "Авторизовать приложение",
+
+  "oauthConsentUnknownApp": "Это приложение не найдено.",
+
+  "oauthConsentAllowQuestion": "Разрешить {appName} доступ к вашей учётной записи Koda?",
+
+  "oauthConsentWillBeAbleTo": "Это позволит приложению:",
+
+  "oauthConsentAllow": "Разрешить",
+
+  "oauthConsentDeny": "Отказать",
+
+  "oauthConsentError": "Не удалось завершить -- попробуйте снова.",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "Подключите Steam, чтобы делиться тем, во что вы сейчас играете, и/или сравнивать библиотеки игр с друзьями -- это два независимых переключателя, включение одного никогда не включает другой.",
+
+  "settingsSteamConnected": "Steam подключён как {personaName}",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "Steam не подключён",
+
+  "settingsSteamSharePresence": "Делиться тем, во что я играю",
+
+  "settingsSteamSharePresenceSubtitle": "Друзья и участники сервера видят вашу текущую игру рядом со статусом",
+
+  "settingsSteamShareLibrary": "Разрешить сравнение библиотек",
+
+  "settingsSteamShareLibrarySubtitle": "Друзья и участники сервера могут сравнить свою библиотеку Steam с вашей",
+
+  "profilePlayingGame": "Играет в {game}",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "Сравнить библиотеки Steam",
+
+  "steamCompareScreenTitle": "Общая библиотека Steam",
+
+  "steamCompareSharedCount": "У вас обоих {count} игр",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "Пока нет общих игр.",
+
+  "steamCompareError": "Не удалось загрузить общие игры сейчас.",
+
+  "steamSyncNow": "Синхронизировать сейчас",
+
+  "steamSyncSuccess": "Библиотека Steam синхронизирована.",
+
+  "steamSyncError": "Не удалось синхронизировать сейчас -- попробуйте снова через минуту.",
+
+  "steamManageLibraryTitle": "Управление синхронизированными играми",
+
+  "steamManageLibraryDescription": "Игры, которые вы здесь отметите как скрытые, никогда не появятся в сравнении библиотек, даже если Steam всё ещё считает их публичными.",
+
+  "steamManageLibraryEmptyState": "Пока нет синхронизированных игр -- попробуйте Синхронизировать сейчас.",
+
+  "steamHiddenFromComparison": "Скрыто из сравнения",
   "settingsThroneTitle": "Вебхук Throne",
   "settingsThroneDescription": "Вставьте этот URL в настройки вебхука на Throne.com, чтобы получать уведомления в Koda каждый раз, когда вам отправляют подарок.",
   "settingsThroneGetUrl": "Получить URL моего вебхука",
@@ -861,6 +987,26 @@
   "calendarFallbackTitle": "Календарь",
   "calendarAskVispTooltip": "Спросить Visp",
   "calendarCreateEventTooltip": "Создать событие",
+
+  "calendarSyncTooltip": "Синхронизировать с вашим календарём",
+
+  "calendarSyncDialogTitle": "Синхронизировать этот календарь",
+
+  "calendarSyncDialogDescription": "Подпишитесь на этот URL в Google Календаре, Apple Календаре, Outlook или любом приложении с поддержкой \"подписки по URL\", чтобы видеть события этого сервера в своём календаре. Только для чтения, включает только события из каналов, которые вы можете видеть.",
+
+  "calendarSyncCopyTooltip": "Скопировать URL",
+
+  "calendarSyncCopiedToast": "URL календаря скопирован.",
+
+  "calendarSyncRegenerateTooltip": "Обновить URL",
+
+  "calendarSyncRegenerate": "Обновить",
+
+  "calendarSyncRegenerateConfirmTitle": "Обновить URL календаря?",
+
+  "calendarSyncRegenerateConfirmBody": "Старый URL сразу перестанет работать -- везде, где вы уже подписались, понадобится новый.",
+
+  "calendarSyncInstructions": "Google Календарь: Другие календари > По URL. Apple Календарь: Файл > Новая подписка на календарь. Outlook: Добавить календарь > Подписаться из интернета.",
   "calendarPreviousMonthTooltip": "Предыдущий месяц",
   "calendarNextMonthTooltip": "Следующий месяц",
   "calendarTodayButton": "Сегодня",
@@ -1126,6 +1272,18 @@
   "settingsFoundersHallTitle": "Зал основателей",
 
   "settingsFoundersHallSubtitle": "Узнайте, кто помог создать Koda",
+
+
+  "settingsWikiTitle": "Помощь и вики",
+
+
+  "settingsWikiSubtitle": "Просмотрите базу знаний Koda",
+
+
+  "wikiScreenTitle": "Помощь и вики",
+
+
+  "wikiScreenEmptyState": "Здесь пока ничего нет.",
   "vispAvatarInDevelopment": "В РАЗРАБОТКЕ",
   "vispBoostAdvisorCouldNotAnswer": "Visp не смог составить ответ.",
   "vispBoostAdvisorTitle": "Спросить Visp: Советник по окупаемости бустов",

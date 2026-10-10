@@ -176,6 +176,14 @@ class AppLocalizationsVi extends AppLocalizations {
       'Chuyển văn bản nội dung sang OpenDyslexic trên toàn ứng dụng';
 
   @override
+  String get settingsNewestAtTopTitle =>
+      'Hiển thị Tin nhắn Mới nhất ở Trên cùng';
+
+  @override
+  String get settingsNewestAtTopSubtitle =>
+      'Áp dụng cho kênh, tin nhắn trực tiếp và trò chuyện kênh thoại';
+
+  @override
   String get settingsFontSizeTitle => 'Cỡ chữ';
 
   @override
@@ -247,6 +255,204 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get settingsStreamingFinishInBrowser =>
       'Hoàn tất kết nối trong trình duyệt, sau đó quay lại và làm mới.';
+
+  @override
+  String get settingsDeveloperPortalTitle => 'Cổng thông tin nhà phát triển';
+
+  @override
+  String get settingsDeveloperPortalSubtitle =>
+      'Đăng ký bot và ứng dụng sử dụng API Koda';
+
+  @override
+  String get devPortalScreenTitle => 'Cổng thông tin nhà phát triển';
+
+  @override
+  String get devPortalNewAppTooltip => 'Ứng dụng mới';
+
+  @override
+  String get devPortalEmptyState =>
+      'Chưa có ứng dụng nào. Tạo một ứng dụng để nhận khóa API cho bot của bạn.';
+
+  @override
+  String get devPortalNewAppTitle => 'Ứng dụng mới';
+
+  @override
+  String get devPortalAppNameHint => 'Tên ứng dụng';
+
+  @override
+  String get devPortalAppDescriptionHint => 'Mô tả (tùy chọn)';
+
+  @override
+  String get devPortalBotUsernameHint => 'Tên người dùng bot';
+
+  @override
+  String get devPortalInteractionDataOnlyNote =>
+      'Bot của bạn chỉ nhận lệnh và các tùy chọn mà người dùng gửi rõ ràng đến nó -- không bao giờ nhận lịch sử tin nhắn của kênh.';
+
+  @override
+  String get devPortalCreateError => 'Hiện không thể tạo ứng dụng này.';
+
+  @override
+  String get devPortalKeyRevealTitle => 'Khóa API của bạn';
+
+  @override
+  String get devPortalKeyRevealWarning =>
+      'Đây là lần duy nhất khóa này được hiển thị. Hãy sao chép ngay bây giờ -- Koda không lưu trữ nó ở dạng có thể khôi phục.';
+
+  @override
+  String get devPortalCopyKeyTooltip => 'Sao chép khóa';
+
+  @override
+  String get devPortalKeyCopiedToast => 'Đã sao chép khóa API.';
+
+  @override
+  String get devPortalKeySavedIt => 'Tôi đã lưu nó';
+
+  @override
+  String get devPortalRegenerate => 'Tạo Lại';
+
+  @override
+  String get devPortalRegenerateConfirmTitle => 'Tạo lại khóa API?';
+
+  @override
+  String get devPortalRegenerateConfirmBody =>
+      'Khóa hiện tại sẽ ngừng hoạt động ngay lập tức -- bất cứ thứ gì đang dùng nó sẽ cần khóa mới.';
+
+  @override
+  String get devPortalDeleteConfirmTitle => 'Xóa ứng dụng này?';
+
+  @override
+  String get devPortalDeleteConfirmBody =>
+      'Khóa API của nó sẽ bị thu hồi và tài khoản bot sẽ bị vô hiệu hóa. Không thể hoàn tác.';
+
+  @override
+  String get devPortalOAuthSectionTitle => 'OAuth2 (Đăng nhập bằng Koda)';
+
+  @override
+  String get devPortalNoRedirectUris =>
+      'Chưa có redirect URI nào được đăng ký.';
+
+  @override
+  String get devPortalEditRedirectUris => 'Chỉnh sửa redirect URI';
+
+  @override
+  String get devPortalEditRedirectUrisTitle => 'Redirect URI';
+
+  @override
+  String get devPortalRedirectUrisHelp =>
+      'Mỗi dòng một URI. redirect_uri của yêu cầu đồng ý phải khớp chính xác với một trong số này.';
+
+  @override
+  String get devPortalRedirectUrisHint => 'https://example.com/callback';
+
+  @override
+  String get devPortalGenerateClientSecret => 'Tạo client secret';
+
+  @override
+  String get devPortalRegenerateClientSecret => 'Tạo lại client secret';
+
+  @override
+  String devPortalClientSecretEndingIn(String lastFour) {
+    return 'Client secret kết thúc bằng $lastFour';
+  }
+
+  @override
+  String get oauthConsentTitle => 'Cấp quyền ứng dụng';
+
+  @override
+  String get oauthConsentUnknownApp => 'Không tìm thấy ứng dụng này.';
+
+  @override
+  String oauthConsentAllowQuestion(String appName) {
+    return 'Cho phép $appName truy cập tài khoản Koda của bạn?';
+  }
+
+  @override
+  String get oauthConsentWillBeAbleTo => 'Điều này sẽ cho phép ứng dụng:';
+
+  @override
+  String get oauthConsentAllow => 'Cho phép';
+
+  @override
+  String get oauthConsentDeny => 'Từ chối';
+
+  @override
+  String get oauthConsentError => 'Không thể hoàn tất -- hãy thử lại.';
+
+  @override
+  String get settingsSteamTitle => 'Steam';
+
+  @override
+  String get settingsSteamDescription =>
+      'Kết nối Steam để chia sẻ bạn đang chơi gì và/hoặc so sánh thư viện game với bạn bè -- đây là hai công tắc độc lập, bật một cái không bao giờ tự bật cái kia.';
+
+  @override
+  String settingsSteamConnected(String personaName) {
+    return 'Đã kết nối Steam với tên $personaName';
+  }
+
+  @override
+  String get settingsSteamNotConnected => 'Chưa kết nối Steam';
+
+  @override
+  String get settingsSteamSharePresence => 'Chia sẻ trò chơi tôi đang chơi';
+
+  @override
+  String get settingsSteamSharePresenceSubtitle =>
+      'Bạn bè và thành viên server thấy trò chơi hiện tại của bạn bên cạnh trạng thái';
+
+  @override
+  String get settingsSteamShareLibrary => 'Cho phép so sánh thư viện';
+
+  @override
+  String get settingsSteamShareLibrarySubtitle =>
+      'Bạn bè và thành viên server có thể so sánh thư viện Steam của họ với bạn';
+
+  @override
+  String profilePlayingGame(String game) {
+    return 'Đang chơi $game';
+  }
+
+  @override
+  String get profileCompareSteamLibraries => 'So Sánh Thư Viện Steam';
+
+  @override
+  String get steamCompareScreenTitle => 'Thư Viện Steam Chung';
+
+  @override
+  String steamCompareSharedCount(int count) {
+    return 'Cả hai bạn đều có $count trò chơi';
+  }
+
+  @override
+  String get steamCompareEmptyState => 'Chưa có trò chơi chung nào.';
+
+  @override
+  String get steamCompareError => 'Không thể tải trò chơi chung lúc này.';
+
+  @override
+  String get steamSyncNow => 'Đồng Bộ Ngay';
+
+  @override
+  String get steamSyncSuccess => 'Đã đồng bộ thư viện Steam.';
+
+  @override
+  String get steamSyncError =>
+      'Không thể đồng bộ ngay bây giờ -- thử lại sau chút nữa.';
+
+  @override
+  String get steamManageLibraryTitle => 'Quản lý trò chơi đã đồng bộ';
+
+  @override
+  String get steamManageLibraryDescription =>
+      'Các trò chơi bạn đánh dấu ẩn ở đây sẽ không bao giờ xuất hiện trong so sánh thư viện, ngay cả khi Steam vẫn coi chúng là công khai.';
+
+  @override
+  String get steamManageLibraryEmptyState =>
+      'Chưa có trò chơi đồng bộ nào -- hãy thử Đồng Bộ Ngay.';
+
+  @override
+  String get steamHiddenFromComparison => 'Đã ẩn khỏi so sánh';
 
   @override
   String get settingsThroneTitle => 'Webhook Throne';
@@ -2929,6 +3135,39 @@ class AppLocalizationsVi extends AppLocalizations {
   String get calendarCreateEventTooltip => 'Tạo sự kiện';
 
   @override
+  String get calendarSyncTooltip => 'Đồng bộ với ứng dụng lịch của bạn';
+
+  @override
+  String get calendarSyncDialogTitle => 'Đồng bộ lịch này';
+
+  @override
+  String get calendarSyncDialogDescription =>
+      'Đăng ký URL này từ Google Lịch, Apple Lịch, Outlook hoặc bất kỳ ứng dụng nào hỗ trợ \"đăng ký qua URL\" để xem sự kiện của server này trong lịch của riêng bạn. Chỉ đọc, và chỉ bao gồm sự kiện từ các kênh bạn có thể xem.';
+
+  @override
+  String get calendarSyncCopyTooltip => 'Sao chép URL';
+
+  @override
+  String get calendarSyncCopiedToast => 'Đã sao chép URL lịch.';
+
+  @override
+  String get calendarSyncRegenerateTooltip => 'Tạo lại URL';
+
+  @override
+  String get calendarSyncRegenerate => 'Tạo Lại';
+
+  @override
+  String get calendarSyncRegenerateConfirmTitle => 'Tạo lại URL lịch?';
+
+  @override
+  String get calendarSyncRegenerateConfirmBody =>
+      'URL cũ sẽ ngừng hoạt động ngay lập tức -- bất cứ nơi nào bạn đã đăng ký sẽ cần URL mới.';
+
+  @override
+  String get calendarSyncInstructions =>
+      'Google Lịch: Lịch khác > Từ URL. Apple Lịch: Tệp > Đăng Ký Lịch Mới. Outlook: Thêm lịch > Đăng ký từ web.';
+
+  @override
   String get calendarPreviousMonthTooltip => 'Tháng trước';
 
   @override
@@ -3845,6 +4084,18 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get settingsFoundersHallSubtitle => 'Xem ai đã giúp xây dựng Koda';
+
+  @override
+  String get settingsWikiTitle => 'Trợ giúp & Wiki';
+
+  @override
+  String get settingsWikiSubtitle => 'Duyệt cơ sở kiến thức của Koda';
+
+  @override
+  String get wikiScreenTitle => 'Trợ giúp & Wiki';
+
+  @override
+  String get wikiScreenEmptyState => 'Chưa có gì ở đây.';
 
   @override
   String get vispAvatarInDevelopment => 'ĐANG PHÁT TRIỂN';

@@ -55,6 +55,10 @@
   "settingsHighContrastSubtitle": "Uygulama genelinde saf siyah/beyaz, yüksek kontrastlı renkler -- geçiş yapmak mevcut ekranı kısa süreliğine yeniden yükler.",
   "settingsDyslexiaFontTitle": "Disleksi dostu yazı tipi",
   "settingsDyslexiaFontSubtitle": "Gövde metnini uygulama genelinde OpenDyslexic'e çevirir",
+
+  "settingsNewestAtTopTitle": "En Yeni Mesajları Üstte Göster",
+
+  "settingsNewestAtTopSubtitle": "Kanallar, DM'ler ve ses kanalı sohbeti için aynı şekilde geçerlidir",
   "settingsFontSizeTitle": "Yazı tipi boyutu",
   "settingsFontSizeSample": "Pijamalı hasta yağız şoföre çabucak güvendi",
   "settingsDensityTitle": "Yoğunluk",
@@ -75,6 +79,128 @@
   "settingsRefreshStatus": "Tarayıcınızda zaten bağlandınız mı? Durumu yenile",
   "settingsStreamingConnectError": "{platform} bağlantısı başlatılamadı.",
   "settingsStreamingFinishInBrowser": "Bağlantıyı tarayıcınızda tamamlayın, sonra geri dönüp yenileyin.",
+
+  "settingsDeveloperPortalTitle": "Geliştirici Portalı",
+
+  "settingsDeveloperPortalSubtitle": "Koda API'sini kullanan bot ve uygulamaları kaydet",
+
+  "devPortalScreenTitle": "Geliştirici Portalı",
+
+  "devPortalNewAppTooltip": "Yeni Uygulama",
+
+  "devPortalEmptyState": "Henüz uygulama yok. Botun için bir API anahtarı almak üzere bir tane oluştur.",
+
+  "devPortalNewAppTitle": "Yeni Uygulama",
+
+  "devPortalAppNameHint": "Uygulama adı",
+
+  "devPortalAppDescriptionHint": "Açıklama (isteğe bağlı)",
+
+  "devPortalBotUsernameHint": "Bot kullanıcı adı",
+
+  "devPortalInteractionDataOnlyNote": "Botun yalnızca bir kullanıcının açıkça gönderdiği komutu ve seçenekleri alır -- bir kanalın mesaj geçmişini asla almaz.",
+
+  "devPortalCreateError": "Bu uygulama şu anda oluşturulamadı.",
+
+  "devPortalKeyRevealTitle": "API anahtarın",
+
+  "devPortalKeyRevealWarning": "Bu anahtar yalnızca bu sefer gösterilecek. Şimdi kopyala -- Koda onu kurtarılabilir biçimde saklamaz.",
+
+  "devPortalCopyKeyTooltip": "Anahtarı kopyala",
+
+  "devPortalKeyCopiedToast": "API anahtarı kopyalandı.",
+
+  "devPortalKeySavedIt": "Kaydettim",
+
+  "devPortalRegenerate": "Yeniden Oluştur",
+
+  "devPortalRegenerateConfirmTitle": "API anahtarı yeniden oluşturulsun mu?",
+
+  "devPortalRegenerateConfirmBody": "Mevcut anahtar hemen çalışmayı durduracak -- onu zaten kullanan her şey yenisine ihtiyaç duyacak.",
+
+  "devPortalDeleteConfirmTitle": "Bu uygulama silinsin mi?",
+
+  "devPortalDeleteConfirmBody": "API anahtarı iptal edilecek ve bot hesabı devre dışı bırakılacak. Bu geri alınamaz.",
+
+  "devPortalOAuthSectionTitle": "OAuth2 (Koda ile Giriş Yap)",
+
+  "devPortalNoRedirectUris": "Henüz kayıtlı yönlendirme URI'si yok.",
+
+  "devPortalEditRedirectUris": "Yönlendirme URI'lerini düzenle",
+
+  "devPortalEditRedirectUrisTitle": "Yönlendirme URI'leri",
+
+  "devPortalRedirectUrisHelp": "Her satıra bir tane. Bir onay isteğinin redirect_uri'si bunlardan biriyle tam olarak eşleşmelidir.",
+
+  "devPortalRedirectUrisHint": "https://example.com/callback",
+
+  "devPortalGenerateClientSecret": "İstemci sırrı oluştur",
+
+  "devPortalRegenerateClientSecret": "İstemci sırrını yeniden oluştur",
+
+  "devPortalClientSecretEndingIn": "{lastFour} ile biten istemci sırrı",
+
+  "oauthConsentTitle": "Uygulamayı Yetkilendir",
+
+  "oauthConsentUnknownApp": "Bu uygulama bulunamadı.",
+
+  "oauthConsentAllowQuestion": "{appName} uygulamasının Koda hesabına erişmesine izin verilsin mi?",
+
+  "oauthConsentWillBeAbleTo": "Bu, uygulamanın şunları yapmasına izin verecek:",
+
+  "oauthConsentAllow": "İzin Ver",
+
+  "oauthConsentDeny": "Reddet",
+
+  "oauthConsentError": "Bu tamamlanamadı -- tekrar deneyin.",
+
+  "settingsSteamTitle": "Steam",
+
+  "settingsSteamDescription": "Şu an ne oynadığını paylaşmak ve/veya arkadaşlarla oyun kitaplıklarını karşılaştırmak için Steam'i bağla -- bunlar birbirinden bağımsız iki anahtardır, birini açmak diğerini asla açmaz.",
+
+  "settingsSteamConnected": "Steam {personaName} olarak bağlandı",
+
+  "@settingsSteamConnected": {"placeholders": {"personaName": {"type": "String"}}},
+
+  "settingsSteamNotConnected": "Steam bağlı değil",
+
+  "settingsSteamSharePresence": "Ne oynadığımı paylaş",
+
+  "settingsSteamSharePresenceSubtitle": "Arkadaşlar ve sunucu üyeleri durumunun yanında şu anki oyununu görür",
+
+  "settingsSteamShareLibrary": "Kitaplık karşılaştırmasına izin ver",
+
+  "settingsSteamShareLibrarySubtitle": "Arkadaşlar ve sunucu üyeleri Steam kitaplıklarını seninkiyle karşılaştırabilir",
+
+  "profilePlayingGame": "{game} oynuyor",
+
+  "@profilePlayingGame": {"placeholders": {"game": {"type": "String"}}},
+
+  "profileCompareSteamLibraries": "Steam Kitaplıklarını Karşılaştır",
+
+  "steamCompareScreenTitle": "Paylaşılan Steam Kitaplığı",
+
+  "steamCompareSharedCount": "İkinizin de {count} oyunu var",
+
+  "@steamCompareSharedCount": {"placeholders": {"count": {"type": "int"}}},
+
+  "steamCompareEmptyState": "Henüz ortak oyun yok.",
+
+  "steamCompareError": "Paylaşılan oyunlar şu anda yüklenemedi.",
+
+  "steamSyncNow": "Şimdi Senkronize Et",
+
+  "steamSyncSuccess": "Steam kitaplığı senkronize edildi.",
+
+  "steamSyncError": "Şimdi senkronize edilemedi -- bir süre sonra tekrar deneyin.",
+
+  "steamManageLibraryTitle": "Senkronize oyunları yönet",
+
+  "steamManageLibraryDescription": "Burada gizli olarak işaretlediğin oyunlar, Steam onları hâlâ herkese açık görse bile kitaplık karşılaştırmasında asla görünmez.",
+
+  "steamManageLibraryEmptyState": "Henüz senkronize oyun yok -- Şimdi Senkronize Et'i dene.",
+
+  "steamHiddenFromComparison": "Karşılaştırmadan gizlendi",
   "settingsThroneTitle": "Throne Webhook",
   "settingsThroneDescription": "Biri size hediye gönderdiğinde Koda'da bildirim almak için bu URL'yi Throne.com webhook ayarlarınıza yapıştırın.",
   "settingsThroneGetUrl": "Webhook URL'imi al",
@@ -861,6 +987,26 @@
   "calendarFallbackTitle": "Takvim",
   "calendarAskVispTooltip": "Visp'e Sor",
   "calendarCreateEventTooltip": "Etkinlik Oluştur",
+
+  "calendarSyncTooltip": "Takvim uygulamanla senkronize et",
+
+  "calendarSyncDialogTitle": "Bu takvimi senkronize et",
+
+  "calendarSyncDialogDescription": "Bu sunucunun etkinliklerini kendi takviminde görmek için bu URL'ye Google Takvim, Apple Takvim, Outlook veya \"URL ile abone ol\"u destekleyen herhangi bir uygulamadan abone ol. Salt okunur ve yalnızca görebildiğin kanallardaki etkinlikleri içerir.",
+
+  "calendarSyncCopyTooltip": "URL'yi kopyala",
+
+  "calendarSyncCopiedToast": "Takvim URL'si kopyalandı.",
+
+  "calendarSyncRegenerateTooltip": "URL'yi yeniden oluştur",
+
+  "calendarSyncRegenerate": "Yeniden Oluştur",
+
+  "calendarSyncRegenerateConfirmTitle": "Takvim URL'si yeniden oluşturulsun mu?",
+
+  "calendarSyncRegenerateConfirmBody": "Eski URL hemen çalışmayı durduracak -- zaten abone olduğun her yerde yenisi gerekecek.",
+
+  "calendarSyncInstructions": "Google Takvim: Diğer takvimler > URL'den. Apple Takvim: Dosya > Yeni Takvim Aboneliği. Outlook: Takvim ekle > Web'den abone ol.",
   "calendarPreviousMonthTooltip": "Önceki ay",
   "calendarNextMonthTooltip": "Sonraki ay",
   "calendarTodayButton": "Bugün",
@@ -1126,6 +1272,18 @@
   "settingsFoundersHallTitle": "Founders Hall",
 
   "settingsFoundersHallSubtitle": "Koda’yı kimin inşa etmeye yardım ettiğini gör",
+
+
+  "settingsWikiTitle": "Yardım ve Wiki",
+
+
+  "settingsWikiSubtitle": "Koda'nın bilgi bankasına göz atın",
+
+
+  "wikiScreenTitle": "Yardım ve Wiki",
+
+
+  "wikiScreenEmptyState": "Henüz burada bir şey yok.",
   "vispAvatarInDevelopment": "GELİŞTİRİLİYOR",
   "vispBoostAdvisorCouldNotAnswer": "Visp bir yanıt hazırlayamadı.",
   "vispBoostAdvisorTitle": "Visp'e Sor: Boost Getiri Danışmanı",
