@@ -151,6 +151,66 @@
 
   "oauthConsentError": "Impossible de terminer -- réessayez.",
 
+  "commonNext": "Suivant",
+
+  "serverTabBots": "Bots",
+
+  "botInstallTitle": "Installer un bot",
+
+  "botInstallSuccess": "Bot installé.",
+
+  "botInstallNoEligibleServers": "Vous ne gérez aucun serveur pouvant installer des bots.",
+
+  "botInstallSelectServer": "Installer dans",
+
+  "botInstallSelectPermissions": "Permissions à accorder",
+
+  "botInstallPermissionsHelp": "Seules les permissions que vous possédez vous-même peuvent être accordées -- celles grisées ne sont pas les vôtres à donner.",
+
+  "botInstallConfirm": "Installer",
+
+  "botsTabDescription": "Bots installés sur ce serveur, et ce qu'ils sont autorisés à faire.",
+
+  "botsTabInstallButton": "Installer un bot",
+
+  "botsTabInstallDialogTitle": "Installer un bot",
+
+  "botsTabClientIdHint": "Collez l'ID de l'application du bot",
+
+  "botsTabEmptyState": "Aucun bot installé pour le moment.",
+
+  "botsTabNoPermissions": "Aucune permission accordée",
+
+  "botsTabUninstall": "Désinstaller",
+
+  "devPortalCommandsSectionTitle": "Commandes slash",
+
+  "devPortalNoInteractionsUrl": "Aucune URL d'interactions définie pour l'instant.",
+
+  "devPortalEditInteractionsUrl": "Modifier l'URL d'interactions",
+
+  "devPortalEditInteractionsUrlTitle": "URL d'interactions",
+
+  "devPortalInteractionsUrlHelp": "Où Koda envoie un POST signé chaque fois que quelqu'un invoque une commande de cette app. Doit répondre en environ 3 secondes.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "Générer un secret de signature",
+
+  "devPortalRegenerateSigningSecret": "Régénérer le secret de signature",
+
+  "homeSlashCommandsTooltip": "Commandes slash",
+
+  "slashCommandsNoneAvailable": "Aucun bot avec des commandes n'est installé sur ce serveur.",
+
+  "slashCommandsPickerTitle": "Choisir une commande",
+
+  "slashCommandsRun": "Exécuter",
+
+  "devPortalEventsSectionTitle": "Événements webhook",
+
+  "devPortalEventsSectionHelp": "Koda notifie l'URL d'interactions de cette app quand un événement abonné se produit -- n'activez que ce dont vous avez besoin.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Connectez Steam pour partager à quoi vous jouez et/ou comparer vos bibliothèques de jeux avec des amis -- ce sont deux interrupteurs indépendants, activer l'un n'active jamais l'autre.",

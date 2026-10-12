@@ -154,6 +154,66 @@
 
   "oauthConsentError": "Не удалось завершить -- попробуйте снова.",
 
+  "commonNext": "Далее",
+
+  "serverTabBots": "Боты",
+
+  "botInstallTitle": "Установить бота",
+
+  "botInstallSuccess": "Бот установлен.",
+
+  "botInstallNoEligibleServers": "Вы не управляете ни одним сервером, куда можно установить ботов.",
+
+  "botInstallSelectServer": "Установить в",
+
+  "botInstallSelectPermissions": "Разрешения для предоставления",
+
+  "botInstallPermissionsHelp": "Можно предоставить только те разрешения, которыми вы сами обладаете -- серые недоступны для передачи.",
+
+  "botInstallConfirm": "Установить",
+
+  "botsTabDescription": "Боты, установленные на этом сервере, и что им разрешено делать.",
+
+  "botsTabInstallButton": "Установить бота",
+
+  "botsTabInstallDialogTitle": "Установить бота",
+
+  "botsTabClientIdHint": "Вставьте ID приложения бота",
+
+  "botsTabEmptyState": "Пока нет установленных ботов.",
+
+  "botsTabNoPermissions": "Разрешения не предоставлены",
+
+  "botsTabUninstall": "Удалить",
+
+  "devPortalCommandsSectionTitle": "Слэш-команды",
+
+  "devPortalNoInteractionsUrl": "URL взаимодействий ещё не задан.",
+
+  "devPortalEditInteractionsUrl": "Изменить URL взаимодействий",
+
+  "devPortalEditInteractionsUrlTitle": "URL взаимодействий",
+
+  "devPortalInteractionsUrlHelp": "Куда Koda отправляет подписанный POST каждый раз, когда кто-то вызывает одну из команд этого приложения. Должен отвечать в течение примерно 3 секунд.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "Создать секрет подписи",
+
+  "devPortalRegenerateSigningSecret": "Создать новый секрет подписи",
+
+  "homeSlashCommandsTooltip": "Слэш-команды",
+
+  "slashCommandsNoneAvailable": "На этом сервере не установлены боты с командами.",
+
+  "slashCommandsPickerTitle": "Выберите команду",
+
+  "slashCommandsRun": "Выполнить",
+
+  "devPortalEventsSectionTitle": "События webhook",
+
+  "devPortalEventsSectionHelp": "Koda уведомляет URL взаимодействий этого приложения при возникновении подписанного события -- включайте только то, что нужно.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Подключите Steam, чтобы делиться тем, во что вы сейчас играете, и/или сравнивать библиотеки игр с друзьями -- это два независимых переключателя, включение одного никогда не включает другой.",

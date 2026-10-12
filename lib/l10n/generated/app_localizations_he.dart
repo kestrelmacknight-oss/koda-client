@@ -372,6 +372,104 @@ class AppLocalizationsHe extends AppLocalizations {
   String get oauthConsentError => 'לא ניתן להשלים -- נסה שוב.';
 
   @override
+  String get commonNext => 'הבא';
+
+  @override
+  String get serverTabBots => 'בוטים';
+
+  @override
+  String get botInstallTitle => 'התקן בוט';
+
+  @override
+  String get botInstallSuccess => 'הבוט הותקן.';
+
+  @override
+  String get botInstallNoEligibleServers =>
+      'אינך מנהל שום שרת שבו אפשר להתקין בוטים.';
+
+  @override
+  String get botInstallSelectServer => 'התקן בתוך';
+
+  @override
+  String get botInstallSelectPermissions => 'הרשאות להעניק';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      'ניתן להעניק רק הרשאות שיש לך עצמך -- הרשאות מוצללות אינן שלך להעניק.';
+
+  @override
+  String get botInstallConfirm => 'התקן';
+
+  @override
+  String get botsTabDescription =>
+      'בוטים המותקנים בשרת זה, ומה הם מורשים לעשות.';
+
+  @override
+  String get botsTabInstallButton => 'התקן בוט';
+
+  @override
+  String get botsTabInstallDialogTitle => 'התקן בוט';
+
+  @override
+  String get botsTabClientIdHint => 'הדבק את מזהה האפליקציה של הבוט';
+
+  @override
+  String get botsTabEmptyState => 'אין עדיין בוטים מותקנים.';
+
+  @override
+  String get botsTabNoPermissions => 'לא הוענקו הרשאות';
+
+  @override
+  String get botsTabUninstall => 'הסר התקנה';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'פקודות קו נטוי';
+
+  @override
+  String get devPortalNoInteractionsUrl =>
+      'עדיין לא הוגדרה כתובת URL לאינטראקציות.';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'ערוך כתובת URL לאינטראקציות';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'כתובת URL לאינטראקציות';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'לאן Koda שולח POST חתום בכל פעם שמישהו מפעיל פקודה של אפליקציה זו. חייב להשיב בתוך כ-3 שניות.';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => 'צור סוד חתימה';
+
+  @override
+  String get devPortalRegenerateSigningSecret => 'צור סוד חתימה מחדש';
+
+  @override
+  String get homeSlashCommandsTooltip => 'פקודות קו נטוי';
+
+  @override
+  String get slashCommandsNoneAvailable =>
+      'אין בוטים עם פקודות מותקנים בשרת זה.';
+
+  @override
+  String get slashCommandsPickerTitle => 'בחר פקודה';
+
+  @override
+  String get slashCommandsRun => 'הפעל';
+
+  @override
+  String get devPortalEventsSectionTitle => 'אירועי Webhook';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'Koda מודיע לכתובת URL לאינטראקציות של אפליקציה זו כאשר מתרחש אירוע מנוי -- הפעל רק את מה שאתה צריך.';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

@@ -154,6 +154,66 @@
 
   "oauthConsentError": "वह पूरा नहीं हो सका -- फिर से प्रयास करें।",
 
+  "commonNext": "आगे",
+
+  "serverTabBots": "बॉट्स",
+
+  "botInstallTitle": "बॉट इंस्टॉल करें",
+
+  "botInstallSuccess": "बॉट इंस्टॉल हो गया।",
+
+  "botInstallNoEligibleServers": "आप किसी भी ऐसे सर्वर का प्रबंधन नहीं करते जहाँ बॉट इंस्टॉल किए जा सकें।",
+
+  "botInstallSelectServer": "इसमें इंस्टॉल करें",
+
+  "botInstallSelectPermissions": "देने के लिए अनुमतियाँ",
+
+  "botInstallPermissionsHelp": "केवल वे अनुमतियाँ दी जा सकती हैं जो आपके पास स्वयं हैं -- धूसर की गई अनुमतियाँ देने के लिए आपकी नहीं हैं।",
+
+  "botInstallConfirm": "इंस्टॉल करें",
+
+  "botsTabDescription": "इस सर्वर में इंस्टॉल किए गए बॉट्स, और वे क्या करने की अनुमति रखते हैं।",
+
+  "botsTabInstallButton": "एक बॉट इंस्टॉल करें",
+
+  "botsTabInstallDialogTitle": "एक बॉट इंस्टॉल करें",
+
+  "botsTabClientIdHint": "बॉट की एप्लिकेशन ID पेस्ट करें",
+
+  "botsTabEmptyState": "अभी तक कोई बॉट इंस्टॉल नहीं है।",
+
+  "botsTabNoPermissions": "कोई अनुमति नहीं दी गई",
+
+  "botsTabUninstall": "अनइंस्टॉल करें",
+
+  "devPortalCommandsSectionTitle": "स्लैश कमांड",
+
+  "devPortalNoInteractionsUrl": "अभी तक कोई इंटरैक्शन URL सेट नहीं है।",
+
+  "devPortalEditInteractionsUrl": "इंटरैक्शन URL संपादित करें",
+
+  "devPortalEditInteractionsUrlTitle": "इंटरैक्शन URL",
+
+  "devPortalInteractionsUrlHelp": "जहां Koda एक हस्ताक्षरित POST भेजता है जब भी कोई इस ऐप के किसी कमांड को आमंत्रित करता है। लगभग 3 सेकंड के भीतर जवाब देना चाहिए।",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "हस्ताक्षर रहस्य बनाएं",
+
+  "devPortalRegenerateSigningSecret": "हस्ताक्षर रहस्य फिर से बनाएं",
+
+  "homeSlashCommandsTooltip": "स्लैश कमांड",
+
+  "slashCommandsNoneAvailable": "इस सर्वर में कमांड वाले कोई बॉट इंस्टॉल नहीं हैं।",
+
+  "slashCommandsPickerTitle": "एक कमांड चुनें",
+
+  "slashCommandsRun": "चलाएं",
+
+  "devPortalEventsSectionTitle": "वेबहुक ईवेंट",
+
+  "devPortalEventsSectionHelp": "जब कोई सब्सक्राइब किया गया ईवेंट होता है तो Koda इस ऐप के इंटरैक्शन URL को सूचित करता है -- केवल वही चालू करें जिसकी आपको आवश्यकता है।",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Steam कनेक्ट करें और बताएं कि आप क्या खेल रहे हैं और/या मित्रों के साथ गेम लाइब्रेरी की तुलना करें -- ये दो स्वतंत्र स्विच हैं, एक को चालू करने से दूसरा कभी चालू नहीं होता।",

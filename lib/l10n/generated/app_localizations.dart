@@ -808,6 +808,186 @@ abstract class AppLocalizations {
   /// **'Couldn\'t complete that -- try again.'**
   String get oauthConsentError;
 
+  /// No description provided for @commonNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get commonNext;
+
+  /// No description provided for @serverTabBots.
+  ///
+  /// In en, this message translates to:
+  /// **'Bots'**
+  String get serverTabBots;
+
+  /// No description provided for @botInstallTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Install Bot'**
+  String get botInstallTitle;
+
+  /// No description provided for @botInstallSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Bot installed.'**
+  String get botInstallSuccess;
+
+  /// No description provided for @botInstallNoEligibleServers.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t manage any servers that can install bots.'**
+  String get botInstallNoEligibleServers;
+
+  /// No description provided for @botInstallSelectServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Install into'**
+  String get botInstallSelectServer;
+
+  /// No description provided for @botInstallSelectPermissions.
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions to grant'**
+  String get botInstallSelectPermissions;
+
+  /// No description provided for @botInstallPermissionsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Only permissions you hold yourself can be granted -- greyed-out ones aren\'t yours to give.'**
+  String get botInstallPermissionsHelp;
+
+  /// No description provided for @botInstallConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Install'**
+  String get botInstallConfirm;
+
+  /// No description provided for @botsTabDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Bots installed in this server, and what they\'re allowed to do.'**
+  String get botsTabDescription;
+
+  /// No description provided for @botsTabInstallButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Install a bot'**
+  String get botsTabInstallButton;
+
+  /// No description provided for @botsTabInstallDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Install a bot'**
+  String get botsTabInstallDialogTitle;
+
+  /// No description provided for @botsTabClientIdHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the bot\'s application ID'**
+  String get botsTabClientIdHint;
+
+  /// No description provided for @botsTabEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No bots installed yet.'**
+  String get botsTabEmptyState;
+
+  /// No description provided for @botsTabNoPermissions.
+  ///
+  /// In en, this message translates to:
+  /// **'No permissions granted'**
+  String get botsTabNoPermissions;
+
+  /// No description provided for @botsTabUninstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Uninstall'**
+  String get botsTabUninstall;
+
+  /// No description provided for @devPortalCommandsSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Slash Commands'**
+  String get devPortalCommandsSectionTitle;
+
+  /// No description provided for @devPortalNoInteractionsUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'No interactions URL set yet.'**
+  String get devPortalNoInteractionsUrl;
+
+  /// No description provided for @devPortalEditInteractionsUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit interactions URL'**
+  String get devPortalEditInteractionsUrl;
+
+  /// No description provided for @devPortalEditInteractionsUrlTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Interactions URL'**
+  String get devPortalEditInteractionsUrlTitle;
+
+  /// No description provided for @devPortalInteractionsUrlHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Where Koda delivers a signed POST whenever a user invokes one of this app\'s commands. Must respond within about 3 seconds.'**
+  String get devPortalInteractionsUrlHelp;
+
+  /// No description provided for @devPortalInteractionsUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'https://example.com/koda/interactions'**
+  String get devPortalInteractionsUrlHint;
+
+  /// No description provided for @devPortalGenerateSigningSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate signing secret'**
+  String get devPortalGenerateSigningSecret;
+
+  /// No description provided for @devPortalRegenerateSigningSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate signing secret'**
+  String get devPortalRegenerateSigningSecret;
+
+  /// No description provided for @homeSlashCommandsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Slash commands'**
+  String get homeSlashCommandsTooltip;
+
+  /// No description provided for @slashCommandsNoneAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No bots with commands are installed in this server.'**
+  String get slashCommandsNoneAvailable;
+
+  /// No description provided for @slashCommandsPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a command'**
+  String get slashCommandsPickerTitle;
+
+  /// No description provided for @slashCommandsRun.
+  ///
+  /// In en, this message translates to:
+  /// **'Run'**
+  String get slashCommandsRun;
+
+  /// No description provided for @devPortalEventsSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Webhook Events'**
+  String get devPortalEventsSectionTitle;
+
+  /// No description provided for @devPortalEventsSectionHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Koda notifies this app\'s interactions URL when a subscribed event happens -- opt in to only what you need.'**
+  String get devPortalEventsSectionHelp;
+
   /// No description provided for @settingsSteamTitle.
   ///
   /// In en, this message translates to:

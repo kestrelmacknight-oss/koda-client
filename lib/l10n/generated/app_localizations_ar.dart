@@ -374,6 +374,104 @@ class AppLocalizationsAr extends AppLocalizations {
   String get oauthConsentError => 'تعذر إكمال ذلك -- حاول مرة أخرى.';
 
   @override
+  String get commonNext => 'التالي';
+
+  @override
+  String get serverTabBots => 'البوتات';
+
+  @override
+  String get botInstallTitle => 'تثبيت بوت';
+
+  @override
+  String get botInstallSuccess => 'تم تثبيت البوت.';
+
+  @override
+  String get botInstallNoEligibleServers =>
+      'أنت لا تدير أي خوادم يمكنها تثبيت البوتات.';
+
+  @override
+  String get botInstallSelectServer => 'التثبيت في';
+
+  @override
+  String get botInstallSelectPermissions => 'الصلاحيات المراد منحها';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      'يمكن منح الصلاحيات التي تملكها أنت فقط -- الصلاحيات الرمادية ليست لك لتمنحها.';
+
+  @override
+  String get botInstallConfirm => 'تثبيت';
+
+  @override
+  String get botsTabDescription =>
+      'البوتات المثبتة في هذا الخادم، وما يُسمح لها بفعله.';
+
+  @override
+  String get botsTabInstallButton => 'تثبيت بوت';
+
+  @override
+  String get botsTabInstallDialogTitle => 'تثبيت بوت';
+
+  @override
+  String get botsTabClientIdHint => 'الصق معرّف تطبيق البوت';
+
+  @override
+  String get botsTabEmptyState => 'لا توجد بوتات مثبتة بعد.';
+
+  @override
+  String get botsTabNoPermissions => 'لا توجد صلاحيات ممنوحة';
+
+  @override
+  String get botsTabUninstall => 'إزالة التثبيت';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'أوامر الشرطة المائلة';
+
+  @override
+  String get devPortalNoInteractionsUrl =>
+      'لم يتم تعيين عنوان URL للتفاعلات حتى الآن.';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'تعديل عنوان URL للتفاعلات';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'عنوان URL للتفاعلات';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'حيث يرسل Koda طلب POST موقّعًا كل مرة يستدعي فيها مستخدم أحد أوامر هذا التطبيق. يجب الاستجابة في غضون 3 ثوانٍ تقريبًا.';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => 'إنشاء رمز سري للتوقيع';
+
+  @override
+  String get devPortalRegenerateSigningSecret => 'إعادة إنشاء رمز سري للتوقيع';
+
+  @override
+  String get homeSlashCommandsTooltip => 'أوامر الشرطة المائلة';
+
+  @override
+  String get slashCommandsNoneAvailable =>
+      'لا توجد بوتات تحتوي على أوامر مثبتة في هذا الخادم.';
+
+  @override
+  String get slashCommandsPickerTitle => 'اختر أمرًا';
+
+  @override
+  String get slashCommandsRun => 'تشغيل';
+
+  @override
+  String get devPortalEventsSectionTitle => 'أحداث الـ Webhook';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'يُشعر Koda عنوان URL للتفاعلات الخاص بهذا التطبيق عند حدوث حدث مُشترك فيه -- فعّل فقط ما تحتاجه.';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

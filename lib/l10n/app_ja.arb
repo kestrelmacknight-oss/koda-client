@@ -154,6 +154,66 @@
 
   "oauthConsentError": "完了できませんでした -- もう一度お試しください。",
 
+  "commonNext": "次へ",
+
+  "serverTabBots": "ボット",
+
+  "botInstallTitle": "ボットをインストール",
+
+  "botInstallSuccess": "ボットをインストールしました。",
+
+  "botInstallNoEligibleServers": "ボットをインストールできるサーバーを管理していません。",
+
+  "botInstallSelectServer": "インストール先",
+
+  "botInstallSelectPermissions": "付与する権限",
+
+  "botInstallPermissionsHelp": "自分が持っている権限のみ付与できます -- グレー表示の権限は付与できません。",
+
+  "botInstallConfirm": "インストール",
+
+  "botsTabDescription": "このサーバーにインストールされているボットと、できること。",
+
+  "botsTabInstallButton": "ボットをインストール",
+
+  "botsTabInstallDialogTitle": "ボットをインストール",
+
+  "botsTabClientIdHint": "ボットのアプリケーションIDを貼り付け",
+
+  "botsTabEmptyState": "まだボットがインストールされていません。",
+
+  "botsTabNoPermissions": "権限は付与されていません",
+
+  "botsTabUninstall": "アンインストール",
+
+  "devPortalCommandsSectionTitle": "スラッシュコマンド",
+
+  "devPortalNoInteractionsUrl": "インタラクションURLがまだ設定されていません。",
+
+  "devPortalEditInteractionsUrl": "インタラクションURLを編集",
+
+  "devPortalEditInteractionsUrlTitle": "インタラクションURL",
+
+  "devPortalInteractionsUrlHelp": "ユーザーがこのアプリのコマンドを実行するたびにKodaが署名付きPOSTを送信する先です。約3秒以内に応答する必要があります。",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "署名シークレットを生成",
+
+  "devPortalRegenerateSigningSecret": "署名シークレットを再生成",
+
+  "homeSlashCommandsTooltip": "スラッシュコマンド",
+
+  "slashCommandsNoneAvailable": "このサーバーにはコマンドを持つボットがインストールされていません。",
+
+  "slashCommandsPickerTitle": "コマンドを選択",
+
+  "slashCommandsRun": "実行",
+
+  "devPortalEventsSectionTitle": "Webhookイベント",
+
+  "devPortalEventsSectionHelp": "サブスクライブしたイベントが発生すると、Kodaはこのアプリのインタラクションurlに通知します -- 必要なものだけを有効にしてください。",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Steamを連携して、今プレイしているゲームを共有したり、フレンドとゲームライブラリを比較したりできます -- これらは独立した2つのスイッチで、片方をオンにしても他方が自動でオンになることはありません。",

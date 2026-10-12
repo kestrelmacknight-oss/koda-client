@@ -154,6 +154,66 @@
 
   "oauthConsentError": "تعذر إكمال ذلك -- حاول مرة أخرى.",
 
+  "commonNext": "التالي",
+
+  "serverTabBots": "البوتات",
+
+  "botInstallTitle": "تثبيت بوت",
+
+  "botInstallSuccess": "تم تثبيت البوت.",
+
+  "botInstallNoEligibleServers": "أنت لا تدير أي خوادم يمكنها تثبيت البوتات.",
+
+  "botInstallSelectServer": "التثبيت في",
+
+  "botInstallSelectPermissions": "الصلاحيات المراد منحها",
+
+  "botInstallPermissionsHelp": "يمكن منح الصلاحيات التي تملكها أنت فقط -- الصلاحيات الرمادية ليست لك لتمنحها.",
+
+  "botInstallConfirm": "تثبيت",
+
+  "botsTabDescription": "البوتات المثبتة في هذا الخادم، وما يُسمح لها بفعله.",
+
+  "botsTabInstallButton": "تثبيت بوت",
+
+  "botsTabInstallDialogTitle": "تثبيت بوت",
+
+  "botsTabClientIdHint": "الصق معرّف تطبيق البوت",
+
+  "botsTabEmptyState": "لا توجد بوتات مثبتة بعد.",
+
+  "botsTabNoPermissions": "لا توجد صلاحيات ممنوحة",
+
+  "botsTabUninstall": "إزالة التثبيت",
+
+  "devPortalCommandsSectionTitle": "أوامر الشرطة المائلة",
+
+  "devPortalNoInteractionsUrl": "لم يتم تعيين عنوان URL للتفاعلات حتى الآن.",
+
+  "devPortalEditInteractionsUrl": "تعديل عنوان URL للتفاعلات",
+
+  "devPortalEditInteractionsUrlTitle": "عنوان URL للتفاعلات",
+
+  "devPortalInteractionsUrlHelp": "حيث يرسل Koda طلب POST موقّعًا كل مرة يستدعي فيها مستخدم أحد أوامر هذا التطبيق. يجب الاستجابة في غضون 3 ثوانٍ تقريبًا.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "إنشاء رمز سري للتوقيع",
+
+  "devPortalRegenerateSigningSecret": "إعادة إنشاء رمز سري للتوقيع",
+
+  "homeSlashCommandsTooltip": "أوامر الشرطة المائلة",
+
+  "slashCommandsNoneAvailable": "لا توجد بوتات تحتوي على أوامر مثبتة في هذا الخادم.",
+
+  "slashCommandsPickerTitle": "اختر أمرًا",
+
+  "slashCommandsRun": "تشغيل",
+
+  "devPortalEventsSectionTitle": "أحداث الـ Webhook",
+
+  "devPortalEventsSectionHelp": "يُشعر Koda عنوان URL للتفاعلات الخاص بهذا التطبيق عند حدوث حدث مُشترك فيه -- فعّل فقط ما تحتاجه.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "اربط Steam لمشاركة ما تلعبه و/أو مقارنة مكتبات الألعاب مع الأصدقاء -- هذان مفتاحان مستقلان، تفعيل أحدهما لا يفعّل الآخر أبدًا.",

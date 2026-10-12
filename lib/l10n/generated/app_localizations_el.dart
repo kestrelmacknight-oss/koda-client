@@ -381,6 +381,105 @@ class AppLocalizationsEl extends AppLocalizations {
       'Δεν ήταν δυνατή η ολοκλήρωση -- δοκιμάστε ξανά.';
 
   @override
+  String get commonNext => 'Επόμενο';
+
+  @override
+  String get serverTabBots => 'Bots';
+
+  @override
+  String get botInstallTitle => 'Εγκατάσταση Bot';
+
+  @override
+  String get botInstallSuccess => 'Το bot εγκαταστάθηκε.';
+
+  @override
+  String get botInstallNoEligibleServers =>
+      'Δεν διαχειρίζεστε διακομιστές όπου μπορούν να εγκατασταθούν bots.';
+
+  @override
+  String get botInstallSelectServer => 'Εγκατάσταση σε';
+
+  @override
+  String get botInstallSelectPermissions => 'Δικαιώματα για εκχώρηση';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      'Μπορούν να εκχωρηθούν μόνο δικαιώματα που κατέχετε εσείς -- τα γκριζαρισμένα δεν είναι δικά σας για εκχώρηση.';
+
+  @override
+  String get botInstallConfirm => 'Εγκατάσταση';
+
+  @override
+  String get botsTabDescription =>
+      'Bots εγκατεστημένα σε αυτόν τον διακομιστή, και τι επιτρέπεται να κάνουν.';
+
+  @override
+  String get botsTabInstallButton => 'Εγκατάσταση bot';
+
+  @override
+  String get botsTabInstallDialogTitle => 'Εγκατάσταση bot';
+
+  @override
+  String get botsTabClientIdHint => 'Επικολλήστε το ID εφαρμογής του bot';
+
+  @override
+  String get botsTabEmptyState => 'Δεν έχουν εγκατασταθεί bots ακόμα.';
+
+  @override
+  String get botsTabNoPermissions => 'Δεν έχουν εκχωρηθεί δικαιώματα';
+
+  @override
+  String get botsTabUninstall => 'Κατάργηση εγκατάστασης';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'Εντολές κάθετου';
+
+  @override
+  String get devPortalNoInteractionsUrl =>
+      'Δεν έχει ορισθεί ακόμα URL αλληλεπιδράσεων.';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'Επεξεργασία URL αλληλεπιδράσεων';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'URL αλληλεπιδράσεων';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'Πού στέλνει το Koda ένα υπογεγραμμένο POST κάθε φορά που κάποιος καλεί μια εντολή αυτής της εφαρμογής. Πρέπει να απαντήσει εντός περίπου 3 δευτερολέπτων.';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => 'Δημιουργία μυστικού υπογραφής';
+
+  @override
+  String get devPortalRegenerateSigningSecret =>
+      'Δημιουργία νέου μυστικού υπογραφής';
+
+  @override
+  String get homeSlashCommandsTooltip => 'Εντολές κάθετου';
+
+  @override
+  String get slashCommandsNoneAvailable =>
+      'Δεν υπάρχουν bots με εντολές εγκατεστημένα σε αυτόν τον διακομιστή.';
+
+  @override
+  String get slashCommandsPickerTitle => 'Επιλέξτε εντολή';
+
+  @override
+  String get slashCommandsRun => 'Εκτέλεση';
+
+  @override
+  String get devPortalEventsSectionTitle => 'Συμβάντα Webhook';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'Το Koda ειδοποιεί το URL αλληλεπιδράσεων αυτής της εφαρμογής όταν συμβαίνει ένα εγγεγραμμένο συμβάν -- ενεργοποιήστε μόνο ό,τι χρειάζεστε.';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

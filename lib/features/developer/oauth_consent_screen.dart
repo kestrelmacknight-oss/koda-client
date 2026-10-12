@@ -56,9 +56,12 @@ class _OAuthConsentScreenState extends State<OAuthConsentScreen> {
       return;
     }
     setState(() => _submitting = true);
+    // Non-null by construction here -- only the bot.install scope
+    // (never routed to this screen, see home_screen.dart's
+    // _handleOAuthDeepLink) can have a null redirectUri.
     final redirectTo = await KodaApi.instance.approveOAuthAuthorize(
       clientId: widget.request.clientId,
-      redirectUri: widget.request.redirectUri,
+      redirectUri: widget.request.redirectUri!,
       scope: widget.request.scope,
       state: widget.request.state,
       codeChallenge: widget.request.codeChallenge,

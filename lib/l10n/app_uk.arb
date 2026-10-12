@@ -154,6 +154,66 @@
 
   "oauthConsentError": "Не вдалося завершити -- спробуйте ще раз.",
 
+  "commonNext": "Далі",
+
+  "serverTabBots": "Боти",
+
+  "botInstallTitle": "Встановити бота",
+
+  "botInstallSuccess": "Бота встановлено.",
+
+  "botInstallNoEligibleServers": "Ви не керуєте жодним сервером, куди можна встановити ботів.",
+
+  "botInstallSelectServer": "Встановити в",
+
+  "botInstallSelectPermissions": "Дозволи для надання",
+
+  "botInstallPermissionsHelp": "Можна надати лише ті дозволи, якими ви самі володієте -- сірі недоступні для передачі.",
+
+  "botInstallConfirm": "Встановити",
+
+  "botsTabDescription": "Боти, встановлені на цьому сервері, і що їм дозволено робити.",
+
+  "botsTabInstallButton": "Встановити бота",
+
+  "botsTabInstallDialogTitle": "Встановити бота",
+
+  "botsTabClientIdHint": "Вставте ID застосунку бота",
+
+  "botsTabEmptyState": "Поки немає встановлених ботів.",
+
+  "botsTabNoPermissions": "Дозволів не надано",
+
+  "botsTabUninstall": "Видалити",
+
+  "devPortalCommandsSectionTitle": "Слеш-команди",
+
+  "devPortalNoInteractionsUrl": "URL взаємодій ще не встановлено.",
+
+  "devPortalEditInteractionsUrl": "Редагувати URL взаємодій",
+
+  "devPortalEditInteractionsUrlTitle": "URL взаємодій",
+
+  "devPortalInteractionsUrlHelp": "Куди Koda надсилає підписаний POST щоразу, коли хтось викликає одну з команд цього застосунку. Має відповісти протягом приблизно 3 секунд.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "Створити секрет підпису",
+
+  "devPortalRegenerateSigningSecret": "Створити новий секрет підпису",
+
+  "homeSlashCommandsTooltip": "Слеш-команди",
+
+  "slashCommandsNoneAvailable": "На цьому сервері не встановлено ботів із командами.",
+
+  "slashCommandsPickerTitle": "Виберіть команду",
+
+  "slashCommandsRun": "Виконати",
+
+  "devPortalEventsSectionTitle": "Події Webhook",
+
+  "devPortalEventsSectionHelp": "Koda повідомляє URL взаємодій цього застосунку, коли відбувається підписана подія -- увімкніть лише те, що потрібно.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Підключіть Steam, щоб ділитися тим, у що ви зараз граєте, і/або порівнювати бібліотеки гри з друзями -- це два незалежні перемикачі, увімкнення одного ніколи не увімкне інший.",

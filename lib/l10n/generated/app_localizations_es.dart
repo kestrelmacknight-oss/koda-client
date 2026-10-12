@@ -378,6 +378,104 @@ class AppLocalizationsEs extends AppLocalizations {
   String get oauthConsentError => 'No se pudo completar -- intenta de nuevo.';
 
   @override
+  String get commonNext => 'Siguiente';
+
+  @override
+  String get serverTabBots => 'Bots';
+
+  @override
+  String get botInstallTitle => 'Instalar bot';
+
+  @override
+  String get botInstallSuccess => 'Bot instalado.';
+
+  @override
+  String get botInstallNoEligibleServers =>
+      'No administras ningún servidor donde se puedan instalar bots.';
+
+  @override
+  String get botInstallSelectServer => 'Instalar en';
+
+  @override
+  String get botInstallSelectPermissions => 'Permisos a otorgar';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      'Solo se pueden otorgar los permisos que tú mismo tienes -- los atenuados no son tuyos para otorgar.';
+
+  @override
+  String get botInstallConfirm => 'Instalar';
+
+  @override
+  String get botsTabDescription =>
+      'Bots instalados en este servidor, y qué pueden hacer.';
+
+  @override
+  String get botsTabInstallButton => 'Instalar un bot';
+
+  @override
+  String get botsTabInstallDialogTitle => 'Instalar un bot';
+
+  @override
+  String get botsTabClientIdHint => 'Pega el ID de la aplicación del bot';
+
+  @override
+  String get botsTabEmptyState => 'Aún no hay bots instalados.';
+
+  @override
+  String get botsTabNoPermissions => 'Sin permisos otorgados';
+
+  @override
+  String get botsTabUninstall => 'Desinstalar';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'Comandos de barra';
+
+  @override
+  String get devPortalNoInteractionsUrl =>
+      'Aún no se ha establecido una URL de interacciones.';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'Editar URL de interacciones';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'URL de interacciones';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'Donde Koda entrega un POST firmado cada vez que alguien invoca uno de los comandos de esta app. Debe responder en unos 3 segundos.';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => 'Generar secreto de firma';
+
+  @override
+  String get devPortalRegenerateSigningSecret => 'Regenerar secreto de firma';
+
+  @override
+  String get homeSlashCommandsTooltip => 'Comandos de barra';
+
+  @override
+  String get slashCommandsNoneAvailable =>
+      'No hay bots con comandos instalados en este servidor.';
+
+  @override
+  String get slashCommandsPickerTitle => 'Elige un comando';
+
+  @override
+  String get slashCommandsRun => 'Ejecutar';
+
+  @override
+  String get devPortalEventsSectionTitle => 'Eventos de webhook';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'Koda notifica a la URL de interacciones de esta app cuando ocurre un evento suscrito -- activa solo lo que necesites.';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

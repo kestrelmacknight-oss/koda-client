@@ -380,6 +380,104 @@ class AppLocalizationsTr extends AppLocalizations {
   String get oauthConsentError => 'Bu tamamlanamadı -- tekrar deneyin.';
 
   @override
+  String get commonNext => 'İleri';
+
+  @override
+  String get serverTabBots => 'Botlar';
+
+  @override
+  String get botInstallTitle => 'Bot Yükle';
+
+  @override
+  String get botInstallSuccess => 'Bot yüklendi.';
+
+  @override
+  String get botInstallNoEligibleServers =>
+      'Bot yüklenebilecek herhangi bir sunucuyu yönetmiyorsun.';
+
+  @override
+  String get botInstallSelectServer => 'Şuraya yükle';
+
+  @override
+  String get botInstallSelectPermissions => 'Verilecek izinler';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      'Sadece kendi sahip olduğun izinler verilebilir -- grileştirilmiş olanlar vermen için senin değil.';
+
+  @override
+  String get botInstallConfirm => 'Yükle';
+
+  @override
+  String get botsTabDescription =>
+      'Bu sunucuya yüklenen botlar ve yapmalarına izin verilenler.';
+
+  @override
+  String get botsTabInstallButton => 'Bir bot yükle';
+
+  @override
+  String get botsTabInstallDialogTitle => 'Bir bot yükle';
+
+  @override
+  String get botsTabClientIdHint => 'Botun uygulama ID\'sini yapıştır';
+
+  @override
+  String get botsTabEmptyState => 'Henüz yüklenen bot yok.';
+
+  @override
+  String get botsTabNoPermissions => 'Verilen izin yok';
+
+  @override
+  String get botsTabUninstall => 'Kaldır';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'Eğik çizgi komutları';
+
+  @override
+  String get devPortalNoInteractionsUrl =>
+      'Henüz bir etkileşim URL\'si ayarlanmadı.';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'Etkileşim URL\'sini düzenle';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'Etkileşim URL\'si';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'Birisi bu uygulamanın komutlarından birini çağırdığında Koda\'nın imzalı bir POST gönderdiği yer. Yaklaşık 3 saniye içinde yanıt vermelidir.';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => 'İmza sırrı oluştur';
+
+  @override
+  String get devPortalRegenerateSigningSecret => 'İmza sırrını yeniden oluştur';
+
+  @override
+  String get homeSlashCommandsTooltip => 'Eğik çizgi komutları';
+
+  @override
+  String get slashCommandsNoneAvailable =>
+      'Bu sunucuda komutlara sahip bot yüklü değil.';
+
+  @override
+  String get slashCommandsPickerTitle => 'Bir komut seç';
+
+  @override
+  String get slashCommandsRun => 'Çalıştır';
+
+  @override
+  String get devPortalEventsSectionTitle => 'Webhook Olayları';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'Abone olunan bir olay gerçekleştiğinde Koda bu uygulamanın etkileşim URL\'sini bilgilendirir -- yalnızca ihtiyacın olanı etkinleştir.';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

@@ -154,6 +154,66 @@
 
   "oauthConsentError": "Tidak dapat menyelesaikannya -- coba lagi.",
 
+  "commonNext": "Berikutnya",
+
+  "serverTabBots": "Bot",
+
+  "botInstallTitle": "Instal Bot",
+
+  "botInstallSuccess": "Bot terinstal.",
+
+  "botInstallNoEligibleServers": "Anda tidak mengelola server mana pun yang dapat menginstal bot.",
+
+  "botInstallSelectServer": "Instal ke",
+
+  "botInstallSelectPermissions": "Izin yang akan diberikan",
+
+  "botInstallPermissionsHelp": "Hanya izin yang Anda miliki sendiri yang dapat diberikan -- yang berwarna abu-abu bukan milik Anda untuk diberikan.",
+
+  "botInstallConfirm": "Instal",
+
+  "botsTabDescription": "Bot yang terinstal di server ini, dan apa yang boleh mereka lakukan.",
+
+  "botsTabInstallButton": "Instal bot",
+
+  "botsTabInstallDialogTitle": "Instal bot",
+
+  "botsTabClientIdHint": "Tempel ID aplikasi bot",
+
+  "botsTabEmptyState": "Belum ada bot yang terinstal.",
+
+  "botsTabNoPermissions": "Tidak ada izin yang diberikan",
+
+  "botsTabUninstall": "Hapus instalasi",
+
+  "devPortalCommandsSectionTitle": "Perintah garis miring",
+
+  "devPortalNoInteractionsUrl": "Belum ada URL interaksi yang diatur.",
+
+  "devPortalEditInteractionsUrl": "Edit URL interaksi",
+
+  "devPortalEditInteractionsUrlTitle": "URL interaksi",
+
+  "devPortalInteractionsUrlHelp": "Ke mana Koda mengirim POST yang ditandatangani setiap kali seseorang memanggil salah satu perintah aplikasi ini. Harus merespons dalam waktu sekitar 3 detik.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "Buat rahasia tanda tangan",
+
+  "devPortalRegenerateSigningSecret": "Buat ulang rahasia tanda tangan",
+
+  "homeSlashCommandsTooltip": "Perintah garis miring",
+
+  "slashCommandsNoneAvailable": "Tidak ada bot dengan perintah yang terinstal di server ini.",
+
+  "slashCommandsPickerTitle": "Pilih perintah",
+
+  "slashCommandsRun": "Jalankan",
+
+  "devPortalEventsSectionTitle": "Peristiwa Webhook",
+
+  "devPortalEventsSectionHelp": "Koda memberi tahu URL interaksi aplikasi ini saat peristiwa yang dilanggan terjadi -- aktifkan hanya yang Anda perlukan.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Hubungkan Steam untuk membagikan apa yang sedang kamu mainkan dan/atau membandingkan pustaka game dengan teman -- ini dua sakelar independen, mengaktifkan satu tidak pernah mengaktifkan yang lain.",

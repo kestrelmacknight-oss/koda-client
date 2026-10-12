@@ -380,6 +380,103 @@ class AppLocalizationsVi extends AppLocalizations {
   String get oauthConsentError => 'Không thể hoàn tất -- hãy thử lại.';
 
   @override
+  String get commonNext => 'Tiếp theo';
+
+  @override
+  String get serverTabBots => 'Bot';
+
+  @override
+  String get botInstallTitle => 'Cài đặt Bot';
+
+  @override
+  String get botInstallSuccess => 'Đã cài đặt bot.';
+
+  @override
+  String get botInstallNoEligibleServers =>
+      'Bạn không quản lý server nào có thể cài đặt bot.';
+
+  @override
+  String get botInstallSelectServer => 'Cài đặt vào';
+
+  @override
+  String get botInstallSelectPermissions => 'Quyền sẽ cấp';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      'Chỉ có thể cấp các quyền mà chính bạn sở hữu -- quyền bị làm mờ không phải của bạn để cấp.';
+
+  @override
+  String get botInstallConfirm => 'Cài đặt';
+
+  @override
+  String get botsTabDescription =>
+      'Các bot đã cài đặt trong server này, và những gì chúng được phép làm.';
+
+  @override
+  String get botsTabInstallButton => 'Cài đặt một bot';
+
+  @override
+  String get botsTabInstallDialogTitle => 'Cài đặt một bot';
+
+  @override
+  String get botsTabClientIdHint => 'Dán ID ứng dụng của bot';
+
+  @override
+  String get botsTabEmptyState => 'Chưa có bot nào được cài đặt.';
+
+  @override
+  String get botsTabNoPermissions => 'Chưa cấp quyền nào';
+
+  @override
+  String get botsTabUninstall => 'Gỡ cài đặt';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'Lệnh gạch chéo';
+
+  @override
+  String get devPortalNoInteractionsUrl => 'Chưa đặt URL tương tác.';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'Chỉnh sửa URL tương tác';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'URL tương tác';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'Nơi Koda gửi một POST đã ký mỗi khi ai đó gọi một trong các lệnh của ứng dụng này. Phải phản hồi trong khoảng 3 giây.';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => 'Tạo khóa bí mật chữ ký';
+
+  @override
+  String get devPortalRegenerateSigningSecret => 'Tạo lại khóa bí mật chữ ký';
+
+  @override
+  String get homeSlashCommandsTooltip => 'Lệnh gạch chéo';
+
+  @override
+  String get slashCommandsNoneAvailable =>
+      'Không có bot nào có lệnh được cài đặt trong server này.';
+
+  @override
+  String get slashCommandsPickerTitle => 'Chọn một lệnh';
+
+  @override
+  String get slashCommandsRun => 'Chạy';
+
+  @override
+  String get devPortalEventsSectionTitle => 'Sự kiện Webhook';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'Koda thông báo cho URL tương tác của ứng dụng này khi một sự kiện đã đăng ký xảy ra -- chỉ bật những gì bạn cần.';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

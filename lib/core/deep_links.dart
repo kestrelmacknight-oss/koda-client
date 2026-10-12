@@ -29,12 +29,15 @@ import 'platform.dart';
 /// is what actually renders the Allow/Deny decision.
 class OAuthAuthorizeRequest {
   final String clientId;
-  final String redirectUri;
+  // Nullable -- the "bot.install" scope (Phase 3) has no third-party
+  // callback at all; the install completes inside the app and there's
+  // nowhere to redirect back to. Every other scope requires one.
+  final String? redirectUri;
   final String scope;
   final String? state;
   final String? codeChallenge;
   const OAuthAuthorizeRequest({
-    required this.clientId, required this.redirectUri, required this.scope,
+    required this.clientId, this.redirectUri, required this.scope,
     this.state, this.codeChallenge,
   });
 }
@@ -142,7 +145,11 @@ class DeepLinks {
     final clientId = q['client_id'];
     final redirectUri = q['redirect_uri'];
     final scope = q['scope'];
-    if (clientId == null || redirectUri == null || scope == null) return null;
+    if (clientId == null || scope == null) return null;
+    // Every scope except bot.install needs a callback to redirect back
+    // to once consent is given -- bot.install completes in-app with
+    // nowhere to redirect, so it's the one case this can be absent.
+    if (redirectUri == null && scope != 'bot.install') return null;
 
     return OAuthAuthorizeRequest(
       clientId: clientId, redirectUri: redirectUri, scope: scope,

@@ -154,6 +154,66 @@
 
   "oauthConsentError": "無法完成 -- 請再試一次。",
 
+  "commonNext": "下一步",
+
+  "serverTabBots": "機器人",
+
+  "botInstallTitle": "安裝機器人",
+
+  "botInstallSuccess": "機器人已安裝。",
+
+  "botInstallNoEligibleServers": "你沒有管理任何可以安裝機器人的伺服器。",
+
+  "botInstallSelectServer": "安裝到",
+
+  "botInstallSelectPermissions": "要授予的權限",
+
+  "botInstallPermissionsHelp": "只能授予你自己擁有的權限 -- 灰色的權限不是你可以授予的。",
+
+  "botInstallConfirm": "安裝",
+
+  "botsTabDescription": "此伺服器中已安裝的機器人，以及它們被允許執行的操作。",
+
+  "botsTabInstallButton": "安裝機器人",
+
+  "botsTabInstallDialogTitle": "安裝機器人",
+
+  "botsTabClientIdHint": "貼上機器人的應用程式 ID",
+
+  "botsTabEmptyState": "尚未安裝任何機器人。",
+
+  "botsTabNoPermissions": "未授予任何權限",
+
+  "botsTabUninstall": "卸載",
+
+  "devPortalCommandsSectionTitle": "斜線指令",
+
+  "devPortalNoInteractionsUrl": "尚未設定互動 URL。",
+
+  "devPortalEditInteractionsUrl": "編輯互動 URL",
+
+  "devPortalEditInteractionsUrlTitle": "互動 URL",
+
+  "devPortalInteractionsUrlHelp": "Koda 在使用者呼叫此應用程式的某個指令時傳送已簽署 POST 請求的位置。必須在約 3 秒內回應。",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "產生簽署密鑰",
+
+  "devPortalRegenerateSigningSecret": "重新產生簽署密鑰",
+
+  "homeSlashCommandsTooltip": "斜線指令",
+
+  "slashCommandsNoneAvailable": "此伺服器中未安裝任何有指令的機器人。",
+
+  "slashCommandsPickerTitle": "選擇一個指令",
+
+  "slashCommandsRun": "執行",
+
+  "devPortalEventsSectionTitle": "Webhook 事件",
+
+  "devPortalEventsSectionHelp": "當訂閱的事件發生時，Koda 會通知此應用程式的互動 URL -- 僅啟用你需要的事件。",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "連接 Steam 即可分享你正在玩的遊戲，和/或與好友比較遊戲庫 -- 這是兩個獨立的開關，開啟一個絕不會自動開啟另一個。",

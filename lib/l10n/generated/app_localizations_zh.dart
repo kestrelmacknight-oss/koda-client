@@ -360,6 +360,99 @@ class AppLocalizationsZh extends AppLocalizations {
   String get oauthConsentError => '无法完成 -- 请重试。';
 
   @override
+  String get commonNext => '下一步';
+
+  @override
+  String get serverTabBots => '机器人';
+
+  @override
+  String get botInstallTitle => '安装机器人';
+
+  @override
+  String get botInstallSuccess => '机器人已安装。';
+
+  @override
+  String get botInstallNoEligibleServers => '你没有管理任何可以安装机器人的服务器。';
+
+  @override
+  String get botInstallSelectServer => '安装到';
+
+  @override
+  String get botInstallSelectPermissions => '要授予的权限';
+
+  @override
+  String get botInstallPermissionsHelp => '只能授予你自己拥有的权限 -- 灰色的权限不是你可以授予的。';
+
+  @override
+  String get botInstallConfirm => '安装';
+
+  @override
+  String get botsTabDescription => '此服务器中已安装的机器人，以及它们被允许执行的操作。';
+
+  @override
+  String get botsTabInstallButton => '安装机器人';
+
+  @override
+  String get botsTabInstallDialogTitle => '安装机器人';
+
+  @override
+  String get botsTabClientIdHint => '粘贴机器人的应用 ID';
+
+  @override
+  String get botsTabEmptyState => '尚未安装任何机器人。';
+
+  @override
+  String get botsTabNoPermissions => '未授予任何权限';
+
+  @override
+  String get botsTabUninstall => '卸载';
+
+  @override
+  String get devPortalCommandsSectionTitle => '斜杠命令';
+
+  @override
+  String get devPortalNoInteractionsUrl => '尚未设置交互 URL。';
+
+  @override
+  String get devPortalEditInteractionsUrl => '编辑交互 URL';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => '交互 URL';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'Koda 在用户调用此应用的某个命令时发送已签名 POST 请求的位置。必须在约 3 秒内响应。';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => '生成签名密钥';
+
+  @override
+  String get devPortalRegenerateSigningSecret => '重新生成签名密钥';
+
+  @override
+  String get homeSlashCommandsTooltip => '斜杠命令';
+
+  @override
+  String get slashCommandsNoneAvailable => '此服务器中未安装任何带命令的机器人。';
+
+  @override
+  String get slashCommandsPickerTitle => '选择一个命令';
+
+  @override
+  String get slashCommandsRun => '运行';
+
+  @override
+  String get devPortalEventsSectionTitle => 'Webhook 事件';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      '当订阅的事件发生时，Koda 会通知此应用的交互 URL -- 仅启用你需要的事件。';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -4944,6 +5037,99 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get oauthConsentError => '無法完成 -- 請再試一次。';
+
+  @override
+  String get commonNext => '下一步';
+
+  @override
+  String get serverTabBots => '機器人';
+
+  @override
+  String get botInstallTitle => '安裝機器人';
+
+  @override
+  String get botInstallSuccess => '機器人已安裝。';
+
+  @override
+  String get botInstallNoEligibleServers => '你沒有管理任何可以安裝機器人的伺服器。';
+
+  @override
+  String get botInstallSelectServer => '安裝到';
+
+  @override
+  String get botInstallSelectPermissions => '要授予的權限';
+
+  @override
+  String get botInstallPermissionsHelp => '只能授予你自己擁有的權限 -- 灰色的權限不是你可以授予的。';
+
+  @override
+  String get botInstallConfirm => '安裝';
+
+  @override
+  String get botsTabDescription => '此伺服器中已安裝的機器人，以及它們被允許執行的操作。';
+
+  @override
+  String get botsTabInstallButton => '安裝機器人';
+
+  @override
+  String get botsTabInstallDialogTitle => '安裝機器人';
+
+  @override
+  String get botsTabClientIdHint => '貼上機器人的應用程式 ID';
+
+  @override
+  String get botsTabEmptyState => '尚未安裝任何機器人。';
+
+  @override
+  String get botsTabNoPermissions => '未授予任何權限';
+
+  @override
+  String get botsTabUninstall => '卸載';
+
+  @override
+  String get devPortalCommandsSectionTitle => '斜線指令';
+
+  @override
+  String get devPortalNoInteractionsUrl => '尚未設定互動 URL。';
+
+  @override
+  String get devPortalEditInteractionsUrl => '編輯互動 URL';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => '互動 URL';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'Koda 在使用者呼叫此應用程式的某個指令時傳送已簽署 POST 請求的位置。必須在約 3 秒內回應。';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => '產生簽署密鑰';
+
+  @override
+  String get devPortalRegenerateSigningSecret => '重新產生簽署密鑰';
+
+  @override
+  String get homeSlashCommandsTooltip => '斜線指令';
+
+  @override
+  String get slashCommandsNoneAvailable => '此伺服器中未安裝任何有指令的機器人。';
+
+  @override
+  String get slashCommandsPickerTitle => '選擇一個指令';
+
+  @override
+  String get slashCommandsRun => '執行';
+
+  @override
+  String get devPortalEventsSectionTitle => 'Webhook 事件';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      '當訂閱的事件發生時，Koda 會通知此應用程式的互動 URL -- 僅啟用你需要的事件。';
 
   @override
   String get settingsSteamTitle => 'Steam';

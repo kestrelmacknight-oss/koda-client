@@ -151,6 +151,66 @@
 
   "oauthConsentError": "No se pudo completar -- intenta de nuevo.",
 
+  "commonNext": "Siguiente",
+
+  "serverTabBots": "Bots",
+
+  "botInstallTitle": "Instalar bot",
+
+  "botInstallSuccess": "Bot instalado.",
+
+  "botInstallNoEligibleServers": "No administras ningún servidor donde se puedan instalar bots.",
+
+  "botInstallSelectServer": "Instalar en",
+
+  "botInstallSelectPermissions": "Permisos a otorgar",
+
+  "botInstallPermissionsHelp": "Solo se pueden otorgar los permisos que tú mismo tienes -- los atenuados no son tuyos para otorgar.",
+
+  "botInstallConfirm": "Instalar",
+
+  "botsTabDescription": "Bots instalados en este servidor, y qué pueden hacer.",
+
+  "botsTabInstallButton": "Instalar un bot",
+
+  "botsTabInstallDialogTitle": "Instalar un bot",
+
+  "botsTabClientIdHint": "Pega el ID de la aplicación del bot",
+
+  "botsTabEmptyState": "Aún no hay bots instalados.",
+
+  "botsTabNoPermissions": "Sin permisos otorgados",
+
+  "botsTabUninstall": "Desinstalar",
+
+  "devPortalCommandsSectionTitle": "Comandos de barra",
+
+  "devPortalNoInteractionsUrl": "Aún no se ha establecido una URL de interacciones.",
+
+  "devPortalEditInteractionsUrl": "Editar URL de interacciones",
+
+  "devPortalEditInteractionsUrlTitle": "URL de interacciones",
+
+  "devPortalInteractionsUrlHelp": "Donde Koda entrega un POST firmado cada vez que alguien invoca uno de los comandos de esta app. Debe responder en unos 3 segundos.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "Generar secreto de firma",
+
+  "devPortalRegenerateSigningSecret": "Regenerar secreto de firma",
+
+  "homeSlashCommandsTooltip": "Comandos de barra",
+
+  "slashCommandsNoneAvailable": "No hay bots con comandos instalados en este servidor.",
+
+  "slashCommandsPickerTitle": "Elige un comando",
+
+  "slashCommandsRun": "Ejecutar",
+
+  "devPortalEventsSectionTitle": "Eventos de webhook",
+
+  "devPortalEventsSectionHelp": "Koda notifica a la URL de interacciones de esta app cuando ocurre un evento suscrito -- activa solo lo que necesites.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Conecta Steam para compartir a qué estás jugando y/o comparar bibliotecas de juegos con amigos -- son dos interruptores independientes, activar uno nunca activa el otro.",

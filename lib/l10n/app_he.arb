@@ -151,6 +151,66 @@
 
   "oauthConsentError": "לא ניתן להשלים -- נסה שוב.",
 
+  "commonNext": "הבא",
+
+  "serverTabBots": "בוטים",
+
+  "botInstallTitle": "התקן בוט",
+
+  "botInstallSuccess": "הבוט הותקן.",
+
+  "botInstallNoEligibleServers": "אינך מנהל שום שרת שבו אפשר להתקין בוטים.",
+
+  "botInstallSelectServer": "התקן בתוך",
+
+  "botInstallSelectPermissions": "הרשאות להעניק",
+
+  "botInstallPermissionsHelp": "ניתן להעניק רק הרשאות שיש לך עצמך -- הרשאות מוצללות אינן שלך להעניק.",
+
+  "botInstallConfirm": "התקן",
+
+  "botsTabDescription": "בוטים המותקנים בשרת זה, ומה הם מורשים לעשות.",
+
+  "botsTabInstallButton": "התקן בוט",
+
+  "botsTabInstallDialogTitle": "התקן בוט",
+
+  "botsTabClientIdHint": "הדבק את מזהה האפליקציה של הבוט",
+
+  "botsTabEmptyState": "אין עדיין בוטים מותקנים.",
+
+  "botsTabNoPermissions": "לא הוענקו הרשאות",
+
+  "botsTabUninstall": "הסר התקנה",
+
+  "devPortalCommandsSectionTitle": "פקודות קו נטוי",
+
+  "devPortalNoInteractionsUrl": "עדיין לא הוגדרה כתובת URL לאינטראקציות.",
+
+  "devPortalEditInteractionsUrl": "ערוך כתובת URL לאינטראקציות",
+
+  "devPortalEditInteractionsUrlTitle": "כתובת URL לאינטראקציות",
+
+  "devPortalInteractionsUrlHelp": "לאן Koda שולח POST חתום בכל פעם שמישהו מפעיל פקודה של אפליקציה זו. חייב להשיב בתוך כ-3 שניות.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "צור סוד חתימה",
+
+  "devPortalRegenerateSigningSecret": "צור סוד חתימה מחדש",
+
+  "homeSlashCommandsTooltip": "פקודות קו נטוי",
+
+  "slashCommandsNoneAvailable": "אין בוטים עם פקודות מותקנים בשרת זה.",
+
+  "slashCommandsPickerTitle": "בחר פקודה",
+
+  "slashCommandsRun": "הפעל",
+
+  "devPortalEventsSectionTitle": "אירועי Webhook",
+
+  "devPortalEventsSectionHelp": "Koda מודיע לכתובת URL לאינטראקציות של אפליקציה זו כאשר מתרחש אירוע מנוי -- הפעל רק את מה שאתה צריך.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "חברו את Steam כדי לשתף במה אתם משחקים כרגע ו/או להשוות ספריות משחקים עם חברים -- אלו שני מתגים עצמאיים, הפעלת אחד אינה מפעילה את השני.",

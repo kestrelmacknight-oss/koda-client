@@ -154,6 +154,66 @@
 
   "oauthConsentError": "Nepodařilo se to dokončit -- zkuste to znovu.",
 
+  "commonNext": "Další",
+
+  "serverTabBots": "Boti",
+
+  "botInstallTitle": "Instalovat bota",
+
+  "botInstallSuccess": "Bot byl nainstalován.",
+
+  "botInstallNoEligibleServers": "Nesprávce žádné servery, do kterých lze instalovat boty.",
+
+  "botInstallSelectServer": "Instalovat do",
+
+  "botInstallSelectPermissions": "Oprávnění k udělení",
+
+  "botInstallPermissionsHelp": "Udělit lze jen oprávnění, která máte vy sami -- zašedlá nejsou vaše k udělení.",
+
+  "botInstallConfirm": "Instalovat",
+
+  "botsTabDescription": "Boti nainstalovaní na tomto serveru a co mohou dělat.",
+
+  "botsTabInstallButton": "Instalovat bota",
+
+  "botsTabInstallDialogTitle": "Instalovat bota",
+
+  "botsTabClientIdHint": "Vložte ID aplikace bota",
+
+  "botsTabEmptyState": "Zatím žádní nainstalovaní boti.",
+
+  "botsTabNoPermissions": "Žádná udělená oprávnění",
+
+  "botsTabUninstall": "Odinstalovat",
+
+  "devPortalCommandsSectionTitle": "Lomítkové příkazy",
+
+  "devPortalNoInteractionsUrl": "Zatím není nastavena URL pro interakce.",
+
+  "devPortalEditInteractionsUrl": "Upravit URL pro interakce",
+
+  "devPortalEditInteractionsUrlTitle": "URL pro interakce",
+
+  "devPortalInteractionsUrlHelp": "Kam Koda doručuje podepsaný POST pokaždé, když uživatel vyvolá jeden z příkazů této aplikace. Musí odpovědět do přibližně 3 sekund.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "Vygenerovat podpisový klíč",
+
+  "devPortalRegenerateSigningSecret": "Vygenerovat nový podpisový klíč",
+
+  "homeSlashCommandsTooltip": "Lomítkové příkazy",
+
+  "slashCommandsNoneAvailable": "V tomto serveru nejsou nainstalováni žádní boti s příkazy.",
+
+  "slashCommandsPickerTitle": "Vyberte příkaz",
+
+  "slashCommandsRun": "Spustit",
+
+  "devPortalEventsSectionTitle": "Webhook události",
+
+  "devPortalEventsSectionHelp": "Koda upozorní URL pro interakce této aplikace, když nastane odebraná událost -- zapněte jen to, co potřebujete.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Připojte Steam a sdílejte, co právě hrajete, a/nebo porovnávejte knihovny her s přáteli -- jde o dva nezávislé přepínače, zapnutí jednoho nikdy nezapne druhý.",

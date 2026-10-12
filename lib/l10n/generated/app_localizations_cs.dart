@@ -380,6 +380,105 @@ class AppLocalizationsCs extends AppLocalizations {
       'Nepodařilo se to dokončit -- zkuste to znovu.';
 
   @override
+  String get commonNext => 'Další';
+
+  @override
+  String get serverTabBots => 'Boti';
+
+  @override
+  String get botInstallTitle => 'Instalovat bota';
+
+  @override
+  String get botInstallSuccess => 'Bot byl nainstalován.';
+
+  @override
+  String get botInstallNoEligibleServers =>
+      'Nesprávce žádné servery, do kterých lze instalovat boty.';
+
+  @override
+  String get botInstallSelectServer => 'Instalovat do';
+
+  @override
+  String get botInstallSelectPermissions => 'Oprávnění k udělení';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      'Udělit lze jen oprávnění, která máte vy sami -- zašedlá nejsou vaše k udělení.';
+
+  @override
+  String get botInstallConfirm => 'Instalovat';
+
+  @override
+  String get botsTabDescription =>
+      'Boti nainstalovaní na tomto serveru a co mohou dělat.';
+
+  @override
+  String get botsTabInstallButton => 'Instalovat bota';
+
+  @override
+  String get botsTabInstallDialogTitle => 'Instalovat bota';
+
+  @override
+  String get botsTabClientIdHint => 'Vložte ID aplikace bota';
+
+  @override
+  String get botsTabEmptyState => 'Zatím žádní nainstalovaní boti.';
+
+  @override
+  String get botsTabNoPermissions => 'Žádná udělená oprávnění';
+
+  @override
+  String get botsTabUninstall => 'Odinstalovat';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'Lomítkové příkazy';
+
+  @override
+  String get devPortalNoInteractionsUrl =>
+      'Zatím není nastavena URL pro interakce.';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'Upravit URL pro interakce';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'URL pro interakce';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'Kam Koda doručuje podepsaný POST pokaždé, když uživatel vyvolá jeden z příkazů této aplikace. Musí odpovědět do přibližně 3 sekund.';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => 'Vygenerovat podpisový klíč';
+
+  @override
+  String get devPortalRegenerateSigningSecret =>
+      'Vygenerovat nový podpisový klíč';
+
+  @override
+  String get homeSlashCommandsTooltip => 'Lomítkové příkazy';
+
+  @override
+  String get slashCommandsNoneAvailable =>
+      'V tomto serveru nejsou nainstalováni žádní boti s příkazy.';
+
+  @override
+  String get slashCommandsPickerTitle => 'Vyberte příkaz';
+
+  @override
+  String get slashCommandsRun => 'Spustit';
+
+  @override
+  String get devPortalEventsSectionTitle => 'Webhook události';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'Koda upozorní URL pro interakce této aplikace, když nastane odebraná událost -- zapněte jen to, co potřebujete.';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

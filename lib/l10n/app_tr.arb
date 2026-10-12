@@ -154,6 +154,66 @@
 
   "oauthConsentError": "Bu tamamlanamadı -- tekrar deneyin.",
 
+  "commonNext": "İleri",
+
+  "serverTabBots": "Botlar",
+
+  "botInstallTitle": "Bot Yükle",
+
+  "botInstallSuccess": "Bot yüklendi.",
+
+  "botInstallNoEligibleServers": "Bot yüklenebilecek herhangi bir sunucuyu yönetmiyorsun.",
+
+  "botInstallSelectServer": "Şuraya yükle",
+
+  "botInstallSelectPermissions": "Verilecek izinler",
+
+  "botInstallPermissionsHelp": "Sadece kendi sahip olduğun izinler verilebilir -- grileştirilmiş olanlar vermen için senin değil.",
+
+  "botInstallConfirm": "Yükle",
+
+  "botsTabDescription": "Bu sunucuya yüklenen botlar ve yapmalarına izin verilenler.",
+
+  "botsTabInstallButton": "Bir bot yükle",
+
+  "botsTabInstallDialogTitle": "Bir bot yükle",
+
+  "botsTabClientIdHint": "Botun uygulama ID'sini yapıştır",
+
+  "botsTabEmptyState": "Henüz yüklenen bot yok.",
+
+  "botsTabNoPermissions": "Verilen izin yok",
+
+  "botsTabUninstall": "Kaldır",
+
+  "devPortalCommandsSectionTitle": "Eğik çizgi komutları",
+
+  "devPortalNoInteractionsUrl": "Henüz bir etkileşim URL'si ayarlanmadı.",
+
+  "devPortalEditInteractionsUrl": "Etkileşim URL'sini düzenle",
+
+  "devPortalEditInteractionsUrlTitle": "Etkileşim URL'si",
+
+  "devPortalInteractionsUrlHelp": "Birisi bu uygulamanın komutlarından birini çağırdığında Koda'nın imzalı bir POST gönderdiği yer. Yaklaşık 3 saniye içinde yanıt vermelidir.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "İmza sırrı oluştur",
+
+  "devPortalRegenerateSigningSecret": "İmza sırrını yeniden oluştur",
+
+  "homeSlashCommandsTooltip": "Eğik çizgi komutları",
+
+  "slashCommandsNoneAvailable": "Bu sunucuda komutlara sahip bot yüklü değil.",
+
+  "slashCommandsPickerTitle": "Bir komut seç",
+
+  "slashCommandsRun": "Çalıştır",
+
+  "devPortalEventsSectionTitle": "Webhook Olayları",
+
+  "devPortalEventsSectionHelp": "Abone olunan bir olay gerçekleştiğinde Koda bu uygulamanın etkileşim URL'sini bilgilendirir -- yalnızca ihtiyacın olanı etkinleştir.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Şu an ne oynadığını paylaşmak ve/veya arkadaşlarla oyun kitaplıklarını karşılaştırmak için Steam'i bağla -- bunlar birbirinden bağımsız iki anahtardır, birini açmak diğerini asla açmaz.",

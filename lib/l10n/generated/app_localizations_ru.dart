@@ -379,6 +379,103 @@ class AppLocalizationsRu extends AppLocalizations {
   String get oauthConsentError => 'Не удалось завершить -- попробуйте снова.';
 
   @override
+  String get commonNext => 'Далее';
+
+  @override
+  String get serverTabBots => 'Боты';
+
+  @override
+  String get botInstallTitle => 'Установить бота';
+
+  @override
+  String get botInstallSuccess => 'Бот установлен.';
+
+  @override
+  String get botInstallNoEligibleServers =>
+      'Вы не управляете ни одним сервером, куда можно установить ботов.';
+
+  @override
+  String get botInstallSelectServer => 'Установить в';
+
+  @override
+  String get botInstallSelectPermissions => 'Разрешения для предоставления';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      'Можно предоставить только те разрешения, которыми вы сами обладаете -- серые недоступны для передачи.';
+
+  @override
+  String get botInstallConfirm => 'Установить';
+
+  @override
+  String get botsTabDescription =>
+      'Боты, установленные на этом сервере, и что им разрешено делать.';
+
+  @override
+  String get botsTabInstallButton => 'Установить бота';
+
+  @override
+  String get botsTabInstallDialogTitle => 'Установить бота';
+
+  @override
+  String get botsTabClientIdHint => 'Вставьте ID приложения бота';
+
+  @override
+  String get botsTabEmptyState => 'Пока нет установленных ботов.';
+
+  @override
+  String get botsTabNoPermissions => 'Разрешения не предоставлены';
+
+  @override
+  String get botsTabUninstall => 'Удалить';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'Слэш-команды';
+
+  @override
+  String get devPortalNoInteractionsUrl => 'URL взаимодействий ещё не задан.';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'Изменить URL взаимодействий';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'URL взаимодействий';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'Куда Koda отправляет подписанный POST каждый раз, когда кто-то вызывает одну из команд этого приложения. Должен отвечать в течение примерно 3 секунд.';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => 'Создать секрет подписи';
+
+  @override
+  String get devPortalRegenerateSigningSecret => 'Создать новый секрет подписи';
+
+  @override
+  String get homeSlashCommandsTooltip => 'Слэш-команды';
+
+  @override
+  String get slashCommandsNoneAvailable =>
+      'На этом сервере не установлены боты с командами.';
+
+  @override
+  String get slashCommandsPickerTitle => 'Выберите команду';
+
+  @override
+  String get slashCommandsRun => 'Выполнить';
+
+  @override
+  String get devPortalEventsSectionTitle => 'События webhook';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'Koda уведомляет URL взаимодействий этого приложения при возникновении подписанного события -- включайте только то, что нужно.';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

@@ -154,6 +154,66 @@
 
   "oauthConsentError": "无法完成 -- 请重试。",
 
+  "commonNext": "下一步",
+
+  "serverTabBots": "机器人",
+
+  "botInstallTitle": "安装机器人",
+
+  "botInstallSuccess": "机器人已安装。",
+
+  "botInstallNoEligibleServers": "你没有管理任何可以安装机器人的服务器。",
+
+  "botInstallSelectServer": "安装到",
+
+  "botInstallSelectPermissions": "要授予的权限",
+
+  "botInstallPermissionsHelp": "只能授予你自己拥有的权限 -- 灰色的权限不是你可以授予的。",
+
+  "botInstallConfirm": "安装",
+
+  "botsTabDescription": "此服务器中已安装的机器人，以及它们被允许执行的操作。",
+
+  "botsTabInstallButton": "安装机器人",
+
+  "botsTabInstallDialogTitle": "安装机器人",
+
+  "botsTabClientIdHint": "粘贴机器人的应用 ID",
+
+  "botsTabEmptyState": "尚未安装任何机器人。",
+
+  "botsTabNoPermissions": "未授予任何权限",
+
+  "botsTabUninstall": "卸载",
+
+  "devPortalCommandsSectionTitle": "斜杠命令",
+
+  "devPortalNoInteractionsUrl": "尚未设置交互 URL。",
+
+  "devPortalEditInteractionsUrl": "编辑交互 URL",
+
+  "devPortalEditInteractionsUrlTitle": "交互 URL",
+
+  "devPortalInteractionsUrlHelp": "Koda 在用户调用此应用的某个命令时发送已签名 POST 请求的位置。必须在约 3 秒内响应。",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "生成签名密钥",
+
+  "devPortalRegenerateSigningSecret": "重新生成签名密钥",
+
+  "homeSlashCommandsTooltip": "斜杠命令",
+
+  "slashCommandsNoneAvailable": "此服务器中未安装任何带命令的机器人。",
+
+  "slashCommandsPickerTitle": "选择一个命令",
+
+  "slashCommandsRun": "运行",
+
+  "devPortalEventsSectionTitle": "Webhook 事件",
+
+  "devPortalEventsSectionHelp": "当订阅的事件发生时，Koda 会通知此应用的交互 URL -- 仅启用你需要的事件。",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "连接 Steam 即可分享你正在玩的游戏，和/或与好友比较游戏库 -- 这是两个独立的开关，开启一个绝不会自动开启另一个。",

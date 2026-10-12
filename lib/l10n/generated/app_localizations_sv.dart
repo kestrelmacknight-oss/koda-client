@@ -375,6 +375,105 @@ class AppLocalizationsSv extends AppLocalizations {
   String get oauthConsentError => 'Kunde inte slutföra det -- försök igen.';
 
   @override
+  String get commonNext => 'Nästa';
+
+  @override
+  String get serverTabBots => 'Bottar';
+
+  @override
+  String get botInstallTitle => 'Installera bot';
+
+  @override
+  String get botInstallSuccess => 'Bot installerad.';
+
+  @override
+  String get botInstallNoEligibleServers =>
+      'Du hanterar inga servrar där bottar kan installeras.';
+
+  @override
+  String get botInstallSelectServer => 'Installera i';
+
+  @override
+  String get botInstallSelectPermissions => 'Behörigheter att bevilja';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      'Endast behörigheter du själv har kan beviljas -- gråtonade är inte dina att ge bort.';
+
+  @override
+  String get botInstallConfirm => 'Installera';
+
+  @override
+  String get botsTabDescription =>
+      'Bottar installerade i denna server, och vad de får göra.';
+
+  @override
+  String get botsTabInstallButton => 'Installera en bot';
+
+  @override
+  String get botsTabInstallDialogTitle => 'Installera en bot';
+
+  @override
+  String get botsTabClientIdHint => 'Klistra in botens app-ID';
+
+  @override
+  String get botsTabEmptyState => 'Inga bottar installerade än.';
+
+  @override
+  String get botsTabNoPermissions => 'Inga behörigheter beviljade';
+
+  @override
+  String get botsTabUninstall => 'Avinstallera';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'Snedstreckskommandon';
+
+  @override
+  String get devPortalNoInteractionsUrl =>
+      'Ingen interaktions-URL inställd än.';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'Redigera interaktions-URL';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'Interaktions-URL';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'Vart Koda levererar en signerad POST varje gång någon anropar ett av den här appens kommandon. Måste svara inom cirka 3 sekunder.';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => 'Generera signeringshemlighet';
+
+  @override
+  String get devPortalRegenerateSigningSecret =>
+      'Generera ny signeringshemlighet';
+
+  @override
+  String get homeSlashCommandsTooltip => 'Snedstreckskommandon';
+
+  @override
+  String get slashCommandsNoneAvailable =>
+      'Inga bottar med kommandon installerade i den här servern.';
+
+  @override
+  String get slashCommandsPickerTitle => 'Välj ett kommando';
+
+  @override
+  String get slashCommandsRun => 'Kör';
+
+  @override
+  String get devPortalEventsSectionTitle => 'Webhook-händelser';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'Koda meddelar den här appens interaktions-URL när en prenumererad händelse inträffar -- aktivera bara det du behöver.';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

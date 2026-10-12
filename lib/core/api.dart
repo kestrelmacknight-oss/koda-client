@@ -1827,6 +1827,36 @@ class KodaApi {
     } catch (e) { _log('regenerateDeveloperAppClientSecret', e); return null; }
   }
 
+  /// Slash commands (Phase 4) -- where Koda delivers a signed command
+  /// invocation for this app.
+  Future<bool> setDeveloperAppInteractionsUrl(String appId, String url) async {
+    try {
+      await _dio.put('/developer/apps/$appId/interactions_url', data: {'interactions_url': url});
+      return true;
+    } catch (e) { _log('setDeveloperAppInteractionsUrl', e); return false; }
+  }
+
+  /// Rotates the app's signing secret -- shown exactly once, same
+  /// discipline as the API key/client secret above.
+  Future<String?> regenerateDeveloperAppSigningSecret(String appId) async {
+    try {
+      final res = await _dio.post('/developer/apps/$appId/signing_secret/regenerate');
+      return res.data['signing_secret'] as String?;
+    } catch (e) { _log('regenerateDeveloperAppSigningSecret', e); return null; }
+  }
+
+  /// Webhook events (Phase 5) -- replaces the app's subscription list
+  /// wholesale, via the human-facing developer-portal route (the bot
+  /// itself can also self-manage this with its own API key, at
+  /// PUT /api/public/v1/event_subscriptions -- this is the portal's
+  /// own Guardian-authenticated equivalent).
+  Future<bool> setDeveloperAppSubscribedEvents(String appId, List<String> events) async {
+    try {
+      await _dio.put('/developer/apps/$appId/subscribed_events', data: {'events': events});
+      return true;
+    } catch (e) { _log('setDeveloperAppSubscribedEvents', e); return false; }
+  }
+
   /// Public app metadata for the OAuth consent screen -- name/
   /// description only, never the secret.
   Future<Map<String, dynamic>?> getOAuthAppInfo(String clientId) async {
@@ -1851,6 +1881,74 @@ class KodaApi {
       });
       return res.data['redirect_to'] as String?;
     } catch (e) { _log('approveOAuthAuthorize', e); return null; }
+  }
+
+  // -- Bot server installs (developer platform, Phase 3) -----------------------
+  // A direct admin action on the admin's own normal session -- not
+  // routed through OAuth tokens at all, see koda-server's
+  // Koda.Developers.install_bot/4 moduledoc for why.
+
+  /// Servers the current user can install a bot into (owner or holds
+  /// manage_roles), each already carrying its own effective_permissions
+  /// list so the picker never needs a second round-trip per server.
+  Future<List<Map<String, dynamic>>> getInstallableServers() async {
+    try {
+      final res = await _dio.get('/bots/installable_servers');
+      return List<Map<String, dynamic>>.from(res.data['servers'] ?? []);
+    } catch (e) { _log('getInstallableServers', e); return []; }
+  }
+
+  Future<List<Map<String, dynamic>>> getInstalledBots(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/bots');
+      return List<Map<String, dynamic>>.from(res.data['bots'] ?? []);
+    } catch (e) { _log('getInstalledBots', e); return []; }
+  }
+
+  /// Returns null on success, or the server's own error message on
+  /// failure (e.g. "Can't grant permissions you don't hold yourself")
+  /// -- shown to the admin directly rather than mapped through a
+  /// client-side code table, since it's specific/actionable as-is.
+  Future<String?> installBot(String serverId, String clientId, List<String> permissions) async {
+    try {
+      await _dio.post('/servers/$serverId/bots/install',
+          data: {'client_id': clientId, 'permissions': permissions});
+      return null;
+    } on DioException catch (e) {
+      _log('installBot', e);
+      return _errorCodeOf(e) ?? 'error';
+    }
+  }
+
+  Future<bool> uninstallBot(String serverId, String clientId) async {
+    try {
+      await _dio.delete('/servers/$serverId/bots/$clientId');
+      return true;
+    } catch (e) { _log('uninstallBot', e); return false; }
+  }
+
+  // -- Slash commands (developer platform, Phase 4) -----------------------------
+
+  /// The "/" picker's data source -- every command from every bot
+  /// installed in this channel's server.
+  Future<List<Map<String, dynamic>>> getChannelCommands(String channelId) async {
+    try {
+      final res = await _dio.get('/channels/$channelId/commands');
+      return List<Map<String, dynamic>>.from(res.data['commands'] ?? []);
+    } catch (e) { _log('getChannelCommands', e); return []; }
+  }
+
+  /// Returns null on success, or the server's own error message on
+  /// failure (e.g. "The bot didn't respond in time").
+  Future<String?> invokeCommand(
+      String channelId, String appId, String name, Map<String, dynamic> options) async {
+    try {
+      await _dio.post('/channels/$channelId/commands/$appId/$name/invoke', data: {'options': options});
+      return null;
+    } on DioException catch (e) {
+      _log('invokeCommand', e);
+      return _errorCodeOf(e) ?? 'error';
+    }
   }
 
   // -- Marketplace --------------------------------------------------------------

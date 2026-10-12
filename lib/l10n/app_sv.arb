@@ -154,6 +154,66 @@
 
   "oauthConsentError": "Kunde inte slutföra det -- försök igen.",
 
+  "commonNext": "Nästa",
+
+  "serverTabBots": "Bottar",
+
+  "botInstallTitle": "Installera bot",
+
+  "botInstallSuccess": "Bot installerad.",
+
+  "botInstallNoEligibleServers": "Du hanterar inga servrar där bottar kan installeras.",
+
+  "botInstallSelectServer": "Installera i",
+
+  "botInstallSelectPermissions": "Behörigheter att bevilja",
+
+  "botInstallPermissionsHelp": "Endast behörigheter du själv har kan beviljas -- gråtonade är inte dina att ge bort.",
+
+  "botInstallConfirm": "Installera",
+
+  "botsTabDescription": "Bottar installerade i denna server, och vad de får göra.",
+
+  "botsTabInstallButton": "Installera en bot",
+
+  "botsTabInstallDialogTitle": "Installera en bot",
+
+  "botsTabClientIdHint": "Klistra in botens app-ID",
+
+  "botsTabEmptyState": "Inga bottar installerade än.",
+
+  "botsTabNoPermissions": "Inga behörigheter beviljade",
+
+  "botsTabUninstall": "Avinstallera",
+
+  "devPortalCommandsSectionTitle": "Snedstreckskommandon",
+
+  "devPortalNoInteractionsUrl": "Ingen interaktions-URL inställd än.",
+
+  "devPortalEditInteractionsUrl": "Redigera interaktions-URL",
+
+  "devPortalEditInteractionsUrlTitle": "Interaktions-URL",
+
+  "devPortalInteractionsUrlHelp": "Vart Koda levererar en signerad POST varje gång någon anropar ett av den här appens kommandon. Måste svara inom cirka 3 sekunder.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "Generera signeringshemlighet",
+
+  "devPortalRegenerateSigningSecret": "Generera ny signeringshemlighet",
+
+  "homeSlashCommandsTooltip": "Snedstreckskommandon",
+
+  "slashCommandsNoneAvailable": "Inga bottar med kommandon installerade i den här servern.",
+
+  "slashCommandsPickerTitle": "Välj ett kommando",
+
+  "slashCommandsRun": "Kör",
+
+  "devPortalEventsSectionTitle": "Webhook-händelser",
+
+  "devPortalEventsSectionHelp": "Koda meddelar den här appens interaktions-URL när en prenumererad händelse inträffar -- aktivera bara det du behöver.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Anslut Steam för att dela vad du spelar och/eller jämföra spelbibliotek med vänner -- det är två oberoende reglage, att slå på ett slår aldrig på det andra.",

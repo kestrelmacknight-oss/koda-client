@@ -379,6 +379,103 @@ class AppLocalizationsTh extends AppLocalizations {
       'ไม่สามารถดำเนินการให้เสร็จสิ้นได้ -- โปรดลองอีกครั้ง';
 
   @override
+  String get commonNext => 'ถัดไป';
+
+  @override
+  String get serverTabBots => 'บอท';
+
+  @override
+  String get botInstallTitle => 'ติดตั้งบอท';
+
+  @override
+  String get botInstallSuccess => 'ติดตั้งบอทแล้ว';
+
+  @override
+  String get botInstallNoEligibleServers =>
+      'คุณไม่ได้จัดการเซิร์ฟเวอร์ใดที่สามารถติดตั้งบอทได้';
+
+  @override
+  String get botInstallSelectServer => 'ติดตั้งใน';
+
+  @override
+  String get botInstallSelectPermissions => 'สิทธิ์ที่จะให้';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      'สามารถให้ได้เฉพาะสิทธิ์ที่คุณมีเท่านั้น -- สิทธิ์ที่เป็นสีเทาไม่ใช่ของคุณที่จะให้';
+
+  @override
+  String get botInstallConfirm => 'ติดตั้ง';
+
+  @override
+  String get botsTabDescription =>
+      'บอทที่ติดตั้งในเซิร์ฟเวอร์นี้ และสิ่งที่พวกมันได้รับอนุญาตให้ทำ';
+
+  @override
+  String get botsTabInstallButton => 'ติดตั้งบอท';
+
+  @override
+  String get botsTabInstallDialogTitle => 'ติดตั้งบอท';
+
+  @override
+  String get botsTabClientIdHint => 'วาง ID แอปพลิเคชันของบอท';
+
+  @override
+  String get botsTabEmptyState => 'ยังไม่มีบอทที่ติดตั้ง';
+
+  @override
+  String get botsTabNoPermissions => 'ไม่มีสิทธิ์ที่ได้รับ';
+
+  @override
+  String get botsTabUninstall => 'ถอนการติดตั้ง';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'คำสั่งสแลช';
+
+  @override
+  String get devPortalNoInteractionsUrl => 'ยังไม่มีการตั้งค่า URL การโต้ตอบ';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'แก้ไข URL การโต้ตอบ';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'URL การโต้ตอบ';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'ที่ซึ่ง Koda ส่ง POST ที่ลงนามทุกครั้งที่มีผู้เรียกใช้คำสั่งใดคำสั่งหนึ่งของแอปนี้ ต้องตอบกลับภายในประมาณ 3 วินาที';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => 'สร้างรหัสลับการลงนาม';
+
+  @override
+  String get devPortalRegenerateSigningSecret => 'สร้างรหัสลับการลงนามใหม่';
+
+  @override
+  String get homeSlashCommandsTooltip => 'คำสั่งสแลช';
+
+  @override
+  String get slashCommandsNoneAvailable =>
+      'ไม่มีบอทที่มีคำสั่งติดตั้งอยู่ในเซิร์ฟเวอร์นี้';
+
+  @override
+  String get slashCommandsPickerTitle => 'เลือกคำสั่ง';
+
+  @override
+  String get slashCommandsRun => 'เรียกใช้';
+
+  @override
+  String get devPortalEventsSectionTitle => 'เหตุการณ์ Webhook';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'Koda จะแจ้งเตือน URL การโต้ตอบของแอปนี้เมื่อเหตุการณ์ที่สมัครรับเกิดขึ้น -- เปิดใช้งานเฉพาะสิ่งที่คุณต้องการ';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

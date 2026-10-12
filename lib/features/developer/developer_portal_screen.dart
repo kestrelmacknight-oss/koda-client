@@ -18,6 +18,12 @@ import '../../core/theme.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 
+// Mirrors koda-server's Koda.Developers.DeveloperApp.event_types/0
+// exactly -- keep in sync by hand (different repo/language, same
+// reasoning as every other client-side mirror of a server-side enum
+// this session).
+const _eventTypes = ['member_joined', 'member_left', 'reaction_added'];
+
 class DeveloperPortalScreen extends StatefulWidget {
   const DeveloperPortalScreen({super.key});
   @override
@@ -191,6 +197,49 @@ class _DeveloperPortalScreenState extends State<DeveloperPortalScreen> {
     if (ok) _load();
   }
 
+  Future<void> _editInteractionsUrl(String appId, String? current) async {
+    final t = AppLocalizations.of(context);
+    final ctrl = TextEditingController(text: current ?? '');
+    final save = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: Text(t.devPortalEditInteractionsUrlTitle, style: TextStyle(color: KodaColors.text1)),
+        content: SizedBox(
+          width: 400,
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(t.devPortalInteractionsUrlHelp, style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+            const SizedBox(height: 8),
+            KodaTextField(controller: ctrl, hintText: t.devPortalInteractionsUrlHint),
+          ]),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.commonCancel)),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text(t.commonSave)),
+        ],
+      ),
+    );
+    if (save != true) return;
+    final ok = await KodaApi.instance.setDeveloperAppInteractionsUrl(appId, ctrl.text.trim());
+    if (ok) _load();
+  }
+
+  Future<void> _generateSigningSecret(String appId) async {
+    final newSecret = await KodaApi.instance.regenerateDeveloperAppSigningSecret(appId);
+    if (newSecret == null) return;
+    await _load();
+    if (mounted) await _showNewKeyDialog(newSecret);
+  }
+
+  Future<void> _toggleEventSubscription(
+      String appId, List<String> current, String eventType, bool subscribe) async {
+    final updated = subscribe
+        ? ({...current, eventType}.toList())
+        : (current.where((e) => e != eventType).toList());
+    final ok = await KodaApi.instance.setDeveloperAppSubscribedEvents(appId, updated);
+    if (ok) _load();
+  }
+
   Future<void> _generateClientSecret(String appId) async {
     final newSecret = await KodaApi.instance.regenerateDeveloperAppClientSecret(appId);
     if (newSecret == null) return;
@@ -308,6 +357,51 @@ class _DeveloperPortalScreenState extends State<DeveloperPortalScreen> {
                         if (app['client_secret_last_four'] != null)
                           Text(t.devPortalClientSecretEndingIn(app['client_secret_last_four'] as String),
                               style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+                        Divider(color: KodaColors.border, height: 20),
+                        Text(t.devPortalCommandsSectionTitle,
+                            style: TextStyle(color: KodaColors.text2, fontSize: 11, fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 6),
+                        Text(
+                          (app['interactions_url'] as String?)?.isNotEmpty == true
+                              ? app['interactions_url'] as String
+                              : t.devPortalNoInteractionsUrl,
+                          style: TextStyle(color: KodaColors.text3, fontSize: 11, fontFamily: 'monospace'),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(children: [
+                          TextButton(
+                            onPressed: () => _editInteractionsUrl(
+                                app['id'] as String, app['interactions_url'] as String?),
+                            child: Text(t.devPortalEditInteractionsUrl,
+                                style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                          ),
+                          const Spacer(),
+                          TextButton(
+                            onPressed: () => _generateSigningSecret(app['id'] as String),
+                            child: Text(
+                                app['has_signing_secret'] == true
+                                    ? t.devPortalRegenerateSigningSecret
+                                    : t.devPortalGenerateSigningSecret,
+                                style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                          ),
+                        ]),
+                        Divider(color: KodaColors.border, height: 20),
+                        Text(t.devPortalEventsSectionTitle,
+                            style: TextStyle(color: KodaColors.text2, fontSize: 11, fontWeight: FontWeight.w600)),
+                        Text(t.devPortalEventsSectionHelp,
+                            style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+                        for (final eventType in _eventTypes)
+                          CheckboxListTile(
+                            dense: true,
+                            contentPadding: EdgeInsets.zero,
+                            controlAffinity: ListTileControlAffinity.leading,
+                            title: Text(eventType, style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+                            value: (app['subscribed_events'] as List?)?.contains(eventType) ?? false,
+                            onChanged: (checked) => _toggleEventSubscription(
+                                app['id'] as String,
+                                List<String>.from(app['subscribed_events'] ?? []),
+                                eventType, checked ?? false),
+                          ),
                       ]),
                     );
                   },

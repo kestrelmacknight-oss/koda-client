@@ -154,6 +154,66 @@
 
   "oauthConsentError": "ไม่สามารถดำเนินการให้เสร็จสิ้นได้ -- โปรดลองอีกครั้ง",
 
+  "commonNext": "ถัดไป",
+
+  "serverTabBots": "บอท",
+
+  "botInstallTitle": "ติดตั้งบอท",
+
+  "botInstallSuccess": "ติดตั้งบอทแล้ว",
+
+  "botInstallNoEligibleServers": "คุณไม่ได้จัดการเซิร์ฟเวอร์ใดที่สามารถติดตั้งบอทได้",
+
+  "botInstallSelectServer": "ติดตั้งใน",
+
+  "botInstallSelectPermissions": "สิทธิ์ที่จะให้",
+
+  "botInstallPermissionsHelp": "สามารถให้ได้เฉพาะสิทธิ์ที่คุณมีเท่านั้น -- สิทธิ์ที่เป็นสีเทาไม่ใช่ของคุณที่จะให้",
+
+  "botInstallConfirm": "ติดตั้ง",
+
+  "botsTabDescription": "บอทที่ติดตั้งในเซิร์ฟเวอร์นี้ และสิ่งที่พวกมันได้รับอนุญาตให้ทำ",
+
+  "botsTabInstallButton": "ติดตั้งบอท",
+
+  "botsTabInstallDialogTitle": "ติดตั้งบอท",
+
+  "botsTabClientIdHint": "วาง ID แอปพลิเคชันของบอท",
+
+  "botsTabEmptyState": "ยังไม่มีบอทที่ติดตั้ง",
+
+  "botsTabNoPermissions": "ไม่มีสิทธิ์ที่ได้รับ",
+
+  "botsTabUninstall": "ถอนการติดตั้ง",
+
+  "devPortalCommandsSectionTitle": "คำสั่งสแลช",
+
+  "devPortalNoInteractionsUrl": "ยังไม่มีการตั้งค่า URL การโต้ตอบ",
+
+  "devPortalEditInteractionsUrl": "แก้ไข URL การโต้ตอบ",
+
+  "devPortalEditInteractionsUrlTitle": "URL การโต้ตอบ",
+
+  "devPortalInteractionsUrlHelp": "ที่ซึ่ง Koda ส่ง POST ที่ลงนามทุกครั้งที่มีผู้เรียกใช้คำสั่งใดคำสั่งหนึ่งของแอปนี้ ต้องตอบกลับภายในประมาณ 3 วินาที",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "สร้างรหัสลับการลงนาม",
+
+  "devPortalRegenerateSigningSecret": "สร้างรหัสลับการลงนามใหม่",
+
+  "homeSlashCommandsTooltip": "คำสั่งสแลช",
+
+  "slashCommandsNoneAvailable": "ไม่มีบอทที่มีคำสั่งติดตั้งอยู่ในเซิร์ฟเวอร์นี้",
+
+  "slashCommandsPickerTitle": "เลือกคำสั่ง",
+
+  "slashCommandsRun": "เรียกใช้",
+
+  "devPortalEventsSectionTitle": "เหตุการณ์ Webhook",
+
+  "devPortalEventsSectionHelp": "Koda จะแจ้งเตือน URL การโต้ตอบของแอปนี้เมื่อเหตุการณ์ที่สมัครรับเกิดขึ้น -- เปิดใช้งานเฉพาะสิ่งที่คุณต้องการ",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "เชื่อมต่อ Steam เพื่อแชร์ว่าคุณกำลังเล่นอะไร และ/หรือเปรียบเทียบคลังเกมกับเพื่อน -- นี่คือสวิตช์อิสระสองตัว เปิดอันหนึ่งจะไม่เปิดอีกอันโดยอัตโนมัติ",

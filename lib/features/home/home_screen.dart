@@ -36,6 +36,7 @@ import '../server/server_settings_screen.dart';
 import '../voice/voice_bar.dart';
 import '../../core/voice_session.dart';
 import '../dm/dm_screen.dart';
+import '../developer/bot_install_screen.dart';
 import '../developer/oauth_consent_screen.dart';
 import '../steam/steam_compare_screen.dart';
 import '../../core/socket.dart';
@@ -230,8 +231,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
 
   void _handleOAuthDeepLink(OAuthAuthorizeRequest request) {
     if (!mounted) return;
-    Navigator.push(context, MaterialPageRoute(
-        builder: (_) => OAuthConsentScreen(request: request)));
+    // bot.install has no token/redirect step at all -- a dedicated
+    // screen (server + permission picker) rather than the generic
+    // Allow/Deny consent screen, which has no provision for either.
+    if (request.scope == 'bot.install') {
+      Navigator.push(context, MaterialPageRoute(
+          builder: (_) => BotInstallScreen(clientId: request.clientId)));
+    } else {
+      Navigator.push(context, MaterialPageRoute(
+          builder: (_) => OAuthConsentScreen(request: request)));
+    }
   }
 
   // Routes a tapped push notification (see push_notifications.dart's

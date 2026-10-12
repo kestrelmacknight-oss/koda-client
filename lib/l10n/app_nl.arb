@@ -154,6 +154,66 @@
 
   "oauthConsentError": "Kon dit niet voltooien -- probeer het opnieuw.",
 
+  "commonNext": "Volgende",
+
+  "serverTabBots": "Bots",
+
+  "botInstallTitle": "Bot installeren",
+
+  "botInstallSuccess": "Bot geïnstalleerd.",
+
+  "botInstallNoEligibleServers": "Je beheert geen servers waarin bots geïnstalleerd kunnen worden.",
+
+  "botInstallSelectServer": "Installeren in",
+
+  "botInstallSelectPermissions": "Toe te kennen rechten",
+
+  "botInstallPermissionsHelp": "Alleen rechten die je zelf hebt kunnen worden toegekend -- grijze rechten zijn niet van jou om te geven.",
+
+  "botInstallConfirm": "Installeren",
+
+  "botsTabDescription": "Bots geïnstalleerd in deze server, en wat ze mogen doen.",
+
+  "botsTabInstallButton": "Een bot installeren",
+
+  "botsTabInstallDialogTitle": "Een bot installeren",
+
+  "botsTabClientIdHint": "Plak de app-ID van de bot",
+
+  "botsTabEmptyState": "Nog geen bots geïnstalleerd.",
+
+  "botsTabNoPermissions": "Geen rechten toegekend",
+
+  "botsTabUninstall": "Verwijderen",
+
+  "devPortalCommandsSectionTitle": "Slash-commando's",
+
+  "devPortalNoInteractionsUrl": "Nog geen interacties-URL ingesteld.",
+
+  "devPortalEditInteractionsUrl": "Interacties-URL bewerken",
+
+  "devPortalEditInteractionsUrlTitle": "Interacties-URL",
+
+  "devPortalInteractionsUrlHelp": "Waar Koda een ondertekende POST aflevert telkens wanneer iemand een commando van deze app aanroept. Moet binnen ongeveer 3 seconden reageren.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "Ondertekeningsgeheim genereren",
+
+  "devPortalRegenerateSigningSecret": "Ondertekeningsgeheim opnieuw genereren",
+
+  "homeSlashCommandsTooltip": "Slash-commando's",
+
+  "slashCommandsNoneAvailable": "Geen bots met commando's geïnstalleerd in deze server.",
+
+  "slashCommandsPickerTitle": "Kies een commando",
+
+  "slashCommandsRun": "Uitvoeren",
+
+  "devPortalEventsSectionTitle": "Webhook-gebeurtenissen",
+
+  "devPortalEventsSectionHelp": "Koda informeert de interacties-URL van deze app wanneer een geabonneerde gebeurtenis plaatsvindt -- schakel alleen in wat je nodig hebt.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Koppel Steam om te delen wat je speelt en/of gamebibliotheken met vrienden te vergelijken -- dit zijn twee onafhankelijke schakelaars, de ene inschakelen schakelt de andere nooit automatisch in.",

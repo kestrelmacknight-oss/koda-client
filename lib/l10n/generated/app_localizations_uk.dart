@@ -378,6 +378,104 @@ class AppLocalizationsUk extends AppLocalizations {
   String get oauthConsentError => 'Не вдалося завершити -- спробуйте ще раз.';
 
   @override
+  String get commonNext => 'Далі';
+
+  @override
+  String get serverTabBots => 'Боти';
+
+  @override
+  String get botInstallTitle => 'Встановити бота';
+
+  @override
+  String get botInstallSuccess => 'Бота встановлено.';
+
+  @override
+  String get botInstallNoEligibleServers =>
+      'Ви не керуєте жодним сервером, куди можна встановити ботів.';
+
+  @override
+  String get botInstallSelectServer => 'Встановити в';
+
+  @override
+  String get botInstallSelectPermissions => 'Дозволи для надання';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      'Можна надати лише ті дозволи, якими ви самі володієте -- сірі недоступні для передачі.';
+
+  @override
+  String get botInstallConfirm => 'Встановити';
+
+  @override
+  String get botsTabDescription =>
+      'Боти, встановлені на цьому сервері, і що їм дозволено робити.';
+
+  @override
+  String get botsTabInstallButton => 'Встановити бота';
+
+  @override
+  String get botsTabInstallDialogTitle => 'Встановити бота';
+
+  @override
+  String get botsTabClientIdHint => 'Вставте ID застосунку бота';
+
+  @override
+  String get botsTabEmptyState => 'Поки немає встановлених ботів.';
+
+  @override
+  String get botsTabNoPermissions => 'Дозволів не надано';
+
+  @override
+  String get botsTabUninstall => 'Видалити';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'Слеш-команди';
+
+  @override
+  String get devPortalNoInteractionsUrl => 'URL взаємодій ще не встановлено.';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'Редагувати URL взаємодій';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'URL взаємодій';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'Куди Koda надсилає підписаний POST щоразу, коли хтось викликає одну з команд цього застосунку. Має відповісти протягом приблизно 3 секунд.';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => 'Створити секрет підпису';
+
+  @override
+  String get devPortalRegenerateSigningSecret =>
+      'Створити новий секрет підпису';
+
+  @override
+  String get homeSlashCommandsTooltip => 'Слеш-команди';
+
+  @override
+  String get slashCommandsNoneAvailable =>
+      'На цьому сервері не встановлено ботів із командами.';
+
+  @override
+  String get slashCommandsPickerTitle => 'Виберіть команду';
+
+  @override
+  String get slashCommandsRun => 'Виконати';
+
+  @override
+  String get devPortalEventsSectionTitle => 'Події Webhook';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'Koda повідомляє URL взаємодій цього застосунку, коли відбувається підписана подія -- увімкніть лише те, що потрібно.';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

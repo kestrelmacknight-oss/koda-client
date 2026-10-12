@@ -154,6 +154,66 @@
 
   "oauthConsentError": "Nie udało się tego zakończyć -- spróbuj ponownie.",
 
+  "commonNext": "Dalej",
+
+  "serverTabBots": "Boty",
+
+  "botInstallTitle": "Zainstaluj bota",
+
+  "botInstallSuccess": "Bot zainstalowany.",
+
+  "botInstallNoEligibleServers": "Nie zarządzasz żadnym serwerem, na którym można instalować boty.",
+
+  "botInstallSelectServer": "Zainstaluj w",
+
+  "botInstallSelectPermissions": "Uprawnienia do przyznania",
+
+  "botInstallPermissionsHelp": "Można przyznać tylko uprawnienia, które posiadasz sam -- wyszarzone nie są twoje do przyznania.",
+
+  "botInstallConfirm": "Zainstaluj",
+
+  "botsTabDescription": "Boty zainstalowane na tym serwerze i co mogą robić.",
+
+  "botsTabInstallButton": "Zainstaluj bota",
+
+  "botsTabInstallDialogTitle": "Zainstaluj bota",
+
+  "botsTabClientIdHint": "Wklej identyfikator aplikacji bota",
+
+  "botsTabEmptyState": "Brak zainstalowanych botów.",
+
+  "botsTabNoPermissions": "Brak przyznanych uprawnień",
+
+  "botsTabUninstall": "Odinstaluj",
+
+  "devPortalCommandsSectionTitle": "Komendy ukośnikowe",
+
+  "devPortalNoInteractionsUrl": "Nie ustawiono jeszcze adresu URL interakcji.",
+
+  "devPortalEditInteractionsUrl": "Edytuj adres URL interakcji",
+
+  "devPortalEditInteractionsUrlTitle": "Adres URL interakcji",
+
+  "devPortalInteractionsUrlHelp": "Gdzie Koda dostarcza podpisany POST, gdy ktoś wywoła jedną z komend tej aplikacji. Musi odpowiedzieć w ciągu około 3 sekund.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "Wygeneruj sekret podpisu",
+
+  "devPortalRegenerateSigningSecret": "Wygeneruj nowy sekret podpisu",
+
+  "homeSlashCommandsTooltip": "Komendy ukośnikowe",
+
+  "slashCommandsNoneAvailable": "Brak botów z komendami zainstalowanych na tym serwerze.",
+
+  "slashCommandsPickerTitle": "Wybierz komendę",
+
+  "slashCommandsRun": "Uruchom",
+
+  "devPortalEventsSectionTitle": "Zdarzenia webhook",
+
+  "devPortalEventsSectionHelp": "Koda powiadamia adres URL interakcji tej aplikacji, gdy wystąpi zaabonowane zdarzenie -- włącz tylko to, czego potrzebujesz.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Połącz Steam, aby udostępniać, w co właśnie grasz, i/lub porównywać biblioteki gier z przyjaciółmi -- to dwa niezależne przełączniki, włączenie jednego nigdy nie włącza drugiego.",

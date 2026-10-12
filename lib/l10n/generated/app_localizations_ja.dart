@@ -363,6 +363,100 @@ class AppLocalizationsJa extends AppLocalizations {
   String get oauthConsentError => '完了できませんでした -- もう一度お試しください。';
 
   @override
+  String get commonNext => '次へ';
+
+  @override
+  String get serverTabBots => 'ボット';
+
+  @override
+  String get botInstallTitle => 'ボットをインストール';
+
+  @override
+  String get botInstallSuccess => 'ボットをインストールしました。';
+
+  @override
+  String get botInstallNoEligibleServers => 'ボットをインストールできるサーバーを管理していません。';
+
+  @override
+  String get botInstallSelectServer => 'インストール先';
+
+  @override
+  String get botInstallSelectPermissions => '付与する権限';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      '自分が持っている権限のみ付与できます -- グレー表示の権限は付与できません。';
+
+  @override
+  String get botInstallConfirm => 'インストール';
+
+  @override
+  String get botsTabDescription => 'このサーバーにインストールされているボットと、できること。';
+
+  @override
+  String get botsTabInstallButton => 'ボットをインストール';
+
+  @override
+  String get botsTabInstallDialogTitle => 'ボットをインストール';
+
+  @override
+  String get botsTabClientIdHint => 'ボットのアプリケーションIDを貼り付け';
+
+  @override
+  String get botsTabEmptyState => 'まだボットがインストールされていません。';
+
+  @override
+  String get botsTabNoPermissions => '権限は付与されていません';
+
+  @override
+  String get botsTabUninstall => 'アンインストール';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'スラッシュコマンド';
+
+  @override
+  String get devPortalNoInteractionsUrl => 'インタラクションURLがまだ設定されていません。';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'インタラクションURLを編集';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'インタラクションURL';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'ユーザーがこのアプリのコマンドを実行するたびにKodaが署名付きPOSTを送信する先です。約3秒以内に応答する必要があります。';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => '署名シークレットを生成';
+
+  @override
+  String get devPortalRegenerateSigningSecret => '署名シークレットを再生成';
+
+  @override
+  String get homeSlashCommandsTooltip => 'スラッシュコマンド';
+
+  @override
+  String get slashCommandsNoneAvailable => 'このサーバーにはコマンドを持つボットがインストールされていません。';
+
+  @override
+  String get slashCommandsPickerTitle => 'コマンドを選択';
+
+  @override
+  String get slashCommandsRun => '実行';
+
+  @override
+  String get devPortalEventsSectionTitle => 'Webhookイベント';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'サブスクライブしたイベントが発生すると、Kodaはこのアプリのインタラクションurlに通知します -- 必要なものだけを有効にしてください。';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

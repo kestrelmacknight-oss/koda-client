@@ -23,6 +23,7 @@ import '../../shared/category_edit_dialog.dart';
 import '../../shared/custom_emoji.dart';
 import '../marketplace/printful_merch_screen.dart';
 import 'discord_import_dialog.dart';
+import 'bots_tab.dart';
 import 'threshold_moderation_tab.dart';
 import '../visp/visp_setup_dialog.dart';
 
@@ -93,7 +94,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 11, vsync: this);
+    _tabController = TabController(length: 12, vsync: this);
     _loadAll();
     _loadPrintfulStatus();
     _loadTiltifyStatus();
@@ -594,6 +595,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             Tab(text: t.serverTabReports),
             Tab(text: t.serverTabThresholdMod),
             Tab(text: t.serverTabCharity),
+            Tab(text: t.serverTabBots),
           ],
         ),
       ),
@@ -605,7 +607,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                   _buildInvitesTab(), _buildMerchTab(), _buildEmojiTab(),
                   _buildCustomizeTab(), _buildAuditLogTab(), _buildReportsTab(),
                   ThresholdModerationTab(serverId: _serverId, members: _members, channels: _channels),
-                  _buildCharityTab()],
+                  _buildCharityTab(), BotsTab(serverId: _serverId)],
             ),
     );
   }

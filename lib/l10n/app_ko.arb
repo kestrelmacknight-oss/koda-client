@@ -154,6 +154,66 @@
 
   "oauthConsentError": "완료할 수 없습니다 -- 다시 시도하세요.",
 
+  "commonNext": "다음",
+
+  "serverTabBots": "봇",
+
+  "botInstallTitle": "봇 설치",
+
+  "botInstallSuccess": "봇이 설치되었습니다.",
+
+  "botInstallNoEligibleServers": "봇을 설치할 수 있는 서버를 관리하고 있지 않습니다.",
+
+  "botInstallSelectServer": "설치 위치",
+
+  "botInstallSelectPermissions": "부여할 권한",
+
+  "botInstallPermissionsHelp": "본인이 가진 권한만 부여할 수 있습니다 -- 회색으로 표시된 권한은 부여할 수 없습니다.",
+
+  "botInstallConfirm": "설치",
+
+  "botsTabDescription": "이 서버에 설치된 봇과 허용된 작업입니다.",
+
+  "botsTabInstallButton": "봇 설치",
+
+  "botsTabInstallDialogTitle": "봇 설치",
+
+  "botsTabClientIdHint": "봇의 애플리케이션 ID 붙여넣기",
+
+  "botsTabEmptyState": "아직 설치된 봇이 없습니다.",
+
+  "botsTabNoPermissions": "부여된 권한 없음",
+
+  "botsTabUninstall": "제거",
+
+  "devPortalCommandsSectionTitle": "슬래시 명령어",
+
+  "devPortalNoInteractionsUrl": "아직 인터랙션 URL이 설정되지 않았습니다.",
+
+  "devPortalEditInteractionsUrl": "인터랙션 URL 편집",
+
+  "devPortalEditInteractionsUrlTitle": "인터랙션 URL",
+
+  "devPortalInteractionsUrlHelp": "사용자가 이 앱의 명령어를 호출할 때마다 Koda가 서명된 POST를 전달하는 위치입니다. 약 3초 이내에 응답해야 합니다.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "서명 비밀 생성",
+
+  "devPortalRegenerateSigningSecret": "서명 비밀 재생성",
+
+  "homeSlashCommandsTooltip": "슬래시 명령어",
+
+  "slashCommandsNoneAvailable": "이 서버에는 명령어가 있는 봇이 설치되어 있지 않습니다.",
+
+  "slashCommandsPickerTitle": "명령어 선택",
+
+  "slashCommandsRun": "실행",
+
+  "devPortalEventsSectionTitle": "웹훅 이벤트",
+
+  "devPortalEventsSectionHelp": "구독한 이벤트가 발생하면 Koda가 이 앱의 인터랙션 URL에 알립니다 -- 필요한 것만 활성화하세요.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Steam을 연결하여 현재 플레이 중인 게임을 공유하거나 친구와 게임 라이브러리를 비교할 수 있습니다 -- 이 둘은 독립적인 스위치이며, 하나를 켜도 다른 하나가 자동으로 켜지지 않습니다.",

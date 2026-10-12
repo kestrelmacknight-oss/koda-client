@@ -154,6 +154,66 @@
 
   "oauthConsentError": "Δεν ήταν δυνατή η ολοκλήρωση -- δοκιμάστε ξανά.",
 
+  "commonNext": "Επόμενο",
+
+  "serverTabBots": "Bots",
+
+  "botInstallTitle": "Εγκατάσταση Bot",
+
+  "botInstallSuccess": "Το bot εγκαταστάθηκε.",
+
+  "botInstallNoEligibleServers": "Δεν διαχειρίζεστε διακομιστές όπου μπορούν να εγκατασταθούν bots.",
+
+  "botInstallSelectServer": "Εγκατάσταση σε",
+
+  "botInstallSelectPermissions": "Δικαιώματα για εκχώρηση",
+
+  "botInstallPermissionsHelp": "Μπορούν να εκχωρηθούν μόνο δικαιώματα που κατέχετε εσείς -- τα γκριζαρισμένα δεν είναι δικά σας για εκχώρηση.",
+
+  "botInstallConfirm": "Εγκατάσταση",
+
+  "botsTabDescription": "Bots εγκατεστημένα σε αυτόν τον διακομιστή, και τι επιτρέπεται να κάνουν.",
+
+  "botsTabInstallButton": "Εγκατάσταση bot",
+
+  "botsTabInstallDialogTitle": "Εγκατάσταση bot",
+
+  "botsTabClientIdHint": "Επικολλήστε το ID εφαρμογής του bot",
+
+  "botsTabEmptyState": "Δεν έχουν εγκατασταθεί bots ακόμα.",
+
+  "botsTabNoPermissions": "Δεν έχουν εκχωρηθεί δικαιώματα",
+
+  "botsTabUninstall": "Κατάργηση εγκατάστασης",
+
+  "devPortalCommandsSectionTitle": "Εντολές κάθετου",
+
+  "devPortalNoInteractionsUrl": "Δεν έχει ορισθεί ακόμα URL αλληλεπιδράσεων.",
+
+  "devPortalEditInteractionsUrl": "Επεξεργασία URL αλληλεπιδράσεων",
+
+  "devPortalEditInteractionsUrlTitle": "URL αλληλεπιδράσεων",
+
+  "devPortalInteractionsUrlHelp": "Πού στέλνει το Koda ένα υπογεγραμμένο POST κάθε φορά που κάποιος καλεί μια εντολή αυτής της εφαρμογής. Πρέπει να απαντήσει εντός περίπου 3 δευτερολέπτων.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "Δημιουργία μυστικού υπογραφής",
+
+  "devPortalRegenerateSigningSecret": "Δημιουργία νέου μυστικού υπογραφής",
+
+  "homeSlashCommandsTooltip": "Εντολές κάθετου",
+
+  "slashCommandsNoneAvailable": "Δεν υπάρχουν bots με εντολές εγκατεστημένα σε αυτόν τον διακομιστή.",
+
+  "slashCommandsPickerTitle": "Επιλέξτε εντολή",
+
+  "slashCommandsRun": "Εκτέλεση",
+
+  "devPortalEventsSectionTitle": "Συμβάντα Webhook",
+
+  "devPortalEventsSectionHelp": "Το Koda ειδοποιεί το URL αλληλεπιδράσεων αυτής της εφαρμογής όταν συμβαίνει ένα εγγεγραμμένο συμβάν -- ενεργοποιήστε μόνο ό,τι χρειάζεστε.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Συνδέστε το Steam για να μοιραστείτε τι παίζετε τώρα και/ή να συγκρίνετε βιβλιοθήκες παιχνιδιών με φίλους -- πρόκειται για δύο ανεξάρτητους διακόπτες, η ενεργοποίηση του ενός δεν ενεργοποιεί ποτέ τον άλλο.",

@@ -366,6 +366,100 @@ class AppLocalizationsKo extends AppLocalizations {
   String get oauthConsentError => '완료할 수 없습니다 -- 다시 시도하세요.';
 
   @override
+  String get commonNext => '다음';
+
+  @override
+  String get serverTabBots => '봇';
+
+  @override
+  String get botInstallTitle => '봇 설치';
+
+  @override
+  String get botInstallSuccess => '봇이 설치되었습니다.';
+
+  @override
+  String get botInstallNoEligibleServers => '봇을 설치할 수 있는 서버를 관리하고 있지 않습니다.';
+
+  @override
+  String get botInstallSelectServer => '설치 위치';
+
+  @override
+  String get botInstallSelectPermissions => '부여할 권한';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      '본인이 가진 권한만 부여할 수 있습니다 -- 회색으로 표시된 권한은 부여할 수 없습니다.';
+
+  @override
+  String get botInstallConfirm => '설치';
+
+  @override
+  String get botsTabDescription => '이 서버에 설치된 봇과 허용된 작업입니다.';
+
+  @override
+  String get botsTabInstallButton => '봇 설치';
+
+  @override
+  String get botsTabInstallDialogTitle => '봇 설치';
+
+  @override
+  String get botsTabClientIdHint => '봇의 애플리케이션 ID 붙여넣기';
+
+  @override
+  String get botsTabEmptyState => '아직 설치된 봇이 없습니다.';
+
+  @override
+  String get botsTabNoPermissions => '부여된 권한 없음';
+
+  @override
+  String get botsTabUninstall => '제거';
+
+  @override
+  String get devPortalCommandsSectionTitle => '슬래시 명령어';
+
+  @override
+  String get devPortalNoInteractionsUrl => '아직 인터랙션 URL이 설정되지 않았습니다.';
+
+  @override
+  String get devPortalEditInteractionsUrl => '인터랙션 URL 편집';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => '인터랙션 URL';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      '사용자가 이 앱의 명령어를 호출할 때마다 Koda가 서명된 POST를 전달하는 위치입니다. 약 3초 이내에 응답해야 합니다.';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => '서명 비밀 생성';
+
+  @override
+  String get devPortalRegenerateSigningSecret => '서명 비밀 재생성';
+
+  @override
+  String get homeSlashCommandsTooltip => '슬래시 명령어';
+
+  @override
+  String get slashCommandsNoneAvailable => '이 서버에는 명령어가 있는 봇이 설치되어 있지 않습니다.';
+
+  @override
+  String get slashCommandsPickerTitle => '명령어 선택';
+
+  @override
+  String get slashCommandsRun => '실행';
+
+  @override
+  String get devPortalEventsSectionTitle => '웹훅 이벤트';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      '구독한 이벤트가 발생하면 Koda가 이 앱의 인터랙션 URL에 알립니다 -- 필요한 것만 활성화하세요.';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

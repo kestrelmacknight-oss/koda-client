@@ -376,6 +376,104 @@ class AppLocalizationsHi extends AppLocalizations {
   String get oauthConsentError => 'वह पूरा नहीं हो सका -- फिर से प्रयास करें।';
 
   @override
+  String get commonNext => 'आगे';
+
+  @override
+  String get serverTabBots => 'बॉट्स';
+
+  @override
+  String get botInstallTitle => 'बॉट इंस्टॉल करें';
+
+  @override
+  String get botInstallSuccess => 'बॉट इंस्टॉल हो गया।';
+
+  @override
+  String get botInstallNoEligibleServers =>
+      'आप किसी भी ऐसे सर्वर का प्रबंधन नहीं करते जहाँ बॉट इंस्टॉल किए जा सकें।';
+
+  @override
+  String get botInstallSelectServer => 'इसमें इंस्टॉल करें';
+
+  @override
+  String get botInstallSelectPermissions => 'देने के लिए अनुमतियाँ';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      'केवल वे अनुमतियाँ दी जा सकती हैं जो आपके पास स्वयं हैं -- धूसर की गई अनुमतियाँ देने के लिए आपकी नहीं हैं।';
+
+  @override
+  String get botInstallConfirm => 'इंस्टॉल करें';
+
+  @override
+  String get botsTabDescription =>
+      'इस सर्वर में इंस्टॉल किए गए बॉट्स, और वे क्या करने की अनुमति रखते हैं।';
+
+  @override
+  String get botsTabInstallButton => 'एक बॉट इंस्टॉल करें';
+
+  @override
+  String get botsTabInstallDialogTitle => 'एक बॉट इंस्टॉल करें';
+
+  @override
+  String get botsTabClientIdHint => 'बॉट की एप्लिकेशन ID पेस्ट करें';
+
+  @override
+  String get botsTabEmptyState => 'अभी तक कोई बॉट इंस्टॉल नहीं है।';
+
+  @override
+  String get botsTabNoPermissions => 'कोई अनुमति नहीं दी गई';
+
+  @override
+  String get botsTabUninstall => 'अनइंस्टॉल करें';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'स्लैश कमांड';
+
+  @override
+  String get devPortalNoInteractionsUrl =>
+      'अभी तक कोई इंटरैक्शन URL सेट नहीं है।';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'इंटरैक्शन URL संपादित करें';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'इंटरैक्शन URL';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'जहां Koda एक हस्ताक्षरित POST भेजता है जब भी कोई इस ऐप के किसी कमांड को आमंत्रित करता है। लगभग 3 सेकंड के भीतर जवाब देना चाहिए।';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => 'हस्ताक्षर रहस्य बनाएं';
+
+  @override
+  String get devPortalRegenerateSigningSecret => 'हस्ताक्षर रहस्य फिर से बनाएं';
+
+  @override
+  String get homeSlashCommandsTooltip => 'स्लैश कमांड';
+
+  @override
+  String get slashCommandsNoneAvailable =>
+      'इस सर्वर में कमांड वाले कोई बॉट इंस्टॉल नहीं हैं।';
+
+  @override
+  String get slashCommandsPickerTitle => 'एक कमांड चुनें';
+
+  @override
+  String get slashCommandsRun => 'चलाएं';
+
+  @override
+  String get devPortalEventsSectionTitle => 'वेबहुक ईवेंट';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'जब कोई सब्सक्राइब किया गया ईवेंट होता है तो Koda इस ऐप के इंटरैक्शन URL को सूचित करता है -- केवल वही चालू करें जिसकी आपको आवश्यकता है।';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

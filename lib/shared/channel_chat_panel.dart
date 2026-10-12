@@ -422,6 +422,118 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
     await _sendMessage();
   }
 
+  // Slash commands (developer platform, Phase 4) -- modal picker, same
+  // showDialog precedent as the GIF/emoji pickers above rather than a
+  // live inline overlay (none exists anywhere in this client). Two
+  // dialogs in sequence: pick which command, then fill its typed
+  // options -- kept separate rather than one combined dialog since the
+  // option form's shape depends entirely on which command was picked.
+  Future<void> _showCommandPicker() async {
+    final t = AppLocalizations.of(context);
+    final commands = await KodaApi.instance.getChannelCommands(widget.channelId);
+    if (!mounted) return;
+    if (commands.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.slashCommandsNoneAvailable)));
+      return;
+    }
+
+    final picked = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: Text(t.slashCommandsPickerTitle, style: TextStyle(color: KodaColors.text1)),
+        content: SizedBox(
+          width: 360,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: commands.length,
+            itemBuilder: (_, i) {
+              final c = commands[i];
+              return ListTile(
+                dense: true,
+                title: Text('/${c['name']}', style: TextStyle(color: KodaColors.text1, fontSize: 14)),
+                subtitle: Text('${c['app_name']} -- ${c['description'] ?? ''}',
+                    style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+                onTap: () => Navigator.pop(context, c),
+              );
+            },
+          ),
+        ),
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text(t.commonCancel))],
+      ),
+    );
+    if (picked == null || !mounted) return;
+    await _showCommandOptionsDialog(picked);
+  }
+
+  Future<void> _showCommandOptionsDialog(Map<String, dynamic> command) async {
+    final t = AppLocalizations.of(context);
+    final options = List<Map<String, dynamic>>.from(command['options'] ?? []);
+    final controllers = <String, TextEditingController>{};
+    final boolValues = <String, bool>{};
+    for (final o in options) {
+      if (o['type'] == 'boolean') { boolValues[o['name'] as String] = false; }
+      else { controllers[o['name'] as String] = TextEditingController(); }
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          backgroundColor: KodaColors.card,
+          title: Text('/${command['name']}', style: TextStyle(color: KodaColors.text1)),
+          content: SizedBox(
+            width: 360,
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              for (final o in options)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: o['type'] == 'boolean'
+                      ? CheckboxListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          controlAffinity: ListTileControlAffinity.leading,
+                          title: Text(o['name'] as String, style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+                          value: boolValues[o['name']] ?? false,
+                          onChanged: (v) => setDialogState(() => boolValues[o['name']] = v ?? false),
+                        )
+                      : KodaTextField(
+                          controller: controllers[o['name']]!,
+                          hintText: '${o['name']}${o['required'] == true ? ' *' : ''}',
+                          keyboardType: o['type'] == 'integer' ? TextInputType.number : TextInputType.text,
+                        ),
+                ),
+            ]),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.commonCancel)),
+            TextButton(onPressed: () => Navigator.pop(context, true), child: Text(t.slashCommandsRun)),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final values = <String, dynamic>{};
+    for (final o in options) {
+      final name = o['name'] as String;
+      if (o['type'] == 'boolean') {
+        values[name] = boolValues[name] ?? false;
+      } else {
+        final text = controllers[name]!.text.trim();
+        if (text.isEmpty) continue;
+        values[name] = o['type'] == 'integer' ? (int.tryParse(text) ?? text) : text;
+      }
+    }
+
+    final error = await KodaApi.instance.invokeCommand(
+        widget.channelId, command['app_id'] as String, command['name'] as String, values);
+    if (!mounted) return;
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+    }
+  }
+
   Future<void> _editMessage(String channelId, Map<String, dynamic> message) async {
     final t = AppLocalizations.of(context);
     final ctrl = TextEditingController(text: message['content'] as String? ?? '');
@@ -1131,12 +1243,26 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
             tooltip: t.homeGifTooltip,
             onPressed: _pickGif,
           ),
+          IconButton(
+            iconSize: 18,
+            icon: Icon(Icons.terminal, color: KodaColors.text2),
+            tooltip: t.homeSlashCommandsTooltip,
+            onPressed: _showCommandPicker,
+          ),
           Expanded(
             child: KodaTextField(
               controller: _messageController,
               hintText: t.homeMessageHint(''),
-              onChanged: (_) {
+              onChanged: (text) {
                 KodaSocket.instance.push('channel:${widget.channelId}', 'typing', {'typing': true});
+                // Typing a bare "/" is the discoverability path for the
+                // same picker the dedicated icon button opens -- not a
+                // live inline overlay (none exists anywhere in this
+                // client), just a shortcut into the same modal dialog.
+                if (text == '/') {
+                  _messageController.clear();
+                  _showCommandPicker();
+                }
               },
               onSubmitted: (_) => _sendMessage(),
             ),

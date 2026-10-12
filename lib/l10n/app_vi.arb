@@ -154,6 +154,66 @@
 
   "oauthConsentError": "Không thể hoàn tất -- hãy thử lại.",
 
+  "commonNext": "Tiếp theo",
+
+  "serverTabBots": "Bot",
+
+  "botInstallTitle": "Cài đặt Bot",
+
+  "botInstallSuccess": "Đã cài đặt bot.",
+
+  "botInstallNoEligibleServers": "Bạn không quản lý server nào có thể cài đặt bot.",
+
+  "botInstallSelectServer": "Cài đặt vào",
+
+  "botInstallSelectPermissions": "Quyền sẽ cấp",
+
+  "botInstallPermissionsHelp": "Chỉ có thể cấp các quyền mà chính bạn sở hữu -- quyền bị làm mờ không phải của bạn để cấp.",
+
+  "botInstallConfirm": "Cài đặt",
+
+  "botsTabDescription": "Các bot đã cài đặt trong server này, và những gì chúng được phép làm.",
+
+  "botsTabInstallButton": "Cài đặt một bot",
+
+  "botsTabInstallDialogTitle": "Cài đặt một bot",
+
+  "botsTabClientIdHint": "Dán ID ứng dụng của bot",
+
+  "botsTabEmptyState": "Chưa có bot nào được cài đặt.",
+
+  "botsTabNoPermissions": "Chưa cấp quyền nào",
+
+  "botsTabUninstall": "Gỡ cài đặt",
+
+  "devPortalCommandsSectionTitle": "Lệnh gạch chéo",
+
+  "devPortalNoInteractionsUrl": "Chưa đặt URL tương tác.",
+
+  "devPortalEditInteractionsUrl": "Chỉnh sửa URL tương tác",
+
+  "devPortalEditInteractionsUrlTitle": "URL tương tác",
+
+  "devPortalInteractionsUrlHelp": "Nơi Koda gửi một POST đã ký mỗi khi ai đó gọi một trong các lệnh của ứng dụng này. Phải phản hồi trong khoảng 3 giây.",
+
+  "devPortalInteractionsUrlHint": "https://example.com/koda/interactions",
+
+  "devPortalGenerateSigningSecret": "Tạo khóa bí mật chữ ký",
+
+  "devPortalRegenerateSigningSecret": "Tạo lại khóa bí mật chữ ký",
+
+  "homeSlashCommandsTooltip": "Lệnh gạch chéo",
+
+  "slashCommandsNoneAvailable": "Không có bot nào có lệnh được cài đặt trong server này.",
+
+  "slashCommandsPickerTitle": "Chọn một lệnh",
+
+  "slashCommandsRun": "Chạy",
+
+  "devPortalEventsSectionTitle": "Sự kiện Webhook",
+
+  "devPortalEventsSectionHelp": "Koda thông báo cho URL tương tác của ứng dụng này khi một sự kiện đã đăng ký xảy ra -- chỉ bật những gì bạn cần.",
+
   "settingsSteamTitle": "Steam",
 
   "settingsSteamDescription": "Kết nối Steam để chia sẻ bạn đang chơi gì và/hoặc so sánh thư viện game với bạn bè -- đây là hai công tắc độc lập, bật một cái không bao giờ tự bật cái kia.",

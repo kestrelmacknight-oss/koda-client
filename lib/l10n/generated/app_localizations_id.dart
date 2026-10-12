@@ -378,6 +378,105 @@ class AppLocalizationsId extends AppLocalizations {
   String get oauthConsentError => 'Tidak dapat menyelesaikannya -- coba lagi.';
 
   @override
+  String get commonNext => 'Berikutnya';
+
+  @override
+  String get serverTabBots => 'Bot';
+
+  @override
+  String get botInstallTitle => 'Instal Bot';
+
+  @override
+  String get botInstallSuccess => 'Bot terinstal.';
+
+  @override
+  String get botInstallNoEligibleServers =>
+      'Anda tidak mengelola server mana pun yang dapat menginstal bot.';
+
+  @override
+  String get botInstallSelectServer => 'Instal ke';
+
+  @override
+  String get botInstallSelectPermissions => 'Izin yang akan diberikan';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      'Hanya izin yang Anda miliki sendiri yang dapat diberikan -- yang berwarna abu-abu bukan milik Anda untuk diberikan.';
+
+  @override
+  String get botInstallConfirm => 'Instal';
+
+  @override
+  String get botsTabDescription =>
+      'Bot yang terinstal di server ini, dan apa yang boleh mereka lakukan.';
+
+  @override
+  String get botsTabInstallButton => 'Instal bot';
+
+  @override
+  String get botsTabInstallDialogTitle => 'Instal bot';
+
+  @override
+  String get botsTabClientIdHint => 'Tempel ID aplikasi bot';
+
+  @override
+  String get botsTabEmptyState => 'Belum ada bot yang terinstal.';
+
+  @override
+  String get botsTabNoPermissions => 'Tidak ada izin yang diberikan';
+
+  @override
+  String get botsTabUninstall => 'Hapus instalasi';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'Perintah garis miring';
+
+  @override
+  String get devPortalNoInteractionsUrl =>
+      'Belum ada URL interaksi yang diatur.';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'Edit URL interaksi';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'URL interaksi';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'Ke mana Koda mengirim POST yang ditandatangani setiap kali seseorang memanggil salah satu perintah aplikasi ini. Harus merespons dalam waktu sekitar 3 detik.';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => 'Buat rahasia tanda tangan';
+
+  @override
+  String get devPortalRegenerateSigningSecret =>
+      'Buat ulang rahasia tanda tangan';
+
+  @override
+  String get homeSlashCommandsTooltip => 'Perintah garis miring';
+
+  @override
+  String get slashCommandsNoneAvailable =>
+      'Tidak ada bot dengan perintah yang terinstal di server ini.';
+
+  @override
+  String get slashCommandsPickerTitle => 'Pilih perintah';
+
+  @override
+  String get slashCommandsRun => 'Jalankan';
+
+  @override
+  String get devPortalEventsSectionTitle => 'Peristiwa Webhook';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'Koda memberi tahu URL interaksi aplikasi ini saat peristiwa yang dilanggan terjadi -- aktifkan hanya yang Anda perlukan.';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

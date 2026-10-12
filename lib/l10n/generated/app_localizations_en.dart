@@ -376,6 +376,103 @@ class AppLocalizationsEn extends AppLocalizations {
   String get oauthConsentError => 'Couldn\'t complete that -- try again.';
 
   @override
+  String get commonNext => 'Next';
+
+  @override
+  String get serverTabBots => 'Bots';
+
+  @override
+  String get botInstallTitle => 'Install Bot';
+
+  @override
+  String get botInstallSuccess => 'Bot installed.';
+
+  @override
+  String get botInstallNoEligibleServers =>
+      'You don\'t manage any servers that can install bots.';
+
+  @override
+  String get botInstallSelectServer => 'Install into';
+
+  @override
+  String get botInstallSelectPermissions => 'Permissions to grant';
+
+  @override
+  String get botInstallPermissionsHelp =>
+      'Only permissions you hold yourself can be granted -- greyed-out ones aren\'t yours to give.';
+
+  @override
+  String get botInstallConfirm => 'Install';
+
+  @override
+  String get botsTabDescription =>
+      'Bots installed in this server, and what they\'re allowed to do.';
+
+  @override
+  String get botsTabInstallButton => 'Install a bot';
+
+  @override
+  String get botsTabInstallDialogTitle => 'Install a bot';
+
+  @override
+  String get botsTabClientIdHint => 'Paste the bot\'s application ID';
+
+  @override
+  String get botsTabEmptyState => 'No bots installed yet.';
+
+  @override
+  String get botsTabNoPermissions => 'No permissions granted';
+
+  @override
+  String get botsTabUninstall => 'Uninstall';
+
+  @override
+  String get devPortalCommandsSectionTitle => 'Slash Commands';
+
+  @override
+  String get devPortalNoInteractionsUrl => 'No interactions URL set yet.';
+
+  @override
+  String get devPortalEditInteractionsUrl => 'Edit interactions URL';
+
+  @override
+  String get devPortalEditInteractionsUrlTitle => 'Interactions URL';
+
+  @override
+  String get devPortalInteractionsUrlHelp =>
+      'Where Koda delivers a signed POST whenever a user invokes one of this app\'s commands. Must respond within about 3 seconds.';
+
+  @override
+  String get devPortalInteractionsUrlHint =>
+      'https://example.com/koda/interactions';
+
+  @override
+  String get devPortalGenerateSigningSecret => 'Generate signing secret';
+
+  @override
+  String get devPortalRegenerateSigningSecret => 'Regenerate signing secret';
+
+  @override
+  String get homeSlashCommandsTooltip => 'Slash commands';
+
+  @override
+  String get slashCommandsNoneAvailable =>
+      'No bots with commands are installed in this server.';
+
+  @override
+  String get slashCommandsPickerTitle => 'Choose a command';
+
+  @override
+  String get slashCommandsRun => 'Run';
+
+  @override
+  String get devPortalEventsSectionTitle => 'Webhook Events';
+
+  @override
+  String get devPortalEventsSectionHelp =>
+      'Koda notifies this app\'s interactions URL when a subscribed event happens -- opt in to only what you need.';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
