@@ -1,7 +1,7 @@
 // lib/core/api.dart
 //
 // Koda API client -- production build targeting api.koda.fyi exclusively.
-// No demo fallbacks: this is a live Alpha client. Failures surface as
+// No demo fallbacks: this is a live Beta client. Failures surface as
 // empty results or null so the UI can show a real connection error
 // rather than fabricated content.
 
@@ -1855,6 +1855,39 @@ class KodaApi {
       await _dio.put('/developer/apps/$appId/subscribed_events', data: {'events': events});
       return true;
     } catch (e) { _log('setDeveloperAppSubscribedEvents', e); return false; }
+  }
+
+  /// Phase 7 (sandbox): fires a real signed test interaction at the
+  /// app's interactions_url with sentinel IDs (never a real server/
+  /// channel/user), so a developer can verify their bot's webhook
+  /// handling before installing it anywhere. Returns the bot's reply
+  /// on success, or the server's error message on failure.
+  Future<({String? reply, String? error})> sendTestInteraction(
+      String appId, String command, Map<String, dynamic> options) async {
+    try {
+      final res = await _dio.post('/developer/apps/$appId/sandbox/interaction',
+          data: {'command': command, 'options': options});
+      return (reply: res.data['reply'] as String?, error: null);
+    } on DioException catch (e) {
+      return (reply: null, error: _errorCodeOf(e) ?? 'Request failed');
+    } catch (e) {
+      _log('sendTestInteraction', e);
+      return (reply: null, error: 'Request failed');
+    }
+  }
+
+  /// Same idea as sendTestInteraction, for one of the webhook event
+  /// types -- returns null on success, the error message otherwise.
+  Future<String?> sendTestEvent(String appId, String eventType) async {
+    try {
+      await _dio.post('/developer/apps/$appId/sandbox/event', data: {'event': eventType});
+      return null;
+    } on DioException catch (e) {
+      return _errorCodeOf(e) ?? 'Request failed';
+    } catch (e) {
+      _log('sendTestEvent', e);
+      return 'Request failed';
+    }
   }
 
   /// Public app metadata for the OAuth consent screen -- name/

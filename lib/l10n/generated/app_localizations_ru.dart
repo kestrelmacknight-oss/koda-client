@@ -476,6 +476,32 @@ class AppLocalizationsRu extends AppLocalizations {
       'Koda уведомляет URL взаимодействий этого приложения при возникновении подписанного события -- включайте только то, что нужно.';
 
   @override
+  String get devPortalSandboxSection => 'Песочница';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'Имя команды';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'Параметры (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction =>
+      'Отправить тестовое взаимодействие';
+
+  @override
+  String get devPortalSandboxTestEvent => 'Отправить тест';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'Ответ:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'Ошибка:';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'Сначала укажите URL взаимодействий и секрет подписи';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

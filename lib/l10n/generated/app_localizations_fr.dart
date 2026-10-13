@@ -478,6 +478,32 @@ class AppLocalizationsFr extends AppLocalizations {
       'Koda notifie l\'URL d\'interactions de cette app quand un événement abonné se produit -- n\'activez que ce dont vous avez besoin.';
 
   @override
+  String get devPortalSandboxSection => 'Bac à sable';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'Nom de la commande';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'Options (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction =>
+      'Envoyer une interaction de test';
+
+  @override
+  String get devPortalSandboxTestEvent => 'Envoyer un test';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'Réponse :';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'Erreur :';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'Configurez d\'abord une URL d\'interactions et un secret de signature';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

@@ -477,6 +477,31 @@ class AppLocalizationsIt extends AppLocalizations {
       'Koda notifica l\'URL di interazioni di questa app quando si verifica un evento sottoscritto -- attiva solo ciò di cui hai bisogno.';
 
   @override
+  String get devPortalSandboxSection => 'Sandbox';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'Nome comando';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'Opzioni (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => 'Invia interazione di prova';
+
+  @override
+  String get devPortalSandboxTestEvent => 'Invia test';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'Risposta:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'Errore:';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'Imposta prima un URL di interazioni e un segreto di firma';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

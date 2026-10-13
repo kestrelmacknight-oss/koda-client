@@ -460,6 +460,30 @@ class AppLocalizationsKo extends AppLocalizations {
       '구독한 이벤트가 발생하면 Koda가 이 앱의 인터랙션 URL에 알립니다 -- 필요한 것만 활성화하세요.';
 
   @override
+  String get devPortalSandboxSection => '샌드박스';
+
+  @override
+  String get devPortalSandboxCommandLabel => '명령어 이름';
+
+  @override
+  String get devPortalSandboxOptionsLabel => '옵션 (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => '테스트 인터랙션 보내기';
+
+  @override
+  String get devPortalSandboxTestEvent => '테스트 보내기';
+
+  @override
+  String get devPortalSandboxReplyLabel => '응답:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => '오류:';
+
+  @override
+  String get devPortalSandboxNotReady => '먼저 인터랙션 URL과 서명 비밀키를 설정하세요';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

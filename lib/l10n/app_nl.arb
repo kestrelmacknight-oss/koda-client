@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "Webhook-gebeurtenissen",
 
   "devPortalEventsSectionHelp": "Koda informeert de interacties-URL van deze app wanneer een geabonneerde gebeurtenis plaatsvindt -- schakel alleen in wat je nodig hebt.",
+  "devPortalSandboxSection": "Sandbox",
+  "devPortalSandboxCommandLabel": "Opdrachtnaam",
+  "devPortalSandboxOptionsLabel": "Opties (JSON)",
+  "devPortalSandboxSendInteraction": "Testinteractie verzenden",
+  "devPortalSandboxTestEvent": "Test verzenden",
+  "devPortalSandboxReplyLabel": "Antwoord:",
+  "devPortalSandboxErrorPrefix": "Fout:",
+  "devPortalSandboxNotReady": "Stel eerst een interacties-URL en ondertekeningsgeheim in",
 
   "settingsSteamTitle": "Steam",
 

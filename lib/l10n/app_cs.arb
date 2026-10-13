@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "Webhook události",
 
   "devPortalEventsSectionHelp": "Koda upozorní URL pro interakce této aplikace, když nastane odebraná událost -- zapněte jen to, co potřebujete.",
+  "devPortalSandboxSection": "Sandbox",
+  "devPortalSandboxCommandLabel": "Název příkazu",
+  "devPortalSandboxOptionsLabel": "Možnosti (JSON)",
+  "devPortalSandboxSendInteraction": "Odeslat testovací interakci",
+  "devPortalSandboxTestEvent": "Odeslat test",
+  "devPortalSandboxReplyLabel": "Odpověď:",
+  "devPortalSandboxErrorPrefix": "Chyba:",
+  "devPortalSandboxNotReady": "Nejprve nastavte URL adresu interakcí a podpisový klíč",
 
   "settingsSteamTitle": "Steam",
 

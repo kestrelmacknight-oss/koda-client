@@ -477,6 +477,31 @@ class AppLocalizationsId extends AppLocalizations {
       'Koda memberi tahu URL interaksi aplikasi ini saat peristiwa yang dilanggan terjadi -- aktifkan hanya yang Anda perlukan.';
 
   @override
+  String get devPortalSandboxSection => 'Sandbox';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'Nama perintah';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'Opsi (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => 'Kirim interaksi uji';
+
+  @override
+  String get devPortalSandboxTestEvent => 'Kirim uji';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'Balasan:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'Kesalahan:';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'Atur URL interaksi dan kunci penandatanganan terlebih dahulu';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

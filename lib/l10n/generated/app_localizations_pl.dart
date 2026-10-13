@@ -480,6 +480,31 @@ class AppLocalizationsPl extends AppLocalizations {
       'Koda powiadamia adres URL interakcji tej aplikacji, gdy wystąpi zaabonowane zdarzenie -- włącz tylko to, czego potrzebujesz.';
 
   @override
+  String get devPortalSandboxSection => 'Piaskownica';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'Nazwa komendy';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'Opcje (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => 'Wyślij testową interakcję';
+
+  @override
+  String get devPortalSandboxTestEvent => 'Wyślij test';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'Odpowiedź:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'Błąd:';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'Najpierw ustaw adres URL interakcji i tajny klucz podpisu';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "Події Webhook",
 
   "devPortalEventsSectionHelp": "Koda повідомляє URL взаємодій цього застосунку, коли відбувається підписана подія -- увімкніть лише те, що потрібно.",
+  "devPortalSandboxSection": "Пісочниця",
+  "devPortalSandboxCommandLabel": "Назва команди",
+  "devPortalSandboxOptionsLabel": "Параметри (JSON)",
+  "devPortalSandboxSendInteraction": "Надіслати тестову взаємодію",
+  "devPortalSandboxTestEvent": "Надіслати тест",
+  "devPortalSandboxReplyLabel": "Відповідь:",
+  "devPortalSandboxErrorPrefix": "Помилка:",
+  "devPortalSandboxNotReady": "Спочатку вкажіть URL-адресу взаємодій і секретний підпис",
 
   "settingsSteamTitle": "Steam",
 

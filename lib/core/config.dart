@@ -1,6 +1,6 @@
 // lib/core/config.dart
 //
-// Production configuration for Koda Alpha v0.34.
+// Production configuration for Koda Beta v0.6.2.
 // Every URL and email address Koda needs lives here, and only here.
 // No hosting-provider details (Railway service variables, Neon
 // connection strings, etc.) belong in this file or anywhere in this
@@ -29,8 +29,8 @@ class KodaConfig {
 
   // ── App identity ───────────────────────────────────────────────────────
   static const String appName     = 'Koda';
-  static const String appVersion  = '0.5.0';
-  static const String buildLabel  = 'Alpha';
+  static const String appVersion  = '0.6.2';
+  static const String buildLabel  = 'Beta';
   static const String fullVersion = '$appName $buildLabel v$appVersion';
   static const String company     = 'GryphonHeart LLC';
 
@@ -55,7 +55,7 @@ class KodaConfig {
   // ── Feature flags ──────────────────────────────────────────────────────
   // E2EE wiring point: a future build links the koda_protocol Rust crate
   // here and flips this to true once message encrypt/decrypt is hooked up.
-  // This Alpha build sends message content as plain text over TLS.
+  // This Beta build sends message content as plain text over TLS.
   static const bool enableE2EE = false;
 
   // ── Local storage keys ─────────────────────────────────────────────────

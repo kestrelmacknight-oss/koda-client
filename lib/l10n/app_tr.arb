@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "Webhook Olayları",
 
   "devPortalEventsSectionHelp": "Abone olunan bir olay gerçekleştiğinde Koda bu uygulamanın etkileşim URL'sini bilgilendirir -- yalnızca ihtiyacın olanı etkinleştir.",
+  "devPortalSandboxSection": "Sandbox",
+  "devPortalSandboxCommandLabel": "Komut adı",
+  "devPortalSandboxOptionsLabel": "Seçenekler (JSON)",
+  "devPortalSandboxSendInteraction": "Test etkileşimi gönder",
+  "devPortalSandboxTestEvent": "Test gönder",
+  "devPortalSandboxReplyLabel": "Yanıt:",
+  "devPortalSandboxErrorPrefix": "Hata:",
+  "devPortalSandboxNotReady": "Önce bir etkileşim URL'si ve imzalama anahtarı ayarlayın",
 
   "settingsSteamTitle": "Steam",
 

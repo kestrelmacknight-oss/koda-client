@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "События webhook",
 
   "devPortalEventsSectionHelp": "Koda уведомляет URL взаимодействий этого приложения при возникновении подписанного события -- включайте только то, что нужно.",
+  "devPortalSandboxSection": "Песочница",
+  "devPortalSandboxCommandLabel": "Имя команды",
+  "devPortalSandboxOptionsLabel": "Параметры (JSON)",
+  "devPortalSandboxSendInteraction": "Отправить тестовое взаимодействие",
+  "devPortalSandboxTestEvent": "Отправить тест",
+  "devPortalSandboxReplyLabel": "Ответ:",
+  "devPortalSandboxErrorPrefix": "Ошибка:",
+  "devPortalSandboxNotReady": "Сначала укажите URL взаимодействий и секрет подписи",
 
   "settingsSteamTitle": "Steam",
 

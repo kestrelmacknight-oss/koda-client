@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "Συμβάντα Webhook",
 
   "devPortalEventsSectionHelp": "Το Koda ειδοποιεί το URL αλληλεπιδράσεων αυτής της εφαρμογής όταν συμβαίνει ένα εγγεγραμμένο συμβάν -- ενεργοποιήστε μόνο ό,τι χρειάζεστε.",
+  "devPortalSandboxSection": "Sandbox",
+  "devPortalSandboxCommandLabel": "Όνομα εντολής",
+  "devPortalSandboxOptionsLabel": "Επιλογές (JSON)",
+  "devPortalSandboxSendInteraction": "Αποστολή δοκιμαστικής αλληλεπίδρασης",
+  "devPortalSandboxTestEvent": "Αποστολή δοκιμής",
+  "devPortalSandboxReplyLabel": "Απάντηση:",
+  "devPortalSandboxErrorPrefix": "Σφάλμα:",
+  "devPortalSandboxNotReady": "Ορίστε πρώτα ένα URL αλληλεπιδράσεων και ένα κλειδί υπογραφής",
 
   "settingsSteamTitle": "Steam",
 

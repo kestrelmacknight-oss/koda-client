@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "Webhookイベント",
 
   "devPortalEventsSectionHelp": "サブスクライブしたイベントが発生すると、Kodaはこのアプリのインタラクションurlに通知します -- 必要なものだけを有効にしてください。",
+  "devPortalSandboxSection": "サンドボックス",
+  "devPortalSandboxCommandLabel": "コマンド名",
+  "devPortalSandboxOptionsLabel": "オプション (JSON)",
+  "devPortalSandboxSendInteraction": "テストインタラクションを送信",
+  "devPortalSandboxTestEvent": "テストを送信",
+  "devPortalSandboxReplyLabel": "返信:",
+  "devPortalSandboxErrorPrefix": "エラー:",
+  "devPortalSandboxNotReady": "先にインタラクションURLと署名シークレットを設定してください",
 
   "settingsSteamTitle": "Steam",
 

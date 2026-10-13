@@ -479,6 +479,31 @@ class AppLocalizationsCs extends AppLocalizations {
       'Koda upozorní URL pro interakce této aplikace, když nastane odebraná událost -- zapněte jen to, co potřebujete.';
 
   @override
+  String get devPortalSandboxSection => 'Sandbox';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'Název příkazu';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'Možnosti (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => 'Odeslat testovací interakci';
+
+  @override
+  String get devPortalSandboxTestEvent => 'Odeslat test';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'Odpověď:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'Chyba:';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'Nejprve nastavte URL adresu interakcí a podpisový klíč';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

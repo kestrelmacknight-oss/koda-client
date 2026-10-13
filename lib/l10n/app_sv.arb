@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "Webhook-händelser",
 
   "devPortalEventsSectionHelp": "Koda meddelar den här appens interaktions-URL när en prenumererad händelse inträffar -- aktivera bara det du behöver.",
+  "devPortalSandboxSection": "Sandlåda",
+  "devPortalSandboxCommandLabel": "Kommandonamn",
+  "devPortalSandboxOptionsLabel": "Alternativ (JSON)",
+  "devPortalSandboxSendInteraction": "Skicka testinteraktion",
+  "devPortalSandboxTestEvent": "Skicka test",
+  "devPortalSandboxReplyLabel": "Svar:",
+  "devPortalSandboxErrorPrefix": "Fel:",
+  "devPortalSandboxNotReady": "Ange en interaktions-URL och signeringsnyckel först",
 
   "settingsSteamTitle": "Steam",
 

@@ -472,6 +472,31 @@ class AppLocalizationsAr extends AppLocalizations {
       'يُشعر Koda عنوان URL للتفاعلات الخاص بهذا التطبيق عند حدوث حدث مُشترك فيه -- فعّل فقط ما تحتاجه.';
 
   @override
+  String get devPortalSandboxSection => 'بيئة تجريبية';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'اسم الأمر';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'الخيارات (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => 'إرسال تفاعل تجريبي';
+
+  @override
+  String get devPortalSandboxTestEvent => 'إرسال اختبار';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'الرد:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'خطأ:';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'قم أولاً بتعيين عنوان URL للتفاعلات وسر التوقيع';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

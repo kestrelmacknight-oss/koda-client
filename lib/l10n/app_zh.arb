@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "Webhook 事件",
 
   "devPortalEventsSectionHelp": "当订阅的事件发生时，Koda 会通知此应用的交互 URL -- 仅启用你需要的事件。",
+  "devPortalSandboxSection": "沙盒",
+  "devPortalSandboxCommandLabel": "命令名称",
+  "devPortalSandboxOptionsLabel": "选项 (JSON)",
+  "devPortalSandboxSendInteraction": "发送测试交互",
+  "devPortalSandboxTestEvent": "发送测试",
+  "devPortalSandboxReplyLabel": "回复：",
+  "devPortalSandboxErrorPrefix": "错误：",
+  "devPortalSandboxNotReady": "请先设置交互 URL 和签名密钥",
 
   "settingsSteamTitle": "Steam",
 

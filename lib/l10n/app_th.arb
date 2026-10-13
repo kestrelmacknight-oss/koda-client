@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "เหตุการณ์ Webhook",
 
   "devPortalEventsSectionHelp": "Koda จะแจ้งเตือน URL การโต้ตอบของแอปนี้เมื่อเหตุการณ์ที่สมัครรับเกิดขึ้น -- เปิดใช้งานเฉพาะสิ่งที่คุณต้องการ",
+  "devPortalSandboxSection": "แซนด์บ็อกซ์",
+  "devPortalSandboxCommandLabel": "ชื่อคำสั่ง",
+  "devPortalSandboxOptionsLabel": "ตัวเลือก (JSON)",
+  "devPortalSandboxSendInteraction": "ส่งการโต้ตอบทดสอบ",
+  "devPortalSandboxTestEvent": "ส่งการทดสอบ",
+  "devPortalSandboxReplyLabel": "คำตอบ:",
+  "devPortalSandboxErrorPrefix": "ข้อผิดพลาด:",
+  "devPortalSandboxNotReady": "กรุณาตั้งค่า URL การโต้ตอบและคีย์ลงนามก่อน",
 
   "settingsSteamTitle": "Steam",
 

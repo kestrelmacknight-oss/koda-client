@@ -11,6 +11,7 @@
 // recoverable form, so there is no "view key" action afterward, only
 // "key ending in ****" plus Regenerate.
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import '../../core/api.dart';
@@ -33,6 +34,30 @@ class DeveloperPortalScreen extends StatefulWidget {
 class _DeveloperPortalScreenState extends State<DeveloperPortalScreen> {
   List<Map<String, dynamic>> _apps = [];
   bool _loading = true;
+
+  // Phase 7 (sandbox): one controller pair per app, keyed by app id,
+  // created lazily -- avoids a state explosion for apps the developer
+  // never opens the sandbox section for.
+  final Map<String, TextEditingController> _sandboxCommandCtrls = {};
+  final Map<String, TextEditingController> _sandboxOptionsCtrls = {};
+  // Last sandbox result shown per app: null = nothing sent yet.
+  final Map<String, ({bool ok, String text})?> _sandboxResults = {};
+
+  TextEditingController _commandCtrl(String appId) =>
+      _sandboxCommandCtrls.putIfAbsent(appId, () => TextEditingController());
+  TextEditingController _optionsCtrl(String appId) =>
+      _sandboxOptionsCtrls.putIfAbsent(appId, () => TextEditingController(text: '{}'));
+
+  @override
+  void dispose() {
+    for (final c in _sandboxCommandCtrls.values) {
+      c.dispose();
+    }
+    for (final c in _sandboxOptionsCtrls.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -240,6 +265,47 @@ class _DeveloperPortalScreenState extends State<DeveloperPortalScreen> {
     if (ok) _load();
   }
 
+  /// Phase 7 (sandbox): fires a real signed test interaction at the
+  /// app's interactions_url using sentinel IDs, then shows the bot's
+  /// reply (or whatever error came back) right in this card -- no
+  /// real server/channel is touched.
+  Future<void> _sendTestInteraction(String appId) async {
+    final t = AppLocalizations.of(context);
+    final command = _commandCtrl(appId).text.trim();
+    if (command.isEmpty) return;
+
+    Map<String, dynamic> options;
+    try {
+      options = jsonDecode(_optionsCtrl(appId).text.trim().isEmpty
+          ? '{}'
+          : _optionsCtrl(appId).text) as Map<String, dynamic>;
+    } catch (_) {
+      setState(() => _sandboxResults[appId] = (ok: false, text: 'Invalid JSON in options'));
+      return;
+    }
+
+    final result = await KodaApi.instance.sendTestInteraction(appId, command, options);
+    if (!mounted) return;
+    setState(() {
+      _sandboxResults[appId] = result.error != null
+          ? (ok: false, text: '${t.devPortalSandboxErrorPrefix} ${result.error}')
+          : (ok: true, text: '${t.devPortalSandboxReplyLabel} ${result.reply ?? ''}');
+    });
+  }
+
+  /// Same idea as _sendTestInteraction, for one of the subscribed-event
+  /// checkboxes -- lets a developer verify each event type individually.
+  Future<void> _sendTestEvent(String appId, String eventType) async {
+    final t = AppLocalizations.of(context);
+    final error = await KodaApi.instance.sendTestEvent(appId, eventType);
+    if (!mounted) return;
+    setState(() {
+      _sandboxResults[appId] = error != null
+          ? (ok: false, text: '${t.devPortalSandboxErrorPrefix} $error')
+          : (ok: true, text: '${t.devPortalSandboxTestEvent}: $eventType ✓');
+    });
+  }
+
   Future<void> _generateClientSecret(String appId) async {
     final newSecret = await KodaApi.instance.regenerateDeveloperAppClientSecret(appId);
     if (newSecret == null) return;
@@ -401,7 +467,50 @@ class _DeveloperPortalScreenState extends State<DeveloperPortalScreen> {
                                 app['id'] as String,
                                 List<String>.from(app['subscribed_events'] ?? []),
                                 eventType, checked ?? false),
+                            secondary: IconButton(
+                              icon: Icon(Icons.send, size: 15, color: KodaColors.text3),
+                              tooltip: t.devPortalSandboxTestEvent,
+                              onPressed: () => _sendTestEvent(app['id'] as String, eventType),
+                            ),
                           ),
+                        Divider(color: KodaColors.border, height: 20),
+                        Text(t.devPortalSandboxSection,
+                            style: TextStyle(color: KodaColors.text2, fontSize: 11, fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 6),
+                        KodaTextField(
+                          controller: _commandCtrl(app['id'] as String),
+                          hintText: t.devPortalSandboxCommandLabel,
+                        ),
+                        const SizedBox(height: 6),
+                        TextField(
+                          controller: _optionsCtrl(app['id'] as String),
+                          style: TextStyle(color: KodaColors.text1, fontSize: 12, fontFamily: 'monospace'),
+                          decoration: InputDecoration(
+                            hintText: t.devPortalSandboxOptionsLabel,
+                            hintStyle: TextStyle(color: KodaColors.text3),
+                            filled: true,
+                            fillColor: KodaColors.elevated,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton(
+                            onPressed: () => _sendTestInteraction(app['id'] as String),
+                            child: Text(t.devPortalSandboxSendInteraction,
+                                style: TextStyle(color: KodaColors.koda, fontSize: 12)),
+                          ),
+                        ),
+                        if (_sandboxResults[app['id']] != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            _sandboxResults[app['id']]!.text,
+                            style: TextStyle(
+                                color: _sandboxResults[app['id']]!.ok ? KodaColors.text2 : Colors.redAccent,
+                                fontSize: 12),
+                          ),
+                        ],
                       ]),
                     );
                   },

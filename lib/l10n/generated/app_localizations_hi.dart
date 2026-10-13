@@ -474,6 +474,31 @@ class AppLocalizationsHi extends AppLocalizations {
       'जब कोई सब्सक्राइब किया गया ईवेंट होता है तो Koda इस ऐप के इंटरैक्शन URL को सूचित करता है -- केवल वही चालू करें जिसकी आपको आवश्यकता है।';
 
   @override
+  String get devPortalSandboxSection => 'सैंडबॉक्स';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'कमांड नाम';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'विकल्प (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => 'परीक्षण इंटरैक्शन भेजें';
+
+  @override
+  String get devPortalSandboxTestEvent => 'परीक्षण भेजें';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'उत्तर:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'त्रुटि:';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'पहले एक इंटरैक्शन URL और साइनिंग सीक्रेट सेट करें';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

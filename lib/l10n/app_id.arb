@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "Peristiwa Webhook",
 
   "devPortalEventsSectionHelp": "Koda memberi tahu URL interaksi aplikasi ini saat peristiwa yang dilanggan terjadi -- aktifkan hanya yang Anda perlukan.",
+  "devPortalSandboxSection": "Sandbox",
+  "devPortalSandboxCommandLabel": "Nama perintah",
+  "devPortalSandboxOptionsLabel": "Opsi (JSON)",
+  "devPortalSandboxSendInteraction": "Kirim interaksi uji",
+  "devPortalSandboxTestEvent": "Kirim uji",
+  "devPortalSandboxReplyLabel": "Balasan:",
+  "devPortalSandboxErrorPrefix": "Kesalahan:",
+  "devPortalSandboxNotReady": "Atur URL interaksi dan kunci penandatanganan terlebih dahulu",
 
   "settingsSteamTitle": "Steam",
 

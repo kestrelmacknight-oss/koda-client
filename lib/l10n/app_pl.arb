@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "Zdarzenia webhook",
 
   "devPortalEventsSectionHelp": "Koda powiadamia adres URL interakcji tej aplikacji, gdy wystąpi zaabonowane zdarzenie -- włącz tylko to, czego potrzebujesz.",
+  "devPortalSandboxSection": "Piaskownica",
+  "devPortalSandboxCommandLabel": "Nazwa komendy",
+  "devPortalSandboxOptionsLabel": "Opcje (JSON)",
+  "devPortalSandboxSendInteraction": "Wyślij testową interakcję",
+  "devPortalSandboxTestEvent": "Wyślij test",
+  "devPortalSandboxReplyLabel": "Odpowiedź:",
+  "devPortalSandboxErrorPrefix": "Błąd:",
+  "devPortalSandboxNotReady": "Najpierw ustaw adres URL interakcji i tajny klucz podpisu",
 
   "settingsSteamTitle": "Steam",
 

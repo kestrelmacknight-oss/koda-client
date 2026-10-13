@@ -1,4 +1,4 @@
-# Koda Client -- Alpha v0.34
+# Koda Client -- Beta v0.6.2
 
 A fresh Flutter desktop client, pre-configured for production. Every URL in
 this app points at koda.fyi already -- there is nothing to fill in, and no

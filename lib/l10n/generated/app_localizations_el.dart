@@ -480,6 +480,32 @@ class AppLocalizationsEl extends AppLocalizations {
       'Το Koda ειδοποιεί το URL αλληλεπιδράσεων αυτής της εφαρμογής όταν συμβαίνει ένα εγγεγραμμένο συμβάν -- ενεργοποιήστε μόνο ό,τι χρειάζεστε.';
 
   @override
+  String get devPortalSandboxSection => 'Sandbox';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'Όνομα εντολής';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'Επιλογές (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction =>
+      'Αποστολή δοκιμαστικής αλληλεπίδρασης';
+
+  @override
+  String get devPortalSandboxTestEvent => 'Αποστολή δοκιμής';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'Απάντηση:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'Σφάλμα:';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'Ορίστε πρώτα ένα URL αλληλεπιδράσεων και ένα κλειδί υπογραφής';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

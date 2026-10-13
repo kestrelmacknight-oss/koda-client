@@ -474,6 +474,31 @@ class AppLocalizationsSv extends AppLocalizations {
       'Koda meddelar den här appens interaktions-URL när en prenumererad händelse inträffar -- aktivera bara det du behöver.';
 
   @override
+  String get devPortalSandboxSection => 'Sandlåda';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'Kommandonamn';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'Alternativ (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => 'Skicka testinteraktion';
+
+  @override
+  String get devPortalSandboxTestEvent => 'Skicka test';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'Svar:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'Fel:';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'Ange en interaktions-URL och signeringsnyckel först';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

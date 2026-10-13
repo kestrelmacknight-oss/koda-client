@@ -210,6 +210,14 @@
   "devPortalEventsSectionTitle": "Événements webhook",
 
   "devPortalEventsSectionHelp": "Koda notifie l'URL d'interactions de cette app quand un événement abonné se produit -- n'activez que ce dont vous avez besoin.",
+  "devPortalSandboxSection": "Bac à sable",
+  "devPortalSandboxCommandLabel": "Nom de la commande",
+  "devPortalSandboxOptionsLabel": "Options (JSON)",
+  "devPortalSandboxSendInteraction": "Envoyer une interaction de test",
+  "devPortalSandboxTestEvent": "Envoyer un test",
+  "devPortalSandboxReplyLabel": "Réponse :",
+  "devPortalSandboxErrorPrefix": "Erreur :",
+  "devPortalSandboxNotReady": "Configurez d'abord une URL d'interactions et un secret de signature",
 
   "settingsSteamTitle": "Steam",
 

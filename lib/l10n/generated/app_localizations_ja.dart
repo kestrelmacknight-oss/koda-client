@@ -457,6 +457,30 @@ class AppLocalizationsJa extends AppLocalizations {
       'サブスクライブしたイベントが発生すると、Kodaはこのアプリのインタラクションurlに通知します -- 必要なものだけを有効にしてください。';
 
   @override
+  String get devPortalSandboxSection => 'サンドボックス';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'コマンド名';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'オプション (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => 'テストインタラクションを送信';
+
+  @override
+  String get devPortalSandboxTestEvent => 'テストを送信';
+
+  @override
+  String get devPortalSandboxReplyLabel => '返信:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'エラー:';
+
+  @override
+  String get devPortalSandboxNotReady => '先にインタラクションURLと署名シークレットを設定してください';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

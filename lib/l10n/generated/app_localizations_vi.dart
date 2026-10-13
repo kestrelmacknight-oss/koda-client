@@ -477,6 +477,31 @@ class AppLocalizationsVi extends AppLocalizations {
       'Koda thông báo cho URL tương tác của ứng dụng này khi một sự kiện đã đăng ký xảy ra -- chỉ bật những gì bạn cần.';
 
   @override
+  String get devPortalSandboxSection => 'Hộp cát';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'Tên lệnh';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'Tùy chọn (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => 'Gửi tương tác thử nghiệm';
+
+  @override
+  String get devPortalSandboxTestEvent => 'Gửi thử nghiệm';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'Phản hồi:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'Lỗi:';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'Hãy đặt URL tương tác và khóa ký trước';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

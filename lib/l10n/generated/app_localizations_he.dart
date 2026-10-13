@@ -470,6 +470,31 @@ class AppLocalizationsHe extends AppLocalizations {
       'Koda מודיע לכתובת URL לאינטראקציות של אפליקציה זו כאשר מתרחש אירוע מנוי -- הפעל רק את מה שאתה צריך.';
 
   @override
+  String get devPortalSandboxSection => 'סנדבוקס';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'שם הפקודה';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'אפשרויות (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => 'שליחת אינטראקציית בדיקה';
+
+  @override
+  String get devPortalSandboxTestEvent => 'שליחת בדיקה';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'תגובה:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'שגיאה:';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'הגדר קודם כתובת URL לאינטראקציות ומפתח חתימה';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

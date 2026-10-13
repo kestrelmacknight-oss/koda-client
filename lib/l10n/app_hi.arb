@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "वेबहुक ईवेंट",
 
   "devPortalEventsSectionHelp": "जब कोई सब्सक्राइब किया गया ईवेंट होता है तो Koda इस ऐप के इंटरैक्शन URL को सूचित करता है -- केवल वही चालू करें जिसकी आपको आवश्यकता है।",
+  "devPortalSandboxSection": "सैंडबॉक्स",
+  "devPortalSandboxCommandLabel": "कमांड नाम",
+  "devPortalSandboxOptionsLabel": "विकल्प (JSON)",
+  "devPortalSandboxSendInteraction": "परीक्षण इंटरैक्शन भेजें",
+  "devPortalSandboxTestEvent": "परीक्षण भेजें",
+  "devPortalSandboxReplyLabel": "उत्तर:",
+  "devPortalSandboxErrorPrefix": "त्रुटि:",
+  "devPortalSandboxNotReady": "पहले एक इंटरैक्शन URL और साइनिंग सीक्रेट सेट करें",
 
   "settingsSteamTitle": "Steam",
 

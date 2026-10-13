@@ -988,6 +988,54 @@ abstract class AppLocalizations {
   /// **'Koda notifies this app\'s interactions URL when a subscribed event happens -- opt in to only what you need.'**
   String get devPortalEventsSectionHelp;
 
+  /// No description provided for @devPortalSandboxSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Sandbox'**
+  String get devPortalSandboxSection;
+
+  /// No description provided for @devPortalSandboxCommandLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Command name'**
+  String get devPortalSandboxCommandLabel;
+
+  /// No description provided for @devPortalSandboxOptionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Options (JSON)'**
+  String get devPortalSandboxOptionsLabel;
+
+  /// No description provided for @devPortalSandboxSendInteraction.
+  ///
+  /// In en, this message translates to:
+  /// **'Send test interaction'**
+  String get devPortalSandboxSendInteraction;
+
+  /// No description provided for @devPortalSandboxTestEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Send test'**
+  String get devPortalSandboxTestEvent;
+
+  /// No description provided for @devPortalSandboxReplyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply:'**
+  String get devPortalSandboxReplyLabel;
+
+  /// No description provided for @devPortalSandboxErrorPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Error:'**
+  String get devPortalSandboxErrorPrefix;
+
+  /// No description provided for @devPortalSandboxNotReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Set an interactions URL and signing secret first'**
+  String get devPortalSandboxNotReady;
+
   /// No description provided for @settingsSteamTitle.
   ///
   /// In en, this message translates to:

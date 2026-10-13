@@ -210,6 +210,14 @@
   "devPortalEventsSectionTitle": "אירועי Webhook",
 
   "devPortalEventsSectionHelp": "Koda מודיע לכתובת URL לאינטראקציות של אפליקציה זו כאשר מתרחש אירוע מנוי -- הפעל רק את מה שאתה צריך.",
+  "devPortalSandboxSection": "סנדבוקס",
+  "devPortalSandboxCommandLabel": "שם הפקודה",
+  "devPortalSandboxOptionsLabel": "אפשרויות (JSON)",
+  "devPortalSandboxSendInteraction": "שליחת אינטראקציית בדיקה",
+  "devPortalSandboxTestEvent": "שליחת בדיקה",
+  "devPortalSandboxReplyLabel": "תגובה:",
+  "devPortalSandboxErrorPrefix": "שגיאה:",
+  "devPortalSandboxNotReady": "הגדר קודם כתובת URL לאינטראקציות ומפתח חתימה",
 
   "settingsSteamTitle": "Steam",
 

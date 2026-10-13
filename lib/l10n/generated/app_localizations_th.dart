@@ -476,6 +476,31 @@ class AppLocalizationsTh extends AppLocalizations {
       'Koda จะแจ้งเตือน URL การโต้ตอบของแอปนี้เมื่อเหตุการณ์ที่สมัครรับเกิดขึ้น -- เปิดใช้งานเฉพาะสิ่งที่คุณต้องการ';
 
   @override
+  String get devPortalSandboxSection => 'แซนด์บ็อกซ์';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'ชื่อคำสั่ง';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'ตัวเลือก (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => 'ส่งการโต้ตอบทดสอบ';
+
+  @override
+  String get devPortalSandboxTestEvent => 'ส่งการทดสอบ';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'คำตอบ:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'ข้อผิดพลาด:';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'กรุณาตั้งค่า URL การโต้ตอบและคีย์ลงนามก่อน';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

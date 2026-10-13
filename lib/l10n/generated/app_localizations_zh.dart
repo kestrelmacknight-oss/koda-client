@@ -453,6 +453,30 @@ class AppLocalizationsZh extends AppLocalizations {
       '当订阅的事件发生时，Koda 会通知此应用的交互 URL -- 仅启用你需要的事件。';
 
   @override
+  String get devPortalSandboxSection => '沙盒';
+
+  @override
+  String get devPortalSandboxCommandLabel => '命令名称';
+
+  @override
+  String get devPortalSandboxOptionsLabel => '选项 (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => '发送测试交互';
+
+  @override
+  String get devPortalSandboxTestEvent => '发送测试';
+
+  @override
+  String get devPortalSandboxReplyLabel => '回复：';
+
+  @override
+  String get devPortalSandboxErrorPrefix => '错误：';
+
+  @override
+  String get devPortalSandboxNotReady => '请先设置交互 URL 和签名密钥';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5130,6 +5154,30 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   @override
   String get devPortalEventsSectionHelp =>
       '當訂閱的事件發生時，Koda 會通知此應用程式的互動 URL -- 僅啟用你需要的事件。';
+
+  @override
+  String get devPortalSandboxSection => '沙盒';
+
+  @override
+  String get devPortalSandboxCommandLabel => '指令名稱';
+
+  @override
+  String get devPortalSandboxOptionsLabel => '選項 (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => '傳送測試互動';
+
+  @override
+  String get devPortalSandboxTestEvent => '傳送測試';
+
+  @override
+  String get devPortalSandboxReplyLabel => '回覆：';
+
+  @override
+  String get devPortalSandboxErrorPrefix => '錯誤：';
+
+  @override
+  String get devPortalSandboxNotReady => '請先設定互動 URL 與簽署密鑰';
 
   @override
   String get settingsSteamTitle => 'Steam';

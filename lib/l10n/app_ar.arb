@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "أحداث الـ Webhook",
 
   "devPortalEventsSectionHelp": "يُشعر Koda عنوان URL للتفاعلات الخاص بهذا التطبيق عند حدوث حدث مُشترك فيه -- فعّل فقط ما تحتاجه.",
+  "devPortalSandboxSection": "بيئة تجريبية",
+  "devPortalSandboxCommandLabel": "اسم الأمر",
+  "devPortalSandboxOptionsLabel": "الخيارات (JSON)",
+  "devPortalSandboxSendInteraction": "إرسال تفاعل تجريبي",
+  "devPortalSandboxTestEvent": "إرسال اختبار",
+  "devPortalSandboxReplyLabel": "الرد:",
+  "devPortalSandboxErrorPrefix": "خطأ:",
+  "devPortalSandboxNotReady": "قم أولاً بتعيين عنوان URL للتفاعلات وسر التوقيع",
 
   "settingsSteamTitle": "Steam",
 

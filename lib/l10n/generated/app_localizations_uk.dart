@@ -476,6 +476,31 @@ class AppLocalizationsUk extends AppLocalizations {
       'Koda повідомляє URL взаємодій цього застосунку, коли відбувається підписана подія -- увімкніть лише те, що потрібно.';
 
   @override
+  String get devPortalSandboxSection => 'Пісочниця';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'Назва команди';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'Параметри (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => 'Надіслати тестову взаємодію';
+
+  @override
+  String get devPortalSandboxTestEvent => 'Надіслати тест';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'Відповідь:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'Помилка:';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'Спочатку вкажіть URL-адресу взаємодій і секретний підпис';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

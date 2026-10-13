@@ -478,6 +478,31 @@ class AppLocalizationsTr extends AppLocalizations {
       'Abone olunan bir olay gerçekleştiğinde Koda bu uygulamanın etkileşim URL\'sini bilgilendirir -- yalnızca ihtiyacın olanı etkinleştir.';
 
   @override
+  String get devPortalSandboxSection => 'Sandbox';
+
+  @override
+  String get devPortalSandboxCommandLabel => 'Komut adı';
+
+  @override
+  String get devPortalSandboxOptionsLabel => 'Seçenekler (JSON)';
+
+  @override
+  String get devPortalSandboxSendInteraction => 'Test etkileşimi gönder';
+
+  @override
+  String get devPortalSandboxTestEvent => 'Test gönder';
+
+  @override
+  String get devPortalSandboxReplyLabel => 'Yanıt:';
+
+  @override
+  String get devPortalSandboxErrorPrefix => 'Hata:';
+
+  @override
+  String get devPortalSandboxNotReady =>
+      'Önce bir etkileşim URL\'si ve imzalama anahtarı ayarlayın';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

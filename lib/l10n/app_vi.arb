@@ -213,6 +213,14 @@
   "devPortalEventsSectionTitle": "Sự kiện Webhook",
 
   "devPortalEventsSectionHelp": "Koda thông báo cho URL tương tác của ứng dụng này khi một sự kiện đã đăng ký xảy ra -- chỉ bật những gì bạn cần.",
+  "devPortalSandboxSection": "Hộp cát",
+  "devPortalSandboxCommandLabel": "Tên lệnh",
+  "devPortalSandboxOptionsLabel": "Tùy chọn (JSON)",
+  "devPortalSandboxSendInteraction": "Gửi tương tác thử nghiệm",
+  "devPortalSandboxTestEvent": "Gửi thử nghiệm",
+  "devPortalSandboxReplyLabel": "Phản hồi:",
+  "devPortalSandboxErrorPrefix": "Lỗi:",
+  "devPortalSandboxNotReady": "Hãy đặt URL tương tác và khóa ký trước",
 
   "settingsSteamTitle": "Steam",
 
