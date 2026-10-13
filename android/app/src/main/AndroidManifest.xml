@@ -59,7 +59,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="https" android:host="koda.fyi" android:pathPrefix="/invite"/>
-                <!-- https://koda.fyi/oauth/authorize App Link -- the
+                <!-- https://koda.fyi/oauth/authorize App Link: the
                      developer platform's OAuth2 consent step (Phase 2),
                      see lib/core/deep_links.dart's _oauthRequestFrom.
                      Same assetlinks.json dependency noted above. -->
