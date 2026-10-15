@@ -477,6 +477,119 @@ class AppLocalizationsZh extends AppLocalizations {
   String get devPortalSandboxNotReady => '请先设置交互 URL 和签名密钥';
 
   @override
+  String get homeBrowsePublicServersTooltip => '浏览公开服务器';
+
+  @override
+  String get serverDiscoveryTitle => '浏览服务器';
+
+  @override
+  String get serverDiscoverySearchHint => '搜索服务器';
+
+  @override
+  String get serverDiscoveryEmptyState => '未找到公开服务器。';
+
+  @override
+  String get serverDiscoveryMatureBadge => '成人内容';
+
+  @override
+  String get serverDiscoveryNoDescription => '暂无描述。';
+
+  @override
+  String serverDiscoveryMemberCount(int count) {
+    return '$count 位成员';
+  }
+
+  @override
+  String get serverDiscoveryJoinError => '无法加入此服务器';
+
+  @override
+  String get serverDiscoveryNotFound => '此服务器已不可用。';
+
+  @override
+  String get serverDiscoveryJoinButton => '加入服务器';
+
+  @override
+  String get serverDiscoveryPreviewChannelsLabel => '预览频道';
+
+  @override
+  String get serverDiscoveryPreviewReadOnlyNote => '您正在未加入的情况下查看此频道。加入服务器以回复。';
+
+  @override
+  String get serverDiscoveryPreviewEmptyState => '暂无消息。';
+
+  @override
+  String get serverPublicListingLabel => '公开列表';
+
+  @override
+  String get serverListPublicly => '将此服务器公开列出';
+
+  @override
+  String get serverListPubliclyDescription => '允许任何人从浏览服务器中找到并加入此服务器,无需邀请。';
+
+  @override
+  String get serverDescriptionLabel => '描述';
+
+  @override
+  String get serverDescriptionHint => '这个服务器是关于什么的?';
+
+  @override
+  String get serverMatureContentLabel => '包含成人内容';
+
+  @override
+  String get serverRulesGateNote => '新成员在接受规则之前只能看到您的规则频道(以及任何预览频道)。';
+
+  @override
+  String get serverMakePublicTitle => '要将此服务器设为公开吗?';
+
+  @override
+  String get serverMakePublicBody =>
+      '任何人都可以在没有邀请的情况下找到并加入此服务器。请在继续之前确保描述准确,内容已适当标记。';
+
+  @override
+  String get serverMakePublicConfirm => '设为公开';
+
+  @override
+  String get serverMakePublicNeedsDescription => '在将服务器设为公开之前,请添加描述。';
+
+  @override
+  String get serverMakePublicGenericError => '无法更新公开列表';
+
+  @override
+  String homeFeaturedServerTooltip(String name) {
+    return '精选：$name';
+  }
+
+  @override
+  String get serverRolePriorityHelp => '拖动以设置当成员拥有多个身份组时优先显示哪一个。';
+
+  @override
+  String get steamHideUnplayedTitle => '隐藏未玩过的游戏？';
+
+  @override
+  String steamHideUnplayedBody(int count) {
+    return '你的库中有 $count 款游戏的游玩时间为 0 —— 可能是试玩版、免费赠品，或你一直没顾上玩的游戏。要将它们全部从比较中隐藏吗？';
+  }
+
+  @override
+  String get steamHideUnplayedConfirm => '全部隐藏';
+
+  @override
+  String steamHideUnplayedButton(int count) {
+    return '隐藏 $count 款未玩游戏';
+  }
+
+  @override
+  String steamUnresolvedGameLabel(int appId) {
+    return '应用 $appId';
+  }
+
+  @override
+  String get steamNeverPlayedLabel => '从未玩过';
+
+  @override
+  String get steamVisibleInComparison => '在比较中可见';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5178,6 +5291,119 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get devPortalSandboxNotReady => '請先設定互動 URL 與簽署密鑰';
+
+  @override
+  String get homeBrowsePublicServersTooltip => '瀏覽公開伺服器';
+
+  @override
+  String get serverDiscoveryTitle => '瀏覽伺服器';
+
+  @override
+  String get serverDiscoverySearchHint => '搜尋伺服器';
+
+  @override
+  String get serverDiscoveryEmptyState => '找不到公開伺服器。';
+
+  @override
+  String get serverDiscoveryMatureBadge => '成人內容';
+
+  @override
+  String get serverDiscoveryNoDescription => '尚無描述。';
+
+  @override
+  String serverDiscoveryMemberCount(int count) {
+    return '$count 位成員';
+  }
+
+  @override
+  String get serverDiscoveryJoinError => '無法加入此伺服器';
+
+  @override
+  String get serverDiscoveryNotFound => '此伺服器已不再可用。';
+
+  @override
+  String get serverDiscoveryJoinButton => '加入伺服器';
+
+  @override
+  String get serverDiscoveryPreviewChannelsLabel => '預覽頻道';
+
+  @override
+  String get serverDiscoveryPreviewReadOnlyNote => '您正在未加入的情況下檢視此頻道。加入伺服器以回覆。';
+
+  @override
+  String get serverDiscoveryPreviewEmptyState => '尚無訊息。';
+
+  @override
+  String get serverPublicListingLabel => '公開列表';
+
+  @override
+  String get serverListPublicly => '將此伺服器公開列出';
+
+  @override
+  String get serverListPubliclyDescription => '允許任何人從瀏覽伺服器中找到並加入此伺服器,無需邀請。';
+
+  @override
+  String get serverDescriptionLabel => '描述';
+
+  @override
+  String get serverDescriptionHint => '這個伺服器是關於什麼的?';
+
+  @override
+  String get serverMatureContentLabel => '包含成人內容';
+
+  @override
+  String get serverRulesGateNote => '新成員在接受規則之前,只能看到您的規則頻道(以及任何預覽頻道)。';
+
+  @override
+  String get serverMakePublicTitle => '要將此伺服器設為公開嗎?';
+
+  @override
+  String get serverMakePublicBody =>
+      '任何人都可以在沒有邀請的情況下找到並加入此伺服器。請在繼續之前確保描述準確,內容已適當標記。';
+
+  @override
+  String get serverMakePublicConfirm => '設為公開';
+
+  @override
+  String get serverMakePublicNeedsDescription => '在將伺服器設為公開之前,請新增描述。';
+
+  @override
+  String get serverMakePublicGenericError => '無法更新公開列表';
+
+  @override
+  String homeFeaturedServerTooltip(String name) {
+    return '精選：$name';
+  }
+
+  @override
+  String get serverRolePriorityHelp => '拖曳以設定當成員擁有多個身分組時優先顯示哪一個。';
+
+  @override
+  String get steamHideUnplayedTitle => '隱藏未玩過的遊戲？';
+
+  @override
+  String steamHideUnplayedBody(int count) {
+    return '你的庫中有 $count 款遊戲的遊玩時間為 0 —— 可能是試玩版、免費贈品，或你一直沒空玩的遊戲。要將它們全部從比較中隱藏嗎？';
+  }
+
+  @override
+  String get steamHideUnplayedConfirm => '全部隱藏';
+
+  @override
+  String steamHideUnplayedButton(int count) {
+    return '隱藏 $count 款未玩遊戲';
+  }
+
+  @override
+  String steamUnresolvedGameLabel(int appId) {
+    return '應用程式 $appId';
+  }
+
+  @override
+  String get steamNeverPlayedLabel => '從未玩過';
+
+  @override
+  String get steamVisibleInComparison => '在比較中可見';
 
   @override
   String get settingsSteamTitle => 'Steam';

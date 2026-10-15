@@ -501,6 +501,127 @@ class AppLocalizationsUk extends AppLocalizations {
       'Спочатку вкажіть URL-адресу взаємодій і секретний підпис';
 
   @override
+  String get homeBrowsePublicServersTooltip => 'Перегляд публічних серверів';
+
+  @override
+  String get serverDiscoveryTitle => 'Перегляд серверів';
+
+  @override
+  String get serverDiscoverySearchHint => 'Пошук серверів';
+
+  @override
+  String get serverDiscoveryEmptyState => 'Публічних серверів не знайдено.';
+
+  @override
+  String get serverDiscoveryMatureBadge => 'КОНТЕНТ 18+';
+
+  @override
+  String get serverDiscoveryNoDescription => 'Опис не надано.';
+
+  @override
+  String serverDiscoveryMemberCount(int count) {
+    return '$count учасників';
+  }
+
+  @override
+  String get serverDiscoveryJoinError =>
+      'Не вдалося приєднатися до цього сервера';
+
+  @override
+  String get serverDiscoveryNotFound => 'Цей сервер більше недоступний.';
+
+  @override
+  String get serverDiscoveryJoinButton => 'Приєднатися до сервера';
+
+  @override
+  String get serverDiscoveryPreviewChannelsLabel =>
+      'Канали попереднього перегляду';
+
+  @override
+  String get serverDiscoveryPreviewReadOnlyNote =>
+      'Ви переглядаєте цей канал, не приєднавшись. Приєднайтеся до сервера, щоб відповісти.';
+
+  @override
+  String get serverDiscoveryPreviewEmptyState => 'Повідомлень поки немає.';
+
+  @override
+  String get serverPublicListingLabel => 'Публічний список';
+
+  @override
+  String get serverListPublicly => 'Зробити цей сервер публічним у списку';
+
+  @override
+  String get serverListPubliclyDescription =>
+      'Дозвольте будь-кому знаходити цей сервер і приєднуватися до нього через Перегляд серверів, без запрошення.';
+
+  @override
+  String get serverDescriptionLabel => 'Опис';
+
+  @override
+  String get serverDescriptionHint => 'Про що цей сервер?';
+
+  @override
+  String get serverMatureContentLabel => 'Містить контент для дорослих';
+
+  @override
+  String get serverRulesGateNote =>
+      'Нові учасники бачитимуть лише канал правил (і будь-які канали попереднього перегляду), доки не приймуть правила.';
+
+  @override
+  String get serverMakePublicTitle => 'Зробити цей сервер публічним?';
+
+  @override
+  String get serverMakePublicBody =>
+      'Будь-хто зможе знайти цей сервер і приєднатися до нього без запрошення. Перш ніж продовжити, переконайтеся, що опис точний, а контент належно позначений.';
+
+  @override
+  String get serverMakePublicConfirm => 'Зробити публічним';
+
+  @override
+  String get serverMakePublicNeedsDescription =>
+      'Додайте опис, перш ніж робити сервер публічним.';
+
+  @override
+  String get serverMakePublicGenericError =>
+      'Не вдалося оновити публічний список';
+
+  @override
+  String homeFeaturedServerTooltip(String name) {
+    return 'Рекомендовано: $name';
+  }
+
+  @override
+  String get serverRolePriorityHelp =>
+      'Перетягніть, щоб визначити, яка роль показується першою, якщо учасник має більше однієї.';
+
+  @override
+  String get steamHideUnplayedTitle => 'Приховати неграні ігри?';
+
+  @override
+  String steamHideUnplayedBody(int count) {
+    return '$count ігор у вашій бібліотеці мають 0 часу гри -- демо, безкоштовні роздачі або те, до чого руки не дійшли. Приховати їх усі з порівняння?';
+  }
+
+  @override
+  String get steamHideUnplayedConfirm => 'Приховати всі';
+
+  @override
+  String steamHideUnplayedButton(int count) {
+    return 'Приховати $count неграних ігор';
+  }
+
+  @override
+  String steamUnresolvedGameLabel(int appId) {
+    return 'Застосунок $appId';
+  }
+
+  @override
+  String get steamNeverPlayedLabel => 'Ніколи не грали';
+
+  @override
+  String get steamVisibleInComparison => 'Видно в порівнянні';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

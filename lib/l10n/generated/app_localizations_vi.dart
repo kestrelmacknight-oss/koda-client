@@ -502,6 +502,126 @@ class AppLocalizationsVi extends AppLocalizations {
       'Hãy đặt URL tương tác và khóa ký trước';
 
   @override
+  String get homeBrowsePublicServersTooltip => 'Duyệt máy chủ công khai';
+
+  @override
+  String get serverDiscoveryTitle => 'Duyệt Máy Chủ';
+
+  @override
+  String get serverDiscoverySearchHint => 'Tìm kiếm máy chủ';
+
+  @override
+  String get serverDiscoveryEmptyState =>
+      'Không tìm thấy máy chủ công khai nào.';
+
+  @override
+  String get serverDiscoveryMatureBadge => 'NỘI DUNG NGƯỜI LỚN';
+
+  @override
+  String get serverDiscoveryNoDescription => 'Chưa có mô tả.';
+
+  @override
+  String serverDiscoveryMemberCount(int count) {
+    return '$count thành viên';
+  }
+
+  @override
+  String get serverDiscoveryJoinError => 'Không thể tham gia máy chủ này';
+
+  @override
+  String get serverDiscoveryNotFound => 'Máy chủ này không còn khả dụng.';
+
+  @override
+  String get serverDiscoveryJoinButton => 'Tham Gia Máy Chủ';
+
+  @override
+  String get serverDiscoveryPreviewChannelsLabel => 'Kênh xem trước';
+
+  @override
+  String get serverDiscoveryPreviewReadOnlyNote =>
+      'Bạn đang xem kênh này mà chưa tham gia. Hãy tham gia máy chủ để trả lời.';
+
+  @override
+  String get serverDiscoveryPreviewEmptyState => 'Chưa có tin nhắn nào.';
+
+  @override
+  String get serverPublicListingLabel => 'Danh sách công khai';
+
+  @override
+  String get serverListPublicly => 'Liệt kê máy chủ này công khai';
+
+  @override
+  String get serverListPubliclyDescription =>
+      'Cho phép bất kỳ ai tìm và tham gia máy chủ này từ Duyệt Máy Chủ, không cần lời mời.';
+
+  @override
+  String get serverDescriptionLabel => 'Mô tả';
+
+  @override
+  String get serverDescriptionHint => 'Máy chủ này nói về điều gì?';
+
+  @override
+  String get serverMatureContentLabel => 'Chứa nội dung người lớn';
+
+  @override
+  String get serverRulesGateNote =>
+      'Thành viên mới sẽ chỉ thấy kênh quy tắc của bạn (và bất kỳ kênh xem trước nào) cho đến khi họ chấp nhận quy tắc.';
+
+  @override
+  String get serverMakePublicTitle => 'Công khai máy chủ này?';
+
+  @override
+  String get serverMakePublicBody =>
+      'Bất kỳ ai cũng có thể tìm và tham gia máy chủ này mà không cần lời mời. Hãy đảm bảo mô tả chính xác và nội dung được gắn nhãn phù hợp trước khi tiếp tục.';
+
+  @override
+  String get serverMakePublicConfirm => 'Công Khai';
+
+  @override
+  String get serverMakePublicNeedsDescription =>
+      'Thêm mô tả trước khi công khai máy chủ.';
+
+  @override
+  String get serverMakePublicGenericError =>
+      'Không thể cập nhật danh sách công khai';
+
+  @override
+  String homeFeaturedServerTooltip(String name) {
+    return 'Nổi bật: $name';
+  }
+
+  @override
+  String get serverRolePriorityHelp =>
+      'Kéo để đặt vai trò nào được hiển thị trước khi thành viên có nhiều hơn một vai trò.';
+
+  @override
+  String get steamHideUnplayedTitle => 'Ẩn các game chưa chơi?';
+
+  @override
+  String steamHideUnplayedBody(int count) {
+    return '$count game trong thư viện của bạn có 0 thời gian chơi -- bản demo, game miễn phí, hoặc những thứ bạn chưa từng thử. Ẩn tất cả khỏi so sánh?';
+  }
+
+  @override
+  String get steamHideUnplayedConfirm => 'Ẩn Tất Cả';
+
+  @override
+  String steamHideUnplayedButton(int count) {
+    return 'Ẩn $count game chưa chơi';
+  }
+
+  @override
+  String steamUnresolvedGameLabel(int appId) {
+    return 'Ứng dụng $appId';
+  }
+
+  @override
+  String get steamNeverPlayedLabel => 'Chưa từng chơi';
+
+  @override
+  String get steamVisibleInComparison => 'Hiển thị trong so sánh';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

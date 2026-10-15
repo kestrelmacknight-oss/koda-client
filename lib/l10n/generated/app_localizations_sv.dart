@@ -499,6 +499,128 @@ class AppLocalizationsSv extends AppLocalizations {
       'Ange en interaktions-URL och signeringsnyckel först';
 
   @override
+  String get homeBrowsePublicServersTooltip =>
+      'Bläddra bland offentliga servrar';
+
+  @override
+  String get serverDiscoveryTitle => 'Bläddra Servrar';
+
+  @override
+  String get serverDiscoverySearchHint => 'Sök servrar';
+
+  @override
+  String get serverDiscoveryEmptyState => 'Inga offentliga servrar hittades.';
+
+  @override
+  String get serverDiscoveryMatureBadge => 'VUXET INNEHÅLL';
+
+  @override
+  String get serverDiscoveryNoDescription => 'Ingen beskrivning angiven.';
+
+  @override
+  String serverDiscoveryMemberCount(int count) {
+    return '$count medlemmar';
+  }
+
+  @override
+  String get serverDiscoveryJoinError => 'Kunde inte gå med i servern';
+
+  @override
+  String get serverDiscoveryNotFound =>
+      'Den här servern är inte längre tillgänglig.';
+
+  @override
+  String get serverDiscoveryJoinButton => 'Gå med i Server';
+
+  @override
+  String get serverDiscoveryPreviewChannelsLabel =>
+      'Förhandsgranskningskanaler';
+
+  @override
+  String get serverDiscoveryPreviewReadOnlyNote =>
+      'Du tittar på den här kanalen utan att ha gått med. Gå med i servern för att svara.';
+
+  @override
+  String get serverDiscoveryPreviewEmptyState => 'Inga meddelanden än.';
+
+  @override
+  String get serverPublicListingLabel => 'Offentlig listning';
+
+  @override
+  String get serverListPublicly => 'Lista denna server offentligt';
+
+  @override
+  String get serverListPubliclyDescription =>
+      'Låt vem som helst hitta och gå med i den här servern via Bläddra Servrar, utan inbjudan.';
+
+  @override
+  String get serverDescriptionLabel => 'Beskrivning';
+
+  @override
+  String get serverDescriptionHint => 'Vad handlar den här servern om?';
+
+  @override
+  String get serverMatureContentLabel => 'Innehåller vuxet innehåll';
+
+  @override
+  String get serverRulesGateNote =>
+      'Nya medlemmar ser bara din regelkanal (och eventuella förhandsgranskningskanaler) tills de accepterar reglerna.';
+
+  @override
+  String get serverMakePublicTitle => 'Göra den här servern offentlig?';
+
+  @override
+  String get serverMakePublicBody =>
+      'Vem som helst kan hitta och gå med i den här servern utan inbjudan. Se till att din beskrivning är korrekt och att innehållet är korrekt märkt innan du fortsätter.';
+
+  @override
+  String get serverMakePublicConfirm => 'Gör Offentlig';
+
+  @override
+  String get serverMakePublicNeedsDescription =>
+      'Lägg till en beskrivning innan du gör servern offentlig.';
+
+  @override
+  String get serverMakePublicGenericError =>
+      'Kunde inte uppdatera offentlig listning';
+
+  @override
+  String homeFeaturedServerTooltip(String name) {
+    return 'Utvald: $name';
+  }
+
+  @override
+  String get serverRolePriorityHelp =>
+      'Dra för att ange vilken roll som visas först när en medlem har fler än en.';
+
+  @override
+  String get steamHideUnplayedTitle => 'Dölj ospelade spel?';
+
+  @override
+  String steamHideUnplayedBody(int count) {
+    return '$count spel i ditt bibliotek har 0 speltid -- demos, gratisspel eller sådant du aldrig kom till. Dölja alla från jämförelsen?';
+  }
+
+  @override
+  String get steamHideUnplayedConfirm => 'Dölj alla';
+
+  @override
+  String steamHideUnplayedButton(int count) {
+    return 'Dölj $count ospelade spel';
+  }
+
+  @override
+  String steamUnresolvedGameLabel(int appId) {
+    return 'App $appId';
+  }
+
+  @override
+  String get steamNeverPlayedLabel => 'Aldrig spelat';
+
+  @override
+  String get steamVisibleInComparison => 'Synlig i jämförelsen';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

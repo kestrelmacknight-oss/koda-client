@@ -504,6 +504,126 @@ class AppLocalizationsFr extends AppLocalizations {
       'Configurez d\'abord une URL d\'interactions et un secret de signature';
 
   @override
+  String get homeBrowsePublicServersTooltip => 'Parcourir les serveurs publics';
+
+  @override
+  String get serverDiscoveryTitle => 'Parcourir les serveurs';
+
+  @override
+  String get serverDiscoverySearchHint => 'Rechercher des serveurs';
+
+  @override
+  String get serverDiscoveryEmptyState => 'Aucun serveur public trouvé.';
+
+  @override
+  String get serverDiscoveryMatureBadge => 'CONTENU SENSIBLE';
+
+  @override
+  String get serverDiscoveryNoDescription => 'Aucune description fournie.';
+
+  @override
+  String serverDiscoveryMemberCount(int count) {
+    return '$count membres';
+  }
+
+  @override
+  String get serverDiscoveryJoinError => 'Impossible de rejoindre ce serveur';
+
+  @override
+  String get serverDiscoveryNotFound => 'Ce serveur n\'est plus disponible.';
+
+  @override
+  String get serverDiscoveryJoinButton => 'Rejoindre le serveur';
+
+  @override
+  String get serverDiscoveryPreviewChannelsLabel => 'Salons d\'aperçu';
+
+  @override
+  String get serverDiscoveryPreviewReadOnlyNote =>
+      'Vous consultez ce salon sans l\'avoir rejoint. Rejoignez le serveur pour répondre.';
+
+  @override
+  String get serverDiscoveryPreviewEmptyState =>
+      'Aucun message pour le moment.';
+
+  @override
+  String get serverPublicListingLabel => 'Référencement public';
+
+  @override
+  String get serverListPublicly => 'Référencer ce serveur publiquement';
+
+  @override
+  String get serverListPubliclyDescription =>
+      'Permettez à quiconque de trouver et de rejoindre ce serveur depuis Parcourir les serveurs, sans invitation.';
+
+  @override
+  String get serverDescriptionLabel => 'Description';
+
+  @override
+  String get serverDescriptionHint => 'De quoi parle ce serveur ?';
+
+  @override
+  String get serverMatureContentLabel => 'Contient du contenu sensible';
+
+  @override
+  String get serverRulesGateNote =>
+      'Les nouveaux membres ne verront que votre salon de règles (et les salons d\'aperçu) jusqu\'à ce qu\'ils les acceptent.';
+
+  @override
+  String get serverMakePublicTitle => 'Rendre ce serveur public ?';
+
+  @override
+  String get serverMakePublicBody =>
+      'N\'importe qui pourra trouver et rejoindre ce serveur sans invitation. Assurez-vous que votre description est exacte et que le contenu est correctement signalé avant de continuer.';
+
+  @override
+  String get serverMakePublicConfirm => 'Rendre public';
+
+  @override
+  String get serverMakePublicNeedsDescription =>
+      'Ajoutez une description avant de rendre ce serveur public.';
+
+  @override
+  String get serverMakePublicGenericError =>
+      'Impossible de mettre à jour le référencement public';
+
+  @override
+  String homeFeaturedServerTooltip(String name) {
+    return 'En vedette : $name';
+  }
+
+  @override
+  String get serverRolePriorityHelp =>
+      'Faites glisser pour définir quel rôle s\'affiche en premier quand un membre en a plusieurs.';
+
+  @override
+  String get steamHideUnplayedTitle => 'Masquer les jeux jamais joués ?';
+
+  @override
+  String steamHideUnplayedBody(int count) {
+    return '$count jeux de votre bibliothèque ont 0 temps de jeu -- démos, jeux gratuits ou choses auxquelles vous n\'avez jamais touché. Les masquer tous de la comparaison ?';
+  }
+
+  @override
+  String get steamHideUnplayedConfirm => 'Tout masquer';
+
+  @override
+  String steamHideUnplayedButton(int count) {
+    return 'Masquer $count jeux jamais joués';
+  }
+
+  @override
+  String steamUnresolvedGameLabel(int appId) {
+    return 'App $appId';
+  }
+
+  @override
+  String get steamNeverPlayedLabel => 'Jamais joué';
+
+  @override
+  String get steamVisibleInComparison => 'Visible dans la comparaison';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

@@ -495,6 +495,125 @@ class AppLocalizationsHe extends AppLocalizations {
       'הגדר קודם כתובת URL לאינטראקציות ומפתח חתימה';
 
   @override
+  String get homeBrowsePublicServersTooltip => 'עיון בשרתים ציבוריים';
+
+  @override
+  String get serverDiscoveryTitle => 'עיון בשרתים';
+
+  @override
+  String get serverDiscoverySearchHint => 'חיפוש שרתים';
+
+  @override
+  String get serverDiscoveryEmptyState => 'לא נמצאו שרתים ציבוריים.';
+
+  @override
+  String get serverDiscoveryMatureBadge => 'תוכן למבוגרים';
+
+  @override
+  String get serverDiscoveryNoDescription => 'לא סופק תיאור.';
+
+  @override
+  String serverDiscoveryMemberCount(int count) {
+    return '$count חברים';
+  }
+
+  @override
+  String get serverDiscoveryJoinError => 'לא ניתן היה להצטרף לשרת זה';
+
+  @override
+  String get serverDiscoveryNotFound => 'שרת זה כבר אינו זמין.';
+
+  @override
+  String get serverDiscoveryJoinButton => 'הצטרף לשרת';
+
+  @override
+  String get serverDiscoveryPreviewChannelsLabel => 'ערוצי תצוגה מקדימה';
+
+  @override
+  String get serverDiscoveryPreviewReadOnlyNote =>
+      'אתה צופה בערוץ זה מבלי להצטרף. הצטרף לשרת כדי להגיב.';
+
+  @override
+  String get serverDiscoveryPreviewEmptyState => 'אין הודעות עדיין.';
+
+  @override
+  String get serverPublicListingLabel => 'רישום פומבי';
+
+  @override
+  String get serverListPublicly => 'רשום שרת זה כפומבי';
+
+  @override
+  String get serverListPubliclyDescription =>
+      'אפשר לכל אחד למצוא ולהצטרף לשרת זה דרך עיון בשרתים, ללא צורך בהזמנה.';
+
+  @override
+  String get serverDescriptionLabel => 'תיאור';
+
+  @override
+  String get serverDescriptionHint => 'על מה השרת הזה?';
+
+  @override
+  String get serverMatureContentLabel => 'מכיל תוכן למבוגרים';
+
+  @override
+  String get serverRulesGateNote =>
+      'חברים חדשים יראו רק את ערוץ הכללים שלך (וערוצי תצוגה מקדימה) עד שיקבלו את הכללים.';
+
+  @override
+  String get serverMakePublicTitle => 'להפוך שרת זה לפומבי?';
+
+  @override
+  String get serverMakePublicBody =>
+      'כל אחד יוכל למצוא ולהצטרף לשרת זה ללא הזמנה. ודא שהתיאור מדויק והתוכן מסומן כראוי לפני שתמשיך.';
+
+  @override
+  String get serverMakePublicConfirm => 'הפוך לפומבי';
+
+  @override
+  String get serverMakePublicNeedsDescription =>
+      'הוסף תיאור לפני הפיכת השרת לפומבי.';
+
+  @override
+  String get serverMakePublicGenericError =>
+      'לא ניתן היה לעדכן את הרישום הפומבי';
+
+  @override
+  String homeFeaturedServerTooltip(String name) {
+    return 'מומלץ: $name';
+  }
+
+  @override
+  String get serverRolePriorityHelp =>
+      'גרור כדי לקבוע איזה תפקיד מוצג ראשון כשלחבר יש יותר מתפקיד אחד.';
+
+  @override
+  String get steamHideUnplayedTitle => 'להסתיר משחקים שלא שוחקו?';
+
+  @override
+  String steamHideUnplayedBody(int count) {
+    return 'ל-$count משחקים בספרייה שלך יש 0 זמן משחק -- הדגמות, משחקים חינמיים או דברים שלא הגעת אליהם. להסתיר את כולם מההשוואה?';
+  }
+
+  @override
+  String get steamHideUnplayedConfirm => 'הסתר הכל';
+
+  @override
+  String steamHideUnplayedButton(int count) {
+    return 'הסתר $count משחקים שלא שוחקו';
+  }
+
+  @override
+  String steamUnresolvedGameLabel(int appId) {
+    return 'אפליקציה $appId';
+  }
+
+  @override
+  String get steamNeverPlayedLabel => 'מעולם לא שוחק';
+
+  @override
+  String get steamVisibleInComparison => 'גלוי בהשוואה';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

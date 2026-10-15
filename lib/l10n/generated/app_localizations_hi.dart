@@ -499,6 +499,125 @@ class AppLocalizationsHi extends AppLocalizations {
       'पहले एक इंटरैक्शन URL और साइनिंग सीक्रेट सेट करें';
 
   @override
+  String get homeBrowsePublicServersTooltip => 'सार्वजनिक सर्वर ब्राउज़ करें';
+
+  @override
+  String get serverDiscoveryTitle => 'सर्वर ब्राउज़ करें';
+
+  @override
+  String get serverDiscoverySearchHint => 'सर्वर खोजें';
+
+  @override
+  String get serverDiscoveryEmptyState => 'कोई सार्वजनिक सर्वर नहीं मिला।';
+
+  @override
+  String get serverDiscoveryMatureBadge => 'वयस्क सामग्री';
+
+  @override
+  String get serverDiscoveryNoDescription => 'कोई विवरण नहीं दिया गया।';
+
+  @override
+  String serverDiscoveryMemberCount(int count) {
+    return '$count सदस्य';
+  }
+
+  @override
+  String get serverDiscoveryJoinError => 'इस सर्वर में शामिल नहीं हो सके';
+
+  @override
+  String get serverDiscoveryNotFound => 'यह सर्वर अब उपलब्ध नहीं है।';
+
+  @override
+  String get serverDiscoveryJoinButton => 'सर्वर में शामिल हों';
+
+  @override
+  String get serverDiscoveryPreviewChannelsLabel => 'पूर्वावलोकन चैनल';
+
+  @override
+  String get serverDiscoveryPreviewReadOnlyNote =>
+      'आप बिना शामिल हुए इस चैनल को देख रहे हैं। जवाब देने के लिए सर्वर में शामिल हों।';
+
+  @override
+  String get serverDiscoveryPreviewEmptyState => 'अभी तक कोई संदेश नहीं।';
+
+  @override
+  String get serverPublicListingLabel => 'सार्वजनिक सूचीकरण';
+
+  @override
+  String get serverListPublicly => 'इस सर्वर को सार्वजनिक रूप से सूचीबद्ध करें';
+
+  @override
+  String get serverListPubliclyDescription =>
+      'किसी को भी बिना निमंत्रण के सर्वर ब्राउज़ करें से इस सर्वर को खोजने और शामिल होने दें।';
+
+  @override
+  String get serverDescriptionLabel => 'विवरण';
+
+  @override
+  String get serverDescriptionHint => 'यह सर्वर किस बारे में है?';
+
+  @override
+  String get serverMatureContentLabel => 'वयस्क सामग्री शामिल है';
+
+  @override
+  String get serverRulesGateNote =>
+      'नए सदस्य केवल आपका नियम चैनल (और कोई भी पूर्वावलोकन चैनल) तब तक देखेंगे जब तक वे आपके नियम स्वीकार नहीं करते।';
+
+  @override
+  String get serverMakePublicTitle => 'इस सर्वर को सार्वजनिक बनाएं?';
+
+  @override
+  String get serverMakePublicBody =>
+      'कोई भी बिना निमंत्रण के इस सर्वर को खोज और शामिल हो सकेगा। आगे बढ़ने से पहले सुनिश्चित करें कि आपका विवरण सटीक है और सामग्री को उचित रूप से फ़्लैग किया गया है।';
+
+  @override
+  String get serverMakePublicConfirm => 'सार्वजनिक बनाएं';
+
+  @override
+  String get serverMakePublicNeedsDescription =>
+      'सर्वर को सार्वजनिक बनाने से पहले एक विवरण जोड़ें।';
+
+  @override
+  String get serverMakePublicGenericError =>
+      'सार्वजनिक सूचीकरण अपडेट नहीं हो सका';
+
+  @override
+  String homeFeaturedServerTooltip(String name) {
+    return 'फ़ीचर्ड: $name';
+  }
+
+  @override
+  String get serverRolePriorityHelp =>
+      'जब किसी सदस्य के पास एक से अधिक भूमिकाएं हों तो कौन सी भूमिका पहले दिखाई दे, यह तय करने के लिए खींचें।';
+
+  @override
+  String get steamHideUnplayedTitle => 'बिना खेले गए गेम छिपाएं?';
+
+  @override
+  String steamHideUnplayedBody(int count) {
+    return 'आपकी लाइब्रेरी में $count गेम्स का प्लेटाइम 0 है -- डेमो, मुफ़्त गेम्स, या ऐसी चीज़ें जिन्हें आपने कभी नहीं आज़माया। क्या इन सबको तुलना से छिपाना है?';
+  }
+
+  @override
+  String get steamHideUnplayedConfirm => 'सभी छिपाएं';
+
+  @override
+  String steamHideUnplayedButton(int count) {
+    return '$count बिना खेले गेम छिपाएं';
+  }
+
+  @override
+  String steamUnresolvedGameLabel(int appId) {
+    return 'ऐप $appId';
+  }
+
+  @override
+  String get steamNeverPlayedLabel => 'कभी नहीं खेला';
+
+  @override
+  String get steamVisibleInComparison => 'तुलना में दिखाई देता है';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

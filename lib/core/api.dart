@@ -1214,6 +1214,78 @@ class KodaApi {
     } catch (_) { return []; }
   }
 
+  /// Up to 5 servers currently featured by the weekly community-featured
+  /// rotation (Koda.Servers.CommunityFeaturedRotationSweeper) -- distinct
+  /// from the Koda Marketplace's own featured rotation
+  /// (getMarketplaceServers(featuredOnly: true)).
+  Future<List<Map<String, dynamic>>> getFeaturedServers() async {
+    try {
+      final res = await _dio.get('/discover/featured');
+      return List<Map<String, dynamic>>.from(res.data['servers'] ?? []);
+    } catch (e) { _log('getFeaturedServers', e); return []; }
+  }
+
+  /// A public server's preview -- name/description/icon/member_count/
+  /// mature_content plus its "preview"-type channels -- fetched before
+  /// joining. No auth needed server-side, same as discoverServers above.
+  Future<Map<String, dynamic>?> getServerPreview(String serverId) async {
+    try {
+      final res = await _dio.get('/discover/$serverId');
+      return res.data['server'] as Map<String, dynamic>?;
+    } catch (e) { _log('getServerPreview', e); return null; }
+  }
+
+  /// Messages for one "preview"-type channel, readable without having
+  /// joined the server -- the one kind of channel content non-members
+  /// can see. Same pagination contract as getMessages above.
+  Future<List<Map<String, dynamic>>> getPublicPreviewMessages(
+      String serverId, String channelId, {String? beforeId}) async {
+    try {
+      final res = await _dio.get('/discover/$serverId/channels/$channelId/messages',
+          queryParameters: beforeId != null ? {'before': beforeId} : null);
+      return List<Map<String, dynamic>>.from(res.data['messages'] ?? []);
+    } catch (e) { _log('getPublicPreviewMessages', e); return []; }
+  }
+
+  /// Invite-free join for a server that's opted into public discovery.
+  /// errorCode carries the server's own message directly (e.g. "This
+  /// server isn't open to public joining") -- show it as-is.
+  Future<KodaApiResult<Map<String, dynamic>>> joinPublicServer(String serverId) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/join');
+      return KodaApiResult(data: res.data['server'] as Map<String, dynamic>?);
+    } on DioException catch (e) {
+      return KodaApiResult(statusCode: e.response?.statusCode, errorCode: _errorCodeOf(e));
+    } catch (e) {
+      _log('joinPublicServer', e);
+      return const KodaApiResult();
+    }
+  }
+
+  /// The public-listing opt-in itself -- a thin wrapper over updateServer
+  /// that surfaces the server's validation error (e.g. "description is
+  /// required before making a server public") via errorBody, since
+  /// updateServer's plain null-on-failure return doesn't carry enough
+  /// detail for this specific confirmation flow.
+  Future<KodaApiResult<Map<String, dynamic>>> setPublicListing(
+      String serverId, {required bool isPublic, bool? matureContent}) async {
+    try {
+      final res = await _dio.patch('/servers/$serverId', data: {
+        'is_public': isPublic,
+        if (matureContent != null) 'mature_content': matureContent,
+      });
+      return KodaApiResult(data: res.data['server'] as Map<String, dynamic>?);
+    } on DioException catch (e) {
+      return KodaApiResult(
+        statusCode: e.response?.statusCode,
+        errorBody: e.response?.data is Map<String, dynamic> ? e.response?.data as Map<String, dynamic> : null,
+      );
+    } catch (e) {
+      _log('setPublicListing', e);
+      return const KodaApiResult();
+    }
+  }
+
   Future<Map<String, dynamic>?> updateProfile({
     String? displayName,
     String? avatarUrl,
@@ -1359,6 +1431,18 @@ class KodaApi {
       await _dio.delete('/roles/$roleId');
       return true;
     } catch (e) { _log('deleteRole', e); return false; }
+  }
+
+  /// Sets role priority -- roleIds is the full new order, highest
+  /// priority (shown as a member's top role) first. See
+  /// Koda.Servers.reorder_roles/2.
+  Future<List<Map<String, dynamic>>?> reorderRoles(
+      String serverId, List<String> roleIds) async {
+    try {
+      final res = await _dio.put('/servers/$serverId/roles/order',
+          data: {'role_ids': roleIds});
+      return List<Map<String, dynamic>>.from(res.data['roles'] ?? []);
+    } catch (e) { _log('reorderRoles', e); return null; }
   }
 
   Future<bool> assignRole(String memberId, String roleId) async {

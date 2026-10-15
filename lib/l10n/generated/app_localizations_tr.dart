@@ -503,6 +503,125 @@ class AppLocalizationsTr extends AppLocalizations {
       'Önce bir etkileşim URL\'si ve imzalama anahtarı ayarlayın';
 
   @override
+  String get homeBrowsePublicServersTooltip => 'Herkese açık sunuculara göz at';
+
+  @override
+  String get serverDiscoveryTitle => 'Sunuculara Göz At';
+
+  @override
+  String get serverDiscoverySearchHint => 'Sunucu ara';
+
+  @override
+  String get serverDiscoveryEmptyState => 'Herkese açık sunucu bulunamadı.';
+
+  @override
+  String get serverDiscoveryMatureBadge => 'YETİŞKİN İÇERİK';
+
+  @override
+  String get serverDiscoveryNoDescription => 'Açıklama yok.';
+
+  @override
+  String serverDiscoveryMemberCount(int count) {
+    return '$count üye';
+  }
+
+  @override
+  String get serverDiscoveryJoinError => 'Bu sunucuya katılınamadı';
+
+  @override
+  String get serverDiscoveryNotFound => 'Bu sunucu artık kullanılamıyor.';
+
+  @override
+  String get serverDiscoveryJoinButton => 'Sunucuya Katıl';
+
+  @override
+  String get serverDiscoveryPreviewChannelsLabel => 'Önizleme kanalları';
+
+  @override
+  String get serverDiscoveryPreviewReadOnlyNote =>
+      'Bu kanalı katılmadan görüntülüyorsunuz. Yanıtlamak için sunucuya katılın.';
+
+  @override
+  String get serverDiscoveryPreviewEmptyState => 'Henüz mesaj yok.';
+
+  @override
+  String get serverPublicListingLabel => 'Herkese açık liste';
+
+  @override
+  String get serverListPublicly => 'Bu sunucuyu herkese açık olarak listele';
+
+  @override
+  String get serverListPubliclyDescription =>
+      'Davetiye gerekmeden herkesin Sunuculara Göz At üzerinden bu sunucuyu bulup katılmasına izin ver.';
+
+  @override
+  String get serverDescriptionLabel => 'Açıklama';
+
+  @override
+  String get serverDescriptionHint => 'Bu sunucu ne hakkında?';
+
+  @override
+  String get serverMatureContentLabel => 'Yetişkin içerik barındırıyor';
+
+  @override
+  String get serverRulesGateNote =>
+      'Yeni üyeler, kurallarınızı kabul edene kadar yalnızca kurallar kanalınızı (ve önizleme kanallarını) görecek.';
+
+  @override
+  String get serverMakePublicTitle => 'Bu sunucu herkese açık yapılsın mı?';
+
+  @override
+  String get serverMakePublicBody =>
+      'Herkes davetiye olmadan bu sunucuyu bulup katılabilecek. Devam etmeden önce açıklamanızın doğru olduğundan ve içeriğin uygun şekilde işaretlendiğinden emin olun.';
+
+  @override
+  String get serverMakePublicConfirm => 'Herkese Açık Yap';
+
+  @override
+  String get serverMakePublicNeedsDescription =>
+      'Sunucuyu herkese açık yapmadan önce bir açıklama ekleyin.';
+
+  @override
+  String get serverMakePublicGenericError =>
+      'Herkese açık liste güncellenemedi';
+
+  @override
+  String homeFeaturedServerTooltip(String name) {
+    return 'Öne çıkan: $name';
+  }
+
+  @override
+  String get serverRolePriorityHelp =>
+      'Bir üyenin birden fazla rolü olduğunda hangi rolün önce gösterileceğini belirlemek için sürükleyin.';
+
+  @override
+  String get steamHideUnplayedTitle => 'Oynanmamış oyunlar gizlensin mi?';
+
+  @override
+  String steamHideUnplayedBody(int count) {
+    return 'Kitaplığınızdaki $count oyunun oynama süresi 0 -- demolar, bedava oyunlar veya hiç denemediğiniz şeyler. Hepsi karşılaştırmadan gizlensin mi?';
+  }
+
+  @override
+  String get steamHideUnplayedConfirm => 'Hepsini Gizle';
+
+  @override
+  String steamHideUnplayedButton(int count) {
+    return '$count oynanmamış oyunu gizle';
+  }
+
+  @override
+  String steamUnresolvedGameLabel(int appId) {
+    return 'Uygulama $appId';
+  }
+
+  @override
+  String get steamNeverPlayedLabel => 'Hiç oynanmadı';
+
+  @override
+  String get steamVisibleInComparison => 'Karşılaştırmada görünür';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

@@ -504,6 +504,127 @@ class AppLocalizationsCs extends AppLocalizations {
       'Nejprve nastavte URL adresu interakcí a podpisový klíč';
 
   @override
+  String get homeBrowsePublicServersTooltip => 'Procházet veřejné servery';
+
+  @override
+  String get serverDiscoveryTitle => 'Procházet servery';
+
+  @override
+  String get serverDiscoverySearchHint => 'Hledat servery';
+
+  @override
+  String get serverDiscoveryEmptyState =>
+      'Nebyly nalezeny žádné veřejné servery.';
+
+  @override
+  String get serverDiscoveryMatureBadge => 'PRO DOSPĚLÉ';
+
+  @override
+  String get serverDiscoveryNoDescription => 'Bez popisu.';
+
+  @override
+  String serverDiscoveryMemberCount(int count) {
+    return '$count členů';
+  }
+
+  @override
+  String get serverDiscoveryJoinError =>
+      'Nepodařilo se připojit k tomuto serveru';
+
+  @override
+  String get serverDiscoveryNotFound => 'Tento server již není dostupný.';
+
+  @override
+  String get serverDiscoveryJoinButton => 'Připojit se k serveru';
+
+  @override
+  String get serverDiscoveryPreviewChannelsLabel => 'Náhledové kanály';
+
+  @override
+  String get serverDiscoveryPreviewReadOnlyNote =>
+      'Tento kanál si prohlížíte bez připojení. Pro odpověď se připojte k serveru.';
+
+  @override
+  String get serverDiscoveryPreviewEmptyState => 'Zatím žádné zprávy.';
+
+  @override
+  String get serverPublicListingLabel => 'Veřejný výpis';
+
+  @override
+  String get serverListPublicly => 'Zveřejnit tento server';
+
+  @override
+  String get serverListPubliclyDescription =>
+      'Umožněte komukoli najít a připojit se k tomuto serveru přes Procházet servery, bez nutnosti pozvánky.';
+
+  @override
+  String get serverDescriptionLabel => 'Popis';
+
+  @override
+  String get serverDescriptionHint => 'O čem je tento server?';
+
+  @override
+  String get serverMatureContentLabel => 'Obsahuje materiál pro dospělé';
+
+  @override
+  String get serverRulesGateNote =>
+      'Noví členové uvidí pouze kanál s pravidly (a případné náhledové kanály), dokud pravidla nepřijmou.';
+
+  @override
+  String get serverMakePublicTitle => 'Zveřejnit tento server?';
+
+  @override
+  String get serverMakePublicBody =>
+      'Kdokoli bude moci najít a připojit se k tomuto serveru bez pozvánky. Než budete pokračovat, ujistěte se, že je popis přesný a obsah je správně označen.';
+
+  @override
+  String get serverMakePublicConfirm => 'Zveřejnit';
+
+  @override
+  String get serverMakePublicNeedsDescription =>
+      'Před zveřejněním serveru přidejte popis.';
+
+  @override
+  String get serverMakePublicGenericError =>
+      'Nepodařilo se aktualizovat veřejný výpis';
+
+  @override
+  String homeFeaturedServerTooltip(String name) {
+    return 'Doporučeno: $name';
+  }
+
+  @override
+  String get serverRolePriorityHelp =>
+      'Přetažením určete, která role se zobrazí jako první, pokud má člen více rolí.';
+
+  @override
+  String get steamHideUnplayedTitle => 'Skrýt nehrané hry?';
+
+  @override
+  String steamHideUnplayedBody(int count) {
+    return '$count her ve vaší knihovně má 0 odehraných hodin -- dema, dárky nebo věci, ke kterým jste se nedostali. Skrýt je všechny z porovnání?';
+  }
+
+  @override
+  String get steamHideUnplayedConfirm => 'Skrýt vše';
+
+  @override
+  String steamHideUnplayedButton(int count) {
+    return 'Skrýt $count nehraných her';
+  }
+
+  @override
+  String steamUnresolvedGameLabel(int appId) {
+    return 'Aplikace $appId';
+  }
+
+  @override
+  String get steamNeverPlayedLabel => 'Nikdy hráno';
+
+  @override
+  String get steamVisibleInComparison => 'Viditelné v porovnání';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

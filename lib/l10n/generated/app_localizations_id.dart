@@ -502,6 +502,127 @@ class AppLocalizationsId extends AppLocalizations {
       'Atur URL interaksi dan kunci penandatanganan terlebih dahulu';
 
   @override
+  String get homeBrowsePublicServersTooltip => 'Jelajahi server publik';
+
+  @override
+  String get serverDiscoveryTitle => 'Jelajahi Server';
+
+  @override
+  String get serverDiscoverySearchHint => 'Cari server';
+
+  @override
+  String get serverDiscoveryEmptyState =>
+      'Tidak ada server publik yang ditemukan.';
+
+  @override
+  String get serverDiscoveryMatureBadge => 'KONTEN DEWASA';
+
+  @override
+  String get serverDiscoveryNoDescription => 'Tidak ada deskripsi.';
+
+  @override
+  String serverDiscoveryMemberCount(int count) {
+    return '$count anggota';
+  }
+
+  @override
+  String get serverDiscoveryJoinError =>
+      'Tidak dapat bergabung dengan server ini';
+
+  @override
+  String get serverDiscoveryNotFound => 'Server ini tidak lagi tersedia.';
+
+  @override
+  String get serverDiscoveryJoinButton => 'Gabung Server';
+
+  @override
+  String get serverDiscoveryPreviewChannelsLabel => 'Saluran pratinjau';
+
+  @override
+  String get serverDiscoveryPreviewReadOnlyNote =>
+      'Anda melihat saluran ini tanpa bergabung. Gabung server untuk membalas.';
+
+  @override
+  String get serverDiscoveryPreviewEmptyState => 'Belum ada pesan.';
+
+  @override
+  String get serverPublicListingLabel => 'Daftar Publik';
+
+  @override
+  String get serverListPublicly => 'Daftarkan server ini secara publik';
+
+  @override
+  String get serverListPubliclyDescription =>
+      'Izinkan siapa saja menemukan dan bergabung dengan server ini dari Jelajahi Server, tanpa perlu undangan.';
+
+  @override
+  String get serverDescriptionLabel => 'Deskripsi';
+
+  @override
+  String get serverDescriptionHint => 'Server ini tentang apa?';
+
+  @override
+  String get serverMatureContentLabel => 'Berisi konten dewasa';
+
+  @override
+  String get serverRulesGateNote =>
+      'Anggota baru hanya akan melihat saluran aturan Anda (dan saluran pratinjau apa pun) sampai mereka menyetujui aturan Anda.';
+
+  @override
+  String get serverMakePublicTitle => 'Jadikan server ini publik?';
+
+  @override
+  String get serverMakePublicBody =>
+      'Siapa pun akan dapat menemukan dan bergabung dengan server ini tanpa undangan. Pastikan deskripsi Anda akurat dan konten ditandai dengan tepat sebelum melanjutkan.';
+
+  @override
+  String get serverMakePublicConfirm => 'Jadikan Publik';
+
+  @override
+  String get serverMakePublicNeedsDescription =>
+      'Tambahkan deskripsi sebelum menjadikan server ini publik.';
+
+  @override
+  String get serverMakePublicGenericError =>
+      'Tidak dapat memperbarui daftar publik';
+
+  @override
+  String homeFeaturedServerTooltip(String name) {
+    return 'Unggulan: $name';
+  }
+
+  @override
+  String get serverRolePriorityHelp =>
+      'Seret untuk menentukan peran mana yang ditampilkan lebih dulu jika anggota punya lebih dari satu.';
+
+  @override
+  String get steamHideUnplayedTitle => 'Sembunyikan game yang belum dimainkan?';
+
+  @override
+  String steamHideUnplayedBody(int count) {
+    return '$count game di library Anda memiliki waktu main 0 -- demo, gratisan, atau hal yang belum sempat Anda coba. Sembunyikan semuanya dari perbandingan?';
+  }
+
+  @override
+  String get steamHideUnplayedConfirm => 'Sembunyikan Semua';
+
+  @override
+  String steamHideUnplayedButton(int count) {
+    return 'Sembunyikan $count game belum dimainkan';
+  }
+
+  @override
+  String steamUnresolvedGameLabel(int appId) {
+    return 'App $appId';
+  }
+
+  @override
+  String get steamNeverPlayedLabel => 'Belum pernah dimainkan';
+
+  @override
+  String get steamVisibleInComparison => 'Terlihat dalam perbandingan';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

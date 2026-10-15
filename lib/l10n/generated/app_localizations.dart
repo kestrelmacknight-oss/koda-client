@@ -1036,6 +1036,210 @@ abstract class AppLocalizations {
   /// **'Set an interactions URL and signing secret first'**
   String get devPortalSandboxNotReady;
 
+  /// No description provided for @homeBrowsePublicServersTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse public servers'**
+  String get homeBrowsePublicServersTooltip;
+
+  /// No description provided for @serverDiscoveryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse Servers'**
+  String get serverDiscoveryTitle;
+
+  /// No description provided for @serverDiscoverySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search servers'**
+  String get serverDiscoverySearchHint;
+
+  /// No description provided for @serverDiscoveryEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No public servers found.'**
+  String get serverDiscoveryEmptyState;
+
+  /// No description provided for @serverDiscoveryMatureBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'MATURE'**
+  String get serverDiscoveryMatureBadge;
+
+  /// No description provided for @serverDiscoveryNoDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'No description provided.'**
+  String get serverDiscoveryNoDescription;
+
+  /// No description provided for @serverDiscoveryMemberCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} members'**
+  String serverDiscoveryMemberCount(int count);
+
+  /// No description provided for @serverDiscoveryJoinError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not join this server'**
+  String get serverDiscoveryJoinError;
+
+  /// No description provided for @serverDiscoveryNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This server is no longer available.'**
+  String get serverDiscoveryNotFound;
+
+  /// No description provided for @serverDiscoveryJoinButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Server'**
+  String get serverDiscoveryJoinButton;
+
+  /// No description provided for @serverDiscoveryPreviewChannelsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview channels'**
+  String get serverDiscoveryPreviewChannelsLabel;
+
+  /// No description provided for @serverDiscoveryPreviewReadOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re viewing this channel without joining. Join the server to reply.'**
+  String get serverDiscoveryPreviewReadOnlyNote;
+
+  /// No description provided for @serverDiscoveryPreviewEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet.'**
+  String get serverDiscoveryPreviewEmptyState;
+
+  /// No description provided for @serverPublicListingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Public Listing'**
+  String get serverPublicListingLabel;
+
+  /// No description provided for @serverListPublicly.
+  ///
+  /// In en, this message translates to:
+  /// **'List this server publicly'**
+  String get serverListPublicly;
+
+  /// No description provided for @serverListPubliclyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Let anyone find and join this server from Browse Servers, without needing an invite.'**
+  String get serverListPubliclyDescription;
+
+  /// No description provided for @serverDescriptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get serverDescriptionLabel;
+
+  /// No description provided for @serverDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s this server about?'**
+  String get serverDescriptionHint;
+
+  /// No description provided for @serverMatureContentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Contains mature content'**
+  String get serverMatureContentLabel;
+
+  /// No description provided for @serverRulesGateNote.
+  ///
+  /// In en, this message translates to:
+  /// **'New members will only see your rules channel (and any preview channels) until they accept your rules.'**
+  String get serverRulesGateNote;
+
+  /// No description provided for @serverMakePublicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Make this server public?'**
+  String get serverMakePublicTitle;
+
+  /// No description provided for @serverMakePublicBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone will be able to find and join this server without an invite. Make sure your description is accurate and your content is flagged appropriately before continuing.'**
+  String get serverMakePublicBody;
+
+  /// No description provided for @serverMakePublicConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Make Public'**
+  String get serverMakePublicConfirm;
+
+  /// No description provided for @serverMakePublicNeedsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a description before making this server public.'**
+  String get serverMakePublicNeedsDescription;
+
+  /// No description provided for @serverMakePublicGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update public listing'**
+  String get serverMakePublicGenericError;
+
+  /// No description provided for @homeFeaturedServerTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Featured: {name}'**
+  String homeFeaturedServerTooltip(String name);
+
+  /// No description provided for @serverRolePriorityHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to set which role is shown first when a member has more than one.'**
+  String get serverRolePriorityHelp;
+
+  /// No description provided for @steamHideUnplayedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide unplayed games?'**
+  String get steamHideUnplayedTitle;
+
+  /// No description provided for @steamHideUnplayedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} games in your library have 0 playtime -- demos, freebies, or things you never got around to. Hide them all from comparison?'**
+  String steamHideUnplayedBody(int count);
+
+  /// No description provided for @steamHideUnplayedConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide All'**
+  String get steamHideUnplayedConfirm;
+
+  /// No description provided for @steamHideUnplayedButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide {count} unplayed games'**
+  String steamHideUnplayedButton(int count);
+
+  /// No description provided for @steamUnresolvedGameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'App {appId}'**
+  String steamUnresolvedGameLabel(int appId);
+
+  /// No description provided for @steamNeverPlayedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Never played'**
+  String get steamNeverPlayedLabel;
+
+  /// No description provided for @steamVisibleInComparison.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible in comparison'**
+  String get steamVisibleInComparison;
+
   /// No description provided for @settingsSteamTitle.
   ///
   /// In en, this message translates to:

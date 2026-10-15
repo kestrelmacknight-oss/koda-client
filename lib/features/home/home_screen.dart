@@ -38,6 +38,8 @@ import '../../core/voice_session.dart';
 import '../dm/dm_screen.dart';
 import '../developer/bot_install_screen.dart';
 import '../developer/oauth_consent_screen.dart';
+import '../discover/server_discovery_screen.dart';
+import '../discover/featured_server_rail_tile.dart';
 import '../steam/steam_compare_screen.dart';
 import '../../core/socket.dart';
 import '../../core/link_preview.dart';
@@ -697,7 +699,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             serverId: server['id'] as String,
             serverName: server['name'] as String? ?? '',
             rulesContent: rules['rules'] as String,
-            onAccepted: () => Navigator.pop(context),
+            onAccepted: () async {
+              Navigator.pop(context);
+              // Accepting unlocks channels that were server-side gated
+              // (Koda.Servers.has_unaccepted_rules?/2) -- refetch so the
+              // sidebar shows them without needing to leave and reopen
+              // this server.
+              final refreshed = await KodaApi.instance.getChannels(server['id'] as String);
+              if (mounted) setState(() => _channels = refreshed);
+            },
           ),
         ));
       }
@@ -3044,6 +3054,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               ),
             ),
 
+            const FeaturedServerRailTile(),
+
             Container(
                 height: 1, width: 32, color: KodaColors.border,
                 margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 20)),
@@ -3119,6 +3131,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               icon: Icon(Icons.add, color: KodaColors.text2),
               tooltip: t.homeCreateOrJoinTooltip,
               onPressed: () => _showAddServerMenu(),
+            ),
+            IconButton(
+              icon: Icon(Icons.explore_outlined, color: KodaColors.text2),
+              tooltip: t.homeBrowsePublicServersTooltip,
+              onPressed: () async {
+                final joined = await Navigator.push<bool>(context,
+                    MaterialPageRoute(builder: (_) => const ServerDiscoveryScreen()));
+                if (joined == true && mounted) _loadServers();
+              },
             ),
             IconButton(
               icon: Icon(Icons.storefront_outlined, color: KodaColors.text2),

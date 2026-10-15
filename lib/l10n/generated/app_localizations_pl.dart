@@ -505,6 +505,127 @@ class AppLocalizationsPl extends AppLocalizations {
       'Najpierw ustaw adres URL interakcji i tajny klucz podpisu';
 
   @override
+  String get homeBrowsePublicServersTooltip => 'Przeglądaj publiczne serwery';
+
+  @override
+  String get serverDiscoveryTitle => 'Przeglądaj Serwery';
+
+  @override
+  String get serverDiscoverySearchHint => 'Szukaj serwerów';
+
+  @override
+  String get serverDiscoveryEmptyState =>
+      'Nie znaleziono publicznych serwerów.';
+
+  @override
+  String get serverDiscoveryMatureBadge => 'TREŚCI DLA DOROSŁYCH';
+
+  @override
+  String get serverDiscoveryNoDescription => 'Brak opisu.';
+
+  @override
+  String serverDiscoveryMemberCount(int count) {
+    return '$count członków';
+  }
+
+  @override
+  String get serverDiscoveryJoinError =>
+      'Nie udało się dołączyć do tego serwera';
+
+  @override
+  String get serverDiscoveryNotFound => 'Ten serwer nie jest już dostępny.';
+
+  @override
+  String get serverDiscoveryJoinButton => 'Dołącz do Serwera';
+
+  @override
+  String get serverDiscoveryPreviewChannelsLabel => 'Kanały podglądu';
+
+  @override
+  String get serverDiscoveryPreviewReadOnlyNote =>
+      'Przeglądasz ten kanał bez dołączania. Dołącz do serwera, aby odpowiedzieć.';
+
+  @override
+  String get serverDiscoveryPreviewEmptyState => 'Brak wiadomości.';
+
+  @override
+  String get serverPublicListingLabel => 'Publiczna lista';
+
+  @override
+  String get serverListPublicly => 'Wyświetlaj ten serwer publicznie';
+
+  @override
+  String get serverListPubliclyDescription =>
+      'Pozwól każdemu znaleźć i dołączyć do tego serwera z Przeglądaj Serwery, bez zaproszenia.';
+
+  @override
+  String get serverDescriptionLabel => 'Opis';
+
+  @override
+  String get serverDescriptionHint => 'O czym jest ten serwer?';
+
+  @override
+  String get serverMatureContentLabel => 'Zawiera treści dla dorosłych';
+
+  @override
+  String get serverRulesGateNote =>
+      'Nowi członkowie zobaczą tylko kanał z zasadami (i ewentualne kanały podglądu), dopóki ich nie zaakceptują.';
+
+  @override
+  String get serverMakePublicTitle => 'Upublicznić ten serwer?';
+
+  @override
+  String get serverMakePublicBody =>
+      'Każdy będzie mógł znaleźć i dołączyć do tego serwera bez zaproszenia. Upewnij się, że opis jest trafny, a treści odpowiednio oznaczone, zanim przejdziesz dalej.';
+
+  @override
+  String get serverMakePublicConfirm => 'Upublicznij';
+
+  @override
+  String get serverMakePublicNeedsDescription =>
+      'Dodaj opis przed upublicznieniem serwera.';
+
+  @override
+  String get serverMakePublicGenericError =>
+      'Nie udało się zaktualizować publicznej listy';
+
+  @override
+  String homeFeaturedServerTooltip(String name) {
+    return 'Polecane: $name';
+  }
+
+  @override
+  String get serverRolePriorityHelp =>
+      'Przeciągnij, aby ustawić, która rola jest wyświetlana jako pierwsza, gdy członek ma ich więcej niż jedną.';
+
+  @override
+  String get steamHideUnplayedTitle => 'Ukryć nieodegrane gry?';
+
+  @override
+  String steamHideUnplayedBody(int count) {
+    return '$count gier w Twojej bibliotece ma 0 godzin rozgrywki -- dema, darmowe gry lub rzeczy, do których nigdy nie dotarłeś. Ukryć je wszystkie z porównania?';
+  }
+
+  @override
+  String get steamHideUnplayedConfirm => 'Ukryj wszystkie';
+
+  @override
+  String steamHideUnplayedButton(int count) {
+    return 'Ukryj $count nieodegranych gier';
+  }
+
+  @override
+  String steamUnresolvedGameLabel(int appId) {
+    return 'Aplikacja $appId';
+  }
+
+  @override
+  String get steamNeverPlayedLabel => 'Nigdy nie grano';
+
+  @override
+  String get steamVisibleInComparison => 'Widoczne w porównaniu';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

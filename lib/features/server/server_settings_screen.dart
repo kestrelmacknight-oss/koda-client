@@ -59,6 +59,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   bool _uploadingEmoji = false;
   bool _uploadingBackground = false;
   final _marketplaceLinkCtrl = TextEditingController();
+  final _descriptionCtrl = TextEditingController();
+  bool _savingDescription = false;
 
   // Matches the flat permission map used server-side on Koda.Servers.Role.
   static const List<String> _permissionKeys = [
@@ -102,6 +104,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     _loadBoostStatus();
     _marketplaceLinkCtrl.text =
         ref.read(selectedServerProvider)?['marketplace_link'] as String? ?? '';
+    _descriptionCtrl.text =
+        ref.read(selectedServerProvider)?['description'] as String? ?? '';
   }
 
   Future<void> _loadEmoji() async {
@@ -252,6 +256,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   void dispose() {
     _tabController.dispose();
     _marketplaceLinkCtrl.dispose();
+    _descriptionCtrl.dispose();
     super.dispose();
   }
 
@@ -1061,6 +1066,66 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             style: TextStyle(color: KodaColors.text3, fontSize: 11)),
       ],
       const SizedBox(height: 24),
+      Text(t.serverPublicListingLabel, style: TextStyle(color: KodaColors.text3,
+          fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+      const SizedBox(height: 8),
+      Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: KodaColors.card,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: KodaColors.border),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(t.serverListPublicly, style: TextStyle(
+                  color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
+              Text(t.serverListPubliclyDescription,
+                  style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+            ])),
+            Switch(
+              value: server?['is_public'] as bool? ?? false,
+              activeThumbColor: KodaColors.koda,
+              onChanged: _togglePublicListing,
+            ),
+          ]),
+          const SizedBox(height: 12),
+          Text(t.serverDescriptionLabel,
+              style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+          const SizedBox(height: 4),
+          KodaTextField(
+            controller: _descriptionCtrl,
+            hintText: t.serverDescriptionHint,
+            onSubmitted: (_) => _saveDescription(),
+          ),
+          const SizedBox(height: 4),
+          TextButton(
+            onPressed: _savingDescription ? null : _saveDescription,
+            child: Text(t.commonSave),
+          ),
+          if (server?['is_public'] == true) ...[
+            const SizedBox(height: 4),
+            Row(children: [
+              Expanded(child: Text(t.serverMatureContentLabel,
+                  style: TextStyle(color: KodaColors.text2, fontSize: 12))),
+              Switch(
+                value: server?['mature_content'] as bool? ?? false,
+                activeThumbColor: Colors.redAccent,
+                onChanged: (v) async {
+                  final updated = await KodaApi.instance.updateServer(_serverId, {'mature_content': v});
+                  if (updated != null && mounted) {
+                    ref.read(selectedServerProvider.notifier).state = updated;
+                  }
+                },
+              ),
+            ]),
+            Text(t.serverRulesGateNote,
+                style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+          ],
+        ]),
+      ),
+      const SizedBox(height: 16),
       Text(t.serverMarketplaceListingLabel, style: TextStyle(color: KodaColors.text3,
           fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
       const SizedBox(height: 8),
@@ -1166,6 +1231,57 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   // set of codes a creator can pick from, kept small and unambiguous
   // rather than the full ISO 4217 list.
   static const _currencyOptions = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD'];
+
+  Future<void> _saveDescription() async {
+    setState(() => _savingDescription = true);
+    final updated = await KodaApi.instance.updateServer(
+        _serverId, {'description': _descriptionCtrl.text.trim()});
+    if (!mounted) return;
+    setState(() => _savingDescription = false);
+    if (updated != null) {
+      ref.read(selectedServerProvider.notifier).state = updated;
+    }
+  }
+
+  /// Turning OFF never needs confirmation. Turning ON requires a
+  /// description (Koda.Servers.Server's validate_public_requires_description)
+  /// and surfaces that specific validation error if the admin hasn't
+  /// saved one yet, rather than a generic failure.
+  Future<void> _togglePublicListing(bool value) async {
+    final t = AppLocalizations.of(context);
+    if (!value) {
+      final updated = await KodaApi.instance.updateServer(_serverId, {'is_public': false});
+      if (updated != null && mounted) ref.read(selectedServerProvider.notifier).state = updated;
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: Text(t.serverMakePublicTitle, style: TextStyle(color: KodaColors.text1)),
+        content: Text(t.serverMakePublicBody, style: TextStyle(color: KodaColors.text3)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.commonCancel)),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text(t.serverMakePublicConfirm)),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    final result = await KodaApi.instance.setPublicListing(_serverId, isPublic: true);
+    if (!mounted) return;
+    if (result.ok) {
+      ref.read(selectedServerProvider.notifier).state = result.data;
+    } else {
+      final descriptionError =
+          (result.errorBody?['errors'] as Map?)?['description'] as List?;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+          descriptionError != null
+              ? t.serverMakePublicNeedsDescription
+              : t.serverMakePublicGenericError)));
+    }
+  }
 
   Future<void> _setMarketplaceDiscoverable(bool value) async {
     final updated = await KodaApi.instance.updateServer(
@@ -1503,50 +1619,85 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
 
   Widget _buildRolesTab() {
     final t = AppLocalizations.of(context);
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton.icon(
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+        child: Row(children: [
+          Expanded(child: Text(t.serverRolePriorityHelp,
+              style: TextStyle(color: KodaColors.text3, fontSize: 11))),
+          TextButton.icon(
             onPressed: () => _showRoleEditor(),
             icon: Icon(Icons.add, size: 16, color: KodaColors.koda),
             label: Text(t.serverAddRole, style: TextStyle(color: KodaColors.koda)),
           ),
-        ),
-        ..._roles.map((role) {
-          final roleColor = _parseColor(role['color']);
-          return Container(
-            margin: const EdgeInsets.only(bottom: 6),
-            decoration: BoxDecoration(
-              color: KodaColors.card,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: KodaColors.border),
-            ),
-            child: ListTile(
-              leading: Container(
-                  width: 12, height: 12,
-                  decoration: BoxDecoration(color: roleColor, shape: BoxShape.circle)),
-              title: Text(role['name'], style: TextStyle(color: KodaColors.text1, fontSize: 13)),
-              subtitle: role['is_default'] == true
-                  ? Text(t.serverDefaultRoleLabel, style: TextStyle(color: KodaColors.text3, fontSize: 11))
-                  : null,
-              trailing: PopupMenuButton<String>(
-                icon: Icon(Icons.more_vert, size: 16, color: KodaColors.text3),
+        ]),
+      ),
+      Expanded(
+        child: ReorderableListView.builder(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+          buildDefaultDragHandles: false,
+          itemCount: _roles.length,
+          onReorder: _reorderRoles,
+          itemBuilder: (_, i) {
+            final role = _roles[i];
+            final roleColor = _parseColor(role['color']);
+            return Container(
+              key: ValueKey(role['id']),
+              margin: const EdgeInsets.only(bottom: 6),
+              decoration: BoxDecoration(
                 color: KodaColors.card,
-                onSelected: (v) => v == 'edit' ? _showRoleEditor(existing: role) : _deleteRole(role),
-                itemBuilder: (_) => [
-                  PopupMenuItem(value: 'edit', child: Text(t.commonEdit)),
-                  if (role['is_default'] != true)
-                    PopupMenuItem(value: 'delete', child: Text(t.commonDelete)),
-                ],
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: KodaColors.border),
               ),
-              onTap: () => _showRoleEditor(existing: role),
-            ),
-          );
-        }),
-      ],
-    );
+              child: ListTile(
+                leading: Container(
+                    width: 12, height: 12,
+                    decoration: BoxDecoration(color: roleColor, shape: BoxShape.circle)),
+                title: Text(role['name'], style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+                subtitle: role['is_default'] == true
+                    ? Text(t.serverDefaultRoleLabel, style: TextStyle(color: KodaColors.text3, fontSize: 11))
+                    : null,
+                trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                  ReorderableDragStartListener(
+                    index: i,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Icon(Icons.drag_handle, size: 18, color: KodaColors.text3),
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    icon: Icon(Icons.more_vert, size: 16, color: KodaColors.text3),
+                    color: KodaColors.card,
+                    onSelected: (v) => v == 'edit' ? _showRoleEditor(existing: role) : _deleteRole(role),
+                    itemBuilder: (_) => [
+                      PopupMenuItem(value: 'edit', child: Text(t.commonEdit)),
+                      if (role['is_default'] != true)
+                        PopupMenuItem(value: 'delete', child: Text(t.commonDelete)),
+                    ],
+                  ),
+                ]),
+                onTap: () => _showRoleEditor(existing: role),
+              ),
+            );
+          },
+        ),
+      ),
+    ]);
+  }
+
+  /// Role priority -- the top of this list is the role shown as a
+  /// member's displayed role when they hold several (member_panel.dart's
+  /// "roles.first", now backed server-side by Koda.Servers.list_members/1's
+  /// explicit position ordering). Updates optimistically since the
+  /// reorder itself can't meaningfully fail (both roles already belong
+  /// to this server).
+  Future<void> _reorderRoles(int oldIndex, int newIndex) async {
+    if (newIndex > oldIndex) newIndex -= 1;
+    final updated = List<Map<String, dynamic>>.from(_roles);
+    final moved = updated.removeAt(oldIndex);
+    updated.insert(newIndex, moved);
+    setState(() => _roles = updated);
+    await KodaApi.instance.reorderRoles(_serverId, updated.map((r) => r['id'] as String).toList());
   }
 
   Widget _buildMembersTab() {

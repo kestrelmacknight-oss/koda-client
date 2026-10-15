@@ -497,6 +497,124 @@ class AppLocalizationsAr extends AppLocalizations {
       'قم أولاً بتعيين عنوان URL للتفاعلات وسر التوقيع';
 
   @override
+  String get homeBrowsePublicServersTooltip => 'تصفح الخوادم العامة';
+
+  @override
+  String get serverDiscoveryTitle => 'تصفح الخوادم';
+
+  @override
+  String get serverDiscoverySearchHint => 'ابحث عن الخوادم';
+
+  @override
+  String get serverDiscoveryEmptyState => 'لم يتم العثور على خوادم عامة.';
+
+  @override
+  String get serverDiscoveryMatureBadge => 'محتوى للبالغين';
+
+  @override
+  String get serverDiscoveryNoDescription => 'لا يوجد وصف.';
+
+  @override
+  String serverDiscoveryMemberCount(int count) {
+    return '$count عضوًا';
+  }
+
+  @override
+  String get serverDiscoveryJoinError => 'تعذر الانضمام إلى هذا الخادم';
+
+  @override
+  String get serverDiscoveryNotFound => 'لم يعد هذا الخادم متاحًا.';
+
+  @override
+  String get serverDiscoveryJoinButton => 'انضم إلى الخادم';
+
+  @override
+  String get serverDiscoveryPreviewChannelsLabel => 'قنوات المعاينة';
+
+  @override
+  String get serverDiscoveryPreviewReadOnlyNote =>
+      'أنت تشاهد هذه القناة دون الانضمام. انضم إلى الخادم للرد.';
+
+  @override
+  String get serverDiscoveryPreviewEmptyState => 'لا توجد رسائل بعد.';
+
+  @override
+  String get serverPublicListingLabel => 'الإدراج العام';
+
+  @override
+  String get serverListPublicly => 'إدراج هذا الخادم علنًا';
+
+  @override
+  String get serverListPubliclyDescription =>
+      'اسمح لأي شخص بالعثور على هذا الخادم والانضمام إليه من تصفح الخوادم، دون الحاجة إلى دعوة.';
+
+  @override
+  String get serverDescriptionLabel => 'الوصف';
+
+  @override
+  String get serverDescriptionHint => 'ما هذا الخادم؟';
+
+  @override
+  String get serverMatureContentLabel => 'يحتوي على محتوى للبالغين';
+
+  @override
+  String get serverRulesGateNote =>
+      'لن يرى الأعضاء الجدد سوى قناة القواعد الخاصة بك (وأي قنوات معاينة) حتى يقبلوا قواعدك.';
+
+  @override
+  String get serverMakePublicTitle => 'هل تريد جعل هذا الخادم عامًا؟';
+
+  @override
+  String get serverMakePublicBody =>
+      'سيتمكن أي شخص من العثور على هذا الخادم والانضمام إليه بدون دعوة. تأكد من دقة الوصف ومن تصنيف المحتوى بشكل مناسب قبل المتابعة.';
+
+  @override
+  String get serverMakePublicConfirm => 'اجعله عامًا';
+
+  @override
+  String get serverMakePublicNeedsDescription =>
+      'أضف وصفًا قبل جعل هذا الخادم عامًا.';
+
+  @override
+  String get serverMakePublicGenericError => 'تعذر تحديث الإدراج العام';
+
+  @override
+  String homeFeaturedServerTooltip(String name) {
+    return 'مميز: $name';
+  }
+
+  @override
+  String get serverRolePriorityHelp =>
+      'اسحب لتحديد أي دور يظهر أولاً عندما يكون لدى العضو أكثر من دور واحد.';
+
+  @override
+  String get steamHideUnplayedTitle => 'إخفاء الألعاب غير الملعوبة؟';
+
+  @override
+  String steamHideUnplayedBody(int count) {
+    return 'توجد $count ألعاب في مكتبتك بوقت لعب صفر -- عروض تجريبية أو هدايا أو أشياء لم تصل إليها بعد. هل تريد إخفاؤها جميعًا من المقارنة؟';
+  }
+
+  @override
+  String get steamHideUnplayedConfirm => 'إخفاء الكل';
+
+  @override
+  String steamHideUnplayedButton(int count) {
+    return 'إخفاء $count لعبة غير ملعوبة';
+  }
+
+  @override
+  String steamUnresolvedGameLabel(int appId) {
+    return 'التطبيق $appId';
+  }
+
+  @override
+  String get steamNeverPlayedLabel => 'لم تُلعب أبدًا';
+
+  @override
+  String get steamVisibleInComparison => 'مرئية في المقارنة';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override

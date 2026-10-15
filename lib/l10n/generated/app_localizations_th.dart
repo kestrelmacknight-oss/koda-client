@@ -501,6 +501,124 @@ class AppLocalizationsTh extends AppLocalizations {
       'กรุณาตั้งค่า URL การโต้ตอบและคีย์ลงนามก่อน';
 
   @override
+  String get homeBrowsePublicServersTooltip => 'เรียกดูเซิร์ฟเวอร์สาธารณะ';
+
+  @override
+  String get serverDiscoveryTitle => 'เรียกดูเซิร์ฟเวอร์';
+
+  @override
+  String get serverDiscoverySearchHint => 'ค้นหาเซิร์ฟเวอร์';
+
+  @override
+  String get serverDiscoveryEmptyState => 'ไม่พบเซิร์ฟเวอร์สาธารณะ';
+
+  @override
+  String get serverDiscoveryMatureBadge => 'เนื้อหาสำหรับผู้ใหญ่';
+
+  @override
+  String get serverDiscoveryNoDescription => 'ไม่มีคำอธิบาย';
+
+  @override
+  String serverDiscoveryMemberCount(int count) {
+    return 'สมาชิก $count คน';
+  }
+
+  @override
+  String get serverDiscoveryJoinError => 'ไม่สามารถเข้าร่วมเซิร์ฟเวอร์นี้ได้';
+
+  @override
+  String get serverDiscoveryNotFound => 'เซิร์ฟเวอร์นี้ไม่พร้อมใช้งานแล้ว';
+
+  @override
+  String get serverDiscoveryJoinButton => 'เข้าร่วมเซิร์ฟเวอร์';
+
+  @override
+  String get serverDiscoveryPreviewChannelsLabel => 'ช่องตัวอย่าง';
+
+  @override
+  String get serverDiscoveryPreviewReadOnlyNote =>
+      'คุณกำลังดูช่องนี้โดยไม่ได้เข้าร่วม เข้าร่วมเซิร์ฟเวอร์เพื่อตอบกลับ';
+
+  @override
+  String get serverDiscoveryPreviewEmptyState => 'ยังไม่มีข้อความ';
+
+  @override
+  String get serverPublicListingLabel => 'รายการสาธารณะ';
+
+  @override
+  String get serverListPublicly => 'แสดงเซิร์ฟเวอร์นี้ต่อสาธารณะ';
+
+  @override
+  String get serverListPubliclyDescription =>
+      'ให้ทุกคนค้นหาและเข้าร่วมเซิร์ฟเวอร์นี้ได้จากเรียกดูเซิร์ฟเวอร์ โดยไม่ต้องมีคำเชิญ';
+
+  @override
+  String get serverDescriptionLabel => 'คำอธิบาย';
+
+  @override
+  String get serverDescriptionHint => 'เซิร์ฟเวอร์นี้เกี่ยวกับอะไร?';
+
+  @override
+  String get serverMatureContentLabel => 'มีเนื้อหาสำหรับผู้ใหญ่';
+
+  @override
+  String get serverRulesGateNote =>
+      'สมาชิกใหม่จะเห็นเฉพาะช่องกฎ (และช่องตัวอย่างใดๆ) จนกว่าจะยอมรับกฎ';
+
+  @override
+  String get serverMakePublicTitle => 'ทำให้เซิร์ฟเวอร์นี้เป็นสาธารณะหรือไม่?';
+
+  @override
+  String get serverMakePublicBody =>
+      'ทุกคนจะสามารถค้นหาและเข้าร่วมเซิร์ฟเวอร์นี้ได้โดยไม่ต้องมีคำเชิญ โปรดตรวจสอบว่าคำอธิบายถูกต้องและเนื้อหาถูกทำเครื่องหมายอย่างเหมาะสมก่อนดำเนินการต่อ';
+
+  @override
+  String get serverMakePublicConfirm => 'ทำให้เป็นสาธารณะ';
+
+  @override
+  String get serverMakePublicNeedsDescription =>
+      'เพิ่มคำอธิบายก่อนทำให้เซิร์ฟเวอร์เป็นสาธารณะ';
+
+  @override
+  String get serverMakePublicGenericError => 'ไม่สามารถอัปเดตรายการสาธารณะได้';
+
+  @override
+  String homeFeaturedServerTooltip(String name) {
+    return 'แนะนำ: $name';
+  }
+
+  @override
+  String get serverRolePriorityHelp =>
+      'ลากเพื่อกำหนดว่าบทบาทใดจะแสดงก่อน เมื่อสมาชิกมีมากกว่าหนึ่งบทบาท';
+
+  @override
+  String get steamHideUnplayedTitle => 'ซ่อนเกมที่ไม่เคยเล่นหรือไม่?';
+
+  @override
+  String steamHideUnplayedBody(int count) {
+    return 'เกม $count เกมในไลบรารีของคุณมีเวลาเล่น 0 -- เดโม ของแจกฟรี หรือสิ่งที่คุณยังไม่ได้ลอง ต้องการซ่อนทั้งหมดจากการเปรียบเทียบหรือไม่?';
+  }
+
+  @override
+  String get steamHideUnplayedConfirm => 'ซ่อนทั้งหมด';
+
+  @override
+  String steamHideUnplayedButton(int count) {
+    return 'ซ่อนเกมที่ไม่เคยเล่น $count เกม';
+  }
+
+  @override
+  String steamUnresolvedGameLabel(int appId) {
+    return 'แอป $appId';
+  }
+
+  @override
+  String get steamNeverPlayedLabel => 'ไม่เคยเล่น';
+
+  @override
+  String get steamVisibleInComparison => 'มองเห็นได้ในการเปรียบเทียบ';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
