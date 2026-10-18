@@ -1240,6 +1240,96 @@ abstract class AppLocalizations {
   /// **'Visible in comparison'**
   String get steamVisibleInComparison;
 
+  /// No description provided for @channelEditDialogTypePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Public Preview'**
+  String get channelEditDialogTypePreview;
+
+  /// No description provided for @channelEditDialogPreviewHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Viewable by anyone without joining, if this server is public. Still requires joining (and accepting rules, if any) to post.'**
+  String get channelEditDialogPreviewHelp;
+
+  /// No description provided for @channelEditDialogGeneralSection.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get channelEditDialogGeneralSection;
+
+  /// No description provided for @channelEditDialogBehaviorSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Behavior'**
+  String get channelEditDialogBehaviorSection;
+
+  /// No description provided for @channelEditDialogAccessSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Access'**
+  String get channelEditDialogAccessSection;
+
+  /// No description provided for @serverThemeLibraryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Server Templates'**
+  String get serverThemeLibraryTitle;
+
+  /// No description provided for @serverThemeLibraryEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No templates available yet.'**
+  String get serverThemeLibraryEmptyState;
+
+  /// No description provided for @serverThemeLockedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Requires boost level {level}'**
+  String serverThemeLockedHint(int level);
+
+  /// No description provided for @serverThemePreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview: {name}'**
+  String serverThemePreviewTitle(String name);
+
+  /// No description provided for @serverThemePreviewNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a preview — nothing has been applied yet.'**
+  String get serverThemePreviewNote;
+
+  /// No description provided for @serverThemeApplyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Template'**
+  String get serverThemeApplyButton;
+
+  /// No description provided for @serverThemeApplyError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not apply this template'**
+  String get serverThemeApplyError;
+
+  /// No description provided for @serverThemeCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Server Templates'**
+  String get serverThemeCardTitle;
+
+  /// No description provided for @serverThemeCardDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse curated looks and preview one before applying it.'**
+  String get serverThemeCardDescription;
+
+  /// No description provided for @serverThemeBrowseButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse Templates'**
+  String get serverThemeBrowseButton;
+
   /// No description provided for @settingsSteamTitle.
   ///
   /// In en, this message translates to:
@@ -8723,6 +8813,270 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown'**
   String get messageSearchUnknownAuthor;
+
+  /// No description provided for @serverTabLeveling.
+  ///
+  /// In en, this message translates to:
+  /// **'Leveling'**
+  String get serverTabLeveling;
+
+  /// No description provided for @permManageLeaderboards.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Leaderboards'**
+  String get permManageLeaderboards;
+
+  /// No description provided for @serverLevelingEnableLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Server XP'**
+  String get serverLevelingEnableLabel;
+
+  /// No description provided for @serverLevelingEnableDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Members earn XP and levels for chatting. Enabled by default.'**
+  String get serverLevelingEnableDescription;
+
+  /// No description provided for @serverGifLevelGateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'GIF level requirement'**
+  String get serverGifLevelGateLabel;
+
+  /// No description provided for @serverGifLevelGateDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum level required to send GIFs in this server. 0 = no requirement.'**
+  String get serverGifLevelGateDescription;
+
+  /// No description provided for @serverOpenLeaderboards.
+  ///
+  /// In en, this message translates to:
+  /// **'View Leaderboards'**
+  String get serverOpenLeaderboards;
+
+  /// No description provided for @leaderboardScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaderboards'**
+  String get leaderboardScreenTitle;
+
+  /// No description provided for @leaderboardCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Leaderboard'**
+  String get leaderboardCreateTitle;
+
+  /// No description provided for @leaderboardNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaderboard name'**
+  String get leaderboardNameHint;
+
+  /// No description provided for @leaderboardResetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Season'**
+  String get leaderboardResetTitle;
+
+  /// No description provided for @leaderboardResetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will archive the current standings for \"{name}\" and start a fresh season. This can\'t be undone.'**
+  String leaderboardResetBody(String name);
+
+  /// No description provided for @leaderboardResetConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Season'**
+  String get leaderboardResetConfirm;
+
+  /// No description provided for @leaderboardAdjustTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust Score'**
+  String get leaderboardAdjustTitle;
+
+  /// No description provided for @leaderboardUserIdHint.
+  ///
+  /// In en, this message translates to:
+  /// **'User ID'**
+  String get leaderboardUserIdHint;
+
+  /// No description provided for @leaderboardScoreHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Score'**
+  String get leaderboardScoreHint;
+
+  /// No description provided for @leaderboardSeasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Season {number}'**
+  String leaderboardSeasonLabel(int number);
+
+  /// No description provided for @leaderboardEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No entries yet'**
+  String get leaderboardEmptyState;
+
+  /// No description provided for @leaderboardYourRank.
+  ///
+  /// In en, this message translates to:
+  /// **'Your rank: #{rank} ({score})'**
+  String leaderboardYourRank(int rank, int score);
+
+  /// No description provided for @leaderboardXpScore.
+  ///
+  /// In en, this message translates to:
+  /// **'{score} XP · Level {level}'**
+  String leaderboardXpScore(int score, int level);
+
+  /// No description provided for @memberPanelLevelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Lv. {level}'**
+  String memberPanelLevelLabel(int level);
+
+  /// No description provided for @chatGifLevelGated.
+  ///
+  /// In en, this message translates to:
+  /// **'You need level {level} to send GIFs here'**
+  String chatGifLevelGated(int level);
+
+  /// No description provided for @arcadeNavLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Arcade'**
+  String get arcadeNavLabel;
+
+  /// No description provided for @arcadeHomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Koda Arcade'**
+  String get arcadeHomeTitle;
+
+  /// No description provided for @arcadeViewLeaderboardsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'View High Scores'**
+  String get arcadeViewLeaderboardsButton;
+
+  /// No description provided for @arcadeMinesweeperTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Minesweeper'**
+  String get arcadeMinesweeperTitle;
+
+  /// No description provided for @arcadeMinesweeperSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear the board without hitting a mine'**
+  String get arcadeMinesweeperSubtitle;
+
+  /// No description provided for @arcadeMatch3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Gem Match'**
+  String get arcadeMatch3Title;
+
+  /// No description provided for @arcadeMatch3Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Match 3 or more gems to score points'**
+  String get arcadeMatch3Subtitle;
+
+  /// No description provided for @arcadeDifficultyBeginner.
+  ///
+  /// In en, this message translates to:
+  /// **'Beginner'**
+  String get arcadeDifficultyBeginner;
+
+  /// No description provided for @arcadeDifficultyIntermediate.
+  ///
+  /// In en, this message translates to:
+  /// **'Intermediate'**
+  String get arcadeDifficultyIntermediate;
+
+  /// No description provided for @arcadeDifficultyExpert.
+  ///
+  /// In en, this message translates to:
+  /// **'Expert'**
+  String get arcadeDifficultyExpert;
+
+  /// No description provided for @arcadeMinesLeftLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Mines: {count}'**
+  String arcadeMinesLeftLabel(int count);
+
+  /// No description provided for @arcadeTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time: {seconds}s'**
+  String arcadeTimeLabel(int seconds);
+
+  /// No description provided for @arcadeNewGameButton.
+  ///
+  /// In en, this message translates to:
+  /// **'New Game'**
+  String get arcadeNewGameButton;
+
+  /// No description provided for @arcadeMinesweeperWinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Board Cleared!'**
+  String get arcadeMinesweeperWinTitle;
+
+  /// No description provided for @arcadeMinesweeperWinBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You scored {score} points.'**
+  String arcadeMinesweeperWinBody(int score);
+
+  /// No description provided for @arcadeMinesweeperLoseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Boom!'**
+  String get arcadeMinesweeperLoseTitle;
+
+  /// No description provided for @arcadeMinesweeperLoseBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You hit a mine. Give it another go?'**
+  String get arcadeMinesweeperLoseBody;
+
+  /// No description provided for @arcadeScoreSubmittedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Score sent to this server\'s leaderboard'**
+  String get arcadeScoreSubmittedNote;
+
+  /// No description provided for @arcadeMatch3ScoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Score: {score}'**
+  String arcadeMatch3ScoreLabel(int score);
+
+  /// No description provided for @arcadeMatch3MovesLeftLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Moves left: {count}'**
+  String arcadeMatch3MovesLeftLabel(int count);
+
+  /// No description provided for @arcadeMatch3GameOverTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Out of Moves'**
+  String get arcadeMatch3GameOverTitle;
+
+  /// No description provided for @arcadeMatch3GameOverBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Final score: {score}'**
+  String arcadeMatch3GameOverBody(int score);
 }
 
 class _AppLocalizationsDelegate

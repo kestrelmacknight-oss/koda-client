@@ -630,6 +630,60 @@ class AppLocalizationsEl extends AppLocalizations {
   String get steamVisibleInComparison => 'Ορατό στη σύγκριση';
 
   @override
+  String get channelEditDialogTypePreview => 'Δημόσια προεπισκόπηση';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'Ορατό από οποιονδήποτε χωρίς συμμετοχή, εφόσον αυτός ο διακομιστής είναι δημόσιος. Η δημοσίευση εξακολουθεί να απαιτεί συμμετοχή (και αποδοχή κανόνων, αν υπάρχουν).';
+
+  @override
+  String get channelEditDialogGeneralSection => 'Γενικά';
+
+  @override
+  String get channelEditDialogBehaviorSection => 'Συμπεριφορά';
+
+  @override
+  String get channelEditDialogAccessSection => 'Πρόσβαση';
+
+  @override
+  String get serverThemeLibraryTitle => 'Πρότυπα διακομιστή';
+
+  @override
+  String get serverThemeLibraryEmptyState =>
+      'Δεν υπάρχουν ακόμη διαθέσιμα πρότυπα.';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return 'Απαιτεί επίπεδο ενίσχυσης $level';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'Προεπισκόπηση: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote =>
+      'Αυτή είναι προεπισκόπηση — δεν έχει εφαρμοστεί τίποτα ακόμη.';
+
+  @override
+  String get serverThemeApplyButton => 'Εφαρμογή προτύπου';
+
+  @override
+  String get serverThemeApplyError =>
+      'Δεν ήταν δυνατή η εφαρμογή αυτού του προτύπου';
+
+  @override
+  String get serverThemeCardTitle => 'Πρότυπα διακομιστή';
+
+  @override
+  String get serverThemeCardDescription =>
+      'Περιηγηθείτε σε επιμελημένες εμφανίσεις και κάντε προεπισκόπηση πριν την εφαρμογή.';
+
+  @override
+  String get serverThemeBrowseButton => 'Περιήγηση προτύπων';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5107,4 +5161,166 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => 'Άγνωστος';
+
+  @override
+  String get serverTabLeveling => 'Επίπεδα';
+
+  @override
+  String get permManageLeaderboards => 'Διαχείριση Πινάκων Κατάταξης';
+
+  @override
+  String get serverLevelingEnableLabel => 'XP Διακομιστή';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'Τα μέλη κερδίζουν XP και επίπεδα συνομιλώντας. Ενεργό από προεπιλογή.';
+
+  @override
+  String get serverGifLevelGateLabel => 'Απαιτούμενο επίπεδο για GIF';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'Ελάχιστο επίπεδο για αποστολή GIF σε αυτόν τον διακομιστή. 0 = χωρίς περιορισμό.';
+
+  @override
+  String get serverOpenLeaderboards => 'Προβολή Πινάκων Κατάταξης';
+
+  @override
+  String get leaderboardScreenTitle => 'Πίνακες Κατάταξης';
+
+  @override
+  String get leaderboardCreateTitle => 'Δημιουργία Πίνακα Κατάταξης';
+
+  @override
+  String get leaderboardNameHint => 'Όνομα πίνακα κατάταξης';
+
+  @override
+  String get leaderboardResetTitle => 'Επαναφορά Σεζόν';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return 'Αυτό θα αρχειοθετήσει την τρέχουσα κατάταξη για το \"$name\" και θα ξεκινήσει νέα σεζόν. Δεν αναιρείται.';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'Επαναφορά Σεζόν';
+
+  @override
+  String get leaderboardAdjustTitle => 'Προσαρμογή Βαθμολογίας';
+
+  @override
+  String get leaderboardUserIdHint => 'ID χρήστη';
+
+  @override
+  String get leaderboardScoreHint => 'Βαθμολογία';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'Σεζόν $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'Δεν υπάρχουν ακόμη καταχωρήσεις';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'Η θέση σου: #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score XP · Επίπεδο $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'Επ. $level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'Χρειάζεσαι επίπεδο $level για να στείλεις GIF εδώ';
+  }
+
+  @override
+  String get arcadeNavLabel => 'Arcade';
+
+  @override
+  String get arcadeHomeTitle => 'Koda Arcade';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'Προβολή Κορυφαίων Βαθμολογιών';
+
+  @override
+  String get arcadeMinesweeperTitle => 'Ναρκαλιευτής';
+
+  @override
+  String get arcadeMinesweeperSubtitle =>
+      'Αποκάλυψε όλο το ταμπλό χωρίς να πατήσεις νάρκη';
+
+  @override
+  String get arcadeMatch3Title => 'Ταίριασμα Πετραδιών';
+
+  @override
+  String get arcadeMatch3Subtitle =>
+      'Ταίριαξε 3 ή περισσότερα πετράδια για να σκοράρεις';
+
+  @override
+  String get arcadeDifficultyBeginner => 'Αρχάριος';
+
+  @override
+  String get arcadeDifficultyIntermediate => 'Μεσαίος';
+
+  @override
+  String get arcadeDifficultyExpert => 'Έμπειρος';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return 'Νάρκες: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return 'Χρόνος: $secondsδ';
+  }
+
+  @override
+  String get arcadeNewGameButton => 'Νέο Παιχνίδι';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'Το ταμπλό αποκαλύφθηκε!';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return 'Σκόραρες $score πόντους.';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'Μπαμ!';
+
+  @override
+  String get arcadeMinesweeperLoseBody =>
+      'Πάτησες νάρκη. Θέλεις να ξαναδοκιμάσεις;';
+
+  @override
+  String get arcadeScoreSubmittedNote =>
+      'Η βαθμολογία στάλθηκε στον πίνακα κατάταξης αυτού του διακομιστή';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'Σκορ: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return 'Κινήσεις που απομένουν: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => 'Τέλος Κινήσεων';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return 'Τελικό σκορ: $score';
+  }
 }

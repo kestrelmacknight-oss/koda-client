@@ -618,6 +618,59 @@ class AppLocalizationsHi extends AppLocalizations {
   String get steamVisibleInComparison => 'तुलना में दिखाई देता है';
 
   @override
+  String get channelEditDialogTypePreview => 'सार्वजनिक पूर्वावलोकन';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'यदि यह सर्वर सार्वजनिक है, तो बिना शामिल हुए कोई भी इसे देख सकता है। पोस्ट करने के लिए अभी भी शामिल होना (और यदि कोई नियम हों तो उन्हें स्वीकार करना) आवश्यक है।';
+
+  @override
+  String get channelEditDialogGeneralSection => 'सामान्य';
+
+  @override
+  String get channelEditDialogBehaviorSection => 'व्यवहार';
+
+  @override
+  String get channelEditDialogAccessSection => 'एक्सेस';
+
+  @override
+  String get serverThemeLibraryTitle => 'सर्वर टेम्पलेट';
+
+  @override
+  String get serverThemeLibraryEmptyState =>
+      'अभी तक कोई टेम्पलेट उपलब्ध नहीं है।';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return 'बूस्ट स्तर $level आवश्यक है';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'पूर्वावलोकन: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote =>
+      'यह एक पूर्वावलोकन है — अभी तक कुछ भी लागू नहीं हुआ है।';
+
+  @override
+  String get serverThemeApplyButton => 'टेम्पलेट लागू करें';
+
+  @override
+  String get serverThemeApplyError => 'यह टेम्पलेट लागू नहीं किया जा सका';
+
+  @override
+  String get serverThemeCardTitle => 'सर्वर टेम्पलेट';
+
+  @override
+  String get serverThemeCardDescription =>
+      'चुनिंदा लुक ब्राउज़ करें और लागू करने से पहले पूर्वावलोकन करें।';
+
+  @override
+  String get serverThemeBrowseButton => 'टेम्पलेट ब्राउज़ करें';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5027,4 +5080,163 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => 'अज्ञात';
+
+  @override
+  String get serverTabLeveling => 'लेवलिंग';
+
+  @override
+  String get permManageLeaderboards => 'लीडरबोर्ड प्रबंधित करें';
+
+  @override
+  String get serverLevelingEnableLabel => 'सर्वर XP';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'सदस्य चैट करने से XP और लेवल कमाते हैं। डिफ़ॉल्ट रूप से सक्षम।';
+
+  @override
+  String get serverGifLevelGateLabel => 'GIF भेजने के लिए आवश्यक लेवल';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'इस सर्वर पर GIF भेजने के लिए न्यूनतम लेवल। 0 = कोई सीमा नहीं।';
+
+  @override
+  String get serverOpenLeaderboards => 'लीडरबोर्ड देखें';
+
+  @override
+  String get leaderboardScreenTitle => 'लीडरबोर्ड';
+
+  @override
+  String get leaderboardCreateTitle => 'लीडरबोर्ड बनाएं';
+
+  @override
+  String get leaderboardNameHint => 'लीडरबोर्ड का नाम';
+
+  @override
+  String get leaderboardResetTitle => 'सीज़न रीसेट करें';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return 'इससे \"$name\" की मौजूदा रैंकिंग संग्रहित हो जाएगी और एक नया सीज़न शुरू होगा। यह पूर्ववत नहीं किया जा सकता।';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'सीज़न रीसेट करें';
+
+  @override
+  String get leaderboardAdjustTitle => 'स्कोर समायोजित करें';
+
+  @override
+  String get leaderboardUserIdHint => 'यूज़र आईडी';
+
+  @override
+  String get leaderboardScoreHint => 'स्कोर';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'सीज़न $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'अभी तक कोई प्रविष्टि नहीं';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'आपकी रैंक: #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score XP · लेवल $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'लेवल $level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'यहाँ GIF भेजने के लिए आपको लेवल $level चाहिए';
+  }
+
+  @override
+  String get arcadeNavLabel => 'आर्केड';
+
+  @override
+  String get arcadeHomeTitle => 'कोडा आर्केड';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'टॉप स्कोर देखें';
+
+  @override
+  String get arcadeMinesweeperTitle => 'माइनस्वीपर';
+
+  @override
+  String get arcadeMinesweeperSubtitle => 'बिना माइन छुए पूरा बोर्ड खोलें';
+
+  @override
+  String get arcadeMatch3Title => 'जेम मैच';
+
+  @override
+  String get arcadeMatch3Subtitle => 'अंक पाने के लिए 3 या अधिक जेम मिलाएं';
+
+  @override
+  String get arcadeDifficultyBeginner => 'शुरुआती';
+
+  @override
+  String get arcadeDifficultyIntermediate => 'मध्यम';
+
+  @override
+  String get arcadeDifficultyExpert => 'विशेषज्ञ';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return 'माइंस: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return 'समय: $secondsसे';
+  }
+
+  @override
+  String get arcadeNewGameButton => 'नया गेम';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'बोर्ड साफ़ हुआ!';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return 'आपने $score अंक बनाए।';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'धमाका!';
+
+  @override
+  String get arcadeMinesweeperLoseBody => 'आपने माइन दबा दी। फिर कोशिश करें?';
+
+  @override
+  String get arcadeScoreSubmittedNote =>
+      'स्कोर इस सर्वर के लीडरबोर्ड पर भेजा गया';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'स्कोर: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return 'बाकी चालें: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => 'चालें समाप्त';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return 'अंतिम स्कोर: $score';
+  }
 }

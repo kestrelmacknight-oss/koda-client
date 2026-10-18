@@ -622,6 +622,58 @@ class AppLocalizationsRu extends AppLocalizations {
   String get steamVisibleInComparison => 'Видно в сравнении';
 
   @override
+  String get channelEditDialogTypePreview => 'Публичный предпросмотр';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'Виден всем без присоединения, если этот сервер публичный. Для публикации по-прежнему требуется присоединиться (и принять правила, если они есть).';
+
+  @override
+  String get channelEditDialogGeneralSection => 'Общие';
+
+  @override
+  String get channelEditDialogBehaviorSection => 'Поведение';
+
+  @override
+  String get channelEditDialogAccessSection => 'Доступ';
+
+  @override
+  String get serverThemeLibraryTitle => 'Шаблоны сервера';
+
+  @override
+  String get serverThemeLibraryEmptyState => 'Пока нет доступных шаблонов.';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return 'Требуется уровень буста $level';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'Предпросмотр: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote =>
+      'Это предпросмотр — пока ничего не применено.';
+
+  @override
+  String get serverThemeApplyButton => 'Применить шаблон';
+
+  @override
+  String get serverThemeApplyError => 'Не удалось применить этот шаблон';
+
+  @override
+  String get serverThemeCardTitle => 'Шаблоны сервера';
+
+  @override
+  String get serverThemeCardDescription =>
+      'Просматривайте подобранные образы и смотрите предпросмотр перед применением.';
+
+  @override
+  String get serverThemeBrowseButton => 'Просмотреть шаблоны';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5101,4 +5153,164 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => 'Неизвестно';
+
+  @override
+  String get serverTabLeveling => 'Уровни';
+
+  @override
+  String get permManageLeaderboards => 'Управление таблицами лидеров';
+
+  @override
+  String get serverLevelingEnableLabel => 'Опыт сервера';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'Участники получают опыт и уровни за общение в чате. Включено по умолчанию.';
+
+  @override
+  String get serverGifLevelGateLabel => 'Уровень для отправки GIF';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'Минимальный уровень для отправки GIF на этом сервере. 0 = без ограничений.';
+
+  @override
+  String get serverOpenLeaderboards => 'Посмотреть таблицы лидеров';
+
+  @override
+  String get leaderboardScreenTitle => 'Таблицы лидеров';
+
+  @override
+  String get leaderboardCreateTitle => 'Создать таблицу лидеров';
+
+  @override
+  String get leaderboardNameHint => 'Название таблицы лидеров';
+
+  @override
+  String get leaderboardResetTitle => 'Сбросить сезон';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return 'Текущий рейтинг \"$name\" будет архивирован, и начнётся новый сезон. Это действие нельзя отменить.';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'Сбросить сезон';
+
+  @override
+  String get leaderboardAdjustTitle => 'Изменить очки';
+
+  @override
+  String get leaderboardUserIdHint => 'ID пользователя';
+
+  @override
+  String get leaderboardScoreHint => 'Очки';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'Сезон $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'Записей пока нет';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'Ваше место: #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score XP · Уровень $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'Ур. $level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'Чтобы отправлять GIF здесь, нужен уровень $level';
+  }
+
+  @override
+  String get arcadeNavLabel => 'Аркада';
+
+  @override
+  String get arcadeHomeTitle => 'Koda Аркада';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'Посмотреть рекорды';
+
+  @override
+  String get arcadeMinesweeperTitle => 'Сапёр';
+
+  @override
+  String get arcadeMinesweeperSubtitle => 'Откройте всё поле, не задев мину';
+
+  @override
+  String get arcadeMatch3Title => 'Собери Самоцветы';
+
+  @override
+  String get arcadeMatch3Subtitle =>
+      'Соберите 3 или более самоцветов, чтобы набрать очки';
+
+  @override
+  String get arcadeDifficultyBeginner => 'Новичок';
+
+  @override
+  String get arcadeDifficultyIntermediate => 'Средний';
+
+  @override
+  String get arcadeDifficultyExpert => 'Эксперт';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return 'Мины: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return 'Время: $secondsс';
+  }
+
+  @override
+  String get arcadeNewGameButton => 'Новая игра';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'Поле очищено!';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return 'Вы набрали $score очков.';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'Бум!';
+
+  @override
+  String get arcadeMinesweeperLoseBody => 'Вы задели мину. Попробовать снова?';
+
+  @override
+  String get arcadeScoreSubmittedNote =>
+      'Результат отправлен в таблицу лидеров этого сервера';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'Очки: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return 'Осталось ходов: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => 'Ходы закончились';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return 'Итоговый результат: $score';
+  }
 }

@@ -601,6 +601,56 @@ class AppLocalizationsKo extends AppLocalizations {
   String get steamVisibleInComparison => '비교에서 표시됨';
 
   @override
+  String get channelEditDialogTypePreview => '공개 미리보기';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      '이 서버가 공개되어 있으면 참여하지 않아도 누구나 볼 수 있습니다. 게시하려면 여전히 참여(및 규칙이 있는 경우 동의)가 필요합니다.';
+
+  @override
+  String get channelEditDialogGeneralSection => '일반';
+
+  @override
+  String get channelEditDialogBehaviorSection => '동작';
+
+  @override
+  String get channelEditDialogAccessSection => '액세스';
+
+  @override
+  String get serverThemeLibraryTitle => '서버 템플릿';
+
+  @override
+  String get serverThemeLibraryEmptyState => '아직 사용 가능한 템플릿이 없습니다.';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return '부스트 레벨 $level 필요';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return '미리보기: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote => '이것은 미리보기입니다 — 아직 아무것도 적용되지 않았습니다.';
+
+  @override
+  String get serverThemeApplyButton => '템플릿 적용';
+
+  @override
+  String get serverThemeApplyError => '이 템플릿을 적용할 수 없습니다';
+
+  @override
+  String get serverThemeCardTitle => '서버 템플릿';
+
+  @override
+  String get serverThemeCardDescription => '엄선된 스타일을 둘러보고 적용 전에 미리 볼 수 있습니다.';
+
+  @override
+  String get serverThemeBrowseButton => '템플릿 둘러보기';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -4881,4 +4931,162 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => '알 수 없음';
+
+  @override
+  String get serverTabLeveling => '레벨링';
+
+  @override
+  String get permManageLeaderboards => '리더보드 관리';
+
+  @override
+  String get serverLevelingEnableLabel => '서버 XP';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      '멤버는 채팅으로 XP와 레벨을 얻습니다. 기본적으로 활성화되어 있습니다.';
+
+  @override
+  String get serverGifLevelGateLabel => 'GIF 전송에 필요한 레벨';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      '이 서버에서 GIF를 보내는 데 필요한 최소 레벨입니다. 0 = 제한 없음.';
+
+  @override
+  String get serverOpenLeaderboards => '리더보드 보기';
+
+  @override
+  String get leaderboardScreenTitle => '리더보드';
+
+  @override
+  String get leaderboardCreateTitle => '리더보드 만들기';
+
+  @override
+  String get leaderboardNameHint => '리더보드 이름';
+
+  @override
+  String get leaderboardResetTitle => '시즌 초기화';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return '\"$name\"의 현재 순위를 보관하고 새 시즌을 시작합니다. 이 작업은 취소할 수 없습니다.';
+  }
+
+  @override
+  String get leaderboardResetConfirm => '시즌 초기화';
+
+  @override
+  String get leaderboardAdjustTitle => '점수 조정';
+
+  @override
+  String get leaderboardUserIdHint => '사용자 ID';
+
+  @override
+  String get leaderboardScoreHint => '점수';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return '시즌 $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => '아직 항목이 없습니다';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return '내 순위: #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score XP · 레벨 $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'Lv.$level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return '여기서 GIF를 보내려면 레벨 $level이 필요합니다';
+  }
+
+  @override
+  String get arcadeNavLabel => '아케이드';
+
+  @override
+  String get arcadeHomeTitle => 'Koda 아케이드';
+
+  @override
+  String get arcadeViewLeaderboardsButton => '최고 점수 보기';
+
+  @override
+  String get arcadeMinesweeperTitle => '지뢰찾기';
+
+  @override
+  String get arcadeMinesweeperSubtitle => '지뢰를 밟지 않고 보드 전체를 열어보세요';
+
+  @override
+  String get arcadeMatch3Title => '젬 매치';
+
+  @override
+  String get arcadeMatch3Subtitle => '3개 이상의 젬을 맞춰 점수를 획득하세요';
+
+  @override
+  String get arcadeDifficultyBeginner => '초급';
+
+  @override
+  String get arcadeDifficultyIntermediate => '중급';
+
+  @override
+  String get arcadeDifficultyExpert => '고급';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return '지뢰: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return '시간: $seconds초';
+  }
+
+  @override
+  String get arcadeNewGameButton => '새 게임';
+
+  @override
+  String get arcadeMinesweeperWinTitle => '보드 클리어!';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return '$score점을 획득했습니다.';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => '펑!';
+
+  @override
+  String get arcadeMinesweeperLoseBody => '지뢰를 밟았습니다. 다시 시도할까요?';
+
+  @override
+  String get arcadeScoreSubmittedNote => '점수가 이 서버의 리더보드로 전송되었습니다';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return '점수: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return '남은 이동 횟수: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => '이동 횟수 소진';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return '최종 점수: $score';
+  }
 }

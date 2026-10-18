@@ -622,6 +622,58 @@ class AppLocalizationsNl extends AppLocalizations {
   String get steamVisibleInComparison => 'Zichtbaar in vergelijking';
 
   @override
+  String get channelEditDialogTypePreview => 'Openbare preview';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'Zichtbaar voor iedereen zonder lid te worden, als deze server openbaar is. Om te posten is nog steeds lidmaatschap nodig (en het accepteren van regels, indien aanwezig).';
+
+  @override
+  String get channelEditDialogGeneralSection => 'Algemeen';
+
+  @override
+  String get channelEditDialogBehaviorSection => 'Gedrag';
+
+  @override
+  String get channelEditDialogAccessSection => 'Toegang';
+
+  @override
+  String get serverThemeLibraryTitle => 'Serversjablonen';
+
+  @override
+  String get serverThemeLibraryEmptyState => 'Nog geen sjablonen beschikbaar.';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return 'Vereist boostniveau $level';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'Voorbeeld: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote =>
+      'Dit is een voorbeeld — er is nog niets toegepast.';
+
+  @override
+  String get serverThemeApplyButton => 'Sjabloon toepassen';
+
+  @override
+  String get serverThemeApplyError => 'Kon dit sjabloon niet toepassen';
+
+  @override
+  String get serverThemeCardTitle => 'Serversjablonen';
+
+  @override
+  String get serverThemeCardDescription =>
+      'Blader door uitgekozen looks en bekijk een voorbeeld voordat je het toepast.';
+
+  @override
+  String get serverThemeBrowseButton => 'Sjablonen bekijken';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5045,4 +5097,166 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => 'Onbekend';
+
+  @override
+  String get serverTabLeveling => 'Levels';
+
+  @override
+  String get permManageLeaderboards => 'Scoreborden beheren';
+
+  @override
+  String get serverLevelingEnableLabel => 'Server-XP';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'Leden verdienen XP en levels door te chatten. Standaard ingeschakeld.';
+
+  @override
+  String get serverGifLevelGateLabel => 'Vereist level voor GIF\'s';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'Minimaal level om GIF\'s te versturen op deze server. 0 = geen beperking.';
+
+  @override
+  String get serverOpenLeaderboards => 'Scoreborden bekijken';
+
+  @override
+  String get leaderboardScreenTitle => 'Scoreborden';
+
+  @override
+  String get leaderboardCreateTitle => 'Scorebord aanmaken';
+
+  @override
+  String get leaderboardNameHint => 'Naam van het scorebord';
+
+  @override
+  String get leaderboardResetTitle => 'Seizoen resetten';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return 'Dit archiveert de huidige stand van \"$name\" en start een nieuw seizoen. Dit kan niet ongedaan worden gemaakt.';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'Seizoen resetten';
+
+  @override
+  String get leaderboardAdjustTitle => 'Score aanpassen';
+
+  @override
+  String get leaderboardUserIdHint => 'Gebruikers-ID';
+
+  @override
+  String get leaderboardScoreHint => 'Score';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'Seizoen $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'Nog geen vermeldingen';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'Jouw positie: #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score XP · Level $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'Lvl. $level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'Je hebt level $level nodig om hier GIF\'s te versturen';
+  }
+
+  @override
+  String get arcadeNavLabel => 'Arcade';
+
+  @override
+  String get arcadeHomeTitle => 'Koda Arcade';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'Scoreboard bekijken';
+
+  @override
+  String get arcadeMinesweeperTitle => 'Mijnenveger';
+
+  @override
+  String get arcadeMinesweeperSubtitle =>
+      'Ontdek het hele bord zonder een mijn te raken';
+
+  @override
+  String get arcadeMatch3Title => 'Edelsteen Match';
+
+  @override
+  String get arcadeMatch3Subtitle =>
+      'Combineer 3 of meer edelstenen om punten te scoren';
+
+  @override
+  String get arcadeDifficultyBeginner => 'Beginner';
+
+  @override
+  String get arcadeDifficultyIntermediate => 'Gemiddeld';
+
+  @override
+  String get arcadeDifficultyExpert => 'Expert';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return 'Mijnen: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return 'Tijd: ${seconds}s';
+  }
+
+  @override
+  String get arcadeNewGameButton => 'Nieuw spel';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'Bord vrijgemaakt!';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return 'Je hebt $score punten gescoord.';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'Boem!';
+
+  @override
+  String get arcadeMinesweeperLoseBody =>
+      'Je raakte een mijn. Nog een keer proberen?';
+
+  @override
+  String get arcadeScoreSubmittedNote =>
+      'Score verzonden naar het scorebord van deze server';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'Score: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return 'Resterende zetten: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => 'Geen zetten meer';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return 'Eindscore: $score';
+  }
 }

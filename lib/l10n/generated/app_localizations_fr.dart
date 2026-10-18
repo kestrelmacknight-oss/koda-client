@@ -624,6 +624,59 @@ class AppLocalizationsFr extends AppLocalizations {
   String get steamVisibleInComparison => 'Visible dans la comparaison';
 
   @override
+  String get channelEditDialogTypePreview => 'Aperçu public';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'Visible par tout le monde sans avoir à rejoindre, si ce serveur est public. Publier nécessite toujours de rejoindre (et d\'accepter les règles, le cas échéant).';
+
+  @override
+  String get channelEditDialogGeneralSection => 'Général';
+
+  @override
+  String get channelEditDialogBehaviorSection => 'Comportement';
+
+  @override
+  String get channelEditDialogAccessSection => 'Accès';
+
+  @override
+  String get serverThemeLibraryTitle => 'Modèles de serveur';
+
+  @override
+  String get serverThemeLibraryEmptyState =>
+      'Aucun modèle disponible pour le moment.';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return 'Nécessite le niveau de boost $level';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'Aperçu : $name';
+  }
+
+  @override
+  String get serverThemePreviewNote =>
+      'Ceci est un aperçu — rien n\'a encore été appliqué.';
+
+  @override
+  String get serverThemeApplyButton => 'Appliquer le modèle';
+
+  @override
+  String get serverThemeApplyError => 'Impossible d\'appliquer ce modèle';
+
+  @override
+  String get serverThemeCardTitle => 'Modèles de serveur';
+
+  @override
+  String get serverThemeCardDescription =>
+      'Parcourez des styles sélectionnés et prévisualisez-en un avant de l\'appliquer.';
+
+  @override
+  String get serverThemeBrowseButton => 'Parcourir les modèles';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5092,4 +5145,166 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => 'Inconnu';
+
+  @override
+  String get serverTabLeveling => 'Niveaux';
+
+  @override
+  String get permManageLeaderboards => 'Gérer les classements';
+
+  @override
+  String get serverLevelingEnableLabel => 'XP du serveur';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'Les membres gagnent de l\'XP et des niveaux en discutant. Activé par défaut.';
+
+  @override
+  String get serverGifLevelGateLabel => 'Niveau requis pour les GIF';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'Niveau minimum pour envoyer des GIF sur ce serveur. 0 = aucune restriction.';
+
+  @override
+  String get serverOpenLeaderboards => 'Voir les classements';
+
+  @override
+  String get leaderboardScreenTitle => 'Classements';
+
+  @override
+  String get leaderboardCreateTitle => 'Créer un classement';
+
+  @override
+  String get leaderboardNameHint => 'Nom du classement';
+
+  @override
+  String get leaderboardResetTitle => 'Réinitialiser la saison';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return 'Cela archivera le classement actuel de \"$name\" et démarrera une nouvelle saison. Cette action est irréversible.';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'Réinitialiser la saison';
+
+  @override
+  String get leaderboardAdjustTitle => 'Ajuster le score';
+
+  @override
+  String get leaderboardUserIdHint => 'ID utilisateur';
+
+  @override
+  String get leaderboardScoreHint => 'Score';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'Saison $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'Aucune entrée pour le moment';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'Votre rang : #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score XP · Niveau $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'Niv. $level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'Vous devez être niveau $level pour envoyer des GIF ici';
+  }
+
+  @override
+  String get arcadeNavLabel => 'Arcade';
+
+  @override
+  String get arcadeHomeTitle => 'Koda Arcade';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'Voir les meilleurs scores';
+
+  @override
+  String get arcadeMinesweeperTitle => 'Démineur';
+
+  @override
+  String get arcadeMinesweeperSubtitle =>
+      'Découvrez toute la grille sans toucher une mine';
+
+  @override
+  String get arcadeMatch3Title => 'Match de gemmes';
+
+  @override
+  String get arcadeMatch3Subtitle =>
+      'Alignez 3 gemmes ou plus pour marquer des points';
+
+  @override
+  String get arcadeDifficultyBeginner => 'Débutant';
+
+  @override
+  String get arcadeDifficultyIntermediate => 'Intermédiaire';
+
+  @override
+  String get arcadeDifficultyExpert => 'Expert';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return 'Mines : $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return 'Temps : ${seconds}s';
+  }
+
+  @override
+  String get arcadeNewGameButton => 'Nouvelle partie';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'Grille déminée !';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return 'Vous avez marqué $score points.';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'Boum !';
+
+  @override
+  String get arcadeMinesweeperLoseBody =>
+      'Vous avez touché une mine. Retenter ?';
+
+  @override
+  String get arcadeScoreSubmittedNote =>
+      'Score envoyé au classement de ce serveur';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'Score : $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return 'Coups restants : $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => 'Plus de coups';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return 'Score final : $score';
+  }
 }

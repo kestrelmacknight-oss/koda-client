@@ -54,9 +54,10 @@ Future<void> showChannelEditDialog(
             style: TextStyle(color: KodaColors.text1)),
         content: SizedBox(
           width: 340,
-          height: 400,
+          height: 460,
           child: SingleChildScrollView(
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _SectionHeader(t.channelEditDialogGeneralSection),
               KodaTextField(controller: nameController, hintText: t.channelEditDialogNameHint, autofocus: true),
               if (existing != null) ...[
                 const SizedBox(height: 12),
@@ -76,9 +77,34 @@ Future<void> showChannelEditDialog(
                   DropdownMenuItem(value: 'rules', child: Text(t.channelEditDialogTypeRules)),
                   DropdownMenuItem(value: 'role-select', child: Text(t.channelEditDialogTypeRoleSelection)),
                   DropdownMenuItem(value: 'calendar', child: Text(t.channelEditDialogTypeCalendar)),
+                  DropdownMenuItem(value: 'preview', child: Text(t.channelEditDialogTypePreview)),
                 ],
                 onChanged: (v) => setDialogState(() => type = v ?? 'text'),
               ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String?>(
+                initialValue: selectedCategoryId,
+                dropdownColor: KodaColors.card,
+                decoration: InputDecoration(labelText: t.channelEditDialogCategoryLabel),
+                items: [
+                  DropdownMenuItem(value: null, child: Text(t.channelEditDialogNoCategory)),
+                  ...categories.map((c) => DropdownMenuItem(
+                      value: c['id'] as String, child: Text(c['name']))),
+                ],
+                onChanged: (v) => setDialogState(() => selectedCategoryId = v),
+              ),
+
+              // Only rendered when the selected type actually has
+              // behavior of its own to configure -- gallery/stage/rules/
+              // role-select/calendar have none today, so no empty
+              // section header shows for them.
+              if (type == 'preview' || type == 'text' || type == 'voice') ...[
+                _SectionDivider(),
+                _SectionHeader(t.channelEditDialogBehaviorSection),
+              ],
+              if (type == 'preview')
+                Text(t.channelEditDialogPreviewHelp,
+                    style: TextStyle(color: KodaColors.text3, fontSize: 11)),
               if (type == 'text') ...[
                 CheckboxListTile(
                   dense: true,
@@ -107,6 +133,7 @@ Future<void> showChannelEditDialog(
                     onChanged: (v) => setDialogState(() => liveAnnouncements = v ?? false),
                   ),
                 if (isReadOnly && roles.isNotEmpty) ...[
+                  const SizedBox(height: 4),
                   Text(t.channelEditDialogNotifyRolesLabel,
                       style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                   const SizedBox(height: 4),
@@ -142,8 +169,7 @@ Future<void> showChannelEditDialog(
                   onChanged: (v) => setDialogState(() => slowmodeSeconds = v ?? 0),
                 ),
               ],
-              if (type == 'voice') ...[
-                const SizedBox(height: 12),
+              if (type == 'voice')
                 DropdownButtonFormField<int>(
                   initialValue: userLimit,
                   dropdownColor: KodaColors.card,
@@ -154,21 +180,10 @@ Future<void> showChannelEditDialog(
                       .toList(),
                   onChanged: (v) => setDialogState(() => userLimit = v ?? 0),
                 ),
-              ],
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String?>(
-                initialValue: selectedCategoryId,
-                dropdownColor: KodaColors.card,
-                decoration: InputDecoration(labelText: t.channelEditDialogCategoryLabel),
-                items: [
-                  DropdownMenuItem(value: null, child: Text(t.channelEditDialogNoCategory)),
-                  ...categories.map((c) => DropdownMenuItem(
-                      value: c['id'] as String, child: Text(c['name']))),
-                ],
-                onChanged: (v) => setDialogState(() => selectedCategoryId = v),
-              ),
+
               if (roles.isNotEmpty) ...[
-                const SizedBox(height: 12),
+                _SectionDivider(),
+                _SectionHeader(t.channelEditDialogAccessSection),
                 Text(t.channelEditDialogRoleAccessLabel,
                     style: TextStyle(color: KodaColors.text3, fontSize: 12)),
                 const SizedBox(height: 6),
@@ -193,11 +208,10 @@ Future<void> showChannelEditDialog(
                 }),
               ],
               if (existing != null) ...[
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(t.channelEditDialogContentLabelsLabel,
-                      style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                _SectionDivider(),
+                Text(
+                  t.channelEditDialogContentLabelsLabel,
+                  style: TextStyle(color: KodaColors.text3, fontSize: 12, fontWeight: FontWeight.w700),
                 ),
                 Text(
                   t.channelEditDialogContentLabelsDescription,
@@ -257,4 +271,26 @@ Future<void> showChannelEditDialog(
     await KodaApi.instance.setChannelAllowedRoles(existing['id'] as String, selectedRoleIds);
   }
   onSaved();
+}
+
+/// Small-caps group label -- same visual language as the section
+/// headers already used elsewhere (e.g. server_settings_screen.dart's
+/// "Public Listing"/"Marketplace Listing"), reused here so the dialog
+/// reads as organized groups instead of one long flat field list.
+class _SectionHeader extends StatelessWidget {
+  final String label;
+  const _SectionHeader(this.label);
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Text(label,
+            style: TextStyle(color: KodaColors.text3, fontSize: 11,
+                fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+      );
+}
+
+class _SectionDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) =>
+      Divider(color: KodaColors.border, height: 24);
 }

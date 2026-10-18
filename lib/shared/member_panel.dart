@@ -324,6 +324,10 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
                 ],
               ),
             ),
+            if ((member['level'] as int? ?? 0) > 0) ...[
+              _LevelChip(level: member['level'] as int),
+              const SizedBox(width: 4),
+            ],
             TierBadge(tier: tier, size: 13, rewardBadges: badges),
             if ((widget.canKick || widget.canBan) &&
                 member['user_id'] != ref.read(authProvider).user?.id)
@@ -413,6 +417,28 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
     } catch (_) {
       return KodaColors.text2;
     }
+  }
+}
+
+/// A small "Lv. N" chip next to TierBadge -- text-based (not an SVG
+/// icon like every TierBadge entry), so it sits beside that row
+/// rather than inside it. See Koda.Leaderboards.level_for_xp/1 for
+/// where the number comes from.
+class _LevelChip extends StatelessWidget {
+  final int level;
+  const _LevelChip({required this.level});
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      decoration: BoxDecoration(
+        color: KodaColors.koda.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(t.memberPanelLevelLabel(level),
+          style: TextStyle(color: KodaColors.koda, fontSize: 10, fontWeight: FontWeight.w700)),
+    );
   }
 }
 

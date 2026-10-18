@@ -622,6 +622,58 @@ class AppLocalizationsVi extends AppLocalizations {
   String get steamVisibleInComparison => 'Hiển thị trong so sánh';
 
   @override
+  String get channelEditDialogTypePreview => 'Xem Trước Công Khai';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'Bất kỳ ai cũng có thể xem mà không cần tham gia, nếu máy chủ này công khai. Vẫn cần tham gia (và chấp nhận quy tắc, nếu có) để đăng bài.';
+
+  @override
+  String get channelEditDialogGeneralSection => 'Chung';
+
+  @override
+  String get channelEditDialogBehaviorSection => 'Hành vi';
+
+  @override
+  String get channelEditDialogAccessSection => 'Quyền truy cập';
+
+  @override
+  String get serverThemeLibraryTitle => 'Mẫu Máy Chủ';
+
+  @override
+  String get serverThemeLibraryEmptyState => 'Chưa có mẫu nào khả dụng.';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return 'Yêu cầu cấp độ boost $level';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'Xem trước: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote =>
+      'Đây là bản xem trước — chưa có gì được áp dụng.';
+
+  @override
+  String get serverThemeApplyButton => 'Áp Dụng Mẫu';
+
+  @override
+  String get serverThemeApplyError => 'Không thể áp dụng mẫu này';
+
+  @override
+  String get serverThemeCardTitle => 'Mẫu Máy Chủ';
+
+  @override
+  String get serverThemeCardDescription =>
+      'Duyệt qua các giao diện được chọn lọc và xem trước trước khi áp dụng.';
+
+  @override
+  String get serverThemeBrowseButton => 'Duyệt Mẫu';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5018,4 +5070,164 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => 'Không xác định';
+
+  @override
+  String get serverTabLeveling => 'Cấp độ';
+
+  @override
+  String get permManageLeaderboards => 'Quản lý bảng xếp hạng';
+
+  @override
+  String get serverLevelingEnableLabel => 'XP máy chủ';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'Thành viên kiếm XP và cấp độ khi trò chuyện. Được bật theo mặc định.';
+
+  @override
+  String get serverGifLevelGateLabel => 'Cấp độ yêu cầu để gửi GIF';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'Cấp độ tối thiểu để gửi GIF trên máy chủ này. 0 = không giới hạn.';
+
+  @override
+  String get serverOpenLeaderboards => 'Xem bảng xếp hạng';
+
+  @override
+  String get leaderboardScreenTitle => 'Bảng xếp hạng';
+
+  @override
+  String get leaderboardCreateTitle => 'Tạo bảng xếp hạng';
+
+  @override
+  String get leaderboardNameHint => 'Tên bảng xếp hạng';
+
+  @override
+  String get leaderboardResetTitle => 'Đặt lại mùa';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return 'Thao tác này sẽ lưu trữ bảng xếp hạng hiện tại của \"$name\" và bắt đầu một mùa mới. Không thể hoàn tác.';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'Đặt lại mùa';
+
+  @override
+  String get leaderboardAdjustTitle => 'Điều chỉnh điểm';
+
+  @override
+  String get leaderboardUserIdHint => 'ID người dùng';
+
+  @override
+  String get leaderboardScoreHint => 'Điểm';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'Mùa $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'Chưa có mục nào';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'Hạng của bạn: #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score XP · Cấp $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'Cấp $level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'Bạn cần cấp độ $level để gửi GIF ở đây';
+  }
+
+  @override
+  String get arcadeNavLabel => 'Arcade';
+
+  @override
+  String get arcadeHomeTitle => 'Koda Arcade';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'Xem Điểm Cao Nhất';
+
+  @override
+  String get arcadeMinesweeperTitle => 'Dò Mìn';
+
+  @override
+  String get arcadeMinesweeperSubtitle =>
+      'Mở toàn bộ bảng mà không chạm phải mìn';
+
+  @override
+  String get arcadeMatch3Title => 'Nối Đá Quý';
+
+  @override
+  String get arcadeMatch3Subtitle => 'Nối 3 viên đá quý trở lên để ghi điểm';
+
+  @override
+  String get arcadeDifficultyBeginner => 'Mới bắt đầu';
+
+  @override
+  String get arcadeDifficultyIntermediate => 'Trung bình';
+
+  @override
+  String get arcadeDifficultyExpert => 'Chuyên gia';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return 'Mìn: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return 'Thời gian: ${seconds}s';
+  }
+
+  @override
+  String get arcadeNewGameButton => 'Chơi Mới';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'Đã Mở Toàn Bộ Bảng!';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return 'Bạn đã đạt $score điểm.';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'Nổ!';
+
+  @override
+  String get arcadeMinesweeperLoseBody => 'Bạn đã chạm mìn. Thử lại chứ?';
+
+  @override
+  String get arcadeScoreSubmittedNote =>
+      'Điểm số đã được gửi đến bảng xếp hạng của máy chủ này';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'Điểm: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return 'Lượt còn lại: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => 'Hết Lượt';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return 'Điểm cuối cùng: $score';
+  }
 }

@@ -615,6 +615,57 @@ class AppLocalizationsAr extends AppLocalizations {
   String get steamVisibleInComparison => 'مرئية في المقارنة';
 
   @override
+  String get channelEditDialogTypePreview => 'معاينة عامة';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'يمكن لأي شخص مشاهدته دون الانضمام، إذا كان هذا الخادم عامًا. لا يزال النشر يتطلب الانضمام (وقبول القواعد إن وجدت).';
+
+  @override
+  String get channelEditDialogGeneralSection => 'عام';
+
+  @override
+  String get channelEditDialogBehaviorSection => 'السلوك';
+
+  @override
+  String get channelEditDialogAccessSection => 'الوصول';
+
+  @override
+  String get serverThemeLibraryTitle => 'قوالب الخادم';
+
+  @override
+  String get serverThemeLibraryEmptyState => 'لا توجد قوالب متاحة بعد.';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return 'يتطلب مستوى تعزيز $level';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'معاينة: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote => 'هذه معاينة — لم يتم تطبيق أي شيء بعد.';
+
+  @override
+  String get serverThemeApplyButton => 'تطبيق القالب';
+
+  @override
+  String get serverThemeApplyError => 'تعذر تطبيق هذا القالب';
+
+  @override
+  String get serverThemeCardTitle => 'قوالب الخادم';
+
+  @override
+  String get serverThemeCardDescription =>
+      'تصفح أشكالًا منسقة وعايِن أحدها قبل تطبيقه.';
+
+  @override
+  String get serverThemeBrowseButton => 'تصفح القوالب';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5077,4 +5128,165 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => 'غير معروف';
+
+  @override
+  String get serverTabLeveling => 'المستوى';
+
+  @override
+  String get permManageLeaderboards => 'إدارة لوحات الصدارة';
+
+  @override
+  String get serverLevelingEnableLabel => 'نقاط خبرة السيرفر';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'يكسب الأعضاء نقاط خبرة ومستويات عند الدردشة. مفعّل افتراضيًا.';
+
+  @override
+  String get serverGifLevelGateLabel => 'الحد الأدنى للمستوى لإرسال GIF';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'أقل مستوى مطلوب لإرسال صور GIF في هذا السيرفر. 0 = بلا قيد.';
+
+  @override
+  String get serverOpenLeaderboards => 'عرض لوحات الصدارة';
+
+  @override
+  String get leaderboardScreenTitle => 'لوحات الصدارة';
+
+  @override
+  String get leaderboardCreateTitle => 'إنشاء لوحة صدارة';
+
+  @override
+  String get leaderboardNameHint => 'اسم لوحة الصدارة';
+
+  @override
+  String get leaderboardResetTitle => 'بدء موسم جديد';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return 'سيتم أرشفة الترتيب الحالي لـ \"$name\" وبدء موسم جديد. لا يمكن التراجع عن هذا.';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'بدء موسم جديد';
+
+  @override
+  String get leaderboardAdjustTitle => 'تعديل النقاط';
+
+  @override
+  String get leaderboardUserIdHint => 'رقم تعريف المستخدم';
+
+  @override
+  String get leaderboardScoreHint => 'النقاط';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'الموسم $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'لا توجد إدخالات بعد';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'ترتيبك: #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score خبرة · المستوى $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'مستوى $level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'تحتاج إلى المستوى $level لإرسال صور GIF هنا';
+  }
+
+  @override
+  String get arcadeNavLabel => 'الألعاب';
+
+  @override
+  String get arcadeHomeTitle => 'ساحة ألعاب كودا';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'عرض أعلى النتائج';
+
+  @override
+  String get arcadeMinesweeperTitle => 'كاسحة الألغام';
+
+  @override
+  String get arcadeMinesweeperSubtitle =>
+      'اكشف اللوحة بالكامل دون الضغط على لغم';
+
+  @override
+  String get arcadeMatch3Title => 'مطابقة الجواهر';
+
+  @override
+  String get arcadeMatch3Subtitle => 'طابق 3 جواهر أو أكثر لتسجيل النقاط';
+
+  @override
+  String get arcadeDifficultyBeginner => 'مبتدئ';
+
+  @override
+  String get arcadeDifficultyIntermediate => 'متوسط';
+
+  @override
+  String get arcadeDifficultyExpert => 'خبير';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return 'الألغام: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return 'الوقت: $secondsث';
+  }
+
+  @override
+  String get arcadeNewGameButton => 'لعبة جديدة';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'تم كشف اللوحة!';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return 'لقد سجلت $score نقطة.';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'انفجار!';
+
+  @override
+  String get arcadeMinesweeperLoseBody =>
+      'لقد ضغطت على لغم. هل تريد المحاولة مجددًا؟';
+
+  @override
+  String get arcadeScoreSubmittedNote =>
+      'تم إرسال النتيجة إلى لوحة صدارة هذا السيرفر';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'النتيجة: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return 'الحركات المتبقية: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => 'انتهت الحركات';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return 'النتيجة النهائية: $score';
+  }
 }

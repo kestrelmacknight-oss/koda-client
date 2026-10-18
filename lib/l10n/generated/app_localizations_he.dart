@@ -614,6 +614,58 @@ class AppLocalizationsHe extends AppLocalizations {
   String get steamVisibleInComparison => 'גלוי בהשוואה';
 
   @override
+  String get channelEditDialogTypePreview => 'תצוגה מקדימה ציבורית';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'גלוי לכל אחד ללא הצטרפות, אם השרת הזה ציבורי. פרסום עדיין דורש הצטרפות (וקבלת הכללים, אם ישנם).';
+
+  @override
+  String get channelEditDialogGeneralSection => 'כללי';
+
+  @override
+  String get channelEditDialogBehaviorSection => 'התנהגות';
+
+  @override
+  String get channelEditDialogAccessSection => 'גישה';
+
+  @override
+  String get serverThemeLibraryTitle => 'תבניות שרת';
+
+  @override
+  String get serverThemeLibraryEmptyState => 'אין עדיין תבניות זמינות.';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return 'דורש רמת בוסט $level';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'תצוגה מקדימה: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote =>
+      'זוהי תצוגה מקדימה — שום דבר עדיין לא הוחל.';
+
+  @override
+  String get serverThemeApplyButton => 'החל תבנית';
+
+  @override
+  String get serverThemeApplyError => 'לא ניתן היה להחיל תבנית זו';
+
+  @override
+  String get serverThemeCardTitle => 'תבניות שרת';
+
+  @override
+  String get serverThemeCardDescription =>
+      'עיין במראות נבחרים והצג תצוגה מקדימה לפני ההחלה.';
+
+  @override
+  String get serverThemeBrowseButton => 'עיין בתבניות';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5022,4 +5074,162 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => 'לא ידוע';
+
+  @override
+  String get serverTabLeveling => 'רמות';
+
+  @override
+  String get permManageLeaderboards => 'ניהול לוחות מובילים';
+
+  @override
+  String get serverLevelingEnableLabel => 'נק\' ניסיון של השרת';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'חברים מרוויחים נקודות ניסיון ורמות מצ\'אט. מופעל כברירת מחדל.';
+
+  @override
+  String get serverGifLevelGateLabel => 'רמה נדרשת לשליחת GIF';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'הרמה המינימלית לשליחת GIF בשרת הזה. 0 = ללא הגבלה.';
+
+  @override
+  String get serverOpenLeaderboards => 'הצג לוחות מובילים';
+
+  @override
+  String get leaderboardScreenTitle => 'לוחות מובילים';
+
+  @override
+  String get leaderboardCreateTitle => 'יצירת לוח מובילים';
+
+  @override
+  String get leaderboardNameHint => 'שם לוח המובילים';
+
+  @override
+  String get leaderboardResetTitle => 'איפוס עונה';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return 'פעולה זו תאחסן בארכיון את הטבלה הנוכחית של \"$name\" ותתחיל עונה חדשה. לא ניתן לבטל פעולה זו.';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'איפוס עונה';
+
+  @override
+  String get leaderboardAdjustTitle => 'עריכת ניקוד';
+
+  @override
+  String get leaderboardUserIdHint => 'מזהה משתמש';
+
+  @override
+  String get leaderboardScoreHint => 'ניקוד';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'עונה $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'אין עדיין רשומות';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'המיקום שלך: #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score נק\' · רמה $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'רמה $level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'נדרשת רמה $level כדי לשלוח כאן GIF';
+  }
+
+  @override
+  String get arcadeNavLabel => 'ארקייד';
+
+  @override
+  String get arcadeHomeTitle => 'ארקייד קודה';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'הצג תוצאות שיא';
+
+  @override
+  String get arcadeMinesweeperTitle => 'משחק המכרה';
+
+  @override
+  String get arcadeMinesweeperSubtitle => 'חשפו את כל הלוח מבלי לפגוע במכרה';
+
+  @override
+  String get arcadeMatch3Title => 'התאמת אבנים';
+
+  @override
+  String get arcadeMatch3Subtitle => 'התאימו 3 אבנים או יותר כדי לצבור נקודות';
+
+  @override
+  String get arcadeDifficultyBeginner => 'מתחיל';
+
+  @override
+  String get arcadeDifficultyIntermediate => 'בינוני';
+
+  @override
+  String get arcadeDifficultyExpert => 'מומחה';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return 'מכרות: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return 'זמן: $secondsש';
+  }
+
+  @override
+  String get arcadeNewGameButton => 'משחק חדש';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'הלוח נחשף!';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return 'צברת $score נקודות.';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'בום!';
+
+  @override
+  String get arcadeMinesweeperLoseBody => 'פגעת במכרה. לנסות שוב?';
+
+  @override
+  String get arcadeScoreSubmittedNote => 'התוצאה נשלחה ללוח המובילים של שרת זה';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'ניקוד: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return 'מהלכים שנותרו: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => 'נגמרו המהלכים';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return 'ניקוד סופי: $score';
+  }
 }

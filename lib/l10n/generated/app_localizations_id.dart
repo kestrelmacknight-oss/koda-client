@@ -623,6 +623,59 @@ class AppLocalizationsId extends AppLocalizations {
   String get steamVisibleInComparison => 'Terlihat dalam perbandingan';
 
   @override
+  String get channelEditDialogTypePreview => 'Pratinjau Publik';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'Dapat dilihat siapa saja tanpa bergabung, jika server ini publik. Untuk memposting tetap perlu bergabung (dan menyetujui aturan, jika ada).';
+
+  @override
+  String get channelEditDialogGeneralSection => 'Umum';
+
+  @override
+  String get channelEditDialogBehaviorSection => 'Perilaku';
+
+  @override
+  String get channelEditDialogAccessSection => 'Akses';
+
+  @override
+  String get serverThemeLibraryTitle => 'Template Server';
+
+  @override
+  String get serverThemeLibraryEmptyState =>
+      'Belum ada template yang tersedia.';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return 'Memerlukan level boost $level';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'Pratinjau: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote =>
+      'Ini adalah pratinjau — belum ada yang diterapkan.';
+
+  @override
+  String get serverThemeApplyButton => 'Terapkan Template';
+
+  @override
+  String get serverThemeApplyError => 'Tidak dapat menerapkan template ini';
+
+  @override
+  String get serverThemeCardTitle => 'Template Server';
+
+  @override
+  String get serverThemeCardDescription =>
+      'Jelajahi tampilan pilihan dan pratinjau sebelum menerapkannya.';
+
+  @override
+  String get serverThemeBrowseButton => 'Jelajahi Template';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5011,4 +5064,165 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => 'Tidak diketahui';
+
+  @override
+  String get serverTabLeveling => 'Leveling';
+
+  @override
+  String get permManageLeaderboards => 'Kelola Leaderboard';
+
+  @override
+  String get serverLevelingEnableLabel => 'XP Server';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'Anggota mendapatkan XP dan level dari chatting. Aktif secara default.';
+
+  @override
+  String get serverGifLevelGateLabel => 'Level minimum untuk GIF';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'Level minimum untuk mengirim GIF di server ini. 0 = tanpa batasan.';
+
+  @override
+  String get serverOpenLeaderboards => 'Lihat Leaderboard';
+
+  @override
+  String get leaderboardScreenTitle => 'Leaderboard';
+
+  @override
+  String get leaderboardCreateTitle => 'Buat Leaderboard';
+
+  @override
+  String get leaderboardNameHint => 'Nama leaderboard';
+
+  @override
+  String get leaderboardResetTitle => 'Reset Musim';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return 'Ini akan mengarsipkan peringkat saat ini untuk \"$name\" dan memulai musim baru. Tindakan ini tidak dapat dibatalkan.';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'Reset Musim';
+
+  @override
+  String get leaderboardAdjustTitle => 'Sesuaikan Skor';
+
+  @override
+  String get leaderboardUserIdHint => 'ID pengguna';
+
+  @override
+  String get leaderboardScoreHint => 'Skor';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'Musim $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'Belum ada entri';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'Peringkat Anda: #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score XP · Level $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'Lv. $level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'Anda perlu level $level untuk mengirim GIF di sini';
+  }
+
+  @override
+  String get arcadeNavLabel => 'Arcade';
+
+  @override
+  String get arcadeHomeTitle => 'Koda Arcade';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'Lihat Skor Tertinggi';
+
+  @override
+  String get arcadeMinesweeperTitle => 'Minesweeper';
+
+  @override
+  String get arcadeMinesweeperSubtitle =>
+      'Bersihkan seluruh papan tanpa mengenai ranjau';
+
+  @override
+  String get arcadeMatch3Title => 'Cocokkan Permata';
+
+  @override
+  String get arcadeMatch3Subtitle =>
+      'Cocokkan 3 atau lebih permata untuk mendapatkan poin';
+
+  @override
+  String get arcadeDifficultyBeginner => 'Pemula';
+
+  @override
+  String get arcadeDifficultyIntermediate => 'Menengah';
+
+  @override
+  String get arcadeDifficultyExpert => 'Ahli';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return 'Ranjau: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return 'Waktu: ${seconds}d';
+  }
+
+  @override
+  String get arcadeNewGameButton => 'Permainan Baru';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'Papan Berhasil Dibersihkan!';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return 'Anda mendapatkan $score poin.';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'Dar!';
+
+  @override
+  String get arcadeMinesweeperLoseBody => 'Anda mengenai ranjau. Coba lagi?';
+
+  @override
+  String get arcadeScoreSubmittedNote =>
+      'Skor dikirim ke leaderboard server ini';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'Skor: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return 'Langkah tersisa: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => 'Langkah Habis';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return 'Skor akhir: $score';
+  }
 }

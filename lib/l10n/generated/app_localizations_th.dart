@@ -619,6 +619,57 @@ class AppLocalizationsTh extends AppLocalizations {
   String get steamVisibleInComparison => 'มองเห็นได้ในการเปรียบเทียบ';
 
   @override
+  String get channelEditDialogTypePreview => 'ตัวอย่างสาธารณะ';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'ทุกคนมองเห็นได้โดยไม่ต้องเข้าร่วม หากเซิร์ฟเวอร์นี้เป็นสาธารณะ การโพสต์ยังคงต้องเข้าร่วม (และยอมรับกฎ หากมี)';
+
+  @override
+  String get channelEditDialogGeneralSection => 'ทั่วไป';
+
+  @override
+  String get channelEditDialogBehaviorSection => 'พฤติกรรม';
+
+  @override
+  String get channelEditDialogAccessSection => 'การเข้าถึง';
+
+  @override
+  String get serverThemeLibraryTitle => 'เทมเพลตเซิร์ฟเวอร์';
+
+  @override
+  String get serverThemeLibraryEmptyState => 'ยังไม่มีเทมเพลตให้ใช้งาน';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return 'ต้องการระดับบูสต์ $level';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'ตัวอย่าง: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote => 'นี่คือตัวอย่าง — ยังไม่มีการใช้งานจริง';
+
+  @override
+  String get serverThemeApplyButton => 'ใช้เทมเพลต';
+
+  @override
+  String get serverThemeApplyError => 'ไม่สามารถใช้เทมเพลตนี้ได้';
+
+  @override
+  String get serverThemeCardTitle => 'เทมเพลตเซิร์ฟเวอร์';
+
+  @override
+  String get serverThemeCardDescription =>
+      'เรียกดูลุคที่คัดสรรและดูตัวอย่างก่อนนำไปใช้';
+
+  @override
+  String get serverThemeBrowseButton => 'เรียกดูเทมเพลต';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -4988,4 +5039,163 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => 'ไม่ทราบชื่อ';
+
+  @override
+  String get serverTabLeveling => 'เลเวล';
+
+  @override
+  String get permManageLeaderboards => 'จัดการกระดานผู้นำ';
+
+  @override
+  String get serverLevelingEnableLabel => 'XP ของเซิร์ฟเวอร์';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'สมาชิกจะได้รับ XP และเลเวลจากการแชท เปิดใช้งานเป็นค่าเริ่มต้น';
+
+  @override
+  String get serverGifLevelGateLabel => 'เลเวลที่ต้องใช้ในการส่ง GIF';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'เลเวลขั้นต่ำที่ต้องใช้ในการส่ง GIF ในเซิร์ฟเวอร์นี้ 0 = ไม่มีข้อจำกัด';
+
+  @override
+  String get serverOpenLeaderboards => 'ดูกระดานผู้นำ';
+
+  @override
+  String get leaderboardScreenTitle => 'กระดานผู้นำ';
+
+  @override
+  String get leaderboardCreateTitle => 'สร้างกระดานผู้นำ';
+
+  @override
+  String get leaderboardNameHint => 'ชื่อกระดานผู้นำ';
+
+  @override
+  String get leaderboardResetTitle => 'รีเซ็ตซีซัน';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return 'การทำเช่นนี้จะเก็บถาวรอันดับปัจจุบันของ \"$name\" และเริ่มซีซันใหม่ ไม่สามารถย้อนกลับได้';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'รีเซ็ตซีซัน';
+
+  @override
+  String get leaderboardAdjustTitle => 'ปรับคะแนน';
+
+  @override
+  String get leaderboardUserIdHint => 'รหัสผู้ใช้';
+
+  @override
+  String get leaderboardScoreHint => 'คะแนน';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'ซีซัน $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'ยังไม่มีรายการ';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'อันดับของคุณ: #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score XP · เลเวล $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'Lv. $level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'คุณต้องมีเลเวล $level เพื่อส่ง GIF ที่นี่';
+  }
+
+  @override
+  String get arcadeNavLabel => 'เกมอาเขต';
+
+  @override
+  String get arcadeHomeTitle => 'Koda อาเขต';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'ดูคะแนนสูงสุด';
+
+  @override
+  String get arcadeMinesweeperTitle => 'กู้ระเบิด';
+
+  @override
+  String get arcadeMinesweeperSubtitle => 'เปิดกระดานทั้งหมดโดยไม่เหยียบระเบิด';
+
+  @override
+  String get arcadeMatch3Title => 'จับคู่อัญมณี';
+
+  @override
+  String get arcadeMatch3Subtitle => 'จับคู่อัญมณี 3 ชิ้นขึ้นไปเพื่อทำคะแนน';
+
+  @override
+  String get arcadeDifficultyBeginner => 'ผู้เริ่มต้น';
+
+  @override
+  String get arcadeDifficultyIntermediate => 'ระดับกลาง';
+
+  @override
+  String get arcadeDifficultyExpert => 'ผู้เชี่ยวชาญ';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return 'ระเบิด: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return 'เวลา: $secondsวิ';
+  }
+
+  @override
+  String get arcadeNewGameButton => 'เกมใหม่';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'เปิดกระดานสำเร็จ!';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return 'คุณทำได้ $score คะแนน';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'บูม!';
+
+  @override
+  String get arcadeMinesweeperLoseBody => 'คุณเหยียบระเบิด ลองใหม่อีกครั้งไหม?';
+
+  @override
+  String get arcadeScoreSubmittedNote =>
+      'ส่งคะแนนไปยังกระดานผู้นำของเซิร์ฟเวอร์นี้แล้ว';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'คะแนน: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return 'ตาที่เหลือ: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => 'หมดตาเดิน';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return 'คะแนนสุดท้าย: $score';
+  }
 }

@@ -314,9 +314,15 @@ class KodaApi {
     } catch (e) {
       _log('sendMessage', e);
       final statusCode = e is DioException ? e.response?.statusCode : null;
+      // "level_gated" (403, e.g. a GIF below the server's configured
+      // level requirement -- see Koda.Chat.send_message/4) carries a
+      // required_level the generic errorCode alone can't, hence
+      // errorBody too.
       return KodaApiResult(
         statusCode: statusCode,
-        errorCode: statusCode == 429 ? 'rate_limited' : null,
+        errorCode: statusCode == 429 ? 'rate_limited' : (e is DioException ? _errorCodeOf(e) : null),
+        errorBody: e is DioException && e.response?.data is Map<String, dynamic>
+            ? e.response?.data as Map<String, dynamic> : null,
       );
     }
   }
@@ -2602,6 +2608,112 @@ class KodaApi {
       });
       return res.data['server'] as Map<String, dynamic>?;
     } catch (e) { _log('updateServerCosmetics', e); return null; }
+  }
+
+  /// leveling_enabled defaults true server-side; level_gates is a free-
+  /// form map (e.g. {"gif": 7}) -- see Koda.Servers.update_leveling_config/3.
+  Future<Map<String, dynamic>?> updateLevelingConfig(
+    String serverId, {
+    bool? levelingEnabled,
+    Map<String, int>? levelGates,
+  }) async {
+    try {
+      final res = await _dio.patch('/servers/$serverId/leveling_config', data: {
+        if (levelingEnabled != null) 'leveling_enabled': levelingEnabled,
+        if (levelGates != null) 'level_gates': levelGates,
+      });
+      return res.data['server'] as Map<String, dynamic>?;
+    } catch (e) { _log('updateLevelingConfig', e); return null; }
+  }
+
+  // -- Leaderboards (Koda.Leaderboards -- XP/leveling + custom leaderboards) ---
+  //
+  // Deliberately never called "points" anywhere -- that word is owned
+  // by the Marketplace's Server Bank revenue ledger, a separate concept.
+
+  Future<List<Map<String, dynamic>>> getLeaderboards(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/leaderboards');
+      return List<Map<String, dynamic>>.from(res.data['leaderboards'] ?? []);
+    } catch (e) { _log('getLeaderboards', e); return []; }
+  }
+
+  Future<Map<String, dynamic>?> createCustomLeaderboard(String serverId, String name) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/leaderboards', data: {'name': name});
+      return res.data['leaderboard'] as Map<String, dynamic>?;
+    } catch (e) { _log('createCustomLeaderboard', e); return null; }
+  }
+
+  Future<bool> deleteLeaderboard(String leaderboardId) async {
+    try {
+      await _dio.delete('/leaderboards/$leaderboardId');
+      return true;
+    } catch (e) { _log('deleteLeaderboard', e); return false; }
+  }
+
+  /// Snapshots current standings, clears live entries, bumps
+  /// season_number -- works for the XP leaderboard or a custom one.
+  Future<Map<String, dynamic>?> resetLeaderboardSeason(String leaderboardId) async {
+    try {
+      final res = await _dio.post('/leaderboards/$leaderboardId/reset');
+      return res.data['leaderboard'] as Map<String, dynamic>?;
+    } catch (e) { _log('resetLeaderboardSeason', e); return null; }
+  }
+
+  /// Custom leaderboards only -- pass exactly one of [score] (set
+  /// absolute) or [delta] (increment/decrement).
+  Future<bool> adjustLeaderboardEntry(String leaderboardId, String userId, {int? score, int? delta}) async {
+    try {
+      await _dio.post('/leaderboards/$leaderboardId/entries/$userId/adjust', data: {
+        if (score != null) 'score': score,
+        if (delta != null) 'delta': delta,
+      });
+      return true;
+    } catch (e) { _log('adjustLeaderboardEntry', e); return false; }
+  }
+
+  // -- Koda Arcade (Minesweeper, Gem Match) -- self-reported scores ------------
+  //
+  // Feeds the same Koda.Leaderboards tables above under "arcade_*" kinds,
+  // which is why the result round-trips through getLeaderboards like any
+  // other leaderboard -- no separate arcade-specific read endpoint needed.
+
+  /// [game] is the URL slug ("minesweeper" or "match3"). Only ever raises
+  /// the caller's own best score server-side -- a worse run is a harmless
+  /// no-op, never overwrites a better one. Returns the resulting best score.
+  Future<int?> submitArcadeScore(String serverId, String game, int score) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/arcade/$game/score', data: {'score': score});
+      return res.data['best_score'] as int?;
+    } catch (e) { _log('submitArcadeScore', e); return null; }
+  }
+
+  // -- Server templates (Koda.ServerThemes -- curated cosmetics presets) -------
+  //
+  // Named ServerTheme server-side to avoid colliding with the
+  // unrelated Discord-import "template" concept (previewDiscordTemplate/
+  // applyDiscordTemplate below); "Server Templates" is still the
+  // right user-facing name for this feature.
+
+  /// Every active theme plus whether this server's current boost level
+  /// actually unlocks it (server-computed, see
+  /// Koda.ServerThemes.list_themes_with_lock_status/1).
+  Future<List<Map<String, dynamic>>> getServerThemes(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/themes');
+      return List<Map<String, dynamic>>.from(res.data['themes'] ?? []);
+    } catch (e) { _log('getServerThemes', e); return []; }
+  }
+
+  /// Applies a theme's whole cosmetics bundle in one call -- same
+  /// silent-partial-degrade behavior as updateServerCosmetics above if
+  /// the server is somehow below the theme's required level.
+  Future<Map<String, dynamic>?> applyServerTheme(String serverId, String themeId) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/themes/$themeId/apply');
+      return res.data['server'] as Map<String, dynamic>?;
+    } catch (e) { _log('applyServerTheme', e); return null; }
   }
 
   // -- Server subscriptions ----------------------------------------------------

@@ -328,9 +328,13 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
       final url = firstUrl(text);
       if (url != null) _attachLinkPreview(channelId, msg['id'] as String, url);
     } else if (mounted) {
+      final t = AppLocalizations.of(context);
+      final requiredLevel = result.errorBody?['required_level'] as int?;
       final message = result.errorCode == 'rate_limited'
           ? "You're sending messages too fast -- slow down a bit."
-          : "Message not sent -- you may not have permission to post here.";
+          : result.errorCode == 'level_gated' && requiredLevel != null
+              ? t.chatGifLevelGated(requiredLevel)
+              : "Message not sent -- you may not have permission to post here.";
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
     }
   }

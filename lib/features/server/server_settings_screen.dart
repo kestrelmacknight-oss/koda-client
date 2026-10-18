@@ -26,6 +26,8 @@ import 'discord_import_dialog.dart';
 import 'bots_tab.dart';
 import 'threshold_moderation_tab.dart';
 import '../visp/visp_setup_dialog.dart';
+import 'server_theme_library_screen.dart';
+import 'leaderboard_screen.dart';
 
 class ServerSettingsScreen extends ConsumerStatefulWidget {
   const ServerSettingsScreen({super.key});
@@ -60,6 +62,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   bool _uploadingBackground = false;
   final _marketplaceLinkCtrl = TextEditingController();
   final _descriptionCtrl = TextEditingController();
+  final _gifLevelGateCtrl = TextEditingController();
   bool _savingDescription = false;
 
   // Matches the flat permission map used server-side on Koda.Servers.Role.
@@ -67,7 +70,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     'view_channels', 'send_messages', 'connect_voice', 'manage_server',
     'manage_channels', 'manage_roles', 'manage_messages',
     'kick_members', 'ban_members', 'mute_members', 'mention_everyone', 'manage_marketplace',
-    'announce_live', 'move_members',
+    'announce_live', 'move_members', 'manage_leaderboards',
   ];
 
   // Not static const -- labels are localized, which needs a BuildContext.
@@ -86,6 +89,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     'manage_marketplace': t.permManageMarketplace,
     'announce_live':    t.permAnnounceLive,
     'move_members':     t.permMoveMembers,
+    'manage_leaderboards': t.permManageLeaderboards,
   };
 
   static const List<String> _colorSwatches = [
@@ -96,7 +100,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 12, vsync: this);
+    _tabController = TabController(length: 13, vsync: this);
     _loadAll();
     _loadPrintfulStatus();
     _loadTiltifyStatus();
@@ -106,6 +110,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         ref.read(selectedServerProvider)?['marketplace_link'] as String? ?? '';
     _descriptionCtrl.text =
         ref.read(selectedServerProvider)?['description'] as String? ?? '';
+    final levelGates = ref.read(selectedServerProvider)?['level_gates'] as Map?;
+    _gifLevelGateCtrl.text = (levelGates?['gif'] as int? ?? 0).toString();
   }
 
   Future<void> _loadEmoji() async {
@@ -257,6 +263,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     _tabController.dispose();
     _marketplaceLinkCtrl.dispose();
     _descriptionCtrl.dispose();
+    _gifLevelGateCtrl.dispose();
     super.dispose();
   }
 
@@ -601,6 +608,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             Tab(text: t.serverTabThresholdMod),
             Tab(text: t.serverTabCharity),
             Tab(text: t.serverTabBots),
+            Tab(text: t.serverTabLeveling),
           ],
         ),
       ),
@@ -612,7 +620,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                   _buildInvitesTab(), _buildMerchTab(), _buildEmojiTab(),
                   _buildCustomizeTab(), _buildAuditLogTab(), _buildReportsTab(),
                   ThresholdModerationTab(serverId: _serverId, members: _members, channels: _channels),
-                  _buildCharityTab(), BotsTab(serverId: _serverId)],
+                  _buildCharityTab(), BotsTab(serverId: _serverId), _buildLevelingTab()],
             ),
     );
   }
@@ -690,6 +698,94 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           ),
         ),
     ]);
+  }
+
+  // -- Leveling (Koda.Leaderboards -- server XP + custom leaderboards) ------
+  //
+  // This screen has no client-side "can I manage X" gate anywhere else
+  // (every tab just calls the API and lets the server's own permission
+  // check reject it), so canManage is passed through as true here too --
+  // LeaderboardScreen's management actions (create/delete/reset/adjust)
+  // fail the same way any other under-permissioned action in this screen
+  // already does, via the server's manage_leaderboards check.
+
+  Widget _buildLevelingTab() {
+    final t = AppLocalizations.of(context);
+    final server = ref.watch(selectedServerProvider);
+    final levelingEnabled = server?['leveling_enabled'] as bool? ?? true;
+
+    return ListView(padding: const EdgeInsets.all(20), children: [
+      Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: KodaColors.card,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: KodaColors.border),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(t.serverLevelingEnableLabel, style: TextStyle(
+                  color: KodaColors.text1, fontSize: 13, fontWeight: FontWeight.w600)),
+              Text(t.serverLevelingEnableDescription,
+                  style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+            ])),
+            Switch(
+              value: levelingEnabled,
+              activeThumbColor: KodaColors.koda,
+              onChanged: _setLevelingEnabled,
+            ),
+          ]),
+          const SizedBox(height: 12),
+          Text(t.serverGifLevelGateLabel,
+              style: TextStyle(color: KodaColors.text2, fontSize: 12)),
+          Text(t.serverGifLevelGateDescription,
+              style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+          const SizedBox(height: 6),
+          Row(children: [
+            SizedBox(
+              width: 80,
+              child: KodaTextField(
+                controller: _gifLevelGateCtrl,
+                hintText: '0',
+                keyboardType: TextInputType.number,
+                onSubmitted: (_) => _saveGifLevelGate(),
+              ),
+            ),
+            const SizedBox(width: 8),
+            TextButton(onPressed: _saveGifLevelGate, child: Text(t.commonSave)),
+          ]),
+        ]),
+      ),
+      const SizedBox(height: 16),
+      ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: KodaColors.koda,
+          foregroundColor: Colors.black,
+          minimumSize: const Size(double.infinity, 40),
+        ),
+        icon: const Icon(Icons.leaderboard, size: 16),
+        label: Text(t.serverOpenLeaderboards),
+        onPressed: () => Navigator.push(context, MaterialPageRoute(
+            builder: (_) => LeaderboardScreen(serverId: _serverId, canManage: true))),
+      ),
+    ]);
+  }
+
+  Future<void> _setLevelingEnabled(bool value) async {
+    final updated = await KodaApi.instance.updateLevelingConfig(_serverId, levelingEnabled: value);
+    if (updated != null && mounted) {
+      ref.read(selectedServerProvider.notifier).state = updated;
+    }
+  }
+
+  Future<void> _saveGifLevelGate() async {
+    final level = int.tryParse(_gifLevelGateCtrl.text.trim()) ?? 0;
+    final updated = await KodaApi.instance.updateLevelingConfig(
+        _serverId, levelGates: {'gif': level});
+    if (updated != null && mounted) {
+      ref.read(selectedServerProvider.notifier).state = updated;
+    }
   }
 
   // -- Charity (Tiltify campaign display) ------------------------------------
@@ -1007,6 +1103,21 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         child: Text(t.serverCurrentBoostLevel(level),
             style: TextStyle(color: KodaColors.text2, fontSize: 12, fontWeight: FontWeight.w600)),
       ),
+      _customizeCard(
+        title: t.serverThemeCardTitle,
+        description: t.serverThemeCardDescription,
+        unlocked: cosmeticsUnlocked,
+        lockedHint: t.serverBackgroundLockedHint,
+        child: cosmeticsUnlocked
+            ? OutlinedButton.icon(
+                icon: Icon(Icons.palette_outlined, size: 16, color: KodaColors.koda),
+                label: Text(t.serverThemeBrowseButton),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => ServerThemeLibraryScreen(serverId: _serverId))),
+              )
+            : null,
+      ),
+      const SizedBox(height: 16),
       _customizeCard(
         title: t.serverBackgroundTitle,
         description: t.serverBackgroundDescription,

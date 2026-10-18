@@ -616,6 +616,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String get steamVisibleInComparison => 'Visible in comparison';
 
   @override
+  String get channelEditDialogTypePreview => 'Public Preview';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'Viewable by anyone without joining, if this server is public. Still requires joining (and accepting rules, if any) to post.';
+
+  @override
+  String get channelEditDialogGeneralSection => 'General';
+
+  @override
+  String get channelEditDialogBehaviorSection => 'Behavior';
+
+  @override
+  String get channelEditDialogAccessSection => 'Access';
+
+  @override
+  String get serverThemeLibraryTitle => 'Server Templates';
+
+  @override
+  String get serverThemeLibraryEmptyState => 'No templates available yet.';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return 'Requires boost level $level';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'Preview: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote =>
+      'This is a preview — nothing has been applied yet.';
+
+  @override
+  String get serverThemeApplyButton => 'Apply Template';
+
+  @override
+  String get serverThemeApplyError => 'Could not apply this template';
+
+  @override
+  String get serverThemeCardTitle => 'Server Templates';
+
+  @override
+  String get serverThemeCardDescription =>
+      'Browse curated looks and preview one before applying it.';
+
+  @override
+  String get serverThemeBrowseButton => 'Browse Templates';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5002,4 +5054,164 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => 'Unknown';
+
+  @override
+  String get serverTabLeveling => 'Leveling';
+
+  @override
+  String get permManageLeaderboards => 'Manage Leaderboards';
+
+  @override
+  String get serverLevelingEnableLabel => 'Server XP';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'Members earn XP and levels for chatting. Enabled by default.';
+
+  @override
+  String get serverGifLevelGateLabel => 'GIF level requirement';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'Minimum level required to send GIFs in this server. 0 = no requirement.';
+
+  @override
+  String get serverOpenLeaderboards => 'View Leaderboards';
+
+  @override
+  String get leaderboardScreenTitle => 'Leaderboards';
+
+  @override
+  String get leaderboardCreateTitle => 'Create Leaderboard';
+
+  @override
+  String get leaderboardNameHint => 'Leaderboard name';
+
+  @override
+  String get leaderboardResetTitle => 'Reset Season';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return 'This will archive the current standings for \"$name\" and start a fresh season. This can\'t be undone.';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'Reset Season';
+
+  @override
+  String get leaderboardAdjustTitle => 'Adjust Score';
+
+  @override
+  String get leaderboardUserIdHint => 'User ID';
+
+  @override
+  String get leaderboardScoreHint => 'Score';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'Season $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'No entries yet';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'Your rank: #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score XP · Level $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'Lv. $level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'You need level $level to send GIFs here';
+  }
+
+  @override
+  String get arcadeNavLabel => 'Arcade';
+
+  @override
+  String get arcadeHomeTitle => 'Koda Arcade';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'View High Scores';
+
+  @override
+  String get arcadeMinesweeperTitle => 'Minesweeper';
+
+  @override
+  String get arcadeMinesweeperSubtitle =>
+      'Clear the board without hitting a mine';
+
+  @override
+  String get arcadeMatch3Title => 'Gem Match';
+
+  @override
+  String get arcadeMatch3Subtitle => 'Match 3 or more gems to score points';
+
+  @override
+  String get arcadeDifficultyBeginner => 'Beginner';
+
+  @override
+  String get arcadeDifficultyIntermediate => 'Intermediate';
+
+  @override
+  String get arcadeDifficultyExpert => 'Expert';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return 'Mines: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return 'Time: ${seconds}s';
+  }
+
+  @override
+  String get arcadeNewGameButton => 'New Game';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'Board Cleared!';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return 'You scored $score points.';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'Boom!';
+
+  @override
+  String get arcadeMinesweeperLoseBody => 'You hit a mine. Give it another go?';
+
+  @override
+  String get arcadeScoreSubmittedNote =>
+      'Score sent to this server\'s leaderboard';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'Score: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return 'Moves left: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => 'Out of Moves';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return 'Final score: $score';
+  }
 }

@@ -625,6 +625,59 @@ class AppLocalizationsCs extends AppLocalizations {
   String get steamVisibleInComparison => 'Viditelné v porovnání';
 
   @override
+  String get channelEditDialogTypePreview => 'Veřejný náhled';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'Viditelný pro kohokoli bez připojení, pokud je tento server veřejný. Pro psaní je stále nutné se připojit (a přijmout pravidla, pokud existují).';
+
+  @override
+  String get channelEditDialogGeneralSection => 'Obecné';
+
+  @override
+  String get channelEditDialogBehaviorSection => 'Chování';
+
+  @override
+  String get channelEditDialogAccessSection => 'Přístup';
+
+  @override
+  String get serverThemeLibraryTitle => 'Šablony serveru';
+
+  @override
+  String get serverThemeLibraryEmptyState =>
+      'Zatím nejsou k dispozici žádné šablony.';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return 'Vyžaduje úroveň posílení $level';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'Náhled: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote =>
+      'Toto je náhled — zatím nebylo nic použito.';
+
+  @override
+  String get serverThemeApplyButton => 'Použít šablonu';
+
+  @override
+  String get serverThemeApplyError => 'Tuto šablonu se nepodařilo použít';
+
+  @override
+  String get serverThemeCardTitle => 'Šablony serveru';
+
+  @override
+  String get serverThemeCardDescription =>
+      'Procházejte vybrané vzhledy a prohlédněte si je před použitím.';
+
+  @override
+  String get serverThemeBrowseButton => 'Procházet šablony';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5090,4 +5143,165 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => 'Neznámý';
+
+  @override
+  String get serverTabLeveling => 'Úrovně';
+
+  @override
+  String get permManageLeaderboards => 'Správa žebříčků';
+
+  @override
+  String get serverLevelingEnableLabel => 'Serverové XP';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'Členové získávají XP a úrovně za psaní zpráv. Výchozí je zapnuto.';
+
+  @override
+  String get serverGifLevelGateLabel => 'Požadovaná úroveň pro GIFy';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'Minimální úroveň potřebná k odesílání GIFů na tomto serveru. 0 = bez omezení.';
+
+  @override
+  String get serverOpenLeaderboards => 'Zobrazit žebříčky';
+
+  @override
+  String get leaderboardScreenTitle => 'Žebříčky';
+
+  @override
+  String get leaderboardCreateTitle => 'Vytvořit žebříček';
+
+  @override
+  String get leaderboardNameHint => 'Název žebříčku';
+
+  @override
+  String get leaderboardResetTitle => 'Nová sezóna';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return 'Tím se archivuje aktuální pořadí pro \"$name\" a začne nová sezóna. Tuto akci nelze vrátit.';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'Spustit novou sezónu';
+
+  @override
+  String get leaderboardAdjustTitle => 'Upravit skóre';
+
+  @override
+  String get leaderboardUserIdHint => 'ID uživatele';
+
+  @override
+  String get leaderboardScoreHint => 'Skóre';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'Sezóna $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'Zatím žádné záznamy';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'Vaše pořadí: #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score XP · Úroveň $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'Úr. $level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'Pro odesílání GIFů zde potřebujete úroveň $level';
+  }
+
+  @override
+  String get arcadeNavLabel => 'Arkáda';
+
+  @override
+  String get arcadeHomeTitle => 'Koda Arkáda';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'Zobrazit nejlepší výsledky';
+
+  @override
+  String get arcadeMinesweeperTitle => 'Minové pole';
+
+  @override
+  String get arcadeMinesweeperSubtitle =>
+      'Odkryj celou desku, aniž bys trefil minu';
+
+  @override
+  String get arcadeMatch3Title => 'Spoj drahokamy';
+
+  @override
+  String get arcadeMatch3Subtitle =>
+      'Spojuj 3 nebo více drahokamů a sbírej body';
+
+  @override
+  String get arcadeDifficultyBeginner => 'Začátečník';
+
+  @override
+  String get arcadeDifficultyIntermediate => 'Pokročilý';
+
+  @override
+  String get arcadeDifficultyExpert => 'Expert';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return 'Miny: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return 'Čas: ${seconds}s';
+  }
+
+  @override
+  String get arcadeNewGameButton => 'Nová hra';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'Deska odkryta!';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return 'Získal jsi $score bodů.';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'Bum!';
+
+  @override
+  String get arcadeMinesweeperLoseBody => 'Trefil jsi minu. Zkusíš to znovu?';
+
+  @override
+  String get arcadeScoreSubmittedNote =>
+      'Výsledek odeslán do žebříčku tohoto serveru';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'Skóre: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return 'Zbývající tahy: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => 'Došly tahy';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return 'Konečné skóre: $score';
+  }
 }

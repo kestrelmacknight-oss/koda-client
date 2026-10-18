@@ -621,6 +621,58 @@ class AppLocalizationsSv extends AppLocalizations {
   String get steamVisibleInComparison => 'Synlig i jämförelsen';
 
   @override
+  String get channelEditDialogTypePreview => 'Offentlig förhandsgranskning';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'Synlig för alla utan att gå med, om servern är offentlig. Att posta kräver fortfarande att man går med (och accepterar reglerna, om sådana finns).';
+
+  @override
+  String get channelEditDialogGeneralSection => 'Allmänt';
+
+  @override
+  String get channelEditDialogBehaviorSection => 'Beteende';
+
+  @override
+  String get channelEditDialogAccessSection => 'Åtkomst';
+
+  @override
+  String get serverThemeLibraryTitle => 'Serverteman';
+
+  @override
+  String get serverThemeLibraryEmptyState => 'Inga mallar tillgängliga ännu.';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return 'Kräver boostnivå $level';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'Förhandsgranskning: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote =>
+      'Det här är en förhandsgranskning — inget har tillämpats än.';
+
+  @override
+  String get serverThemeApplyButton => 'Tillämpa mall';
+
+  @override
+  String get serverThemeApplyError => 'Kunde inte tillämpa den här mallen';
+
+  @override
+  String get serverThemeCardTitle => 'Serverteman';
+
+  @override
+  String get serverThemeCardDescription =>
+      'Bläddra bland utvalda utseenden och förhandsgranska innan du tillämpar.';
+
+  @override
+  String get serverThemeBrowseButton => 'Bläddra bland mallar';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5027,4 +5079,165 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => 'Okänd';
+
+  @override
+  String get serverTabLeveling => 'Nivåer';
+
+  @override
+  String get permManageLeaderboards => 'Hantera topplistor';
+
+  @override
+  String get serverLevelingEnableLabel => 'Server-XP';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'Medlemmar tjänar XP och nivåer genom att chatta. Aktiverat som standard.';
+
+  @override
+  String get serverGifLevelGateLabel => 'Nivå som krävs för GIF-bilder';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'Lägsta nivå för att skicka GIF-bilder på den här servern. 0 = ingen begränsning.';
+
+  @override
+  String get serverOpenLeaderboards => 'Visa topplistor';
+
+  @override
+  String get leaderboardScreenTitle => 'Topplistor';
+
+  @override
+  String get leaderboardCreateTitle => 'Skapa topplista';
+
+  @override
+  String get leaderboardNameHint => 'Topplistans namn';
+
+  @override
+  String get leaderboardResetTitle => 'Återställ säsong';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return 'Detta arkiverar den aktuella placeringen för \"$name\" och startar en ny säsong. Detta kan inte ångras.';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'Återställ säsong';
+
+  @override
+  String get leaderboardAdjustTitle => 'Justera poäng';
+
+  @override
+  String get leaderboardUserIdHint => 'Användar-ID';
+
+  @override
+  String get leaderboardScoreHint => 'Poäng';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'Säsong $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'Inga poster än';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'Din placering: #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score XP · Nivå $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'Nivå $level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'Du behöver nivå $level för att skicka GIF-bilder här';
+  }
+
+  @override
+  String get arcadeNavLabel => 'Arkad';
+
+  @override
+  String get arcadeHomeTitle => 'Koda Arkad';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'Visa topplistor';
+
+  @override
+  String get arcadeMinesweeperTitle => 'Minröjaren';
+
+  @override
+  String get arcadeMinesweeperSubtitle =>
+      'Rensa hela brädet utan att träffa en mina';
+
+  @override
+  String get arcadeMatch3Title => 'Ädelstensmatchning';
+
+  @override
+  String get arcadeMatch3Subtitle =>
+      'Matcha 3 eller fler ädelstenar för att få poäng';
+
+  @override
+  String get arcadeDifficultyBeginner => 'Nybörjare';
+
+  @override
+  String get arcadeDifficultyIntermediate => 'Medel';
+
+  @override
+  String get arcadeDifficultyExpert => 'Expert';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return 'Minor: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return 'Tid: ${seconds}s';
+  }
+
+  @override
+  String get arcadeNewGameButton => 'Nytt spel';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'Brädet rensat!';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return 'Du fick $score poäng.';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'Bom!';
+
+  @override
+  String get arcadeMinesweeperLoseBody => 'Du träffade en mina. Försöka igen?';
+
+  @override
+  String get arcadeScoreSubmittedNote =>
+      'Poäng skickat till den här serverns topplista';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'Poäng: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return 'Drag kvar: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => 'Inga fler drag';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return 'Slutpoäng: $score';
+  }
 }

@@ -598,6 +598,56 @@ class AppLocalizationsJa extends AppLocalizations {
   String get steamVisibleInComparison => '比較で表示中';
 
   @override
+  String get channelEditDialogTypePreview => '公開プレビュー';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'このサーバーが公開されている場合、参加しなくても誰でも閲覧できます。投稿するには参加(とルールがある場合はその同意)が必要です。';
+
+  @override
+  String get channelEditDialogGeneralSection => '一般';
+
+  @override
+  String get channelEditDialogBehaviorSection => '動作';
+
+  @override
+  String get channelEditDialogAccessSection => 'アクセス';
+
+  @override
+  String get serverThemeLibraryTitle => 'サーバーテンプレート';
+
+  @override
+  String get serverThemeLibraryEmptyState => 'まだ利用可能なテンプレートはありません。';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return 'ブーストレベル$levelが必要です';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'プレビュー: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote => 'これはプレビューです — まだ何も適用されていません。';
+
+  @override
+  String get serverThemeApplyButton => 'テンプレートを適用';
+
+  @override
+  String get serverThemeApplyError => 'このテンプレートを適用できませんでした';
+
+  @override
+  String get serverThemeCardTitle => 'サーバーテンプレート';
+
+  @override
+  String get serverThemeCardDescription => '厳選されたルックを閲覧し、適用前にプレビューできます。';
+
+  @override
+  String get serverThemeBrowseButton => 'テンプレートを閲覧';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -4871,4 +4921,162 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => '不明';
+
+  @override
+  String get serverTabLeveling => 'レベル';
+
+  @override
+  String get permManageLeaderboards => 'リーダーボードの管理';
+
+  @override
+  String get serverLevelingEnableLabel => 'サーバーXP';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'メンバーはチャットでXPとレベルを獲得します。デフォルトで有効です。';
+
+  @override
+  String get serverGifLevelGateLabel => 'GIF送信に必要なレベル';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'このサーバーでGIFを送信するために必要な最低レベル。0=制限なし。';
+
+  @override
+  String get serverOpenLeaderboards => 'リーダーボードを表示';
+
+  @override
+  String get leaderboardScreenTitle => 'リーダーボード';
+
+  @override
+  String get leaderboardCreateTitle => 'リーダーボードを作成';
+
+  @override
+  String get leaderboardNameHint => 'リーダーボード名';
+
+  @override
+  String get leaderboardResetTitle => 'シーズンをリセット';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return '「$name」の現在の順位がアーカイブされ、新しいシーズンが始まります。この操作は取り消せません。';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'シーズンをリセット';
+
+  @override
+  String get leaderboardAdjustTitle => 'スコアを調整';
+
+  @override
+  String get leaderboardUserIdHint => 'ユーザーID';
+
+  @override
+  String get leaderboardScoreHint => 'スコア';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'シーズン $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'まだエントリーがありません';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'あなたの順位: #$rank（$score）';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score XP・レベル $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'Lv.$level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'ここでGIFを送信するにはレベル$levelが必要です';
+  }
+
+  @override
+  String get arcadeNavLabel => 'アーケード';
+
+  @override
+  String get arcadeHomeTitle => 'Koda アーケード';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'ハイスコアを見る';
+
+  @override
+  String get arcadeMinesweeperTitle => 'マインスイーパー';
+
+  @override
+  String get arcadeMinesweeperSubtitle => '地雷を踏まずにボード全体を開けよう';
+
+  @override
+  String get arcadeMatch3Title => 'ジェムマッチ';
+
+  @override
+  String get arcadeMatch3Subtitle => '3つ以上の宝石を揃えてスコアを獲得';
+
+  @override
+  String get arcadeDifficultyBeginner => '初級';
+
+  @override
+  String get arcadeDifficultyIntermediate => '中級';
+
+  @override
+  String get arcadeDifficultyExpert => '上級';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return '地雷: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return '時間: $seconds秒';
+  }
+
+  @override
+  String get arcadeNewGameButton => '新しいゲーム';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'ボードクリア！';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return '$score点を獲得しました。';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'ドカン！';
+
+  @override
+  String get arcadeMinesweeperLoseBody => '地雷を踏んでしまいました。もう一度挑戦しますか？';
+
+  @override
+  String get arcadeScoreSubmittedNote => 'スコアをこのサーバーのリーダーボードに送信しました';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'スコア: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return '残り手数: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => '手数終了';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return '最終スコア: $score';
+  }
 }

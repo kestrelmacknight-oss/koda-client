@@ -590,6 +590,56 @@ class AppLocalizationsZh extends AppLocalizations {
   String get steamVisibleInComparison => '在比较中可见';
 
   @override
+  String get channelEditDialogTypePreview => '公开预览';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      '如果此服务器是公开的，任何人无需加入即可查看。发布消息仍需要加入（并接受规则，如果有的话）。';
+
+  @override
+  String get channelEditDialogGeneralSection => '常规';
+
+  @override
+  String get channelEditDialogBehaviorSection => '行为';
+
+  @override
+  String get channelEditDialogAccessSection => '访问权限';
+
+  @override
+  String get serverThemeLibraryTitle => '服务器模板';
+
+  @override
+  String get serverThemeLibraryEmptyState => '暂无可用模板。';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return '需要加成等级 $level';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return '预览：$name';
+  }
+
+  @override
+  String get serverThemePreviewNote => '这是预览 — 尚未应用任何内容。';
+
+  @override
+  String get serverThemeApplyButton => '应用模板';
+
+  @override
+  String get serverThemeApplyError => '无法应用此模板';
+
+  @override
+  String get serverThemeCardTitle => '服务器模板';
+
+  @override
+  String get serverThemeCardDescription => '浏览精选外观，应用前可先预览。';
+
+  @override
+  String get serverThemeBrowseButton => '浏览模板';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -4817,6 +4867,162 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => '未知';
+
+  @override
+  String get serverTabLeveling => '等级';
+
+  @override
+  String get permManageLeaderboards => '管理排行榜';
+
+  @override
+  String get serverLevelingEnableLabel => '服务器经验值';
+
+  @override
+  String get serverLevelingEnableDescription => '成员通过聊天获得经验值和等级。默认启用。';
+
+  @override
+  String get serverGifLevelGateLabel => '发送 GIF 所需等级';
+
+  @override
+  String get serverGifLevelGateDescription => '在此服务器发送 GIF 所需的最低等级。0 = 无限制。';
+
+  @override
+  String get serverOpenLeaderboards => '查看排行榜';
+
+  @override
+  String get leaderboardScreenTitle => '排行榜';
+
+  @override
+  String get leaderboardCreateTitle => '创建排行榜';
+
+  @override
+  String get leaderboardNameHint => '排行榜名称';
+
+  @override
+  String get leaderboardResetTitle => '重置赛季';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return '这将存档「$name」当前的排名并开始新的赛季。此操作无法撤销。';
+  }
+
+  @override
+  String get leaderboardResetConfirm => '重置赛季';
+
+  @override
+  String get leaderboardAdjustTitle => '调整分数';
+
+  @override
+  String get leaderboardUserIdHint => '用户 ID';
+
+  @override
+  String get leaderboardScoreHint => '分数';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return '第 $number 赛季';
+  }
+
+  @override
+  String get leaderboardEmptyState => '暂无记录';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return '你的排名：#$rank（$score）';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score 经验 · $level 级';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return '$level 级';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return '你需要 $level 级才能在此发送 GIF';
+  }
+
+  @override
+  String get arcadeNavLabel => '游乐场';
+
+  @override
+  String get arcadeHomeTitle => 'Koda 游乐场';
+
+  @override
+  String get arcadeViewLeaderboardsButton => '查看高分榜';
+
+  @override
+  String get arcadeMinesweeperTitle => '扫雷';
+
+  @override
+  String get arcadeMinesweeperSubtitle => '不踩到地雷，揭开整个棋盘';
+
+  @override
+  String get arcadeMatch3Title => '宝石消消乐';
+
+  @override
+  String get arcadeMatch3Subtitle => '匹配 3 个或更多宝石来得分';
+
+  @override
+  String get arcadeDifficultyBeginner => '初级';
+
+  @override
+  String get arcadeDifficultyIntermediate => '中级';
+
+  @override
+  String get arcadeDifficultyExpert => '高级';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return '地雷：$count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return '时间：$seconds秒';
+  }
+
+  @override
+  String get arcadeNewGameButton => '新游戏';
+
+  @override
+  String get arcadeMinesweeperWinTitle => '棋盘已清空！';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return '你获得了 $score 分。';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => '轰！';
+
+  @override
+  String get arcadeMinesweeperLoseBody => '你踩到了地雷。再试一次吗？';
+
+  @override
+  String get arcadeScoreSubmittedNote => '分数已发送到此服务器的排行榜';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return '分数：$score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return '剩余步数：$count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => '步数已用完';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return '最终得分：$score';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -5404,6 +5610,56 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get steamVisibleInComparison => '在比較中可見';
+
+  @override
+  String get channelEditDialogTypePreview => '公開預覽';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      '如果此伺服器是公開的，任何人無需加入即可檢視。發布訊息仍需要加入（並接受規則，如果有的話）。';
+
+  @override
+  String get channelEditDialogGeneralSection => '一般';
+
+  @override
+  String get channelEditDialogBehaviorSection => '行為';
+
+  @override
+  String get channelEditDialogAccessSection => '存取權限';
+
+  @override
+  String get serverThemeLibraryTitle => '伺服器範本';
+
+  @override
+  String get serverThemeLibraryEmptyState => '尚無可用範本。';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return '需要加成等級 $level';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return '預覽：$name';
+  }
+
+  @override
+  String get serverThemePreviewNote => '這是預覽 — 尚未套用任何內容。';
+
+  @override
+  String get serverThemeApplyButton => '套用範本';
+
+  @override
+  String get serverThemeApplyError => '無法套用此範本';
+
+  @override
+  String get serverThemeCardTitle => '伺服器範本';
+
+  @override
+  String get serverThemeCardDescription => '瀏覽精選外觀，套用前可先預覽。';
+
+  @override
+  String get serverThemeBrowseButton => '瀏覽範本';
 
   @override
   String get settingsSteamTitle => 'Steam';
@@ -9634,4 +9890,160 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get messageSearchUnknownAuthor => '未知';
+
+  @override
+  String get serverTabLeveling => '等級';
+
+  @override
+  String get permManageLeaderboards => '管理排行榜';
+
+  @override
+  String get serverLevelingEnableLabel => '伺服器經驗值';
+
+  @override
+  String get serverLevelingEnableDescription => '成員透過聊天獲得經驗值和等級。預設為啟用。';
+
+  @override
+  String get serverGifLevelGateLabel => '傳送 GIF 所需等級';
+
+  @override
+  String get serverGifLevelGateDescription => '在此伺服器傳送 GIF 所需的最低等級。0 = 無限制。';
+
+  @override
+  String get serverOpenLeaderboards => '查看排行榜';
+
+  @override
+  String get leaderboardScreenTitle => '排行榜';
+
+  @override
+  String get leaderboardCreateTitle => '建立排行榜';
+
+  @override
+  String get leaderboardNameHint => '排行榜名稱';
+
+  @override
+  String get leaderboardResetTitle => '重設賽季';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return '這將封存「$name」目前的排名並開始新賽季。此操作無法復原。';
+  }
+
+  @override
+  String get leaderboardResetConfirm => '重設賽季';
+
+  @override
+  String get leaderboardAdjustTitle => '調整分數';
+
+  @override
+  String get leaderboardUserIdHint => '使用者 ID';
+
+  @override
+  String get leaderboardScoreHint => '分數';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return '第 $number 賽季';
+  }
+
+  @override
+  String get leaderboardEmptyState => '尚無記錄';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return '你的排名：#$rank（$score）';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score 經驗 · $level 級';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return '$level 級';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return '你需要 $level 級才能在此傳送 GIF';
+  }
+
+  @override
+  String get arcadeNavLabel => '遊樂場';
+
+  @override
+  String get arcadeHomeTitle => 'Koda 遊樂場';
+
+  @override
+  String get arcadeViewLeaderboardsButton => '查看高分榜';
+
+  @override
+  String get arcadeMinesweeperTitle => '踩地雷';
+
+  @override
+  String get arcadeMinesweeperSubtitle => '不踩到地雷，揭開整個棋盤';
+
+  @override
+  String get arcadeMatch3Title => '寶石消消樂';
+
+  @override
+  String get arcadeMatch3Subtitle => '配對 3 個或更多寶石來得分';
+
+  @override
+  String get arcadeDifficultyBeginner => '初級';
+
+  @override
+  String get arcadeDifficultyIntermediate => '中級';
+
+  @override
+  String get arcadeDifficultyExpert => '高級';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return '地雷：$count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return '時間：$seconds秒';
+  }
+
+  @override
+  String get arcadeNewGameButton => '新遊戲';
+
+  @override
+  String get arcadeMinesweeperWinTitle => '棋盤已清空！';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return '你獲得了 $score 分。';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => '轟！';
+
+  @override
+  String get arcadeMinesweeperLoseBody => '你踩到了地雷。再試一次嗎？';
+
+  @override
+  String get arcadeScoreSubmittedNote => '分數已傳送到此伺服器的排行榜';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return '分數：$score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return '剩餘步數：$count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => '步數已用完';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return '最終得分：$score';
+  }
 }

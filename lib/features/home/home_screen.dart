@@ -33,6 +33,7 @@ import '../../shared/category_edit_dialog.dart';
 import '../settings/settings_screen.dart';
 import '../settings/content_filters_screen.dart';
 import '../server/server_settings_screen.dart';
+import '../arcade/arcade_home_screen.dart';
 import '../voice/voice_bar.dart';
 import '../../core/voice_session.dart';
 import '../dm/dm_screen.dart';
@@ -97,6 +98,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
 
   bool _showingDms = false;
   bool _showingMarketplace = false;
+  bool _showingArcade = false;
   bool _loadingServers = true;
   Map<String, dynamic> _contentFilters = {};
   String? _activeChannelId;
@@ -516,7 +518,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   }
 
   Future<void> _selectServer(Map<String, dynamic> server) async {
-    setState(() { _showingDms = false; _showingMarketplace = false; });
+    setState(() { _showingDms = false; _showingMarketplace = false; _showingArcade = false; });
     ref.read(selectedServerProvider.notifier).state = server;
     ref.read(selectedChannelProvider.notifier).state = null;
     final results = await Future.wait([
@@ -678,7 +680,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
 
   Future<void> _selectChannel(Map<String, dynamic> channel) async {
     final channelId = channel['id'] as String;
-    if (_showingMarketplace) setState(() => _showingMarketplace = false);
+    if (_showingMarketplace || _showingArcade) {
+      setState(() { _showingMarketplace = false; _showingArcade = false; });
+    }
     ref.read(selectedChannelProvider.notifier).state = channel;
 
     // Leave the previous channel's socket topic
@@ -2462,6 +2466,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         const Expanded(child: MarketplaceScreen(embedded: true)),
       ]);
     }
+    if (_showingArcade) {
+      final serverId = ref.watch(selectedServerProvider)?['id'] as String?;
+      if (serverId == null) return const SizedBox.shrink();
+      return ArcadeHomeScreen(serverId: serverId);
+    }
 
     if (selectedChannel == null) {
       return Center(
@@ -3037,6 +3046,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   onTap: () => setState(() {
                     _showingDms = true;
                     _showingMarketplace = false;
+                    _showingArcade = false;
                     ref.read(selectedServerProvider.notifier).state = null;
                     ref.read(selectedChannelProvider.notifier).state = null;
                   }),
@@ -3215,6 +3225,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   selectedTileColor: KodaColors.koda.withValues(alpha: 0.1),
                   onTap: () => setState(() {
                     _showingMarketplace = true;
+                    _showingArcade = false;
+                    ref.read(selectedChannelProvider.notifier).state = null;
+                  }),
+                ),
+              if (selectedServer != null)
+                ListTile(
+                  dense: true,
+                  leading: Icon(Icons.sports_esports_outlined, size: 16,
+                      color: _showingArcade ? KodaColors.text1 : KodaColors.text3),
+                  title: Text(t.arcadeNavLabel,
+                      style: TextStyle(fontSize: 13,
+                          color: _showingArcade ? KodaColors.text1 : KodaColors.text3,
+                          fontWeight: _showingArcade ? FontWeight.w600 : FontWeight.w400)),
+                  selected: _showingArcade,
+                  selectedTileColor: KodaColors.koda.withValues(alpha: 0.1),
+                  onTap: () => setState(() {
+                    _showingArcade = true;
+                    _showingMarketplace = false;
                     ref.read(selectedChannelProvider.notifier).state = null;
                   }),
                 ),

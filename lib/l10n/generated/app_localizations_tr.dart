@@ -622,6 +622,58 @@ class AppLocalizationsTr extends AppLocalizations {
   String get steamVisibleInComparison => 'Karşılaştırmada görünür';
 
   @override
+  String get channelEditDialogTypePreview => 'Herkese Açık Önizleme';
+
+  @override
+  String get channelEditDialogPreviewHelp =>
+      'Bu sunucu herkese açıksa, katılmadan herkes tarafından görülebilir. Paylaşım yapmak için yine de katılmak (ve varsa kuralları kabul etmek) gerekir.';
+
+  @override
+  String get channelEditDialogGeneralSection => 'Genel';
+
+  @override
+  String get channelEditDialogBehaviorSection => 'Davranış';
+
+  @override
+  String get channelEditDialogAccessSection => 'Erişim';
+
+  @override
+  String get serverThemeLibraryTitle => 'Sunucu Şablonları';
+
+  @override
+  String get serverThemeLibraryEmptyState => 'Henüz kullanılabilir şablon yok.';
+
+  @override
+  String serverThemeLockedHint(int level) {
+    return '$level güçlendirme seviyesi gerekir';
+  }
+
+  @override
+  String serverThemePreviewTitle(String name) {
+    return 'Önizleme: $name';
+  }
+
+  @override
+  String get serverThemePreviewNote =>
+      'Bu bir önizlemedir — henüz hiçbir şey uygulanmadı.';
+
+  @override
+  String get serverThemeApplyButton => 'Şablonu Uygula';
+
+  @override
+  String get serverThemeApplyError => 'Bu şablon uygulanamadı';
+
+  @override
+  String get serverThemeCardTitle => 'Sunucu Şablonları';
+
+  @override
+  String get serverThemeCardDescription =>
+      'Seçilmiş görünümlere göz atın ve uygulamadan önce önizleyin.';
+
+  @override
+  String get serverThemeBrowseButton => 'Şablonlara Göz At';
+
+  @override
   String get settingsSteamTitle => 'Steam';
 
   @override
@@ -5031,4 +5083,165 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get messageSearchUnknownAuthor => 'Bilinmiyor';
+
+  @override
+  String get serverTabLeveling => 'Seviyeler';
+
+  @override
+  String get permManageLeaderboards => 'Lider Tablolarını Yönet';
+
+  @override
+  String get serverLevelingEnableLabel => 'Sunucu XP';
+
+  @override
+  String get serverLevelingEnableDescription =>
+      'Üyeler sohbet ederek XP ve seviye kazanır. Varsayılan olarak etkin.';
+
+  @override
+  String get serverGifLevelGateLabel => 'GIF göndermek için gereken seviye';
+
+  @override
+  String get serverGifLevelGateDescription =>
+      'Bu sunucuda GIF göndermek için gereken minimum seviye. 0 = sınırlama yok.';
+
+  @override
+  String get serverOpenLeaderboards => 'Lider Tablolarını Görüntüle';
+
+  @override
+  String get leaderboardScreenTitle => 'Lider Tabloları';
+
+  @override
+  String get leaderboardCreateTitle => 'Lider Tablosu Oluştur';
+
+  @override
+  String get leaderboardNameHint => 'Lider tablosu adı';
+
+  @override
+  String get leaderboardResetTitle => 'Sezonu Sıfırla';
+
+  @override
+  String leaderboardResetBody(String name) {
+    return 'Bu, \"$name\" için geçerli sıralamayı arşivler ve yeni bir sezon başlatır. Bu işlem geri alınamaz.';
+  }
+
+  @override
+  String get leaderboardResetConfirm => 'Sezonu Sıfırla';
+
+  @override
+  String get leaderboardAdjustTitle => 'Puanı Ayarla';
+
+  @override
+  String get leaderboardUserIdHint => 'Kullanıcı Kimliği';
+
+  @override
+  String get leaderboardScoreHint => 'Puan';
+
+  @override
+  String leaderboardSeasonLabel(int number) {
+    return 'Sezon $number';
+  }
+
+  @override
+  String get leaderboardEmptyState => 'Henüz giriş yok';
+
+  @override
+  String leaderboardYourRank(int rank, int score) {
+    return 'Sıralamanız: #$rank ($score)';
+  }
+
+  @override
+  String leaderboardXpScore(int score, int level) {
+    return '$score XP · Seviye $level';
+  }
+
+  @override
+  String memberPanelLevelLabel(int level) {
+    return 'Sv. $level';
+  }
+
+  @override
+  String chatGifLevelGated(int level) {
+    return 'Burada GIF göndermek için seviye $level gerekiyor';
+  }
+
+  @override
+  String get arcadeNavLabel => 'Oyun Salonu';
+
+  @override
+  String get arcadeHomeTitle => 'Koda Oyun Salonu';
+
+  @override
+  String get arcadeViewLeaderboardsButton => 'En Yüksek Skorları Görüntüle';
+
+  @override
+  String get arcadeMinesweeperTitle => 'Mayın Tarlası';
+
+  @override
+  String get arcadeMinesweeperSubtitle => 'Mayına basmadan tüm tahtayı açın';
+
+  @override
+  String get arcadeMatch3Title => 'Mücevher Eşleştirme';
+
+  @override
+  String get arcadeMatch3Subtitle =>
+      'Puan kazanmak için 3 veya daha fazla mücevheri eşleştirin';
+
+  @override
+  String get arcadeDifficultyBeginner => 'Başlangıç';
+
+  @override
+  String get arcadeDifficultyIntermediate => 'Orta';
+
+  @override
+  String get arcadeDifficultyExpert => 'Uzman';
+
+  @override
+  String arcadeMinesLeftLabel(int count) {
+    return 'Mayınlar: $count';
+  }
+
+  @override
+  String arcadeTimeLabel(int seconds) {
+    return 'Süre: ${seconds}sn';
+  }
+
+  @override
+  String get arcadeNewGameButton => 'Yeni Oyun';
+
+  @override
+  String get arcadeMinesweeperWinTitle => 'Tahta Açıldı!';
+
+  @override
+  String arcadeMinesweeperWinBody(int score) {
+    return '$score puan kazandınız.';
+  }
+
+  @override
+  String get arcadeMinesweeperLoseTitle => 'Güm!';
+
+  @override
+  String get arcadeMinesweeperLoseBody =>
+      'Bir mayına bastınız. Tekrar denensin mi?';
+
+  @override
+  String get arcadeScoreSubmittedNote =>
+      'Skor bu sunucunun lider tablosuna gönderildi';
+
+  @override
+  String arcadeMatch3ScoreLabel(int score) {
+    return 'Skor: $score';
+  }
+
+  @override
+  String arcadeMatch3MovesLeftLabel(int count) {
+    return 'Kalan hamle: $count';
+  }
+
+  @override
+  String get arcadeMatch3GameOverTitle => 'Hamle Kalmadı';
+
+  @override
+  String arcadeMatch3GameOverBody(int score) {
+    return 'Son skor: $score';
+  }
 }
