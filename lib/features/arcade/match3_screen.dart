@@ -51,7 +51,17 @@ class _Match3ScreenState extends State<Match3Screen> {
   }
 
   void _newGame() {
-    _grid = List.generate(_gridSize, (r) => List.generate(_gridSize, (c) => _pickNonMatching(r, c)));
+    // Built into a local first, then assigned to _grid whole -- _grid is
+    // `late` and, on the very first call (from initState), not yet
+    // initialized at all, so _pickNonMatching can't read the real _grid
+    // field mid-construction without throwing LateInitializationError.
+    final grid = List.generate(_gridSize, (_) => List.filled(_gridSize, 0));
+    for (var r = 0; r < _gridSize; r++) {
+      for (var c = 0; c < _gridSize; c++) {
+        grid[r][c] = _pickNonMatching(grid, r, c);
+      }
+    }
+    _grid = grid;
     _selRow = null;
     _selCol = null;
     _score = 0;
@@ -64,11 +74,11 @@ class _Match3ScreenState extends State<Match3Screen> {
   /// Fills a cell during board generation while avoiding an immediate
   /// 3-in-a-row with the two cells already placed to its left/above --
   /// so the starting board never opens with a free match sitting there.
-  int _pickNonMatching(int r, int c) {
+  int _pickNonMatching(List<List<int>> grid, int r, int c) {
     while (true) {
       final g = _rand.nextInt(_gemTypes);
-      final leftPair = c >= 2 && _grid[r][c - 1] == g && _grid[r][c - 2] == g;
-      final upPair = r >= 2 && _grid[r - 1][c] == g && _grid[r - 2][c] == g;
+      final leftPair = c >= 2 && grid[r][c - 1] == g && grid[r][c - 2] == g;
+      final upPair = r >= 2 && grid[r - 1][c] == g && grid[r - 2][c] == g;
       if (!leftPair && !upPair) return g;
     }
   }
