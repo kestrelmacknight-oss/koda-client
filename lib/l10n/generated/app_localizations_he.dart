@@ -5232,4 +5232,156 @@ class AppLocalizationsHe extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return 'ניקוד סופי: $score';
   }
+
+  @override
+  String get commonContinue => 'המשך';
+
+  @override
+  String get adminTabEnterprise => 'ארגונים';
+
+  @override
+  String get adminTabStatus => 'סטטוס';
+
+  @override
+  String get serverTabSso => 'התחברות מאוחדת';
+
+  @override
+  String get serverSsoCardTitle => 'התחברות מאוחדת SAML';
+
+  @override
+  String get serverSsoCardDescription =>
+      'אפשרו לחברים להתחבר דרך ספק הזהות של החברה שלכם במקום אימייל וסיסמה.';
+
+  @override
+  String get serverSsoLockedHint =>
+      'התחברות מאוחדת זמינה בדרגת הארגונים. צרו איתנו קשר לשדרוג.';
+
+  @override
+  String get serverSsoEnabledLabel => 'התחברות מאוחדת מופעלת';
+
+  @override
+  String get serverSsoEmailDomainLabel => 'דומיין האימייל של החברה';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => 'מזהה ישות של ספק הזהות';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => 'כתובת URL להתחברות של ספק הזהות';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel => 'אישור X.509 של ספק הזהות (PEM)';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => 'התחברות דרך SSO במקום זאת';
+
+  @override
+  String get ssoLoginTitle => 'התחברות דרך SSO';
+
+  @override
+  String get ssoLoginDescription =>
+      'הזינו את כתובת האימייל העסקית שלכם -- נפנה אתכם לספק הזהות של החברה שלכם כדי להשלים את ההתחברות.';
+
+  @override
+  String get ssoWorkEmailHint => 'you@company.com';
+
+  @override
+  String get ssoNoConfigError =>
+      'לא הוגדרה התחברות מאוחדת עבור אימייל זה. נסו את הסיסמה שלכם במקום זאת.';
+
+  @override
+  String get ssoGenericError => 'משהו השתבש בעת התחלת ההתחברות המאוחדת.';
+
+  @override
+  String get ssoExpiredError => 'ניסיון ההתחברות הזה פג תוקף. נסו שוב.';
+
+  @override
+  String get ssoWaitingForBrowser =>
+      'השלימו את ההתחברות אצל ספק הזהות בחלון הדפדפן. דף זה יימשיך אוטומטית.';
+
+  @override
+  String get statusPostIncidentTitle => 'פרסום תקרית';
+
+  @override
+  String get statusIncidentTitleHint => 'כותרת התקרית';
+
+  @override
+  String get statusIncidentBodyHint => 'מה קורה? (אופציונלי)';
+
+  @override
+  String get statusAllSystemsNormal => 'כל המערכות תקינות';
+
+  @override
+  String get statusDegraded => 'פגיעה בשירות -- מסד הנתונים אינו נגיש';
+
+  @override
+  String get statusNoIncidents => 'לא דווחו תקריות';
+
+  @override
+  String get statusResolvedLabel => 'נפתר';
+
+  @override
+  String get statusResolveButton => 'פתרון';
+
+  @override
+  String get commonCopy => 'העתק';
+
+  @override
+  String get permManageWebhooks => 'ניהול Webhooks';
+
+  @override
+  String get channelEditDialogManageWebhooks => 'ניהול Webhooks';
+
+  @override
+  String get webhookScreenTitle => 'Webhooks';
+
+  @override
+  String get webhookScreenDescription =>
+      'כל שירות שיכול לשלוח בקשת רשת יכול לפרסם הודעות בערוץ הזה. תואם לכלים שכבר תומכים בפרסום ל-webhook של Discord -- פשוט הדביקו את הכתובת הזו במקום.';
+
+  @override
+  String get webhookEmptyState => 'אין עדיין Webhooks';
+
+  @override
+  String get webhookCreateTitle => 'יצירת Webhook';
+
+  @override
+  String get webhookNameHint => 'שם ה-Webhook';
+
+  @override
+  String get webhookRegenerateTitle => 'יצירת כתובת מחדש';
+
+  @override
+  String get webhookRegenerateBody =>
+      'הכתובת הנוכחית תפסיק לעבוד מיד. כל דבר שעדיין משתמש בה יזדקק לכתובת החדשה.';
+
+  @override
+  String get webhookRegenerateConfirm => 'יצירה מחדש';
+
+  @override
+  String get webhookUrlRevealTitle => 'כתובת ה-Webhook';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      'העתיקו את זה עכשיו -- לא תוכלו לראות זאת שוב. כל מי שיש לו כתובת זו יכול לפרסם הודעות בערוץ הזה.';
+
+  @override
+  String get webhookUrlCopiedToast => 'הכתובת הועתקה';
+
+  @override
+  String get webhookUrlSavedIt => 'שמרתי את זה';
+
+  @override
+  String get chatWebhookBadge => 'WEBHOOK';
 }

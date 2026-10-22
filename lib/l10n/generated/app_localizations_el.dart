@@ -5323,4 +5323,160 @@ class AppLocalizationsEl extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return 'Τελικό σκορ: $score';
   }
+
+  @override
+  String get commonContinue => 'Συνέχεια';
+
+  @override
+  String get adminTabEnterprise => 'Enterprise';
+
+  @override
+  String get adminTabStatus => 'Κατάσταση';
+
+  @override
+  String get serverTabSso => 'SSO';
+
+  @override
+  String get serverSsoCardTitle => 'Ενιαία Σύνδεση SAML';
+
+  @override
+  String get serverSsoCardDescription =>
+      'Επιτρέψτε στα μέλη να συνδέονται μέσω του παρόχου ταυτότητας της εταιρείας σας αντί για email και κωδικό.';
+
+  @override
+  String get serverSsoLockedHint =>
+      'Το SSO είναι διαθέσιμο στο επίπεδο Enterprise. Επικοινωνήστε μαζί μας για αναβάθμιση.';
+
+  @override
+  String get serverSsoEnabledLabel => 'Ενεργοποίηση SSO';
+
+  @override
+  String get serverSsoEmailDomainLabel => 'Domain εταιρικού email';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => 'Entity ID παρόχου ταυτότητας';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => 'URL σύνδεσης παρόχου ταυτότητας';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel =>
+      'Πιστοποιητικό X.509 παρόχου ταυτότητας (PEM)';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => 'Σύνδεση μέσω SSO';
+
+  @override
+  String get ssoLoginTitle => 'Σύνδεση μέσω SSO';
+
+  @override
+  String get ssoLoginDescription =>
+      'Εισαγάγετε το εργασιακό σας email -- θα σας ανακατευθύνουμε στον πάροχο ταυτότητας της εταιρείας σας για να ολοκληρώσετε τη σύνδεση.';
+
+  @override
+  String get ssoWorkEmailHint => 'you@company.com';
+
+  @override
+  String get ssoNoConfigError =>
+      'Δεν έχει ρυθμιστεί SSO για αυτό το email. Δοκιμάστε τον κωδικό σας.';
+
+  @override
+  String get ssoGenericError =>
+      'Κάτι πήγε στραβά κατά την έναρξη της σύνδεσης SSO.';
+
+  @override
+  String get ssoExpiredError =>
+      'Αυτή η προσπάθεια σύνδεσης έληξε. Δοκιμάστε ξανά.';
+
+  @override
+  String get ssoWaitingForBrowser =>
+      'Ολοκληρώστε τη σύνδεση στον πάροχο ταυτότητάς σας στο παράθυρο του browser. Αυτή η σελίδα θα συνεχίσει αυτόματα.';
+
+  @override
+  String get statusPostIncidentTitle => 'Δημοσίευση Συμβάντος';
+
+  @override
+  String get statusIncidentTitleHint => 'Τίτλος συμβάντος';
+
+  @override
+  String get statusIncidentBodyHint => 'Τι συμβαίνει; (προαιρετικό)';
+
+  @override
+  String get statusAllSystemsNormal => 'Όλα τα συστήματα λειτουργούν κανονικά';
+
+  @override
+  String get statusDegraded =>
+      'Υποβαθμισμένη λειτουργία -- μη προσβάσιμη βάση δεδομένων';
+
+  @override
+  String get statusNoIncidents => 'Δεν αναφέρθηκαν συμβάντα';
+
+  @override
+  String get statusResolvedLabel => 'Επιλύθηκε';
+
+  @override
+  String get statusResolveButton => 'Επίλυση';
+
+  @override
+  String get commonCopy => 'Αντιγραφή';
+
+  @override
+  String get permManageWebhooks => 'Διαχείριση Webhooks';
+
+  @override
+  String get channelEditDialogManageWebhooks => 'Διαχείριση Webhooks';
+
+  @override
+  String get webhookScreenTitle => 'Webhooks';
+
+  @override
+  String get webhookScreenDescription =>
+      'Οποιαδήποτε υπηρεσία μπορεί να στείλει web request μπορεί να δημοσιεύσει μηνύματα σε αυτό το κανάλι. Συμβατό με εργαλεία που ήδη υποστηρίζουν δημοσίευση σε webhook του Discord -- απλώς επικολλήστε αυτό το URL αντ\' αυτού.';
+
+  @override
+  String get webhookEmptyState => 'Δεν υπάρχουν ακόμη webhooks';
+
+  @override
+  String get webhookCreateTitle => 'Δημιουργία Webhook';
+
+  @override
+  String get webhookNameHint => 'Όνομα webhook';
+
+  @override
+  String get webhookRegenerateTitle => 'Αναδημιουργία URL';
+
+  @override
+  String get webhookRegenerateBody =>
+      'Το τρέχον URL θα σταματήσει να λειτουργεί αμέσως. Οτιδήποτε το χρησιμοποιεί ακόμα θα χρειαστεί το νέο.';
+
+  @override
+  String get webhookRegenerateConfirm => 'Αναδημιουργία';
+
+  @override
+  String get webhookUrlRevealTitle => 'URL Webhook';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      'Αντιγράψτε το τώρα -- δεν θα μπορείτε να το δείτε ξανά. Οποιοσδήποτε έχει αυτό το URL μπορεί να δημοσιεύσει μηνύματα σε αυτό το κανάλι.';
+
+  @override
+  String get webhookUrlCopiedToast => 'Το URL αντιγράφηκε';
+
+  @override
+  String get webhookUrlSavedIt => 'Το αποθήκευσα';
+
+  @override
+  String get chatWebhookBadge => 'WEBHOOK';
 }

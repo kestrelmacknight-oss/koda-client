@@ -9077,6 +9077,294 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Final score: {score}'**
   String arcadeMatch3GameOverBody(int score);
+
+  /// No description provided for @commonContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get commonContinue;
+
+  /// No description provided for @adminTabEnterprise.
+  ///
+  /// In en, this message translates to:
+  /// **'Enterprise'**
+  String get adminTabEnterprise;
+
+  /// No description provided for @adminTabStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get adminTabStatus;
+
+  /// No description provided for @serverTabSso.
+  ///
+  /// In en, this message translates to:
+  /// **'SSO'**
+  String get serverTabSso;
+
+  /// No description provided for @serverSsoCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SAML Single Sign-On'**
+  String get serverSsoCardTitle;
+
+  /// No description provided for @serverSsoCardDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Let members sign in through your company\'s identity provider instead of an email and password.'**
+  String get serverSsoCardDescription;
+
+  /// No description provided for @serverSsoLockedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'SSO is available on the Enterprise tier. Contact us to upgrade this server.'**
+  String get serverSsoLockedHint;
+
+  /// No description provided for @serverSsoEnabledLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'SSO enabled'**
+  String get serverSsoEnabledLabel;
+
+  /// No description provided for @serverSsoEmailDomainLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Company email domain'**
+  String get serverSsoEmailDomainLabel;
+
+  /// No description provided for @serverSsoEmailDomainHint.
+  ///
+  /// In en, this message translates to:
+  /// **'acme.com'**
+  String get serverSsoEmailDomainHint;
+
+  /// No description provided for @serverSsoEntityIdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity provider Entity ID'**
+  String get serverSsoEntityIdLabel;
+
+  /// No description provided for @serverSsoEntityIdHint.
+  ///
+  /// In en, this message translates to:
+  /// **'https://idp.example.com/entity'**
+  String get serverSsoEntityIdHint;
+
+  /// No description provided for @serverSsoSsoUrlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity provider SSO URL'**
+  String get serverSsoSsoUrlLabel;
+
+  /// No description provided for @serverSsoSsoUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'https://idp.example.com/sso/redirect'**
+  String get serverSsoSsoUrlHint;
+
+  /// No description provided for @serverSsoCertLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity provider X.509 certificate (PEM)'**
+  String get serverSsoCertLabel;
+
+  /// No description provided for @serverSsoCertHint.
+  ///
+  /// In en, this message translates to:
+  /// **'-----BEGIN CERTIFICATE-----'**
+  String get serverSsoCertHint;
+
+  /// No description provided for @ssoSignInButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with SSO instead'**
+  String get ssoSignInButton;
+
+  /// No description provided for @ssoLoginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with SSO'**
+  String get ssoLoginTitle;
+
+  /// No description provided for @ssoLoginDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your work email -- we\'ll redirect you to your company\'s identity provider to finish signing in.'**
+  String get ssoLoginDescription;
+
+  /// No description provided for @ssoWorkEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'you@company.com'**
+  String get ssoWorkEmailHint;
+
+  /// No description provided for @ssoNoConfigError.
+  ///
+  /// In en, this message translates to:
+  /// **'No SSO is configured for that email. Try your password instead.'**
+  String get ssoNoConfigError;
+
+  /// No description provided for @ssoGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong starting SSO sign-in.'**
+  String get ssoGenericError;
+
+  /// No description provided for @ssoExpiredError.
+  ///
+  /// In en, this message translates to:
+  /// **'That sign-in attempt expired. Please try again.'**
+  String get ssoExpiredError;
+
+  /// No description provided for @ssoWaitingForBrowser.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish signing in with your identity provider in the browser window. This page will continue automatically.'**
+  String get ssoWaitingForBrowser;
+
+  /// No description provided for @statusPostIncidentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Post Incident'**
+  String get statusPostIncidentTitle;
+
+  /// No description provided for @statusIncidentTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Incident title'**
+  String get statusIncidentTitleHint;
+
+  /// No description provided for @statusIncidentBodyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s happening? (optional)'**
+  String get statusIncidentBodyHint;
+
+  /// No description provided for @statusAllSystemsNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'All systems normal'**
+  String get statusAllSystemsNormal;
+
+  /// No description provided for @statusDegraded.
+  ///
+  /// In en, this message translates to:
+  /// **'Degraded -- database unreachable'**
+  String get statusDegraded;
+
+  /// No description provided for @statusNoIncidents.
+  ///
+  /// In en, this message translates to:
+  /// **'No incidents reported'**
+  String get statusNoIncidents;
+
+  /// No description provided for @statusResolvedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolved'**
+  String get statusResolvedLabel;
+
+  /// No description provided for @statusResolveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolve'**
+  String get statusResolveButton;
+
+  /// No description provided for @commonCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get commonCopy;
+
+  /// No description provided for @permManageWebhooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Webhooks'**
+  String get permManageWebhooks;
+
+  /// No description provided for @channelEditDialogManageWebhooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Webhooks'**
+  String get channelEditDialogManageWebhooks;
+
+  /// No description provided for @webhookScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Webhooks'**
+  String get webhookScreenTitle;
+
+  /// No description provided for @webhookScreenDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Any service that can send a web request can post messages into this channel. Compatible with tools that already support posting to a Discord webhook -- just paste this URL in instead.'**
+  String get webhookScreenDescription;
+
+  /// No description provided for @webhookEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No webhooks yet'**
+  String get webhookEmptyState;
+
+  /// No description provided for @webhookCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Webhook'**
+  String get webhookCreateTitle;
+
+  /// No description provided for @webhookNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Webhook name'**
+  String get webhookNameHint;
+
+  /// No description provided for @webhookRegenerateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate URL'**
+  String get webhookRegenerateTitle;
+
+  /// No description provided for @webhookRegenerateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The current URL will stop working immediately. Anything still using it will need the new one.'**
+  String get webhookRegenerateBody;
+
+  /// No description provided for @webhookRegenerateConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate'**
+  String get webhookRegenerateConfirm;
+
+  /// No description provided for @webhookUrlRevealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Webhook URL'**
+  String get webhookUrlRevealTitle;
+
+  /// No description provided for @webhookUrlRevealWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy this now -- you won\'t be able to see it again. Anyone with this URL can post messages into this channel.'**
+  String get webhookUrlRevealWarning;
+
+  /// No description provided for @webhookUrlCopiedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'URL copied'**
+  String get webhookUrlCopiedToast;
+
+  /// No description provided for @webhookUrlSavedIt.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ve saved it'**
+  String get webhookUrlSavedIt;
+
+  /// No description provided for @chatWebhookBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'WEBHOOK'**
+  String get chatWebhookBadge;
 }
 
 class _AppLocalizationsDelegate

@@ -5259,4 +5259,159 @@ class AppLocalizationsNl extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return 'Eindscore: $score';
   }
+
+  @override
+  String get commonContinue => 'Doorgaan';
+
+  @override
+  String get adminTabEnterprise => 'Enterprise';
+
+  @override
+  String get adminTabStatus => 'Status';
+
+  @override
+  String get serverTabSso => 'SSO';
+
+  @override
+  String get serverSsoCardTitle => 'SAML Single Sign-On';
+
+  @override
+  String get serverSsoCardDescription =>
+      'Laat leden inloggen via de identiteitsprovider van je bedrijf in plaats van e-mail en wachtwoord.';
+
+  @override
+  String get serverSsoLockedHint =>
+      'SSO is beschikbaar in de Enterprise-laag. Neem contact op voor een upgrade.';
+
+  @override
+  String get serverSsoEnabledLabel => 'SSO ingeschakeld';
+
+  @override
+  String get serverSsoEmailDomainLabel => 'Bedrijfs-e-maildomein';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => 'Entity-ID van identiteitsprovider';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => 'SSO-URL van identiteitsprovider';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel =>
+      'X.509-certificaat van identiteitsprovider (PEM)';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => 'In plaats daarvan inloggen met SSO';
+
+  @override
+  String get ssoLoginTitle => 'Inloggen met SSO';
+
+  @override
+  String get ssoLoginDescription =>
+      'Voer je werk-e-mailadres in -- we leiden je door naar de identiteitsprovider van je bedrijf om het inloggen te voltooien.';
+
+  @override
+  String get ssoWorkEmailHint => 'jij@bedrijf.com';
+
+  @override
+  String get ssoNoConfigError =>
+      'Er is geen SSO geconfigureerd voor dat e-mailadres. Probeer in plaats daarvan je wachtwoord.';
+
+  @override
+  String get ssoGenericError =>
+      'Er ging iets mis bij het starten van SSO-login.';
+
+  @override
+  String get ssoExpiredError =>
+      'Deze inlogpoging is verlopen. Probeer het opnieuw.';
+
+  @override
+  String get ssoWaitingForBrowser =>
+      'Voltooi het inloggen bij je identiteitsprovider in het browservenster. Deze pagina gaat automatisch verder.';
+
+  @override
+  String get statusPostIncidentTitle => 'Incident Plaatsen';
+
+  @override
+  String get statusIncidentTitleHint => 'Titel van incident';
+
+  @override
+  String get statusIncidentBodyHint => 'Wat is er aan de hand? (optioneel)';
+
+  @override
+  String get statusAllSystemsNormal => 'Alle systemen normaal';
+
+  @override
+  String get statusDegraded => 'Verminderd -- database onbereikbaar';
+
+  @override
+  String get statusNoIncidents => 'Geen incidenten gemeld';
+
+  @override
+  String get statusResolvedLabel => 'Opgelost';
+
+  @override
+  String get statusResolveButton => 'Oplossen';
+
+  @override
+  String get commonCopy => 'Kopiëren';
+
+  @override
+  String get permManageWebhooks => 'Webhooks beheren';
+
+  @override
+  String get channelEditDialogManageWebhooks => 'Webhooks beheren';
+
+  @override
+  String get webhookScreenTitle => 'Webhooks';
+
+  @override
+  String get webhookScreenDescription =>
+      'Elke dienst die een webverzoek kan versturen, kan berichten in dit kanaal plaatsen. Compatibel met tools die al posten naar een Discord-webhook ondersteunen -- plak gewoon deze URL in plaats daarvan.';
+
+  @override
+  String get webhookEmptyState => 'Nog geen webhooks';
+
+  @override
+  String get webhookCreateTitle => 'Webhook aanmaken';
+
+  @override
+  String get webhookNameHint => 'Naam van webhook';
+
+  @override
+  String get webhookRegenerateTitle => 'URL vernieuwen';
+
+  @override
+  String get webhookRegenerateBody =>
+      'De huidige URL stopt onmiddellijk met werken. Alles wat deze nog gebruikt heeft de nieuwe nodig.';
+
+  @override
+  String get webhookRegenerateConfirm => 'Vernieuwen';
+
+  @override
+  String get webhookUrlRevealTitle => 'Webhook-URL';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      'Kopieer dit nu -- je kunt het niet opnieuw zien. Iedereen met deze URL kan berichten in dit kanaal plaatsen.';
+
+  @override
+  String get webhookUrlCopiedToast => 'URL gekopieerd';
+
+  @override
+  String get webhookUrlSavedIt => 'Ik heb het bewaard';
+
+  @override
+  String get chatWebhookBadge => 'WEBHOOK';
 }

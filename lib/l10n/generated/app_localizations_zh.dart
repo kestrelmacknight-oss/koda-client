@@ -5023,6 +5023,152 @@ class AppLocalizationsZh extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return '最终得分：$score';
   }
+
+  @override
+  String get commonContinue => '继续';
+
+  @override
+  String get adminTabEnterprise => '企业版';
+
+  @override
+  String get adminTabStatus => '状态';
+
+  @override
+  String get serverTabSso => '单点登录';
+
+  @override
+  String get serverSsoCardTitle => 'SAML 单点登录';
+
+  @override
+  String get serverSsoCardDescription => '让成员通过贵公司的身份提供商登录，而不是使用电子邮件和密码。';
+
+  @override
+  String get serverSsoLockedHint => '单点登录功能在企业版层级提供。请联系我们升级。';
+
+  @override
+  String get serverSsoEnabledLabel => '已启用单点登录';
+
+  @override
+  String get serverSsoEmailDomainLabel => '公司邮箱域名';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => '身份提供商 Entity ID';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => '身份提供商 SSO URL';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel => '身份提供商 X.509 证书（PEM）';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => '改用单点登录';
+
+  @override
+  String get ssoLoginTitle => '使用单点登录';
+
+  @override
+  String get ssoLoginDescription => '输入您的工作邮箱——我们会将您重定向到贵公司的身份提供商以完成登录。';
+
+  @override
+  String get ssoWorkEmailHint => 'you@company.com';
+
+  @override
+  String get ssoNoConfigError => '该邮箱未配置单点登录。请改用您的密码。';
+
+  @override
+  String get ssoGenericError => '启动单点登录时出现问题。';
+
+  @override
+  String get ssoExpiredError => '此登录尝试已过期。请重试。';
+
+  @override
+  String get ssoWaitingForBrowser => '请在浏览器窗口中完成与身份提供商的登录。此页面将自动继续。';
+
+  @override
+  String get statusPostIncidentTitle => '发布事件';
+
+  @override
+  String get statusIncidentTitleHint => '事件标题';
+
+  @override
+  String get statusIncidentBodyHint => '发生了什么？（可选）';
+
+  @override
+  String get statusAllSystemsNormal => '所有系统正常';
+
+  @override
+  String get statusDegraded => '服务降级——数据库无法访问';
+
+  @override
+  String get statusNoIncidents => '没有报告的事件';
+
+  @override
+  String get statusResolvedLabel => '已解决';
+
+  @override
+  String get statusResolveButton => '解决';
+
+  @override
+  String get commonCopy => '复制';
+
+  @override
+  String get permManageWebhooks => '管理 Webhook';
+
+  @override
+  String get channelEditDialogManageWebhooks => '管理 Webhook';
+
+  @override
+  String get webhookScreenTitle => 'Webhook';
+
+  @override
+  String get webhookScreenDescription =>
+      '任何能够发送网络请求的服务都可以向此频道发布消息。兼容已支持发布到 Discord webhook 的工具——只需改为粘贴此 URL 即可。';
+
+  @override
+  String get webhookEmptyState => '暂无 Webhook';
+
+  @override
+  String get webhookCreateTitle => '创建 Webhook';
+
+  @override
+  String get webhookNameHint => 'Webhook 名称';
+
+  @override
+  String get webhookRegenerateTitle => '重新生成 URL';
+
+  @override
+  String get webhookRegenerateBody => '当前 URL 将立即停止工作。仍在使用它的任何东西都需要新的 URL。';
+
+  @override
+  String get webhookRegenerateConfirm => '重新生成';
+
+  @override
+  String get webhookUrlRevealTitle => 'Webhook URL';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      '现在就复制——你将无法再次看到它。任何拥有此 URL 的人都可以在此频道发布消息。';
+
+  @override
+  String get webhookUrlCopiedToast => 'URL 已复制';
+
+  @override
+  String get webhookUrlSavedIt => '我已保存';
+
+  @override
+  String get chatWebhookBadge => 'WEBHOOK';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -10046,4 +10192,150 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String arcadeMatch3GameOverBody(int score) {
     return '最終得分：$score';
   }
+
+  @override
+  String get commonContinue => '繼續';
+
+  @override
+  String get adminTabEnterprise => '企業版';
+
+  @override
+  String get adminTabStatus => '狀態';
+
+  @override
+  String get serverTabSso => '單一登入';
+
+  @override
+  String get serverSsoCardTitle => 'SAML 單一登入';
+
+  @override
+  String get serverSsoCardDescription => '讓成員透過貴公司的身分提供者登入，而非使用電子郵件和密碼。';
+
+  @override
+  String get serverSsoLockedHint => '單一登入功能於企業版層級提供。請聯絡我們升級。';
+
+  @override
+  String get serverSsoEnabledLabel => '已啟用單一登入';
+
+  @override
+  String get serverSsoEmailDomainLabel => '公司電子郵件網域';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => '身分提供者 Entity ID';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => '身分提供者 SSO URL';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel => '身分提供者 X.509 憑證（PEM）';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => '改用單一登入';
+
+  @override
+  String get ssoLoginTitle => '使用單一登入';
+
+  @override
+  String get ssoLoginDescription => '輸入您的工作電子郵件——我們會將您重新導向至貴公司的身分提供者以完成登入。';
+
+  @override
+  String get ssoWorkEmailHint => 'you@company.com';
+
+  @override
+  String get ssoNoConfigError => '該電子郵件尚未設定單一登入。請改用您的密碼。';
+
+  @override
+  String get ssoGenericError => '啟動單一登入時發生問題。';
+
+  @override
+  String get ssoExpiredError => '此登入嘗試已過期。請再試一次。';
+
+  @override
+  String get ssoWaitingForBrowser => '請在瀏覽器視窗中完成與身分提供者的登入。此頁面將自動繼續。';
+
+  @override
+  String get statusPostIncidentTitle => '發布事件';
+
+  @override
+  String get statusIncidentTitleHint => '事件標題';
+
+  @override
+  String get statusIncidentBodyHint => '發生什麼事？（選填）';
+
+  @override
+  String get statusAllSystemsNormal => '所有系統正常';
+
+  @override
+  String get statusDegraded => '服務降級——資料庫無法連線';
+
+  @override
+  String get statusNoIncidents => '沒有回報的事件';
+
+  @override
+  String get statusResolvedLabel => '已解決';
+
+  @override
+  String get statusResolveButton => '解決';
+
+  @override
+  String get commonCopy => '複製';
+
+  @override
+  String get permManageWebhooks => '管理 Webhook';
+
+  @override
+  String get channelEditDialogManageWebhooks => '管理 Webhook';
+
+  @override
+  String get webhookScreenTitle => 'Webhook';
+
+  @override
+  String get webhookScreenDescription =>
+      '任何能夠傳送網路請求的服務都可以向此頻道發布訊息。相容於已支援發布到 Discord webhook 的工具——只需改貼這個網址即可。';
+
+  @override
+  String get webhookEmptyState => '尚無 Webhook';
+
+  @override
+  String get webhookCreateTitle => '建立 Webhook';
+
+  @override
+  String get webhookNameHint => 'Webhook 名稱';
+
+  @override
+  String get webhookRegenerateTitle => '重新產生網址';
+
+  @override
+  String get webhookRegenerateBody => '目前的網址將立即停止運作。仍在使用它的任何東西都需要新的網址。';
+
+  @override
+  String get webhookRegenerateConfirm => '重新產生';
+
+  @override
+  String get webhookUrlRevealTitle => 'Webhook 網址';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      '現在就複製——你將無法再次看到它。任何擁有此網址的人都可以在此頻道發布訊息。';
+
+  @override
+  String get webhookUrlCopiedToast => '網址已複製';
+
+  @override
+  String get webhookUrlSavedIt => '我已儲存';
+
+  @override
+  String get chatWebhookBadge => 'WEBHOOK';
 }

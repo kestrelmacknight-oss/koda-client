@@ -5239,4 +5239,157 @@ class AppLocalizationsHi extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return 'अंतिम स्कोर: $score';
   }
+
+  @override
+  String get commonContinue => 'जारी रखें';
+
+  @override
+  String get adminTabEnterprise => 'एंटरप्राइज़';
+
+  @override
+  String get adminTabStatus => 'स्थिति';
+
+  @override
+  String get serverTabSso => 'SSO';
+
+  @override
+  String get serverSsoCardTitle => 'SAML सिंगल साइन-ऑन';
+
+  @override
+  String get serverSsoCardDescription =>
+      'सदस्यों को ईमेल और पासवर्ड के बजाय आपकी कंपनी के आइडेंटिटी प्रोवाइडर के माध्यम से साइन इन करने दें।';
+
+  @override
+  String get serverSsoLockedHint =>
+      'SSO एंटरप्राइज़ स्तर पर उपलब्ध है। अपग्रेड के लिए हमसे संपर्क करें।';
+
+  @override
+  String get serverSsoEnabledLabel => 'SSO सक्षम';
+
+  @override
+  String get serverSsoEmailDomainLabel => 'कंपनी ईमेल डोमेन';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => 'आइडेंटिटी प्रोवाइडर एंटिटी ID';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => 'आइडेंटिटी प्रोवाइडर SSO URL';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel => 'आइडेंटिटी प्रोवाइडर X.509 सर्टिफिकेट (PEM)';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => 'इसके बजाय SSO से साइन इन करें';
+
+  @override
+  String get ssoLoginTitle => 'SSO से साइन इन करें';
+
+  @override
+  String get ssoLoginDescription =>
+      'अपना कार्य ईमेल दर्ज करें -- साइन इन पूरा करने के लिए हम आपको आपकी कंपनी के आइडेंटिटी प्रोवाइडर पर भेजेंगे।';
+
+  @override
+  String get ssoWorkEmailHint => 'you@company.com';
+
+  @override
+  String get ssoNoConfigError =>
+      'उस ईमेल के लिए कोई SSO कॉन्फ़िगर नहीं है। इसके बजाय अपना पासवर्ड आज़माएं।';
+
+  @override
+  String get ssoGenericError => 'SSO साइन-इन शुरू करने में कुछ गड़बड़ हुई।';
+
+  @override
+  String get ssoExpiredError =>
+      'यह साइन-इन प्रयास समाप्त हो गया। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get ssoWaitingForBrowser =>
+      'ब्राउज़र विंडो में अपने आइडेंटिटी प्रोवाइडर के साथ साइन इन पूरा करें। यह पेज स्वतः जारी रहेगा।';
+
+  @override
+  String get statusPostIncidentTitle => 'घटना पोस्ट करें';
+
+  @override
+  String get statusIncidentTitleHint => 'घटना का शीर्षक';
+
+  @override
+  String get statusIncidentBodyHint => 'क्या हो रहा है? (वैकल्पिक)';
+
+  @override
+  String get statusAllSystemsNormal => 'सभी सिस्टम सामान्य';
+
+  @override
+  String get statusDegraded => 'बाधित -- डेटाबेस अनुपलब्ध';
+
+  @override
+  String get statusNoIncidents => 'कोई घटना रिपोर्ट नहीं हुई';
+
+  @override
+  String get statusResolvedLabel => 'हल हो गया';
+
+  @override
+  String get statusResolveButton => 'हल करें';
+
+  @override
+  String get commonCopy => 'कॉपी करें';
+
+  @override
+  String get permManageWebhooks => 'वेबहुक प्रबंधित करें';
+
+  @override
+  String get channelEditDialogManageWebhooks => 'वेबहुक प्रबंधित करें';
+
+  @override
+  String get webhookScreenTitle => 'वेबहुक';
+
+  @override
+  String get webhookScreenDescription =>
+      'कोई भी सेवा जो वेब रिक्वेस्ट भेज सकती है, इस चैनल में संदेश पोस्ट कर सकती है। उन टूल्स के साथ संगत जो पहले से ही Discord वेबहुक पर पोस्ट करने का समर्थन करते हैं -- बस इसके बजाय यह URL पेस्ट करें।';
+
+  @override
+  String get webhookEmptyState => 'अभी तक कोई वेबहुक नहीं';
+
+  @override
+  String get webhookCreateTitle => 'वेबहुक बनाएं';
+
+  @override
+  String get webhookNameHint => 'वेबहुक का नाम';
+
+  @override
+  String get webhookRegenerateTitle => 'URL पुनः जनरेट करें';
+
+  @override
+  String get webhookRegenerateBody =>
+      'वर्तमान URL तुरंत काम करना बंद कर देगा। जो भी इसका उपयोग कर रहा है उसे नया URL चाहिए होगा।';
+
+  @override
+  String get webhookRegenerateConfirm => 'पुनः जनरेट करें';
+
+  @override
+  String get webhookUrlRevealTitle => 'वेबहुक URL';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      'इसे अभी कॉपी करें -- आप इसे दोबारा नहीं देख पाएंगे। इस URL वाला कोई भी व्यक्ति इस चैनल में संदेश पोस्ट कर सकता है।';
+
+  @override
+  String get webhookUrlCopiedToast => 'URL कॉपी हो गया';
+
+  @override
+  String get webhookUrlSavedIt => 'मैंने इसे सहेज लिया है';
+
+  @override
+  String get chatWebhookBadge => 'वेबहुक';
 }

@@ -5289,4 +5289,157 @@ class AppLocalizationsAr extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return 'النتيجة النهائية: $score';
   }
+
+  @override
+  String get commonContinue => 'متابعة';
+
+  @override
+  String get adminTabEnterprise => 'المؤسسات';
+
+  @override
+  String get adminTabStatus => 'الحالة';
+
+  @override
+  String get serverTabSso => 'تسجيل الدخول الموحّد';
+
+  @override
+  String get serverSsoCardTitle => 'تسجيل دخول SAML الموحّد';
+
+  @override
+  String get serverSsoCardDescription =>
+      'اسمح للأعضاء بتسجيل الدخول عبر مزوّد الهوية الخاص بشركتك بدلاً من البريد الإلكتروني وكلمة المرور.';
+
+  @override
+  String get serverSsoLockedHint =>
+      'تسجيل الدخول الموحّد متاح في فئة المؤسسات. تواصل معنا للترقية.';
+
+  @override
+  String get serverSsoEnabledLabel => 'تفعيل تسجيل الدخول الموحّد';
+
+  @override
+  String get serverSsoEmailDomainLabel => 'نطاق البريد الإلكتروني للشركة';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => 'معرّف كيان مزوّد الهوية';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => 'رابط تسجيل الدخول لمزوّد الهوية';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel => 'شهادة X.509 لمزوّد الهوية (PEM)';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => 'تسجيل الدخول عبر SSO بدلاً من ذلك';
+
+  @override
+  String get ssoLoginTitle => 'تسجيل الدخول عبر SSO';
+
+  @override
+  String get ssoLoginDescription =>
+      'أدخل بريدك الإلكتروني الخاص بالعمل -- سنوجهك إلى مزوّد الهوية الخاص بشركتك لإتمام تسجيل الدخول.';
+
+  @override
+  String get ssoWorkEmailHint => 'you@company.com';
+
+  @override
+  String get ssoNoConfigError =>
+      'لا يوجد تسجيل دخول موحّد مهيأ لهذا البريد. جرّب كلمة المرور بدلاً من ذلك.';
+
+  @override
+  String get ssoGenericError => 'حدث خطأ أثناء بدء تسجيل الدخول الموحّد.';
+
+  @override
+  String get ssoExpiredError =>
+      'انتهت صلاحية محاولة تسجيل الدخول هذه. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get ssoWaitingForBrowser =>
+      'أكمل تسجيل الدخول عبر مزوّد الهوية في نافذة المتصفح. ستتابع هذه الصفحة تلقائيًا.';
+
+  @override
+  String get statusPostIncidentTitle => 'نشر حادثة';
+
+  @override
+  String get statusIncidentTitleHint => 'عنوان الحادثة';
+
+  @override
+  String get statusIncidentBodyHint => 'ما الذي يحدث؟ (اختياري)';
+
+  @override
+  String get statusAllSystemsNormal => 'جميع الأنظمة تعمل بشكل طبيعي';
+
+  @override
+  String get statusDegraded => 'أداء منخفض -- تعذر الوصول إلى قاعدة البيانات';
+
+  @override
+  String get statusNoIncidents => 'لا توجد حوادث مُبلَّغ عنها';
+
+  @override
+  String get statusResolvedLabel => 'تم الحل';
+
+  @override
+  String get statusResolveButton => 'حل';
+
+  @override
+  String get commonCopy => 'نسخ';
+
+  @override
+  String get permManageWebhooks => 'إدارة الويب هوك';
+
+  @override
+  String get channelEditDialogManageWebhooks => 'إدارة الويب هوك';
+
+  @override
+  String get webhookScreenTitle => 'الويب هوك';
+
+  @override
+  String get webhookScreenDescription =>
+      'يمكن لأي خدمة قادرة على إرسال طلب ويب نشر رسائل في هذه القناة. متوافق مع الأدوات التي تدعم بالفعل النشر إلى ويب هوك Discord -- فقط الصق هذا الرابط بدلاً من ذلك.';
+
+  @override
+  String get webhookEmptyState => 'لا توجد ويب هوك بعد';
+
+  @override
+  String get webhookCreateTitle => 'إنشاء ويب هوك';
+
+  @override
+  String get webhookNameHint => 'اسم الويب هوك';
+
+  @override
+  String get webhookRegenerateTitle => 'إعادة إنشاء الرابط';
+
+  @override
+  String get webhookRegenerateBody =>
+      'سيتوقف الرابط الحالي عن العمل فورًا. أي شيء ما زال يستخدمه سيحتاج إلى الرابط الجديد.';
+
+  @override
+  String get webhookRegenerateConfirm => 'إعادة إنشاء';
+
+  @override
+  String get webhookUrlRevealTitle => 'رابط الويب هوك';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      'انسخ هذا الآن -- لن تتمكن من رؤيته مرة أخرى. يمكن لأي شخص لديه هذا الرابط نشر رسائل في هذه القناة.';
+
+  @override
+  String get webhookUrlCopiedToast => 'تم نسخ الرابط';
+
+  @override
+  String get webhookUrlSavedIt => 'لقد حفظته';
+
+  @override
+  String get chatWebhookBadge => 'ويب هوك';
 }

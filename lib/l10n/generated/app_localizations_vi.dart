@@ -5230,4 +5230,158 @@ class AppLocalizationsVi extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return 'Điểm cuối cùng: $score';
   }
+
+  @override
+  String get commonContinue => 'Tiếp tục';
+
+  @override
+  String get adminTabEnterprise => 'Doanh nghiệp';
+
+  @override
+  String get adminTabStatus => 'Trạng thái';
+
+  @override
+  String get serverTabSso => 'SSO';
+
+  @override
+  String get serverSsoCardTitle => 'Đăng nhập một lần SAML';
+
+  @override
+  String get serverSsoCardDescription =>
+      'Cho phép thành viên đăng nhập qua nhà cung cấp danh tính của công ty bạn thay vì email và mật khẩu.';
+
+  @override
+  String get serverSsoLockedHint =>
+      'SSO có sẵn ở hạng Doanh nghiệp. Liên hệ với chúng tôi để nâng cấp.';
+
+  @override
+  String get serverSsoEnabledLabel => 'Đã bật SSO';
+
+  @override
+  String get serverSsoEmailDomainLabel => 'Tên miền email công ty';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => 'Entity ID của nhà cung cấp danh tính';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => 'URL SSO của nhà cung cấp danh tính';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel =>
+      'Chứng chỉ X.509 của nhà cung cấp danh tính (PEM)';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => 'Đăng nhập bằng SSO thay vào đó';
+
+  @override
+  String get ssoLoginTitle => 'Đăng nhập bằng SSO';
+
+  @override
+  String get ssoLoginDescription =>
+      'Nhập email công việc của bạn -- chúng tôi sẽ chuyển hướng bạn đến nhà cung cấp danh tính của công ty để hoàn tất đăng nhập.';
+
+  @override
+  String get ssoWorkEmailHint => 'ban@congty.com';
+
+  @override
+  String get ssoNoConfigError =>
+      'Không có SSO được cấu hình cho email đó. Hãy thử mật khẩu của bạn thay thế.';
+
+  @override
+  String get ssoGenericError => 'Đã xảy ra sự cố khi bắt đầu đăng nhập SSO.';
+
+  @override
+  String get ssoExpiredError =>
+      'Lần thử đăng nhập này đã hết hạn. Vui lòng thử lại.';
+
+  @override
+  String get ssoWaitingForBrowser =>
+      'Hoàn tất đăng nhập với nhà cung cấp danh tính của bạn trong cửa sổ trình duyệt. Trang này sẽ tự động tiếp tục.';
+
+  @override
+  String get statusPostIncidentTitle => 'Đăng Sự cố';
+
+  @override
+  String get statusIncidentTitleHint => 'Tiêu đề sự cố';
+
+  @override
+  String get statusIncidentBodyHint => 'Chuyện gì đang xảy ra? (tùy chọn)';
+
+  @override
+  String get statusAllSystemsNormal => 'Tất cả hệ thống bình thường';
+
+  @override
+  String get statusDegraded => 'Suy giảm -- không thể truy cập cơ sở dữ liệu';
+
+  @override
+  String get statusNoIncidents => 'Không có sự cố nào được báo cáo';
+
+  @override
+  String get statusResolvedLabel => 'Đã giải quyết';
+
+  @override
+  String get statusResolveButton => 'Giải quyết';
+
+  @override
+  String get commonCopy => 'Sao chép';
+
+  @override
+  String get permManageWebhooks => 'Quản lý Webhook';
+
+  @override
+  String get channelEditDialogManageWebhooks => 'Quản lý Webhook';
+
+  @override
+  String get webhookScreenTitle => 'Webhook';
+
+  @override
+  String get webhookScreenDescription =>
+      'Bất kỳ dịch vụ nào có thể gửi yêu cầu web đều có thể đăng tin nhắn vào kênh này. Tương thích với các công cụ đã hỗ trợ đăng lên webhook Discord -- chỉ cần dán URL này thay vào đó.';
+
+  @override
+  String get webhookEmptyState => 'Chưa có webhook nào';
+
+  @override
+  String get webhookCreateTitle => 'Tạo Webhook';
+
+  @override
+  String get webhookNameHint => 'Tên webhook';
+
+  @override
+  String get webhookRegenerateTitle => 'Tạo lại URL';
+
+  @override
+  String get webhookRegenerateBody =>
+      'URL hiện tại sẽ ngừng hoạt động ngay lập tức. Bất cứ thứ gì vẫn đang sử dụng nó sẽ cần URL mới.';
+
+  @override
+  String get webhookRegenerateConfirm => 'Tạo lại';
+
+  @override
+  String get webhookUrlRevealTitle => 'URL Webhook';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      'Sao chép ngay bây giờ -- bạn sẽ không thể xem lại nó. Bất kỳ ai có URL này đều có thể đăng tin nhắn vào kênh này.';
+
+  @override
+  String get webhookUrlCopiedToast => 'Đã sao chép URL';
+
+  @override
+  String get webhookUrlSavedIt => 'Tôi đã lưu nó';
+
+  @override
+  String get chatWebhookBadge => 'WEBHOOK';
 }

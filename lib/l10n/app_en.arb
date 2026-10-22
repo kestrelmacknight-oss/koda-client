@@ -1741,5 +1741,61 @@
   "@arcadeMatch3MovesLeftLabel": {"placeholders": {"count": {"type": "int"}}},
   "arcadeMatch3GameOverTitle": "Out of Moves",
   "arcadeMatch3GameOverBody": "Final score: {score}",
-  "@arcadeMatch3GameOverBody": {"placeholders": {"score": {"type": "int"}}}
+  "@arcadeMatch3GameOverBody": {"placeholders": {"score": {"type": "int"}}},
+
+  "commonContinue": "Continue",
+
+  "adminTabEnterprise": "Enterprise",
+  "adminTabStatus": "Status",
+
+  "serverTabSso": "SSO",
+  "serverSsoCardTitle": "SAML Single Sign-On",
+  "serverSsoCardDescription": "Let members sign in through your company's identity provider instead of an email and password.",
+  "serverSsoLockedHint": "SSO is available on the Enterprise tier. Contact us to upgrade this server.",
+  "serverSsoEnabledLabel": "SSO enabled",
+  "serverSsoEmailDomainLabel": "Company email domain",
+  "serverSsoEmailDomainHint": "acme.com",
+  "serverSsoEntityIdLabel": "Identity provider Entity ID",
+  "serverSsoEntityIdHint": "https://idp.example.com/entity",
+  "serverSsoSsoUrlLabel": "Identity provider SSO URL",
+  "serverSsoSsoUrlHint": "https://idp.example.com/sso/redirect",
+  "serverSsoCertLabel": "Identity provider X.509 certificate (PEM)",
+  "serverSsoCertHint": "-----BEGIN CERTIFICATE-----",
+
+  "ssoSignInButton": "Sign in with SSO instead",
+  "ssoLoginTitle": "Sign in with SSO",
+  "ssoLoginDescription": "Enter your work email -- we'll redirect you to your company's identity provider to finish signing in.",
+  "ssoWorkEmailHint": "you@company.com",
+  "ssoNoConfigError": "No SSO is configured for that email. Try your password instead.",
+  "ssoGenericError": "Something went wrong starting SSO sign-in.",
+  "ssoExpiredError": "That sign-in attempt expired. Please try again.",
+  "ssoWaitingForBrowser": "Finish signing in with your identity provider in the browser window. This page will continue automatically.",
+
+  "statusPostIncidentTitle": "Post Incident",
+  "statusIncidentTitleHint": "Incident title",
+  "statusIncidentBodyHint": "What's happening? (optional)",
+  "statusAllSystemsNormal": "All systems normal",
+  "statusDegraded": "Degraded -- database unreachable",
+  "statusNoIncidents": "No incidents reported",
+  "statusResolvedLabel": "Resolved",
+  "statusResolveButton": "Resolve",
+
+  "commonCopy": "Copy",
+  "permManageWebhooks": "Manage Webhooks",
+  "channelEditDialogManageWebhooks": "Manage Webhooks",
+
+  "webhookScreenTitle": "Webhooks",
+  "webhookScreenDescription": "Any service that can send a web request can post messages into this channel. Compatible with tools that already support posting to a Discord webhook -- just paste this URL in instead.",
+  "webhookEmptyState": "No webhooks yet",
+  "webhookCreateTitle": "Create Webhook",
+  "webhookNameHint": "Webhook name",
+  "webhookRegenerateTitle": "Regenerate URL",
+  "webhookRegenerateBody": "The current URL will stop working immediately. Anything still using it will need the new one.",
+  "webhookRegenerateConfirm": "Regenerate",
+  "webhookUrlRevealTitle": "Webhook URL",
+  "webhookUrlRevealWarning": "Copy this now -- you won't be able to see it again. Anyone with this URL can post messages into this channel.",
+  "webhookUrlCopiedToast": "URL copied",
+  "webhookUrlSavedIt": "I've saved it",
+
+  "chatWebhookBadge": "WEBHOOK"
 }

@@ -5240,4 +5240,159 @@ class AppLocalizationsSv extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return 'Slutpoäng: $score';
   }
+
+  @override
+  String get commonContinue => 'Fortsätt';
+
+  @override
+  String get adminTabEnterprise => 'Enterprise';
+
+  @override
+  String get adminTabStatus => 'Status';
+
+  @override
+  String get serverTabSso => 'SSO';
+
+  @override
+  String get serverSsoCardTitle => 'SAML Single Sign-On';
+
+  @override
+  String get serverSsoCardDescription =>
+      'Låt medlemmar logga in via ditt företags identitetsleverantör istället för e-post och lösenord.';
+
+  @override
+  String get serverSsoLockedHint =>
+      'SSO finns tillgängligt på Enterprise-nivån. Kontakta oss för att uppgradera.';
+
+  @override
+  String get serverSsoEnabledLabel => 'SSO aktiverat';
+
+  @override
+  String get serverSsoEmailDomainLabel => 'Företagets e-postdomän';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => 'Entity-ID för identitetsleverantör';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => 'SSO-URL för identitetsleverantör';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel =>
+      'X.509-certifikat för identitetsleverantör (PEM)';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => 'Logga in med SSO istället';
+
+  @override
+  String get ssoLoginTitle => 'Logga in med SSO';
+
+  @override
+  String get ssoLoginDescription =>
+      'Ange din jobb-e-post -- vi omdirigerar dig till ditt företags identitetsleverantör för att slutföra inloggningen.';
+
+  @override
+  String get ssoWorkEmailHint => 'du@foretag.com';
+
+  @override
+  String get ssoNoConfigError =>
+      'Ingen SSO är konfigurerad för den e-posten. Prova ditt lösenord istället.';
+
+  @override
+  String get ssoGenericError =>
+      'Något gick fel när SSO-inloggningen skulle startas.';
+
+  @override
+  String get ssoExpiredError =>
+      'Det här inloggningsförsöket har upphört. Försök igen.';
+
+  @override
+  String get ssoWaitingForBrowser =>
+      'Slutför inloggningen hos din identitetsleverantör i webbläsarfönstret. Den här sidan fortsätter automatiskt.';
+
+  @override
+  String get statusPostIncidentTitle => 'Publicera incident';
+
+  @override
+  String get statusIncidentTitleHint => 'Incidentens titel';
+
+  @override
+  String get statusIncidentBodyHint => 'Vad händer? (valfritt)';
+
+  @override
+  String get statusAllSystemsNormal => 'Alla system fungerar normalt';
+
+  @override
+  String get statusDegraded => 'Nedsatt -- databasen är oåtkomlig';
+
+  @override
+  String get statusNoIncidents => 'Inga incidenter rapporterade';
+
+  @override
+  String get statusResolvedLabel => 'Löst';
+
+  @override
+  String get statusResolveButton => 'Lös';
+
+  @override
+  String get commonCopy => 'Kopiera';
+
+  @override
+  String get permManageWebhooks => 'Hantera webhooks';
+
+  @override
+  String get channelEditDialogManageWebhooks => 'Hantera webhooks';
+
+  @override
+  String get webhookScreenTitle => 'Webhooks';
+
+  @override
+  String get webhookScreenDescription =>
+      'Vilken tjänst som helst som kan skicka en webbförfrågan kan posta meddelanden i den här kanalen. Kompatibel med verktyg som redan stöder att posta till en Discord-webhook -- klistra bara in den här URL:en istället.';
+
+  @override
+  String get webhookEmptyState => 'Inga webhooks än';
+
+  @override
+  String get webhookCreateTitle => 'Skapa webhook';
+
+  @override
+  String get webhookNameHint => 'Webhookens namn';
+
+  @override
+  String get webhookRegenerateTitle => 'Återskapa URL';
+
+  @override
+  String get webhookRegenerateBody =>
+      'Den nuvarande URL:en slutar fungera omedelbart. Allt som fortfarande använder den behöver den nya.';
+
+  @override
+  String get webhookRegenerateConfirm => 'Återskapa';
+
+  @override
+  String get webhookUrlRevealTitle => 'Webhook-URL';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      'Kopiera det här nu -- du kommer inte kunna se det igen. Vem som helst med den här URL:en kan posta meddelanden i den här kanalen.';
+
+  @override
+  String get webhookUrlCopiedToast => 'URL kopierad';
+
+  @override
+  String get webhookUrlSavedIt => 'Jag har sparat det';
+
+  @override
+  String get chatWebhookBadge => 'WEBHOOK';
 }

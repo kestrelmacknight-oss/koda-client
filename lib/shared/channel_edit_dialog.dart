@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import '../core/api.dart';
 import '../core/theme.dart';
 import '../features/settings/content_filters_screen.dart' show kContentLabels, kContentLabelNames;
+import '../features/server/channel_webhooks_screen.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'slowmode.dart';
 import 'widgets.dart';
@@ -237,6 +238,17 @@ Future<void> showChannelEditDialog(
                     }),
                   );
                 }),
+              ],
+              if (existing != null && type == 'text') ...[
+                _SectionDivider(),
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(foregroundColor: KodaColors.koda),
+                  icon: const Icon(Icons.webhook, size: 16),
+                  label: Text(t.channelEditDialogManageWebhooks),
+                  onPressed: () => Navigator.push(ctx, MaterialPageRoute(
+                      builder: (_) => ChannelWebhooksScreen(
+                          serverId: serverId, channelId: existing['id'] as String))),
+                ),
               ],
             ]),
           ),

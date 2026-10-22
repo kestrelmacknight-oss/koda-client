@@ -5313,4 +5313,159 @@ class AppLocalizationsRu extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return 'Итоговый результат: $score';
   }
+
+  @override
+  String get commonContinue => 'Продолжить';
+
+  @override
+  String get adminTabEnterprise => 'Enterprise';
+
+  @override
+  String get adminTabStatus => 'Статус';
+
+  @override
+  String get serverTabSso => 'SSO';
+
+  @override
+  String get serverSsoCardTitle => 'Единый вход SAML';
+
+  @override
+  String get serverSsoCardDescription =>
+      'Позвольте участникам входить через поставщика удостоверений вашей компании вместо email и пароля.';
+
+  @override
+  String get serverSsoLockedHint =>
+      'SSO доступен на уровне Enterprise. Свяжитесь с нами для обновления.';
+
+  @override
+  String get serverSsoEnabledLabel => 'SSO включён';
+
+  @override
+  String get serverSsoEmailDomainLabel => 'Домен корпоративной почты';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => 'Entity ID поставщика удостоверений';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => 'SSO URL поставщика удостоверений';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel =>
+      'Сертификат X.509 поставщика удостоверений (PEM)';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => 'Войти через SSO';
+
+  @override
+  String get ssoLoginTitle => 'Вход через SSO';
+
+  @override
+  String get ssoLoginDescription =>
+      'Введите свой рабочий email -- мы перенаправим вас к поставщику удостоверений вашей компании для завершения входа.';
+
+  @override
+  String get ssoWorkEmailHint => 'you@company.com';
+
+  @override
+  String get ssoNoConfigError =>
+      'Для этого email SSO не настроен. Попробуйте использовать пароль.';
+
+  @override
+  String get ssoGenericError => 'При запуске входа через SSO произошла ошибка.';
+
+  @override
+  String get ssoExpiredError =>
+      'Срок действия этой попытки входа истёк. Попробуйте снова.';
+
+  @override
+  String get ssoWaitingForBrowser =>
+      'Завершите вход у поставщика удостоверений в окне браузера. Эта страница продолжит автоматически.';
+
+  @override
+  String get statusPostIncidentTitle => 'Опубликовать инцидент';
+
+  @override
+  String get statusIncidentTitleHint => 'Заголовок инцидента';
+
+  @override
+  String get statusIncidentBodyHint => 'Что происходит? (необязательно)';
+
+  @override
+  String get statusAllSystemsNormal => 'Все системы работают нормально';
+
+  @override
+  String get statusDegraded =>
+      'Снижена производительность -- база данных недоступна';
+
+  @override
+  String get statusNoIncidents => 'Инцидентов не зафиксировано';
+
+  @override
+  String get statusResolvedLabel => 'Решено';
+
+  @override
+  String get statusResolveButton => 'Решить';
+
+  @override
+  String get commonCopy => 'Копировать';
+
+  @override
+  String get permManageWebhooks => 'Управление вебхуками';
+
+  @override
+  String get channelEditDialogManageWebhooks => 'Управление вебхуками';
+
+  @override
+  String get webhookScreenTitle => 'Вебхуки';
+
+  @override
+  String get webhookScreenDescription =>
+      'Любой сервис, способный отправить веб-запрос, может публиковать сообщения в этом канале. Совместимо с инструментами, уже поддерживающими публикацию в вебхук Discord -- просто вставьте этот URL вместо него.';
+
+  @override
+  String get webhookEmptyState => 'Пока нет вебхуков';
+
+  @override
+  String get webhookCreateTitle => 'Создать вебхук';
+
+  @override
+  String get webhookNameHint => 'Название вебхука';
+
+  @override
+  String get webhookRegenerateTitle => 'Пересоздать URL';
+
+  @override
+  String get webhookRegenerateBody =>
+      'Текущий URL немедленно перестанет работать. Всему, что всё ещё его использует, потребуется новый.';
+
+  @override
+  String get webhookRegenerateConfirm => 'Пересоздать';
+
+  @override
+  String get webhookUrlRevealTitle => 'URL вебхука';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      'Скопируйте это сейчас -- вы не сможете увидеть это снова. Любой, у кого есть этот URL, может публиковать сообщения в этом канале.';
+
+  @override
+  String get webhookUrlCopiedToast => 'URL скопирован';
+
+  @override
+  String get webhookUrlSavedIt => 'Я сохранил это';
+
+  @override
+  String get chatWebhookBadge => 'ВЕБХУК';
 }

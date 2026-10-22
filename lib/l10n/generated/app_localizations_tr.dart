@@ -5244,4 +5244,157 @@ class AppLocalizationsTr extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return 'Son skor: $score';
   }
+
+  @override
+  String get commonContinue => 'Devam Et';
+
+  @override
+  String get adminTabEnterprise => 'Kurumsal';
+
+  @override
+  String get adminTabStatus => 'Durum';
+
+  @override
+  String get serverTabSso => 'SSO';
+
+  @override
+  String get serverSsoCardTitle => 'SAML Tek Oturum Açma';
+
+  @override
+  String get serverSsoCardDescription =>
+      'Üyelerin e-posta ve şifre yerine şirketinizin kimlik sağlayıcısı üzerinden oturum açmasına izin verin.';
+
+  @override
+  String get serverSsoLockedHint =>
+      'SSO, Kurumsal katmanda kullanılabilir. Yükseltmek için bizimle iletişime geçin.';
+
+  @override
+  String get serverSsoEnabledLabel => 'SSO etkin';
+
+  @override
+  String get serverSsoEmailDomainLabel => 'Şirket e-posta alanı';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => 'Kimlik sağlayıcı Entity ID';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => 'Kimlik sağlayıcı SSO URL\'si';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel => 'Kimlik sağlayıcı X.509 sertifikası (PEM)';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => 'Bunun yerine SSO ile giriş yap';
+
+  @override
+  String get ssoLoginTitle => 'SSO ile Giriş Yap';
+
+  @override
+  String get ssoLoginDescription =>
+      'İş e-postanızı girin -- girişi tamamlamanız için sizi şirketinizin kimlik sağlayıcısına yönlendireceğiz.';
+
+  @override
+  String get ssoWorkEmailHint => 'siz@sirket.com';
+
+  @override
+  String get ssoNoConfigError =>
+      'Bu e-posta için yapılandırılmış bir SSO yok. Bunun yerine şifrenizi deneyin.';
+
+  @override
+  String get ssoGenericError => 'SSO girişi başlatılırken bir sorun oluştu.';
+
+  @override
+  String get ssoExpiredError =>
+      'Bu giriş denemesinin süresi doldu. Lütfen tekrar deneyin.';
+
+  @override
+  String get ssoWaitingForBrowser =>
+      'Tarayıcı penceresinde kimlik sağlayıcınızla girişi tamamlayın. Bu sayfa otomatik olarak devam edecek.';
+
+  @override
+  String get statusPostIncidentTitle => 'Olay Yayınla';
+
+  @override
+  String get statusIncidentTitleHint => 'Olay başlığı';
+
+  @override
+  String get statusIncidentBodyHint => 'Ne oluyor? (isteğe bağlı)';
+
+  @override
+  String get statusAllSystemsNormal => 'Tüm sistemler normal';
+
+  @override
+  String get statusDegraded => 'Düşük performans -- veritabanına ulaşılamıyor';
+
+  @override
+  String get statusNoIncidents => 'Bildirilen olay yok';
+
+  @override
+  String get statusResolvedLabel => 'Çözüldü';
+
+  @override
+  String get statusResolveButton => 'Çöz';
+
+  @override
+  String get commonCopy => 'Kopyala';
+
+  @override
+  String get permManageWebhooks => 'Webhookları Yönet';
+
+  @override
+  String get channelEditDialogManageWebhooks => 'Webhookları Yönet';
+
+  @override
+  String get webhookScreenTitle => 'Webhooklar';
+
+  @override
+  String get webhookScreenDescription =>
+      'Bir web isteği gönderebilen herhangi bir hizmet bu kanala mesaj gönderebilir. Zaten bir Discord webhook\'una gönderimi destekleyen araçlarla uyumludur -- sadece bu URL\'yi yapıştırmanız yeterli.';
+
+  @override
+  String get webhookEmptyState => 'Henüz webhook yok';
+
+  @override
+  String get webhookCreateTitle => 'Webhook Oluştur';
+
+  @override
+  String get webhookNameHint => 'Webhook adı';
+
+  @override
+  String get webhookRegenerateTitle => 'URL\'yi Yeniden Oluştur';
+
+  @override
+  String get webhookRegenerateBody =>
+      'Mevcut URL hemen çalışmayı durduracak. Hâlâ onu kullanan her şeyin yenisine ihtiyacı olacak.';
+
+  @override
+  String get webhookRegenerateConfirm => 'Yeniden Oluştur';
+
+  @override
+  String get webhookUrlRevealTitle => 'Webhook URL\'si';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      'Bunu şimdi kopyalayın -- tekrar göremeyeceksiniz. Bu URL\'ye sahip herkes bu kanala mesaj gönderebilir.';
+
+  @override
+  String get webhookUrlCopiedToast => 'URL kopyalandı';
+
+  @override
+  String get webhookUrlSavedIt => 'Kaydettim';
+
+  @override
+  String get chatWebhookBadge => 'WEBHOOK';
 }

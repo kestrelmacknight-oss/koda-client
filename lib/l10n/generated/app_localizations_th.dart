@@ -5198,4 +5198,160 @@ class AppLocalizationsTh extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return 'คะแนนสุดท้าย: $score';
   }
+
+  @override
+  String get commonContinue => 'ดำเนินการต่อ';
+
+  @override
+  String get adminTabEnterprise => 'องค์กร';
+
+  @override
+  String get adminTabStatus => 'สถานะ';
+
+  @override
+  String get serverTabSso => 'SSO';
+
+  @override
+  String get serverSsoCardTitle => 'การเข้าสู่ระบบครั้งเดียวด้วย SAML';
+
+  @override
+  String get serverSsoCardDescription =>
+      'อนุญาตให้สมาชิกเข้าสู่ระบบผ่านผู้ให้บริการข้อมูลประจำตัวของบริษัทคุณแทนอีเมลและรหัสผ่าน';
+
+  @override
+  String get serverSsoLockedHint =>
+      'SSO มีให้บริการในระดับองค์กร ติดต่อเราเพื่ออัปเกรด';
+
+  @override
+  String get serverSsoEnabledLabel => 'เปิดใช้งาน SSO';
+
+  @override
+  String get serverSsoEmailDomainLabel => 'โดเมนอีเมลบริษัท';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel =>
+      'Entity ID ของผู้ให้บริการข้อมูลประจำตัว';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => 'URL SSO ของผู้ให้บริการข้อมูลประจำตัว';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel =>
+      'ใบรับรอง X.509 ของผู้ให้บริการข้อมูลประจำตัว (PEM)';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => 'เข้าสู่ระบบด้วย SSO แทน';
+
+  @override
+  String get ssoLoginTitle => 'เข้าสู่ระบบด้วย SSO';
+
+  @override
+  String get ssoLoginDescription =>
+      'กรอกอีเมลที่ทำงานของคุณ -- เราจะนำคุณไปยังผู้ให้บริการข้อมูลประจำตัวของบริษัทเพื่อดำเนินการเข้าสู่ระบบให้เสร็จสมบูรณ์';
+
+  @override
+  String get ssoWorkEmailHint => 'you@company.com';
+
+  @override
+  String get ssoNoConfigError =>
+      'ไม่มีการตั้งค่า SSO สำหรับอีเมลนั้น ลองใช้รหัสผ่านแทน';
+
+  @override
+  String get ssoGenericError => 'เกิดข้อผิดพลาดขณะเริ่มการเข้าสู่ระบบด้วย SSO';
+
+  @override
+  String get ssoExpiredError =>
+      'ความพยายามเข้าสู่ระบบนี้หมดอายุแล้ว โปรดลองอีกครั้ง';
+
+  @override
+  String get ssoWaitingForBrowser =>
+      'ดำเนินการเข้าสู่ระบบกับผู้ให้บริการข้อมูลประจำตัวของคุณในหน้าต่างเบราว์เซอร์ให้เสร็จสิ้น หน้านี้จะดำเนินการต่อโดยอัตโนมัติ';
+
+  @override
+  String get statusPostIncidentTitle => 'โพสต์เหตุการณ์';
+
+  @override
+  String get statusIncidentTitleHint => 'ชื่อเหตุการณ์';
+
+  @override
+  String get statusIncidentBodyHint => 'เกิดอะไรขึ้น? (ไม่บังคับ)';
+
+  @override
+  String get statusAllSystemsNormal => 'ระบบทั้งหมดทำงานปกติ';
+
+  @override
+  String get statusDegraded =>
+      'ประสิทธิภาพลดลง -- ไม่สามารถเข้าถึงฐานข้อมูลได้';
+
+  @override
+  String get statusNoIncidents => 'ไม่มีรายงานเหตุการณ์';
+
+  @override
+  String get statusResolvedLabel => 'แก้ไขแล้ว';
+
+  @override
+  String get statusResolveButton => 'แก้ไข';
+
+  @override
+  String get commonCopy => 'คัดลอก';
+
+  @override
+  String get permManageWebhooks => 'จัดการเว็บฮุก';
+
+  @override
+  String get channelEditDialogManageWebhooks => 'จัดการเว็บฮุก';
+
+  @override
+  String get webhookScreenTitle => 'เว็บฮุก';
+
+  @override
+  String get webhookScreenDescription =>
+      'บริการใดก็ตามที่สามารถส่งคำขอเว็บได้สามารถโพสต์ข้อความในช่องนี้ได้ รองรับเครื่องมือที่รองรับการโพสต์ไปยังเว็บฮุกของ Discord อยู่แล้ว -- เพียงวาง URL นี้แทน';
+
+  @override
+  String get webhookEmptyState => 'ยังไม่มีเว็บฮุก';
+
+  @override
+  String get webhookCreateTitle => 'สร้างเว็บฮุก';
+
+  @override
+  String get webhookNameHint => 'ชื่อเว็บฮุก';
+
+  @override
+  String get webhookRegenerateTitle => 'สร้าง URL ใหม่';
+
+  @override
+  String get webhookRegenerateBody =>
+      'URL ปัจจุบันจะหยุดทำงานทันที สิ่งใดก็ตามที่ยังใช้งานอยู่จะต้องใช้ URL ใหม่';
+
+  @override
+  String get webhookRegenerateConfirm => 'สร้างใหม่';
+
+  @override
+  String get webhookUrlRevealTitle => 'URL เว็บฮุก';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      'คัดลอกตอนนี้ -- คุณจะไม่สามารถเห็นมันอีก ใครก็ตามที่มี URL นี้สามารถโพสต์ข้อความในช่องนี้ได้';
+
+  @override
+  String get webhookUrlCopiedToast => 'คัดลอก URL แล้ว';
+
+  @override
+  String get webhookUrlSavedIt => 'ฉันบันทึกไว้แล้ว';
+
+  @override
+  String get chatWebhookBadge => 'เว็บฮุก';
 }

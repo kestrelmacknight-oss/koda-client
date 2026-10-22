@@ -15,6 +15,7 @@ import '../../../core/api.dart';
 import '../../../core/theme.dart';
 import '../../../shared/widgets.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../status/status_screen.dart';
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
@@ -29,7 +30,7 @@ class _AdminScreenState extends State<AdminScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 6, vsync: this);
+    _tabs = TabController(length: 8, vsync: this);
   }
 
   @override
@@ -64,6 +65,8 @@ class _AdminScreenState extends State<AdminScreen>
             Tab(text: t.adminTabSpamFlags),
             Tab(text: t.adminTabWiki),
             Tab(text: t.adminTabBoosts),
+            Tab(text: t.adminTabEnterprise),
+            Tab(text: t.adminTabStatus),
           ],
         ),
       ),
@@ -76,6 +79,8 @@ class _AdminScreenState extends State<AdminScreen>
           _SpamFlagsTab(),
           _WikiTab(),
           _BoostsTab(),
+          _EnterpriseTab(),
+          const StatusScreen(),
         ],
       ),
     );
@@ -1175,6 +1180,123 @@ class _BoostsTabState extends State<_BoostsTab> {
                                   onPressed: () => _grant(s),
                                   icon: Icon(Icons.bolt, size: 16, color: KodaColors.koda),
                                   label: Text(t.adminGrantBoostsButtonLabel, style: TextStyle(color: KodaColors.koda)),
+                                ),
+                        ]),
+                      );
+                    },
+                  ),
+      ),
+    ]);
+  }
+}
+
+/// Enterprise customers are onboarded manually (comped), not self-serve
+/// -- same search-then-act shape as _BoostsTab above, a toggle instead
+/// of a grant-count dialog. See Koda.Servers.set_enterprise_tier/2.
+class _EnterpriseTab extends StatefulWidget {
+  @override
+  State<_EnterpriseTab> createState() => _EnterpriseTabState();
+}
+
+class _EnterpriseTabState extends State<_EnterpriseTab> {
+  final _searchCtrl = TextEditingController();
+  List<Map<String, dynamic>> _results = [];
+  bool _loading = false;
+  String? _togglingServerId;
+
+  Future<void> _search(String query) async {
+    if (query.trim().isEmpty) return;
+    setState(() => _loading = true);
+    final results = await KodaApi.instance.adminSearchServers(query.trim());
+    if (!mounted) return;
+    setState(() { _results = results; _loading = false; });
+  }
+
+  Future<void> _toggle(Map<String, dynamic> server) async {
+    final serverId = server['id'] as String;
+    final newValue = !(server['enterprise_tier'] as bool? ?? false);
+    setState(() => _togglingServerId = serverId);
+    final ok = await KodaApi.instance.adminSetEnterpriseTier(serverId, newValue);
+    if (!mounted) return;
+    setState(() {
+      _togglingServerId = null;
+      if (ok) {
+        final i = _results.indexWhere((s) => s['id'] == serverId);
+        if (i != -1) _results[i] = {..._results[i], 'enterprise_tier': newValue};
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.all(16),
+        child: KodaTextField(
+          controller: _searchCtrl,
+          hintText: t.adminSearchServersHint,
+          onSubmitted: _search,
+        ),
+      ),
+      Divider(color: KodaColors.border, height: 1),
+      Expanded(
+        child: _loading
+            ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
+            : _results.isEmpty
+                ? Center(child: Text(t.adminSearchServersPrompt,
+                    style: TextStyle(color: KodaColors.text3)))
+                : ListView.builder(
+                    padding: const EdgeInsets.all(12),
+                    itemCount: _results.length,
+                    itemBuilder: (_, i) {
+                      final s = _results[i];
+                      final iconUrl = s['icon_url'] as String?;
+                      final enabled = s['enterprise_tier'] as bool? ?? false;
+                      final toggling = _togglingServerId == s['id'];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: KodaColors.card,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: enabled ? KodaColors.koda : KodaColors.border),
+                        ),
+                        child: Row(children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: SizedBox(
+                              width: 36, height: 36,
+                              child: iconUrl != null
+                                  ? Image.network(iconUrl, fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => ColoredBox(color: KodaColors.elevated))
+                                  : ColoredBox(color: KodaColors.elevated,
+                                      child: Icon(Icons.groups_outlined, color: KodaColors.text3, size: 18)),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                            Text(s['name'] as String? ?? '',
+                                style: TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w600)),
+                            Text(t.adminMemberCountLabel(s['member_count'] as int? ?? 0),
+                                style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+                          ])),
+                          const SizedBox(width: 8),
+                          toggling
+                              ? SizedBox(width: 20, height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
+                              : Switch(
+                                  value: enabled,
+                                  activeThumbColor: KodaColors.koda,
+                                  onChanged: (_) => _toggle(s),
                                 ),
                         ]),
                       );

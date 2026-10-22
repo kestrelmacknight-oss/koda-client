@@ -5321,4 +5321,157 @@ class AppLocalizationsPl extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return 'Wynik końcowy: $score';
   }
+
+  @override
+  String get commonContinue => 'Kontynuuj';
+
+  @override
+  String get adminTabEnterprise => 'Enterprise';
+
+  @override
+  String get adminTabStatus => 'Status';
+
+  @override
+  String get serverTabSso => 'SSO';
+
+  @override
+  String get serverSsoCardTitle => 'Logowanie jednokrotne SAML';
+
+  @override
+  String get serverSsoCardDescription =>
+      'Pozwól członkom logować się za pośrednictwem dostawcy tożsamości Twojej firmy zamiast e-maila i hasła.';
+
+  @override
+  String get serverSsoLockedHint =>
+      'SSO jest dostępne w planie Enterprise. Skontaktuj się z nami, aby dokonać aktualizacji.';
+
+  @override
+  String get serverSsoEnabledLabel => 'SSO włączone';
+
+  @override
+  String get serverSsoEmailDomainLabel => 'Domena firmowego e-maila';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => 'Entity ID dostawcy tożsamości';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => 'URL SSO dostawcy tożsamości';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel => 'Certyfikat X.509 dostawcy tożsamości (PEM)';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => 'Zaloguj się przez SSO';
+
+  @override
+  String get ssoLoginTitle => 'Logowanie przez SSO';
+
+  @override
+  String get ssoLoginDescription =>
+      'Wprowadź swój firmowy e-mail -- przekierujemy Cię do dostawcy tożsamości Twojej firmy, aby dokończyć logowanie.';
+
+  @override
+  String get ssoWorkEmailHint => 'ty@firma.com';
+
+  @override
+  String get ssoNoConfigError =>
+      'Dla tego e-maila nie skonfigurowano SSO. Spróbuj zamiast tego użyć hasła.';
+
+  @override
+  String get ssoGenericError =>
+      'Coś poszło nie tak podczas rozpoczynania logowania SSO.';
+
+  @override
+  String get ssoExpiredError => 'Ta próba logowania wygasła. Spróbuj ponownie.';
+
+  @override
+  String get ssoWaitingForBrowser =>
+      'Dokończ logowanie u swojego dostawcy tożsamości w oknie przeglądarki. Ta strona będzie kontynuować automatycznie.';
+
+  @override
+  String get statusPostIncidentTitle => 'Opublikuj Incydent';
+
+  @override
+  String get statusIncidentTitleHint => 'Tytuł incydentu';
+
+  @override
+  String get statusIncidentBodyHint => 'Co się dzieje? (opcjonalnie)';
+
+  @override
+  String get statusAllSystemsNormal => 'Wszystkie systemy działają normalnie';
+
+  @override
+  String get statusDegraded => 'Obniżona wydajność -- baza danych niedostępna';
+
+  @override
+  String get statusNoIncidents => 'Brak zgłoszonych incydentów';
+
+  @override
+  String get statusResolvedLabel => 'Rozwiązane';
+
+  @override
+  String get statusResolveButton => 'Rozwiąż';
+
+  @override
+  String get commonCopy => 'Kopiuj';
+
+  @override
+  String get permManageWebhooks => 'Zarządzaj webhookami';
+
+  @override
+  String get channelEditDialogManageWebhooks => 'Zarządzaj webhookami';
+
+  @override
+  String get webhookScreenTitle => 'Webhooki';
+
+  @override
+  String get webhookScreenDescription =>
+      'Każda usługa, która może wysłać żądanie sieciowe, może publikować wiadomości na tym kanale. Kompatybilne z narzędziami, które już obsługują publikowanie do webhooka Discord -- po prostu wklej tutaj ten adres URL.';
+
+  @override
+  String get webhookEmptyState => 'Brak webhooków';
+
+  @override
+  String get webhookCreateTitle => 'Utwórz webhook';
+
+  @override
+  String get webhookNameHint => 'Nazwa webhooka';
+
+  @override
+  String get webhookRegenerateTitle => 'Wygeneruj ponownie URL';
+
+  @override
+  String get webhookRegenerateBody =>
+      'Bieżący URL natychmiast przestanie działać. Wszystko, co go jeszcze używa, będzie potrzebować nowego.';
+
+  @override
+  String get webhookRegenerateConfirm => 'Wygeneruj ponownie';
+
+  @override
+  String get webhookUrlRevealTitle => 'URL webhooka';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      'Skopiuj to teraz -- nie będziesz mógł zobaczyć tego ponownie. Każdy, kto ma ten URL, może publikować wiadomości na tym kanale.';
+
+  @override
+  String get webhookUrlCopiedToast => 'URL skopiowany';
+
+  @override
+  String get webhookUrlSavedIt => 'Zapisałem to';
+
+  @override
+  String get chatWebhookBadge => 'WEBHOOK';
 }

@@ -15,6 +15,7 @@ import '../../shared/widgets.dart';
 import 'child_lockout_screen.dart';
 import 'verify_email_screen.dart';
 import 'forgot_password_screen.dart';
+import 'sso_login_screen.dart';
 import '../home/home_screen.dart';
 import 'force_password_change_screen.dart';
 
@@ -279,6 +280,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         ),
         const SizedBox(height: 8),
         KodaPrimaryButton(label: t.authSignInButton, onPressed: _login, busy: _busy),
+        const SizedBox(height: 10),
+        Align(
+          alignment: Alignment.center,
+          child: TextButton(
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const SsoLoginScreen())),
+            child: Text(t.ssoSignInButton,
+                style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+          ),
+        ),
       ]);
 
   Widget _registerTab(AppLocalizations t) => SingleChildScrollView(

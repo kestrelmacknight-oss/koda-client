@@ -5079,4 +5079,155 @@ class AppLocalizationsJa extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return '最終スコア: $score';
   }
+
+  @override
+  String get commonContinue => '続ける';
+
+  @override
+  String get adminTabEnterprise => 'エンタープライズ';
+
+  @override
+  String get adminTabStatus => 'ステータス';
+
+  @override
+  String get serverTabSso => 'SSO';
+
+  @override
+  String get serverSsoCardTitle => 'SAML シングルサインオン';
+
+  @override
+  String get serverSsoCardDescription =>
+      'メールとパスワードの代わりに、会社のIDプロバイダーでメンバーをサインインさせます。';
+
+  @override
+  String get serverSsoLockedHint =>
+      'SSOはエンタープライズ層で利用できます。アップグレードについてはお問い合わせください。';
+
+  @override
+  String get serverSsoEnabledLabel => 'SSO有効';
+
+  @override
+  String get serverSsoEmailDomainLabel => '会社のメールドメイン';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => 'IDプロバイダーのEntity ID';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => 'IDプロバイダーのSSO URL';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel => 'IDプロバイダーのX.509証明書（PEM）';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => '代わりにSSOでサインイン';
+
+  @override
+  String get ssoLoginTitle => 'SSOでサインイン';
+
+  @override
+  String get ssoLoginDescription =>
+      '勤務先のメールアドレスを入力してください -- サインインを完了するために会社のIDプロバイダーにリダイレクトします。';
+
+  @override
+  String get ssoWorkEmailHint => 'you@company.com';
+
+  @override
+  String get ssoNoConfigError => 'そのメールにはSSOが設定されていません。代わりにパスワードをお試しください。';
+
+  @override
+  String get ssoGenericError => 'SSOサインインの開始中に問題が発生しました。';
+
+  @override
+  String get ssoExpiredError => 'このサインイン試行は期限切れです。もう一度お試しください。';
+
+  @override
+  String get ssoWaitingForBrowser =>
+      'ブラウザウィンドウでIDプロバイダーへのサインインを完了してください。このページは自動的に続行します。';
+
+  @override
+  String get statusPostIncidentTitle => 'インシデントを投稿';
+
+  @override
+  String get statusIncidentTitleHint => 'インシデントのタイトル';
+
+  @override
+  String get statusIncidentBodyHint => '何が起きていますか？（任意）';
+
+  @override
+  String get statusAllSystemsNormal => 'すべてのシステムは正常です';
+
+  @override
+  String get statusDegraded => '低下 -- データベースに到達できません';
+
+  @override
+  String get statusNoIncidents => '報告されたインシデントはありません';
+
+  @override
+  String get statusResolvedLabel => '解決済み';
+
+  @override
+  String get statusResolveButton => '解決';
+
+  @override
+  String get commonCopy => 'コピー';
+
+  @override
+  String get permManageWebhooks => 'Webhookの管理';
+
+  @override
+  String get channelEditDialogManageWebhooks => 'Webhookを管理';
+
+  @override
+  String get webhookScreenTitle => 'Webhook';
+
+  @override
+  String get webhookScreenDescription =>
+      'Webリクエストを送信できるサービスであれば、このチャンネルにメッセージを投稿できます。Discordのwebhookへの投稿に対応しているツールと互換性があります -- 代わりにこのURLを貼り付けるだけです。';
+
+  @override
+  String get webhookEmptyState => 'まだWebhookはありません';
+
+  @override
+  String get webhookCreateTitle => 'Webhookを作成';
+
+  @override
+  String get webhookNameHint => 'Webhook名';
+
+  @override
+  String get webhookRegenerateTitle => 'URLを再生成';
+
+  @override
+  String get webhookRegenerateBody =>
+      '現在のURLはすぐに使用できなくなります。まだ使用しているものには新しいURLが必要です。';
+
+  @override
+  String get webhookRegenerateConfirm => '再生成';
+
+  @override
+  String get webhookUrlRevealTitle => 'Webhook URL';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      '今すぐコピーしてください -- 二度と表示されません。このURLを持っている人は誰でもこのチャンネルにメッセージを投稿できます。';
+
+  @override
+  String get webhookUrlCopiedToast => 'URLをコピーしました';
+
+  @override
+  String get webhookUrlSavedIt => '保存しました';
+
+  @override
+  String get chatWebhookBadge => 'WEBHOOK';
 }

@@ -5304,4 +5304,159 @@ class AppLocalizationsCs extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return 'Konečné skóre: $score';
   }
+
+  @override
+  String get commonContinue => 'Pokračovat';
+
+  @override
+  String get adminTabEnterprise => 'Enterprise';
+
+  @override
+  String get adminTabStatus => 'Stav';
+
+  @override
+  String get serverTabSso => 'SSO';
+
+  @override
+  String get serverSsoCardTitle => 'Jednotné přihlášení SAML';
+
+  @override
+  String get serverSsoCardDescription =>
+      'Umožněte členům přihlásit se přes firemního poskytovatele identity místo e-mailu a hesla.';
+
+  @override
+  String get serverSsoLockedHint =>
+      'SSO je dostupné v úrovni Enterprise. Kontaktujte nás pro upgrade.';
+
+  @override
+  String get serverSsoEnabledLabel => 'SSO povoleno';
+
+  @override
+  String get serverSsoEmailDomainLabel => 'Firemní e-mailová doména';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => 'Entity ID poskytovatele identity';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => 'SSO URL poskytovatele identity';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel =>
+      'X.509 certifikát poskytovatele identity (PEM)';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => 'Přihlásit se přes SSO';
+
+  @override
+  String get ssoLoginTitle => 'Přihlášení přes SSO';
+
+  @override
+  String get ssoLoginDescription =>
+      'Zadejte svůj pracovní e-mail -- přesměrujeme vás k poskytovateli identity vaší firmy pro dokončení přihlášení.';
+
+  @override
+  String get ssoWorkEmailHint => 'you@company.com';
+
+  @override
+  String get ssoNoConfigError =>
+      'Pro tento e-mail není nakonfigurováno SSO. Zkuste místo toho heslo.';
+
+  @override
+  String get ssoGenericError =>
+      'Při spouštění přihlášení přes SSO došlo k chybě.';
+
+  @override
+  String get ssoExpiredError =>
+      'Tento pokus o přihlášení vypršel. Zkuste to prosím znovu.';
+
+  @override
+  String get ssoWaitingForBrowser =>
+      'Dokončete přihlášení u svého poskytovatele identity v okně prohlížeče. Tato stránka bude pokračovat automaticky.';
+
+  @override
+  String get statusPostIncidentTitle => 'Nahlásit incident';
+
+  @override
+  String get statusIncidentTitleHint => 'Název incidentu';
+
+  @override
+  String get statusIncidentBodyHint => 'Co se děje? (volitelné)';
+
+  @override
+  String get statusAllSystemsNormal => 'Vše funguje normálně';
+
+  @override
+  String get statusDegraded => 'Omezený provoz -- databáze nedostupná';
+
+  @override
+  String get statusNoIncidents => 'Žádné nahlášené incidenty';
+
+  @override
+  String get statusResolvedLabel => 'Vyřešeno';
+
+  @override
+  String get statusResolveButton => 'Vyřešit';
+
+  @override
+  String get commonCopy => 'Kopírovat';
+
+  @override
+  String get permManageWebhooks => 'Správa webhooků';
+
+  @override
+  String get channelEditDialogManageWebhooks => 'Spravovat webhooky';
+
+  @override
+  String get webhookScreenTitle => 'Webhooky';
+
+  @override
+  String get webhookScreenDescription =>
+      'Jakákoli služba, která umí odeslat webový požadavek, může do tohoto kanálu posílat zprávy. Kompatibilní s nástroji, které už podporují odesílání na Discord webhook -- stačí sem vložit tuto URL místo toho.';
+
+  @override
+  String get webhookEmptyState => 'Zatím žádné webhooky';
+
+  @override
+  String get webhookCreateTitle => 'Vytvořit webhook';
+
+  @override
+  String get webhookNameHint => 'Název webhooku';
+
+  @override
+  String get webhookRegenerateTitle => 'Obnovit URL';
+
+  @override
+  String get webhookRegenerateBody =>
+      'Aktuální URL okamžitě přestane fungovat. Vše, co ji stále používá, bude potřebovat novou.';
+
+  @override
+  String get webhookRegenerateConfirm => 'Obnovit';
+
+  @override
+  String get webhookUrlRevealTitle => 'URL webhooku';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      'Zkopírujte si to teď -- znovu to už neuvidíte. Kdokoli s touto URL může do tohoto kanálu posílat zprávy.';
+
+  @override
+  String get webhookUrlCopiedToast => 'URL zkopírována';
+
+  @override
+  String get webhookUrlSavedIt => 'Uložil(a) jsem si to';
+
+  @override
+  String get chatWebhookBadge => 'WEBHOOK';
 }

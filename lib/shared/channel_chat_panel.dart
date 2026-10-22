@@ -965,6 +965,95 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
     );
   }
 
+  /// Discord's own webhook messages carry a visible "APP"-style tag --
+  /// this is the same idea, but also doing real work here: a webhook
+  /// message can never be end-to-end encrypted (the external poster has
+  /// no channel key material), so this is also the one honest signal
+  /// that this specific message isn't E2EE like the rest of the channel.
+  Widget _buildWebhookBadge(AppLocalizations t) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      decoration: BoxDecoration(
+        color: KodaColors.text3.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(t.chatWebhookBadge,
+          style: TextStyle(color: KodaColors.text3, fontSize: 9, fontWeight: FontWeight.w700)),
+    );
+  }
+
+  /// A conservative subset of Discord's embed object -- title/description/
+  /// color/url/image/thumbnail/footer -- rendered in the same card style
+  /// as _buildLinkPreview above, since it's the same "external content
+  /// card" idea.
+  Widget _buildWebhookEmbed(Map<String, dynamic> embed) {
+    final title = embed['title'] as String?;
+    final description = embed['description'] as String?;
+    final url = embed['url'] as String?;
+    final imageUrl = (embed['image'] as Map?)?['url'] as String?;
+    final thumbnailUrl = (embed['thumbnail'] as Map?)?['url'] as String?;
+    final footerText = (embed['footer'] as Map?)?['text'] as String?;
+    final colorValue = embed['color'] as int?;
+    final accentColor = colorValue != null
+        ? Color(0xFF000000 | colorValue)
+        : KodaColors.koda;
+
+    if (title == null && description == null && imageUrl == null) {
+      return const SizedBox.shrink();
+    }
+
+    Widget card = Container(
+      constraints: const BoxConstraints(maxWidth: 320),
+      decoration: BoxDecoration(
+        color: KodaColors.elevated,
+        borderRadius: BorderRadius.circular(8),
+        border: Border(left: BorderSide(color: accentColor, width: 3)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              if (title != null)
+                Text(title, style: TextStyle(color: accentColor, fontSize: 13, fontWeight: FontWeight.w600)),
+              if (description != null) ...[
+                const SizedBox(height: 2),
+                Text(description, style: TextStyle(color: KodaColors.text2, fontSize: 12)),
+              ],
+              if (imageUrl != null) ...[
+                const SizedBox(height: 6),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: Image.network(imageUrl, fit: BoxFit.cover, height: 140, width: double.infinity,
+                      errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+                ),
+              ],
+              if (footerText != null) ...[
+                const SizedBox(height: 6),
+                Text(footerText, style: TextStyle(color: KodaColors.text3, fontSize: 10)),
+              ],
+            ]),
+          ),
+          if (thumbnailUrl != null) ...[
+            const SizedBox(width: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.network(thumbnailUrl, fit: BoxFit.cover, width: 48, height: 48,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+            ),
+          ],
+        ]),
+      ),
+    );
+
+    if (url == null) return card;
+    return InkWell(
+      onTap: () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+      borderRadius: BorderRadius.circular(8),
+      child: card,
+    );
+  }
+
   Future<void> _showUserProfile(Map<String, dynamic>? author) async {
     if (author == null) return;
     final me = ref.read(authProvider).user;
@@ -1097,6 +1186,7 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
             final isMine = m['sender_id'] == ref.read(authProvider).user?.id;
             final isPinned = m['pinned_at'] != null;
             final isEdited = m['edited_at'] != null;
+            final isWebhook = (m['author'] as Map<String, dynamic>?)?['is_webhook'] == true;
             final messageChannelId = m['channel_id'] as String? ?? widget.channelId;
             return GestureDetector(
               onSecondaryTapUp: (d) => _showMessageActionMenu(
@@ -1133,6 +1223,10 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600)),
                               ),
+                              if (isWebhook) ...[
+                                const SizedBox(width: 4),
+                                _buildWebhookBadge(t),
+                              ],
                               if (time.isNotEmpty) ...[
                                 const SizedBox(width: 6),
                                 Text(time,
@@ -1170,10 +1264,19 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
                             const SizedBox(height: 4),
                             _buildAttachment(m),
                           ],
-                          if (m['link_preview'] != null) ...[
+                          if (m['link_preview'] != null &&
+                              (m['link_preview'] as Map)['embeds'] == null) ...[
                             const SizedBox(height: 4),
                             _buildLinkPreview(m['link_preview'] as Map<String, dynamic>),
                           ],
+                          if (m['link_preview'] != null &&
+                              (m['link_preview'] as Map)['embeds'] != null)
+                            ...List<Map<String, dynamic>>.from(
+                                    (m['link_preview'] as Map)['embeds'] as List)
+                                .map((embed) => Padding(
+                                      padding: const EdgeInsets.only(top: 4),
+                                      child: _buildWebhookEmbed(embed),
+                                    )),
                           _buildReactions(m),
                         ],
                       ),

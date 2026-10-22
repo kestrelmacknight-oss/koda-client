@@ -5225,4 +5225,157 @@ class AppLocalizationsId extends AppLocalizations {
   String arcadeMatch3GameOverBody(int score) {
     return 'Skor akhir: $score';
   }
+
+  @override
+  String get commonContinue => 'Lanjutkan';
+
+  @override
+  String get adminTabEnterprise => 'Enterprise';
+
+  @override
+  String get adminTabStatus => 'Status';
+
+  @override
+  String get serverTabSso => 'SSO';
+
+  @override
+  String get serverSsoCardTitle => 'Single Sign-On SAML';
+
+  @override
+  String get serverSsoCardDescription =>
+      'Izinkan anggota masuk melalui penyedia identitas perusahaan Anda, bukan email dan kata sandi.';
+
+  @override
+  String get serverSsoLockedHint =>
+      'SSO tersedia di tingkat Enterprise. Hubungi kami untuk upgrade.';
+
+  @override
+  String get serverSsoEnabledLabel => 'SSO diaktifkan';
+
+  @override
+  String get serverSsoEmailDomainLabel => 'Domain email perusahaan';
+
+  @override
+  String get serverSsoEmailDomainHint => 'acme.com';
+
+  @override
+  String get serverSsoEntityIdLabel => 'Entity ID penyedia identitas';
+
+  @override
+  String get serverSsoEntityIdHint => 'https://idp.example.com/entity';
+
+  @override
+  String get serverSsoSsoUrlLabel => 'URL SSO penyedia identitas';
+
+  @override
+  String get serverSsoSsoUrlHint => 'https://idp.example.com/sso/redirect';
+
+  @override
+  String get serverSsoCertLabel => 'Sertifikat X.509 penyedia identitas (PEM)';
+
+  @override
+  String get serverSsoCertHint => '-----BEGIN CERTIFICATE-----';
+
+  @override
+  String get ssoSignInButton => 'Masuk dengan SSO';
+
+  @override
+  String get ssoLoginTitle => 'Masuk dengan SSO';
+
+  @override
+  String get ssoLoginDescription =>
+      'Masukkan email kerja Anda -- kami akan mengarahkan Anda ke penyedia identitas perusahaan untuk menyelesaikan masuk.';
+
+  @override
+  String get ssoWorkEmailHint => 'anda@perusahaan.com';
+
+  @override
+  String get ssoNoConfigError =>
+      'Tidak ada SSO yang dikonfigurasi untuk email tersebut. Coba kata sandi Anda.';
+
+  @override
+  String get ssoGenericError => 'Terjadi kesalahan saat memulai masuk SSO.';
+
+  @override
+  String get ssoExpiredError =>
+      'Percobaan masuk ini telah kedaluwarsa. Silakan coba lagi.';
+
+  @override
+  String get ssoWaitingForBrowser =>
+      'Selesaikan proses masuk dengan penyedia identitas Anda di jendela browser. Halaman ini akan otomatis melanjutkan.';
+
+  @override
+  String get statusPostIncidentTitle => 'Posting Insiden';
+
+  @override
+  String get statusIncidentTitleHint => 'Judul insiden';
+
+  @override
+  String get statusIncidentBodyHint => 'Apa yang terjadi? (opsional)';
+
+  @override
+  String get statusAllSystemsNormal => 'Semua sistem normal';
+
+  @override
+  String get statusDegraded => 'Terganggu -- basis data tidak dapat dijangkau';
+
+  @override
+  String get statusNoIncidents => 'Tidak ada insiden yang dilaporkan';
+
+  @override
+  String get statusResolvedLabel => 'Terselesaikan';
+
+  @override
+  String get statusResolveButton => 'Selesaikan';
+
+  @override
+  String get commonCopy => 'Salin';
+
+  @override
+  String get permManageWebhooks => 'Kelola Webhook';
+
+  @override
+  String get channelEditDialogManageWebhooks => 'Kelola Webhook';
+
+  @override
+  String get webhookScreenTitle => 'Webhook';
+
+  @override
+  String get webhookScreenDescription =>
+      'Layanan apa pun yang dapat mengirim permintaan web dapat mengirim pesan ke channel ini. Kompatibel dengan alat yang sudah mendukung pengiriman ke webhook Discord -- cukup tempel URL ini sebagai gantinya.';
+
+  @override
+  String get webhookEmptyState => 'Belum ada webhook';
+
+  @override
+  String get webhookCreateTitle => 'Buat Webhook';
+
+  @override
+  String get webhookNameHint => 'Nama webhook';
+
+  @override
+  String get webhookRegenerateTitle => 'Buat Ulang URL';
+
+  @override
+  String get webhookRegenerateBody =>
+      'URL saat ini akan langsung berhenti berfungsi. Apa pun yang masih menggunakannya akan memerlukan yang baru.';
+
+  @override
+  String get webhookRegenerateConfirm => 'Buat Ulang';
+
+  @override
+  String get webhookUrlRevealTitle => 'URL Webhook';
+
+  @override
+  String get webhookUrlRevealWarning =>
+      'Salin ini sekarang -- Anda tidak akan bisa melihatnya lagi. Siapa pun dengan URL ini dapat mengirim pesan ke channel ini.';
+
+  @override
+  String get webhookUrlCopiedToast => 'URL disalin';
+
+  @override
+  String get webhookUrlSavedIt => 'Sudah saya simpan';
+
+  @override
+  String get chatWebhookBadge => 'WEBHOOK';
 }

@@ -1209,6 +1209,15 @@ class KodaApi {
     } catch (e) { _log('adminGrantBoosts', e); return null; }
   }
 
+  /// Platform-admin-only: Enterprise customers are onboarded manually,
+  /// not self-serve -- see Koda.Servers.set_enterprise_tier/2.
+  Future<bool> adminSetEnterpriseTier(String serverId, bool enabled) async {
+    try {
+      await _dio.post('/admin/servers/$serverId/enterprise_tier', data: {'enabled': enabled});
+      return true;
+    } catch (e) { _log('adminSetEnterpriseTier', e); return false; }
+  }
+
 
   // ── Discovery ────────────────────────────────────────────────────────
 
@@ -2687,6 +2696,116 @@ class KodaApi {
       final res = await _dio.post('/servers/$serverId/arcade/$game/score', data: {'score': score});
       return res.data['best_score'] as int?;
     } catch (e) { _log('submitArcadeScore', e); return null; }
+  }
+
+  // -- SAML SSO (Koda.Sso -- Enterprise tier only) -----------------------------
+  //
+  // Login is polling-based, not a deep link -- lib/core/deep_links.dart's
+  // koda:// scheme is Android/iOS only, and SSO logins are at least as
+  // likely from desktop. See DeepLinks' header comment for why.
+
+  /// Looks up SSO by the email's domain; {error: ...} (no exception) if
+  /// that domain has no SSO configured -- the login screen falls back
+  /// to password login in that case, not an error state.
+  Future<Map<String, dynamic>?> startSso(String email) async {
+    try {
+      final res = await _dio.post('/sso/start', data: {'email': email});
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('startSso', e); return null; }
+  }
+
+  /// Returns {status: "pending"|"completed", jwt: ...} or null if the
+  /// attempt token is unknown/expired (caller should stop polling).
+  Future<Map<String, dynamic>?> pollSsoAttempt(String attemptToken) async {
+    try {
+      final res = await _dio.get('/sso/attempt/$attemptToken');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('pollSsoAttempt', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> getSsoConfig(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/sso');
+      return res.data['config'] as Map<String, dynamic>?;
+    } catch (e) { _log('getSsoConfig', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> upsertSsoConfig(String serverId, {
+    required String emailDomain, required String idpEntityId,
+    required String idpSsoUrl, required String idpX509Cert,
+  }) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/sso', data: {
+        'email_domain': emailDomain, 'idp_entity_id': idpEntityId,
+        'idp_sso_url': idpSsoUrl, 'idp_x509_cert': idpX509Cert,
+      });
+      return res.data['config'] as Map<String, dynamic>?;
+    } catch (e) { _log('upsertSsoConfig', e); return null; }
+  }
+
+  Future<bool> setSsoEnabled(String serverId, bool enabled) async {
+    try {
+      await _dio.post('/servers/$serverId/sso/enabled', data: {'enabled': enabled});
+      return true;
+    } catch (e) { _log('setSsoEnabled', e); return false; }
+  }
+
+  // -- Public status page (Koda.Status) ----------------------------------------
+
+  Future<Map<String, dynamic>?> getStatus() async {
+    try {
+      final res = await _dio.get('/status');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getStatus', e); return null; }
+  }
+
+  Future<bool> adminPostIncident(String title, String body) async {
+    try {
+      await _dio.post('/admin/status/incidents', data: {'title': title, 'body': body});
+      return true;
+    } catch (e) { _log('adminPostIncident', e); return false; }
+  }
+
+  Future<bool> adminResolveIncident(String id) async {
+    try {
+      await _dio.post('/admin/status/incidents/$id/resolve');
+      return true;
+    } catch (e) { _log('adminResolveIncident', e); return false; }
+  }
+
+  // -- Channel webhooks (Koda.ChannelWebhooks) -- Discord-compatible ----------
+  //
+  // Independent of the bot/DeveloperApp platform -- no bot registration
+  // needed. The returned `token`/`url` are only ever present in the
+  // create/regenerate response (shown to the user once), never in the
+  // plain list.
+
+  Future<List<Map<String, dynamic>>> getChannelWebhooks(String channelId) async {
+    try {
+      final res = await _dio.get('/channels/$channelId/webhooks');
+      return List<Map<String, dynamic>>.from(res.data['webhooks'] ?? []);
+    } catch (e) { _log('getChannelWebhooks', e); return []; }
+  }
+
+  Future<Map<String, dynamic>?> createChannelWebhook(String channelId, String name) async {
+    try {
+      final res = await _dio.post('/channels/$channelId/webhooks', data: {'name': name});
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('createChannelWebhook', e); return null; }
+  }
+
+  Future<bool> deleteChannelWebhook(String webhookId) async {
+    try {
+      await _dio.delete('/webhooks/$webhookId');
+      return true;
+    } catch (e) { _log('deleteChannelWebhook', e); return false; }
+  }
+
+  Future<Map<String, dynamic>?> regenerateChannelWebhookToken(String webhookId) async {
+    try {
+      final res = await _dio.post('/webhooks/$webhookId/regenerate');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('regenerateChannelWebhookToken', e); return null; }
   }
 
   // -- Server templates (Koda.ServerThemes -- curated cosmetics presets) -------

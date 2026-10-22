@@ -65,12 +65,20 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   final _gifLevelGateCtrl = TextEditingController();
   bool _savingDescription = false;
 
+  final _ssoEmailDomainCtrl = TextEditingController();
+  final _ssoIdpEntityIdCtrl = TextEditingController();
+  final _ssoIdpSsoUrlCtrl = TextEditingController();
+  final _ssoIdpCertCtrl = TextEditingController();
+  Map<String, dynamic>? _ssoConfig;
+  bool _loadingSso = true;
+  bool _savingSso = false;
+
   // Matches the flat permission map used server-side on Koda.Servers.Role.
   static const List<String> _permissionKeys = [
     'view_channels', 'send_messages', 'connect_voice', 'manage_server',
     'manage_channels', 'manage_roles', 'manage_messages',
     'kick_members', 'ban_members', 'mute_members', 'mention_everyone', 'manage_marketplace',
-    'announce_live', 'move_members', 'manage_leaderboards',
+    'announce_live', 'move_members', 'manage_leaderboards', 'manage_webhooks',
   ];
 
   // Not static const -- labels are localized, which needs a BuildContext.
@@ -90,6 +98,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     'announce_live':    t.permAnnounceLive,
     'move_members':     t.permMoveMembers,
     'manage_leaderboards': t.permManageLeaderboards,
+    'manage_webhooks': t.permManageWebhooks,
   };
 
   static const List<String> _colorSwatches = [
@@ -100,7 +109,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 13, vsync: this);
+    _tabController = TabController(length: 14, vsync: this);
     _loadAll();
     _loadPrintfulStatus();
     _loadTiltifyStatus();
@@ -112,6 +121,21 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         ref.read(selectedServerProvider)?['description'] as String? ?? '';
     final levelGates = ref.read(selectedServerProvider)?['level_gates'] as Map?;
     _gifLevelGateCtrl.text = (levelGates?['gif'] as int? ?? 0).toString();
+    _loadSsoConfig();
+  }
+
+  Future<void> _loadSsoConfig() async {
+    final config = await KodaApi.instance.getSsoConfig(_serverId);
+    if (!mounted) return;
+    setState(() {
+      _ssoConfig = config;
+      _loadingSso = false;
+      if (config != null) {
+        _ssoEmailDomainCtrl.text = config['email_domain'] as String? ?? '';
+        _ssoIdpEntityIdCtrl.text = config['idp_entity_id'] as String? ?? '';
+        _ssoIdpSsoUrlCtrl.text = config['idp_sso_url'] as String? ?? '';
+      }
+    });
   }
 
   Future<void> _loadEmoji() async {
@@ -264,6 +288,10 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     _marketplaceLinkCtrl.dispose();
     _descriptionCtrl.dispose();
     _gifLevelGateCtrl.dispose();
+    _ssoEmailDomainCtrl.dispose();
+    _ssoIdpEntityIdCtrl.dispose();
+    _ssoIdpSsoUrlCtrl.dispose();
+    _ssoIdpCertCtrl.dispose();
     super.dispose();
   }
 
@@ -609,6 +637,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
             Tab(text: t.serverTabCharity),
             Tab(text: t.serverTabBots),
             Tab(text: t.serverTabLeveling),
+            Tab(text: t.serverTabSso),
           ],
         ),
       ),
@@ -620,7 +649,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                   _buildInvitesTab(), _buildMerchTab(), _buildEmojiTab(),
                   _buildCustomizeTab(), _buildAuditLogTab(), _buildReportsTab(),
                   ThresholdModerationTab(serverId: _serverId, members: _members, channels: _channels),
-                  _buildCharityTab(), BotsTab(serverId: _serverId), _buildLevelingTab()],
+                  _buildCharityTab(), BotsTab(serverId: _serverId), _buildLevelingTab(),
+                  _buildSsoTab()],
             ),
     );
   }
@@ -786,6 +816,101 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     if (updated != null && mounted) {
       ref.read(selectedServerProvider.notifier).state = updated;
     }
+  }
+
+  // -- SSO (Koda.Sso -- Enterprise tier only) --------------------------------
+
+  Widget _buildSsoTab() {
+    final t = AppLocalizations.of(context);
+    final server = ref.watch(selectedServerProvider);
+    final enterpriseTier = server?['enterprise_tier'] as bool? ?? false;
+
+    if (_loadingSso) {
+      return Center(child: CircularProgressIndicator(color: KodaColors.koda));
+    }
+
+    return ListView(padding: const EdgeInsets.all(20), children: [
+      _customizeCard(
+        title: t.serverSsoCardTitle,
+        description: t.serverSsoCardDescription,
+        unlocked: enterpriseTier,
+        lockedHint: t.serverSsoLockedHint,
+        child: enterpriseTier ? _buildSsoConfigForm(t) : null,
+      ),
+    ]);
+  }
+
+  Widget _buildSsoConfigForm(AppLocalizations t) {
+    final enabled = _ssoConfig?['enabled'] as bool? ?? false;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      if (_ssoConfig != null) ...[
+        Row(children: [
+          Expanded(child: Text(t.serverSsoEnabledLabel,
+              style: TextStyle(color: KodaColors.text2, fontSize: 13))),
+          Switch(
+            value: enabled,
+            activeThumbColor: KodaColors.koda,
+            onChanged: (v) async {
+              final ok = await KodaApi.instance.setSsoEnabled(_serverId, v);
+              if (ok && mounted) setState(() => _ssoConfig = {..._ssoConfig!, 'enabled': v});
+            },
+          ),
+        ]),
+        const SizedBox(height: 8),
+      ],
+      Text(t.serverSsoEmailDomainLabel, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+      const SizedBox(height: 4),
+      KodaTextField(controller: _ssoEmailDomainCtrl, hintText: t.serverSsoEmailDomainHint),
+      const SizedBox(height: 10),
+      Text(t.serverSsoEntityIdLabel, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+      const SizedBox(height: 4),
+      KodaTextField(controller: _ssoIdpEntityIdCtrl, hintText: t.serverSsoEntityIdHint),
+      const SizedBox(height: 10),
+      Text(t.serverSsoSsoUrlLabel, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+      const SizedBox(height: 4),
+      KodaTextField(controller: _ssoIdpSsoUrlCtrl, hintText: t.serverSsoSsoUrlHint),
+      const SizedBox(height: 10),
+      Text(t.serverSsoCertLabel, style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+      const SizedBox(height: 4),
+      TextField(
+        controller: _ssoIdpCertCtrl,
+        maxLines: 4,
+        style: TextStyle(color: KodaColors.text1, fontSize: 12, fontFamily: 'monospace'),
+        decoration: InputDecoration(
+          hintText: t.serverSsoCertHint,
+          hintStyle: TextStyle(color: KodaColors.text3),
+          filled: true,
+          fillColor: KodaColors.bg2,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+        ),
+      ),
+      const SizedBox(height: 10),
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(backgroundColor: KodaColors.koda, foregroundColor: Colors.black),
+        onPressed: _savingSso ? null : _saveSsoConfig,
+        child: _savingSso
+            ? const SizedBox(width: 16, height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+            : Text(t.commonSave),
+      ),
+    ]);
+  }
+
+  Future<void> _saveSsoConfig() async {
+    setState(() => _savingSso = true);
+    final cert = _ssoIdpCertCtrl.text.trim();
+    final config = await KodaApi.instance.upsertSsoConfig(
+      _serverId,
+      emailDomain: _ssoEmailDomainCtrl.text.trim(),
+      idpEntityId: _ssoIdpEntityIdCtrl.text.trim(),
+      idpSsoUrl: _ssoIdpSsoUrlCtrl.text.trim(),
+      idpX509Cert: cert.isEmpty ? (_ssoConfig?['idp_x509_cert'] as String? ?? '') : cert,
+    );
+    if (!mounted) return;
+    setState(() {
+      _savingSso = false;
+      if (config != null) _ssoConfig = config;
+    });
   }
 
   // -- Charity (Tiltify campaign display) ------------------------------------
