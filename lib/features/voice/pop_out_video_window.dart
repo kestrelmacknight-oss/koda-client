@@ -48,11 +48,15 @@ class _PopOutVideoWindowState extends State<PopOutVideoWindow> {
   }
 
   Future<void> _connect() async {
-    final t = AppLocalizations.of(context);
+    // Deliberately no AppLocalizations.of(context) here -- this runs
+    // from initState, before the MaterialApp built below even exists,
+    // so there's no Localizations ancestor yet to find (see build's
+    // comment). _error stores a plain sentinel instead; _localizedError
+    // translates it once a valid context exists, at render time.
     final token = _args['token'] as String?;
     final url = _args['url'] as String?;
     if (token == null || url == null) {
-      setState(() { _error = t.popOutVideoMissingTokenError; _connecting = false; });
+      setState(() { _error = 'missing_token'; _connecting = false; });
       return;
     }
     debugPrint('[PopOut] Connecting to: $url');
@@ -65,7 +69,7 @@ class _PopOutVideoWindowState extends State<PopOutVideoWindow> {
         ),
       );
       await room.connect(url, token).timeout(const Duration(seconds: 15), onTimeout: () {
-        throw Exception(t.popOutVideoConnectionTimedOut);
+        throw Exception('timeout');
       });
 
       final listener = room.createListener()
@@ -126,23 +130,42 @@ class _PopOutVideoWindowState extends State<PopOutVideoWindow> {
     return pubs.first.track as lk.VideoTrack?;
   }
 
+  // _error holds a plain sentinel ('missing_token'), a raw exception
+  // string containing "timeout", or any other raw exception text --
+  // translated here, at render time, where a valid (MaterialApp
+  // descendant) context is actually available.
+  String _localizedError(AppLocalizations t, String error) {
+    if (error == 'missing_token') return t.popOutVideoMissingTokenError;
+    if (error.toLowerCase().contains('timeout')) return t.popOutVideoConnectionTimedOut;
+    return error;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    final channelName = _args['channel_name'] as String? ?? t.popOutVideoFallbackTitle;
-    final room = _room;
-    // This window connects as a subscribe-only "viewer" -- its own local
-    // participant never publishes, so only show the real call participants.
-    final participants = room == null ? <lk.Participant>[] : room
-        .remoteParticipants.values
-        .where((p) => !p.identity.endsWith('-view'))
-        .toList();
-    final speakingSids = (room?.activeSpeakers ?? []).map((p) => p.sid).toSet();
-
+    // AppLocalizations.of needs a Localizations ancestor, which only
+    // exists below the MaterialApp this builds -- this widget's own
+    // `context` is the root passed to runApp in this window's separate
+    // engine, so looking it up here (above the MaterialApp) throws,
+    // and Flutter's release-mode error widget is a blank grey box with
+    // no indication why. Builder gives AppLocalizations.of a context
+    // that's actually a MaterialApp descendant.
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: kodaTheme(),
-      home: Scaffold(
+      home: Builder(builder: (context) {
+        final t = AppLocalizations.of(context);
+        final channelName = _args['channel_name'] as String? ?? t.popOutVideoFallbackTitle;
+        final room = _room;
+        // This window connects as a subscribe-only "viewer" -- its own
+        // local participant never publishes, so only show the real
+        // call participants.
+        final participants = room == null ? <lk.Participant>[] : room
+            .remoteParticipants.values
+            .where((p) => !p.identity.endsWith('-view'))
+            .toList();
+        final speakingSids = (room?.activeSpeakers ?? []).map((p) => p.sid).toSet();
+
+        return Scaffold(
         backgroundColor: KodaColors.voidBg,
         appBar: AppBar(
           backgroundColor: KodaColors.bg2,
@@ -168,7 +191,7 @@ class _PopOutVideoWindowState extends State<PopOutVideoWindow> {
         body: _connecting
             ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
             : _error != null
-                ? Center(child: Text(t.popOutVideoErrorLabel(_error!),
+                ? Center(child: Text(t.popOutVideoErrorLabel(_localizedError(t, _error!)),
                     style: TextStyle(color: KodaColors.accent)))
                 : participants.isEmpty
                     ? Center(child: Text(t.popOutVideoNoParticipants,
@@ -237,7 +260,8 @@ class _PopOutVideoWindowState extends State<PopOutVideoWindow> {
                           );
                         },
                       ),
-      ),
+        );
+      }),
     );
   }
 }

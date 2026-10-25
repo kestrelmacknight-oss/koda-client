@@ -37,26 +37,35 @@ class _ActivityFeedPopoutWindowState extends State<ActivityFeedPopoutWindow> {
 
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
+    // AppLocalizations.of needs a Localizations ancestor, which only
+    // exists below the MaterialApp this builds -- this widget's own
+    // `context` is the root passed to runApp in this window's separate
+    // engine, so looking it up here (above the MaterialApp) throws,
+    // and Flutter's release-mode error widget is a blank grey box with
+    // no indication why. Builder gives AppLocalizations.of a context
+    // that's actually a MaterialApp descendant.
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: kodaTheme(),
-      home: Scaffold(
-        backgroundColor: KodaColors.voidBg,
-        appBar: AppBar(
-          backgroundColor: KodaColors.bg2,
-          title: Text(t.activityFeedTitle, style: TextStyle(color: KodaColors.text1, fontSize: 14)),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.close, color: KodaColors.text2, size: 18),
-              onPressed: () => WindowController.fromWindowId(widget.windowId).hide(),
-            ),
-          ],
-        ),
-        body: _ready
-            ? const ActivityFeedView()
-            : Center(child: CircularProgressIndicator(color: KodaColors.koda)),
-      ),
+      home: Builder(builder: (context) {
+        final t = AppLocalizations.of(context);
+        return Scaffold(
+          backgroundColor: KodaColors.voidBg,
+          appBar: AppBar(
+            backgroundColor: KodaColors.bg2,
+            title: Text(t.activityFeedTitle, style: TextStyle(color: KodaColors.text1, fontSize: 14)),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.close, color: KodaColors.text2, size: 18),
+                onPressed: () => WindowController.fromWindowId(widget.windowId).hide(),
+              ),
+            ],
+          ),
+          body: _ready
+              ? const ActivityFeedView()
+              : Center(child: CircularProgressIndicator(color: KodaColors.koda)),
+        );
+      }),
     );
   }
 }
