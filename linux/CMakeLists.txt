@@ -41,7 +41,14 @@ endif()
 # of modifying this function.
 function(APPLY_STANDARD_SETTINGS TARGET)
   target_compile_features(${TARGET} PUBLIC cxx_std_14)
-  target_compile_options(${TARGET} PRIVATE -Wall -Werror)
+  # -Wno-error=deprecated-literal-operator: this function also applies
+  # to plugin targets (see the comment above), and a newer Clang (from
+  # the Ubuntu 26.04 CI runner) now warns on the pre-C++11-style
+  # literal-operator declarations in flutter_secure_storage_linux's
+  # vendored nlohmann/json header -- third-party vendored code we
+  # don't control, so the warning stays a warning instead of failing
+  # the build, rather than disabling -Werror wholesale.
+  target_compile_options(${TARGET} PRIVATE -Wall -Werror -Wno-error=deprecated-literal-operator)
   target_compile_options(${TARGET} PRIVATE "$<$<NOT:$<CONFIG:Debug>>:-O3>")
   target_compile_definitions(${TARGET} PRIVATE "$<$<NOT:$<CONFIG:Debug>>:NDEBUG>")
 endfunction()
