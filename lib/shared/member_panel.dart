@@ -234,6 +234,10 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
     final override = userId != null ? ref.watch(presenceOverridesProvider)[userId] : null;
     final customStatus = override?.customStatus ?? member['custom_status'] as String?;
     final playingGame = override?.playingGame ?? member['playing_game'] as String?;
+    // Live-only -- unlike the two above, Spotify now-playing isn't part
+    // of the member list's own initial fetch, only this overlay.
+    final spotifyTrack = override?.spotifyTrack;
+    final spotifyArtist = override?.spotifyArtist;
     final effective = effectiveStatus(
         online: !isOffline, selfReported: override?.status ?? member['status'] as String?);
 
@@ -318,6 +322,12 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
                   if (playingGame != null && playingGame.isNotEmpty)
                     Text(
                       '🎮 ${t.profilePlayingGame(playingGame)}',
+                      style: TextStyle(color: KodaColors.text3, fontSize: 11),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  if (spotifyTrack != null && spotifyTrack.isNotEmpty)
+                    Text(
+                      '🎵 ${t.settingsSpotifyNowPlaying(spotifyTrack, spotifyArtist ?? '')}',
                       style: TextStyle(color: KodaColors.text3, fontSize: 11),
                       overflow: TextOverflow.ellipsis,
                     ),

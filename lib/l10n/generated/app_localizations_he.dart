@@ -158,6 +158,26 @@ class AppLocalizationsHe extends AppLocalizations {
       'מציג את הפנים ומצב הרוח של Visp בתיבות הדו-שיח של ההגדרה, האירועים והייעוץ שלו';
 
   @override
+  String get settingsDeleteAccountTitle => 'מחיקת חשבון';
+
+  @override
+  String get settingsDeleteAccountSubtitle =>
+      'הסרה קבועה של המידע האישי שלך מ-Koda';
+
+  @override
+  String get settingsDeleteAccountWarning =>
+      'פעולה זו מוחקת לצמיתות את פרטי הפרופיל שלך ולא ניתן לבטלה. ההודעות הקודמות שלך עשויות להישאר גלויות לאחרים, ומוצגות כנשלחות על ידי משתמש שנמחק. הזינו את הסיסמה שלכם לאישור.';
+
+  @override
+  String get settingsDeleteAccountPasswordHint => 'סיסמה';
+
+  @override
+  String get settingsDeleteAccountConfirm => 'מחיקת חשבון';
+
+  @override
+  String get settingsDeleteAccountWrongPassword => 'סיסמה שגויה.';
+
+  @override
   String get settingsHighContrastTitle => 'ניגודיות גבוהה';
 
   @override
@@ -205,7 +225,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsStreamingDescription =>
-      'חברו את Twitch/YouTube כדי ששרתים שבהם יש לכם את ההרשאה \"הכרזה בעת שידור חי\" יוכלו לפרסם אוטומטית כשאתם משדרים חי או מעלים סרטון חדש.';
+      'חברו את Twitch/YouTube/Kick כדי ששרתים שבהם יש לכם את ההרשאה \"הכרזה בעת שידור חי\" יוכלו לפרסם אוטומטית כשאתם משדרים חי או מעלים סרטון חדש.';
 
   @override
   String settingsStreamingConnected(
@@ -225,6 +245,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settingsStreamingLiveSuffixYoutube => ' -- העלאה חדשה';
 
   @override
+  String get settingsStreamingLiveSuffixKick => ' -- משדר עכשיו';
+
+  @override
   String get settingsStreamingConnecting => 'מתחבר...';
 
   @override
@@ -238,11 +261,19 @@ class AppLocalizationsHe extends AppLocalizations {
       'הכריזו על שידורים חיים והעלאות חדשות';
 
   @override
+  String get settingsAnnounceLiveKick => 'הכריזו כשאני משדר חי';
+
+  @override
   String get settingsRefreshStatus => 'כבר מחוברים בדפדפן? רעננו את הסטטוס';
 
   @override
   String settingsStreamingConnectError(String platform) {
     return 'לא ניתן היה להתחיל את חיבור $platform.';
+  }
+
+  @override
+  String settingsStreamingConsentRequired(String platform) {
+    return 'בקשו מההורה או האפוטרופוס של הילד לאשר תחילה את החיבור ל-$platform בלוח הבקרה ההורי.';
   }
 
   @override
@@ -496,6 +527,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get homeBrowsePublicServersTooltip => 'עיון בשרתים ציבוריים';
+
+  @override
+  String get homeUpcomingEventsTooltip => 'אירועים קרובים';
+
+  @override
+  String get homeActivityFeedTooltip => 'פיד פעילות';
 
   @override
   String get serverDiscoveryTitle => 'עיון בשרתים';
@@ -1571,6 +1608,20 @@ class AppLocalizationsHe extends AppLocalizations {
       'הגיעו לרמת חיזוק 5 כדי לפתוח מסגרת סמל מותאמת אישית.';
 
   @override
+  String get serverAchievementsCardTitle => 'הישגים';
+
+  @override
+  String get serverAchievementsCardDescription =>
+      'צרו תגים מותאמים אישית והעניקו אותם לחברים.';
+
+  @override
+  String get serverAchievementsLockedHint =>
+      'הגיעו לרמת חיזוק 3 כדי ליצור הישגים.';
+
+  @override
+  String get serverOpenAchievements => 'ניהול הישגים';
+
+  @override
   String get serverBoostFromBank =>
       'חזקו שרת זה מתוך בנק השרת בשוק כדי להעלות את רמתו.';
 
@@ -2250,7 +2301,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildExplanation =>
-      'פעולה זו יוצרת חשבון מפוקח באופן מלא: ערוצים מתויגים ייחסמו, ותוכלו להגדיר שעות מותרות ולראות (אך לא לקרוא) את החברים והשרתים שלהם.';
+      'פעולה זו מתחילה בקשה ליצירת חשבון מפוקח באופן מלא לילדכם: ערוצים מתויגים ייחסמו, ותוכלו להגדיר שעות מותרות ולראות (אך לא לקרוא) את החברים והשרתים שלהם. אנו מאמתים שאתם הורה או אפוטרופוס מוסמך לפני יצירת החשבון -- בחרו שיטת אימות למטה.';
 
   @override
   String get parentalDashboardValidationError =>
@@ -2258,10 +2309,10 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildFailed =>
-      'לא ניתן היה ליצור את חשבון הילד/ה -- ייתכן ששם המשתמש/האימייל כבר תפוסים.';
+      'לא ניתן היה להתחיל את הבקשה -- ייתכן ששם המשתמש/האימייל כבר תפוסים.';
 
   @override
-  String get parentalDashboardCreatingLabel => 'יוצר...';
+  String get parentalDashboardCreatingLabel => 'מתחיל...';
 
   @override
   String get parentalDashboardNoChildren => 'אין עדיין חשבונות מקושרים.';
@@ -2271,6 +2322,66 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get parentalDashboardUnknownUser => 'לא ידוע';
+
+  @override
+  String get parentalConsentMethodLabel =>
+      'כיצד עלינו לאמת שאתם ההורה או האפוטרופוס?';
+
+  @override
+  String get parentalConsentMethodCardTitle => 'כרטיס אשראי או דביט';
+
+  @override
+  String get parentalConsentMethodCardSubtitle =>
+      'חיוב קטן של 0.50\$ מאמת שאתם מחזיקים בכרטיס, ולאחר מכן מוחזר מיידית.';
+
+  @override
+  String get parentalConsentMethodFormTitle => 'טופס הסכמה חתום';
+
+  @override
+  String get parentalConsentMethodFormSubtitle =>
+      'העלו טופס חתום. איש צוות יבדוק אותו לפני יצירת החשבון.';
+
+  @override
+  String get parentalConsentAttestation =>
+      'אני מאשר/ת שאני ההורה או האפוטרופוס החוקי המוסמך של ילד/ה זה/ו.';
+
+  @override
+  String get parentalConsentUploadFormHint =>
+      'בשלב הבא, העלו את טופס ההסכמה החתום למטה.';
+
+  @override
+  String get parentalConsentFinishInBrowser =>
+      'סיימו את האימות בדפדפן, ואז חזרו -- זה יתעדכן אוטומטית.';
+
+  @override
+  String parentalConsentStatusRejected(String reason) {
+    return 'נדחה: $reason';
+  }
+
+  @override
+  String get parentalConsentStatusExpired => 'הבקשה פגה -- יש להתחיל מחדש';
+
+  @override
+  String get parentalConsentStatusAwaitingUpload => 'מחכה לטופס החתום שלכם';
+
+  @override
+  String get parentalConsentUploadFormButton => 'העלאת טופס';
+
+  @override
+  String get parentalConsentStatusAwaitingReview => 'מחכה לבדיקת צוות';
+
+  @override
+  String get parentalConsentStatusAwaitingPayment => 'מחכה לאימות תשלום';
+
+  @override
+  String get parentalConsentPendingSectionTitle => 'בקשות בהמתנה';
+
+  @override
+  String get parentalConsentPrivacyNoticePrefix => 'קראו את ';
+
+  @override
+  String get parentalConsentPrivacyNoticeSuffix =>
+      ' שלנו כדי לראות בדיוק אילו מידע אנו אוספים על ילדכם וכיצד הוא משמש.';
 
   @override
   String get childDetailFallbackTitle => 'חשבון ילד/ה';
@@ -2286,6 +2397,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get childDetailTabOverride => 'חריגה';
+
+  @override
+  String get childDetailTabThirdParty => 'חיבורים';
 
   @override
   String get childDetailNoFriends => 'אין חברים.';
@@ -2356,6 +2470,28 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get childDetailOverrideExplanation =>
       'הענקת גישה זמנית מחוץ ללוח הזמנים הרגיל -- שימושי לחריגה חד-פעמית בלי לשנות את לוח הזמנים השבועי.';
+
+  @override
+  String get childDetailThirdPartyExplanation =>
+      'חיבור שירות כמו Twitch, Kick, YouTube, Steam או Spotify משתף את שם המשתמש של ילדכם ב-Koda ואת הפעילות שלו עם אותה פלטפורמה חיצונית. זה נפרד מההסכמה שיצרה את החשבון שלו, וכבוי כברירת מחדל -- הפעילו זאת רק אם ברצונכם לאפשר לילדכם לקשר חשבונות אלה.';
+
+  @override
+  String get childDetailThirdPartyToggleTitle => 'אפשר חיבורים של צד שלישי';
+
+  @override
+  String get childDetailThirdPartyToggleSubtitle =>
+      'כיבוי מנתק מיד כל חשבון שכבר מקושר';
+
+  @override
+  String get childDetailDeleteAccountTitle => 'מחיקת חשבון';
+
+  @override
+  String childDetailDeleteAccountWarning(String username) {
+    return 'פעולה זו מוחקת לצמיתות את החשבון והמידע האישי של $username. לא ניתן לבטל פעולה זו.';
+  }
+
+  @override
+  String get childDetailDeleteAccountConfirm => 'מחיקת חשבון';
 
   @override
   String get childDetailReasonHint => 'סיבה (אופציונלי)';
@@ -3512,6 +3648,111 @@ class AppLocalizationsHe extends AppLocalizations {
   String get calendarUnsubscribeTooltip => 'ביטול מנוי';
 
   @override
+  String get calendarReminderOffTooltip => 'הזכר לי';
+
+  @override
+  String get calendarReminderOnTooltip => 'כבה תזכורת';
+
+  @override
+  String get calendarAddToCalendarTooltip => 'הוסף ליומן שלי';
+
+  @override
+  String get calendarIcsSaved => 'קובץ היומן נשמר';
+
+  @override
+  String get upcomingEventsTitle => 'קרובים';
+
+  @override
+  String get upcomingEventsEmptyState => 'אין אירועים קרובים בשרתים שלך';
+
+  @override
+  String get upcomingEventsPublicBadge => 'ציבורי';
+
+  @override
+  String upcomingEventsFriendGoing(String name) {
+    return '$name מגיע/ה';
+  }
+
+  @override
+  String upcomingEventsTwoFriendsGoing(String name1, String name2) {
+    return '$name1 ו-$name2 מגיעים';
+  }
+
+  @override
+  String upcomingEventsManyFriendsGoing(String name, int count) {
+    return '$name ועוד $count מגיעים';
+  }
+
+  @override
+  String get activityFeedTitle => 'פיד פעילות';
+
+  @override
+  String get activityFeedEmptyState => 'עדיין אין פעילות מהחברים שלך';
+
+  @override
+  String activityFeedAchievement(
+      String username, String achievement, String server) {
+    return '$username קיבל/ה את $achievement ב-$server';
+  }
+
+  @override
+  String activityFeedWentLive(String username, String platform) {
+    return '$username משדר/ת בשידור חי ב-$platform';
+  }
+
+  @override
+  String activityFeedServerJoined(String username, String server) {
+    return '$username הצטרף/ה אל $server';
+  }
+
+  @override
+  String activityFeedArcadeHighScore(String username, String game, int score) {
+    return '$username השיג/ה שיא חדש ב-$game: $score';
+  }
+
+  @override
+  String get activityFeedJustNow => 'ממש עכשיו';
+
+  @override
+  String activityFeedMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לפני $count דקות',
+      many: 'לפני $count דקות',
+      two: 'לפני שתי דקות',
+      one: 'לפני דקה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לפני $count שעות',
+      many: 'לפני $count שעות',
+      two: 'לפני שעתיים',
+      one: 'לפני שעה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לפני $count ימים',
+      many: 'לפני $count ימים',
+      two: 'לפני יומיים',
+      one: 'לפני יום',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String calendarRepeatsLabel(String recurrence) {
     return 'חוזר $recurrence';
   }
@@ -4358,6 +4599,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get updateNudgeLaterButton => 'מאוחר יותר';
 
   @override
+  String get updateNudgeUpdateNowButton => 'עדכן עכשיו';
+
+  @override
+  String updateNudgeDownloading(int percent) {
+    return 'מוריד עדכון... $percent%';
+  }
+
+  @override
+  String get updateNudgeVerifying => 'מאמת את ההורדה...';
+
+  @override
+  String get updateNudgeLaunching => 'מפעיל את המתקין...';
+
+  @override
+  String get updateNudgeFailed =>
+      'לא ניתן היה להשלים את העדכון. ניתן להוריד אותו ידנית במקום זאת.';
+
+  @override
   String get tierBadgeSparkSubscriber => 'מנוי/ת Spark';
 
   @override
@@ -5151,6 +5410,45 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get achievementScreenTitle => 'הישגים';
+
+  @override
+  String get achievementCreateTitle => 'יצירת הישג';
+
+  @override
+  String get achievementNameHint => 'שם ההישג';
+
+  @override
+  String get achievementDescriptionHint => 'תיאור (אופציונלי)';
+
+  @override
+  String get achievementDeleteTitle => 'מחיקת הישג';
+
+  @override
+  String achievementDeleteConfirm(String name) {
+    return 'למחוק את \"$name\"? מי שכבר מחזיק בו ישמור עליו, אך הוא יוסר מהשרת. לא ניתן לבטל פעולה זו.';
+  }
+
+  @override
+  String get achievementAwardTitle => 'הענקת הישג';
+
+  @override
+  String get achievementAwardButton => 'הענקה';
+
+  @override
+  String get achievementUserIdHint => 'מזהה משתמש';
+
+  @override
+  String get achievementLockedBanner =>
+      'השרת הזה מתחת לרמת חיזוק 3, כך שההישגים הקיימים ובעליהם נשארים בדיוק כפי שהם, אך אי אפשר להעניק אף אחד מהם למישהו חדש עד שהשרת יחזור לרמה 3.';
+
+  @override
+  String get achievementEmptyState => 'אין עדיין הישגים';
+
+  @override
+  String get achievementNoRecipients => 'אף אחד עדיין לא מחזיק בזה';
+
+  @override
   String chatGifLevelGated(int level) {
     return 'נדרשת רמה $level כדי לשלוח כאן GIF';
   }
@@ -5241,6 +5539,35 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get adminTabStatus => 'סטטוס';
+
+  @override
+  String get adminTabParentalConsent => 'הסכמת הורים';
+
+  @override
+  String get adminParentalConsentDescription =>
+      'בדקו טפסי הסכמה חתומים שהועלו לפני יצירת חשבון ילד. אימות בכרטיס אשראי מתבצע אוטומטית ולא מופיע כאן.';
+
+  @override
+  String get adminParentalConsentEmptyState => 'אין בדיקות בהמתנה.';
+
+  @override
+  String get adminParentalConsentViewDocument => 'צפייה במסמך';
+
+  @override
+  String get adminParentalConsentApprove => 'אישור';
+
+  @override
+  String get adminParentalConsentReject => 'דחייה';
+
+  @override
+  String get adminParentalConsentRejectTitle => 'דחיית בקשת הסכמה';
+
+  @override
+  String get adminParentalConsentRejectReasonHint =>
+      'סיבה (תוצג להורה/אפוטרופוס)';
+
+  @override
+  String get adminParentalConsentRejectConfirm => 'דחייה';
 
   @override
   String get serverTabSso => 'התחברות מאוחדת';
@@ -5341,6 +5668,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get permManageWebhooks => 'ניהול Webhooks';
 
   @override
+  String get permManageAchievements => 'ניהול הישגים';
+
+  @override
   String get channelEditDialogManageWebhooks => 'ניהול Webhooks';
 
   @override
@@ -5384,4 +5714,77 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get chatWebhookBadge => 'WEBHOOK';
+
+  @override
+  String adminReportWebhookTarget(String reporterId, String webhookName) {
+    return 'מדווח: $reporterId\nWebhook: $webhookName';
+  }
+
+  @override
+  String get commonActionFailed => 'משהו השתבש. אנא נסו שוב.';
+
+  @override
+  String get ssoBrowserLaunchError =>
+      'לא ניתן היה לפתוח דפדפן כדי להמשיך בהתחברות.';
+
+  @override
+  String get settingsSpotifyTitle => 'Spotify';
+
+  @override
+  String get settingsSpotifyDescription =>
+      'חברו את Spotify כדי לשתף מה שאתם מאזינים לו בערוץ. Koda לא יכולה לסנכרן נגינה בזמן אמת -- זה מפרסם קישור כדי שאחרים יוכלו להשמיע את אותו השיר בעצמם.';
+
+  @override
+  String settingsSpotifyConnected(String username) {
+    return 'מחובר בשם $username';
+  }
+
+  @override
+  String get settingsSpotifyNotConnected => 'Spotify לא מחובר';
+
+  @override
+  String settingsSpotifyNowPlaying(String track, String artist) {
+    return 'מתנגן כעת: $track מאת $artist';
+  }
+
+  @override
+  String get settingsSpotifyShareHint =>
+      'שתפו זאת מסמל התווית המוזיקלית בתיבת ההודעות של כל ערוץ.';
+
+  @override
+  String get chatShareSpotifyTooltip => 'שתפו מה שאתם מאזינים לו';
+
+  @override
+  String get chatSpotifyShareFailed =>
+      'לא ניתן לשתף -- הקפידו ש-Spotify מנגן משהו.';
+
+  @override
+  String get chatPreviewBadgeLive => 'בשידור חי';
+
+  @override
+  String get chatPreviewBadgeListening => 'מאזין';
+
+  @override
+  String get chatPreviewBadgeEnded => 'הסתיים';
+
+  @override
+  String get serverAuditLogExportDescription =>
+      'ייצאו את יומן הביקורת המלא כ-CSV או JSON Lines לצורכי תאימות או הזרמה למערכת SIEM.';
+
+  @override
+  String get serverAuditLogExportLockedHint =>
+      'ייצוא יומן הביקורת זמין בדרגת הארגונים. צרו איתנו קשר לשדרוג.';
+
+  @override
+  String get serverExportAuditLog => 'ייצוא';
+
+  @override
+  String get serverExportFormatPrompt =>
+      'בחרו פורמט. JSON Lines מתאים בדרך כלל יותר להזרמה למערכת SIEM או לצינור יומנים; CSV נפתח ישירות בגיליון אלקטרוני.';
+
+  @override
+  String get serverAuditLogExported => 'יומן הביקורת יוצא';
+
+  @override
+  String get chatPreviewBadgePremiere => 'פרימיירה';
 }

@@ -9,6 +9,8 @@
 // expiry, and toggle whether /auth/register requires one at all.
 // Users: search users, view flags, apply manual flags.
 
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/api.dart';
@@ -30,7 +32,7 @@ class _AdminScreenState extends State<AdminScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 8, vsync: this);
+    _tabs = TabController(length: 9, vsync: this);
   }
 
   @override
@@ -67,6 +69,7 @@ class _AdminScreenState extends State<AdminScreen>
             Tab(text: t.adminTabBoosts),
             Tab(text: t.adminTabEnterprise),
             Tab(text: t.adminTabStatus),
+            Tab(text: t.adminTabParentalConsent),
           ],
         ),
       ),
@@ -81,6 +84,7 @@ class _AdminScreenState extends State<AdminScreen>
           _BoostsTab(),
           _EnterpriseTab(),
           const StatusScreen(),
+          _ParentalConsentTab(),
         ],
       ),
     );
@@ -609,7 +613,11 @@ class _DmReportsTabState extends State<_DmReportsTab> {
         Text(r['reason'] as String? ?? t.adminReasonOther,
             style: TextStyle(color: KodaColors.koda, fontSize: 11, fontWeight: FontWeight.w700)),
         const SizedBox(height: 6),
-        Text(t.adminDmReportDetails('${r['reporter_id']}', '${r['target_user_id']}'),
+        Text(
+            r['target_user_id'] != null
+                ? t.adminDmReportDetails('${r['reporter_id']}', '${r['target_user_id']}')
+                : t.adminReportWebhookTarget(
+                    '${r['reporter_id']}', (r['target_webhook_name'] as String?) ?? '${r['target_webhook_id']}'),
             style: TextStyle(color: KodaColors.text2, fontSize: 12)),
         const SizedBox(height: 6),
         Container(
@@ -1225,6 +1233,10 @@ class _EnterpriseTabState extends State<_EnterpriseTab> {
         if (i != -1) _results[i] = {..._results[i], 'enterprise_tier': newValue};
       }
     });
+    if (!ok) {
+      final t = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.commonActionFailed)));
+    }
   }
 
   @override
@@ -1304,5 +1316,157 @@ class _EnterpriseTabState extends State<_EnterpriseTab> {
                   ),
       ),
     ]);
+  }
+}
+
+// ── Parental Consent Review Tab ─────────────────────────────────────────────
+//
+// Signed-form verifiable-parental-consent requests (see koda-server's
+// Koda.Parental moduledoc) -- credit-card requests resolve automatically
+// via Stripe and never show up here; this is only for the method that
+// genuinely needs a human to look at an uploaded document before a
+// child account gets created.
+
+class _ParentalConsentTab extends StatefulWidget {
+  @override
+  State<_ParentalConsentTab> createState() => _ParentalConsentTabState();
+}
+
+class _ParentalConsentTabState extends State<_ParentalConsentTab> {
+  List<Map<String, dynamic>> _requests = [];
+  bool _loading = true;
+  String? _actingOnId;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    final requests = await KodaApi.instance.getParentalConsentReviews();
+    if (!mounted) return;
+    setState(() { _requests = requests; _loading = false; });
+  }
+
+  Future<void> _downloadDocument(String requestId) async {
+    final t = AppLocalizations.of(context);
+    final bytes = await KodaApi.instance.downloadParentalConsentDocument(requestId);
+    if (!mounted) return;
+    if (bytes == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.commonActionFailed)));
+      return;
+    }
+    final path = await FilePicker.platform.saveFile(fileName: 'consent-form-$requestId');
+    if (path == null || !mounted) return;
+    await File(path).writeAsBytes(bytes);
+  }
+
+  Future<void> _approve(String requestId) async {
+    setState(() => _actingOnId = requestId);
+    final ok = await KodaApi.instance.reviewParentalConsentRequest(requestId, 'approve');
+    if (!mounted) return;
+    setState(() => _actingOnId = null);
+    if (ok) {
+      _load();
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).commonActionFailed)));
+    }
+  }
+
+  Future<void> _reject(String requestId) async {
+    final t = AppLocalizations.of(context);
+    final reasonCtrl = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: Text(t.adminParentalConsentRejectTitle, style: TextStyle(color: KodaColors.text1)),
+        content: KodaTextField(controller: reasonCtrl, hintText: t.adminParentalConsentRejectReasonHint),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.commonCancel)),
+          TextButton(onPressed: () => Navigator.pop(context, true),
+              child: Text(t.adminParentalConsentRejectConfirm, style: const TextStyle(color: Colors.redAccent))),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _actingOnId = requestId);
+    final ok = await KodaApi.instance.reviewParentalConsentRequest(
+        requestId, 'reject', reason: reasonCtrl.text.trim().isEmpty ? null : reasonCtrl.text.trim());
+    if (!mounted) return;
+    setState(() => _actingOnId = null);
+    if (ok) {
+      _load();
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.commonActionFailed)));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    return _loading
+        ? Center(child: CircularProgressIndicator(color: KodaColors.koda))
+        : ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Text(t.adminParentalConsentDescription,
+                  style: TextStyle(color: KodaColors.text3, fontSize: 12)),
+              const SizedBox(height: 16),
+              if (_requests.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  child: Text(t.adminParentalConsentEmptyState,
+                      style: TextStyle(color: KodaColors.text3, fontSize: 13)),
+                )
+              else
+                ..._requests.map((r) {
+                  final acting = _actingOnId == r['id'];
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: KodaColors.card,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: KodaColors.border),
+                    ),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(r['child_username'] as String? ?? '',
+                          style: TextStyle(color: KodaColors.text1, fontWeight: FontWeight.w600)),
+                      Text(r['inserted_at'] as String? ?? '',
+                          style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+                      const SizedBox(height: 10),
+                      Wrap(spacing: 8, runSpacing: 8, children: [
+                        OutlinedButton.icon(
+                          icon: Icon(Icons.description_outlined, size: 14, color: KodaColors.text2),
+                          label: Text(t.adminParentalConsentViewDocument),
+                          onPressed: () => _downloadDocument(r['id'] as String),
+                        ),
+                        if (acting)
+                          SizedBox(width: 20, height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
+                        else ...[
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: KodaColors.koda, foregroundColor: Colors.black),
+                            onPressed: () => _approve(r['id'] as String),
+                            child: Text(t.adminParentalConsentApprove),
+                          ),
+                          OutlinedButton(
+                            style: OutlinedButton.styleFrom(foregroundColor: Colors.redAccent),
+                            onPressed: () => _reject(r['id'] as String),
+                            child: Text(t.adminParentalConsentReject),
+                          ),
+                        ],
+                      ]),
+                    ]),
+                  );
+                }),
+            ],
+          );
   }
 }

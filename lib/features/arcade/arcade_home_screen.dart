@@ -15,7 +15,13 @@ import 'match3_screen.dart';
 
 class ArcadeHomeScreen extends StatelessWidget {
   final String serverId;
-  const ArcadeHomeScreen({super.key, required this.serverId});
+  // Real permission, not a hardcoded true -- this screen is reachable by
+  // any member (no gate on its sidebar entry point, unlike the admin-
+  // oriented screens that embed LeaderboardScreen), so a regular member
+  // would otherwise see manage-only controls (add/reset/delete/adjust)
+  // that the server rejects anyway.
+  final bool canManageLeaderboards;
+  const ArcadeHomeScreen({super.key, required this.serverId, required this.canManageLeaderboards});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +38,7 @@ class ArcadeHomeScreen extends StatelessWidget {
             icon: Icon(Icons.leaderboard, size: 16, color: KodaColors.koda),
             label: Text(t.arcadeViewLeaderboardsButton, style: TextStyle(color: KodaColors.koda)),
             onPressed: () => Navigator.push(context, MaterialPageRoute(
-                builder: (_) => LeaderboardScreen(serverId: serverId, canManage: true))),
+                builder: (_) => LeaderboardScreen(serverId: serverId, canManage: canManageLeaderboards))),
           ),
         ]),
       ),

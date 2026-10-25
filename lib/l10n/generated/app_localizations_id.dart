@@ -159,6 +159,26 @@ class AppLocalizationsId extends AppLocalizations {
       'Menampilkan wajah dan suasana hati Visp di dialog pengaturan/acara/penasihatnya';
 
   @override
+  String get settingsDeleteAccountTitle => 'Hapus Akun';
+
+  @override
+  String get settingsDeleteAccountSubtitle =>
+      'Menghapus informasi pribadi Anda secara permanen dari Koda';
+
+  @override
+  String get settingsDeleteAccountWarning =>
+      'Ini akan menghapus informasi profil Anda secara permanen dan tidak dapat dibatalkan. Pesan lama Anda mungkin tetap terlihat oleh orang lain, ditampilkan sebagai terkirim dari pengguna yang terhapus. Masukkan kata sandi Anda untuk konfirmasi.';
+
+  @override
+  String get settingsDeleteAccountPasswordHint => 'Kata sandi';
+
+  @override
+  String get settingsDeleteAccountConfirm => 'Hapus Akun';
+
+  @override
+  String get settingsDeleteAccountWrongPassword => 'Kata sandi salah.';
+
+  @override
   String get settingsHighContrastTitle => 'Kontras Tinggi';
 
   @override
@@ -207,7 +227,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get settingsStreamingDescription =>
-      'Hubungkan Twitch/YouTube agar server tempat Anda memiliki izin \"Umumkan Saat Live\" dapat otomatis memposting saat Anda live atau mengunggah video baru.';
+      'Hubungkan Twitch/YouTube/Kick agar server tempat Anda memiliki izin \"Umumkan Saat Live\" dapat otomatis memposting saat Anda live atau mengunggah video baru.';
 
   @override
   String settingsStreamingConnected(
@@ -227,6 +247,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsStreamingLiveSuffixYoutube => ' -- unggahan baru';
 
   @override
+  String get settingsStreamingLiveSuffixKick => ' -- sedang live';
+
+  @override
   String get settingsStreamingConnecting => 'Menghubungkan...';
 
   @override
@@ -240,12 +263,20 @@ class AppLocalizationsId extends AppLocalizations {
       'Umumkan siaran live dan unggahan baru';
 
   @override
+  String get settingsAnnounceLiveKick => 'Umumkan saat saya live';
+
+  @override
   String get settingsRefreshStatus =>
       'Sudah terhubung di browser Anda? Segarkan status';
 
   @override
   String settingsStreamingConnectError(String platform) {
     return 'Tidak dapat memulai koneksi $platform.';
+  }
+
+  @override
+  String settingsStreamingConsentRequired(String platform) {
+    return 'Minta orang tua atau wali anak untuk mengizinkan koneksi $platform di Dasbor Orang Tua terlebih dahulu.';
   }
 
   @override
@@ -503,6 +534,12 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get homeBrowsePublicServersTooltip => 'Jelajahi server publik';
+
+  @override
+  String get homeUpcomingEventsTooltip => 'Acara mendatang';
+
+  @override
+  String get homeActivityFeedTooltip => 'Feed aktivitas';
 
   @override
   String get serverDiscoveryTitle => 'Jelajahi Server';
@@ -1588,6 +1625,20 @@ class AppLocalizationsId extends AppLocalizations {
       'Capai level boost 5 untuk membuka bingkai ikon khusus.';
 
   @override
+  String get serverAchievementsCardTitle => 'Pencapaian';
+
+  @override
+  String get serverAchievementsCardDescription =>
+      'Buat lencana khusus dan berikan kepada anggota.';
+
+  @override
+  String get serverAchievementsLockedHint =>
+      'Capai level boost 3 untuk membuat pencapaian.';
+
+  @override
+  String get serverOpenAchievements => 'Kelola Pencapaian';
+
+  @override
   String get serverBoostFromBank =>
       'Boost server ini dari Bank Server di Marketplace untuk menaikkan levelnya.';
 
@@ -2264,7 +2315,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildExplanation =>
-      'Ini membuat akun yang sepenuhnya diawasi: kanal berlabel akan diblokir, dan Anda bisa mengatur jam yang diizinkan serta melihat (tapi tidak membaca) teman dan server mereka.';
+      'Ini memulai permintaan untuk membuat akun yang sepenuhnya diawasi untuk anak Anda: kanal berlabel akan diblokir, dan Anda bisa mengatur jam yang diizinkan serta melihat (tapi tidak membaca) teman dan server mereka. Kami memverifikasi bahwa Anda adalah orang tua atau wali resmi mereka sebelum akun dibuat -- pilih metode verifikasi di bawah.';
 
   @override
   String get parentalDashboardValidationError =>
@@ -2272,10 +2323,10 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildFailed =>
-      'Tidak dapat membuat akun anak -- nama pengguna/email mungkin sudah digunakan.';
+      'Tidak dapat memulai permintaan -- nama pengguna/email mungkin sudah digunakan.';
 
   @override
-  String get parentalDashboardCreatingLabel => 'Membuat...';
+  String get parentalDashboardCreatingLabel => 'Memulai...';
 
   @override
   String get parentalDashboardNoChildren => 'Belum ada akun tertaut.';
@@ -2285,6 +2336,70 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get parentalDashboardUnknownUser => 'Tidak diketahui';
+
+  @override
+  String get parentalConsentMethodLabel =>
+      'Bagaimana kami harus memverifikasi bahwa Anda orang tua atau wali mereka?';
+
+  @override
+  String get parentalConsentMethodCardTitle => 'Kartu kredit atau debit';
+
+  @override
+  String get parentalConsentMethodCardSubtitle =>
+      'Biaya kecil \$0,50 memverifikasi bahwa Anda pemilik kartu, lalu langsung dikembalikan.';
+
+  @override
+  String get parentalConsentMethodFormTitle =>
+      'Formulir persetujuan yang ditandatangani';
+
+  @override
+  String get parentalConsentMethodFormSubtitle =>
+      'Unggah formulir yang ditandatangani. Staf akan meninjaunya sebelum akun dibuat.';
+
+  @override
+  String get parentalConsentAttestation =>
+      'Saya menegaskan bahwa saya adalah orang tua atau wali hukum resmi anak ini.';
+
+  @override
+  String get parentalConsentUploadFormHint =>
+      'Selanjutnya, unggah formulir persetujuan yang ditandatangani di bawah.';
+
+  @override
+  String get parentalConsentFinishInBrowser =>
+      'Selesaikan verifikasi di browser Anda, lalu kembali -- ini akan diperbarui otomatis.';
+
+  @override
+  String parentalConsentStatusRejected(String reason) {
+    return 'Ditolak: $reason';
+  }
+
+  @override
+  String get parentalConsentStatusExpired =>
+      'Permintaan telah berakhir -- silakan mulai lagi';
+
+  @override
+  String get parentalConsentStatusAwaitingUpload =>
+      'Menunggu formulir yang ditandatangani dari Anda';
+
+  @override
+  String get parentalConsentUploadFormButton => 'Unggah formulir';
+
+  @override
+  String get parentalConsentStatusAwaitingReview => 'Menunggu tinjauan staf';
+
+  @override
+  String get parentalConsentStatusAwaitingPayment =>
+      'Menunggu verifikasi pembayaran';
+
+  @override
+  String get parentalConsentPendingSectionTitle => 'PERMINTAAN TERTUNDA';
+
+  @override
+  String get parentalConsentPrivacyNoticePrefix => 'Baca ';
+
+  @override
+  String get parentalConsentPrivacyNoticeSuffix =>
+      ' kami untuk melihat persis informasi apa yang kami kumpulkan tentang anak Anda dan bagaimana informasi itu digunakan.';
 
   @override
   String get childDetailFallbackTitle => 'Akun anak';
@@ -2300,6 +2415,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get childDetailTabOverride => 'Pengecualian';
+
+  @override
+  String get childDetailTabThirdParty => 'Koneksi';
 
   @override
   String get childDetailNoFriends => 'Tidak ada teman.';
@@ -2370,6 +2488,28 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get childDetailOverrideExplanation =>
       'Berikan akses sementara di luar jadwal normal -- berguna untuk pengecualian sekali tanpa mengubah jadwal mingguan.';
+
+  @override
+  String get childDetailThirdPartyExplanation =>
+      'Menghubungkan layanan seperti Twitch, Kick, YouTube, Steam, atau Spotify membagikan nama pengguna Koda dan aktivitas anak Anda dengan platform eksternal tersebut. Ini terpisah dari persetujuan yang membuat akunnya, dan secara default dinonaktifkan -- aktifkan hanya jika Anda ingin anak Anda dapat menautkan akun-akun ini.';
+
+  @override
+  String get childDetailThirdPartyToggleTitle => 'Izinkan koneksi pihak ketiga';
+
+  @override
+  String get childDetailThirdPartyToggleSubtitle =>
+      'Menonaktifkan ini langsung memutuskan koneksi akun yang sudah terhubung';
+
+  @override
+  String get childDetailDeleteAccountTitle => 'Hapus Akun';
+
+  @override
+  String childDetailDeleteAccountWarning(String username) {
+    return 'Ini akan menghapus akun dan informasi pribadi $username secara permanen. Tindakan ini tidak dapat dibatalkan.';
+  }
+
+  @override
+  String get childDetailDeleteAccountConfirm => 'Hapus Akun';
 
   @override
   String get childDetailReasonHint => 'Alasan (opsional)';
@@ -3510,6 +3650,103 @@ class AppLocalizationsId extends AppLocalizations {
   String get calendarUnsubscribeTooltip => 'Berhenti berlangganan';
 
   @override
+  String get calendarReminderOffTooltip => 'Ingatkan saya';
+
+  @override
+  String get calendarReminderOnTooltip => 'Matikan pengingat';
+
+  @override
+  String get calendarAddToCalendarTooltip => 'Tambahkan ke kalender saya';
+
+  @override
+  String get calendarIcsSaved => 'File kalender disimpan';
+
+  @override
+  String get upcomingEventsTitle => 'Mendatang';
+
+  @override
+  String get upcomingEventsEmptyState =>
+      'Tidak ada acara mendatang di server Anda';
+
+  @override
+  String get upcomingEventsPublicBadge => 'Publik';
+
+  @override
+  String upcomingEventsFriendGoing(String name) {
+    return '$name akan hadir';
+  }
+
+  @override
+  String upcomingEventsTwoFriendsGoing(String name1, String name2) {
+    return '$name1 dan $name2 akan hadir';
+  }
+
+  @override
+  String upcomingEventsManyFriendsGoing(String name, int count) {
+    return '$name dan $count lainnya akan hadir';
+  }
+
+  @override
+  String get activityFeedTitle => 'Feed Aktivitas';
+
+  @override
+  String get activityFeedEmptyState => 'Belum ada aktivitas dari teman Anda';
+
+  @override
+  String activityFeedAchievement(
+      String username, String achievement, String server) {
+    return '$username meraih $achievement di $server';
+  }
+
+  @override
+  String activityFeedWentLive(String username, String platform) {
+    return '$username sedang live di $platform';
+  }
+
+  @override
+  String activityFeedServerJoined(String username, String server) {
+    return '$username bergabung dengan $server';
+  }
+
+  @override
+  String activityFeedArcadeHighScore(String username, String game, int score) {
+    return '$username meraih skor tertinggi baru di $game: $score';
+  }
+
+  @override
+  String get activityFeedJustNow => 'Baru saja';
+
+  @override
+  String activityFeedMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count menit yang lalu',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jam yang lalu',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hari yang lalu',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String calendarRepeatsLabel(String recurrence) {
     return 'Berulang $recurrence';
   }
@@ -4346,6 +4583,24 @@ class AppLocalizationsId extends AppLocalizations {
   String get updateNudgeLaterButton => 'Nanti';
 
   @override
+  String get updateNudgeUpdateNowButton => 'Perbarui Sekarang';
+
+  @override
+  String updateNudgeDownloading(int percent) {
+    return 'Mengunduh pembaruan... $percent%';
+  }
+
+  @override
+  String get updateNudgeVerifying => 'Memverifikasi unduhan...';
+
+  @override
+  String get updateNudgeLaunching => 'Meluncurkan installer...';
+
+  @override
+  String get updateNudgeFailed =>
+      'Pembaruan tidak dapat diselesaikan. Anda bisa mengunduhnya secara manual.';
+
+  @override
   String get tierBadgeSparkSubscriber => 'Pelanggan Spark';
 
   @override
@@ -5141,6 +5396,45 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String get achievementScreenTitle => 'Pencapaian';
+
+  @override
+  String get achievementCreateTitle => 'Buat Pencapaian';
+
+  @override
+  String get achievementNameHint => 'Nama pencapaian';
+
+  @override
+  String get achievementDescriptionHint => 'Deskripsi (opsional)';
+
+  @override
+  String get achievementDeleteTitle => 'Hapus Pencapaian';
+
+  @override
+  String achievementDeleteConfirm(String name) {
+    return 'Hapus \"$name\"? Yang sudah memilikinya tetap memilikinya, tetapi ini akan dihapus dari server. Tindakan ini tidak dapat dibatalkan.';
+  }
+
+  @override
+  String get achievementAwardTitle => 'Berikan Pencapaian';
+
+  @override
+  String get achievementAwardButton => 'Berikan';
+
+  @override
+  String get achievementUserIdHint => 'ID Pengguna';
+
+  @override
+  String get achievementLockedBanner =>
+      'Server ini berada di bawah level boost 3, jadi pencapaian yang ada dan pemiliknya tetap sama persis, tetapi tidak bisa diberikan ke orang baru sampai server kembali ke level 3.';
+
+  @override
+  String get achievementEmptyState => 'Belum ada pencapaian';
+
+  @override
+  String get achievementNoRecipients => 'Belum ada yang memilikinya';
+
+  @override
   String chatGifLevelGated(int level) {
     return 'Anda perlu level $level untuk mengirim GIF di sini';
   }
@@ -5234,6 +5528,35 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get adminTabStatus => 'Status';
+
+  @override
+  String get adminTabParentalConsent => 'Persetujuan Orang Tua';
+
+  @override
+  String get adminParentalConsentDescription =>
+      'Tinjau formulir persetujuan yang ditandatangani sebelum akun anak dibuat. Verifikasi kartu kredit diselesaikan otomatis dan tidak pernah muncul di sini.';
+
+  @override
+  String get adminParentalConsentEmptyState => 'Tidak ada tinjauan tertunda.';
+
+  @override
+  String get adminParentalConsentViewDocument => 'Lihat dokumen';
+
+  @override
+  String get adminParentalConsentApprove => 'Setujui';
+
+  @override
+  String get adminParentalConsentReject => 'Tolak';
+
+  @override
+  String get adminParentalConsentRejectTitle => 'Tolak Permintaan Persetujuan';
+
+  @override
+  String get adminParentalConsentRejectReasonHint =>
+      'Alasan (ditampilkan ke orang tua/wali)';
+
+  @override
+  String get adminParentalConsentRejectConfirm => 'Tolak';
 
   @override
   String get serverTabSso => 'SSO';
@@ -5335,6 +5658,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get permManageWebhooks => 'Kelola Webhook';
 
   @override
+  String get permManageAchievements => 'Kelola Pencapaian';
+
+  @override
   String get channelEditDialogManageWebhooks => 'Kelola Webhook';
 
   @override
@@ -5378,4 +5704,78 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get chatWebhookBadge => 'WEBHOOK';
+
+  @override
+  String adminReportWebhookTarget(String reporterId, String webhookName) {
+    return 'Pelapor: $reporterId\nWebhook: $webhookName';
+  }
+
+  @override
+  String get commonActionFailed => 'Terjadi kesalahan. Silakan coba lagi.';
+
+  @override
+  String get ssoBrowserLaunchError =>
+      'Tidak dapat membuka browser untuk melanjutkan proses masuk.';
+
+  @override
+  String get settingsSpotifyTitle => 'Spotify';
+
+  @override
+  String get settingsSpotifyDescription =>
+      'Hubungkan Spotify untuk membagikan apa yang sedang Anda dengarkan di sebuah channel. Koda tidak dapat menyinkronkan pemutaran secara real-time -- ini memposting tautan agar orang lain dapat memutar lagu yang sama sendiri.';
+
+  @override
+  String settingsSpotifyConnected(String username) {
+    return 'Terhubung sebagai $username';
+  }
+
+  @override
+  String get settingsSpotifyNotConnected => 'Spotify tidak terhubung';
+
+  @override
+  String settingsSpotifyNowPlaying(String track, String artist) {
+    return 'Sedang memutar: $track oleh $artist';
+  }
+
+  @override
+  String get settingsSpotifyShareHint =>
+      'Bagikan ini dari ikon not musik di kotak pesan channel mana pun.';
+
+  @override
+  String get chatShareSpotifyTooltip =>
+      'Bagikan apa yang sedang Anda dengarkan';
+
+  @override
+  String get chatSpotifyShareFailed =>
+      'Tidak dapat membagikan -- pastikan Spotify sedang memutar sesuatu.';
+
+  @override
+  String get chatPreviewBadgeLive => 'LIVE';
+
+  @override
+  String get chatPreviewBadgeListening => 'MENDENGARKAN';
+
+  @override
+  String get chatPreviewBadgeEnded => 'SELESAI';
+
+  @override
+  String get serverAuditLogExportDescription =>
+      'Ekspor log audit lengkap sebagai CSV atau JSON Lines untuk kepatuhan atau ingesti SIEM.';
+
+  @override
+  String get serverAuditLogExportLockedHint =>
+      'Ekspor log audit tersedia di tingkat Enterprise. Hubungi kami untuk upgrade.';
+
+  @override
+  String get serverExportAuditLog => 'Ekspor';
+
+  @override
+  String get serverExportFormatPrompt =>
+      'Pilih format. JSON Lines biasanya lebih cocok untuk SIEM atau pipeline log; CSV terbuka langsung di spreadsheet.';
+
+  @override
+  String get serverAuditLogExported => 'Log audit berhasil diekspor';
+
+  @override
+  String get chatPreviewBadgePremiere => 'PREMIERE';
 }

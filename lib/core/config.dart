@@ -1,6 +1,6 @@
 // lib/core/config.dart
 //
-// Production configuration for Koda Beta v0.6.2.
+// Production configuration for Koda Beta v0.7.0.
 // Every URL and email address Koda needs lives here, and only here.
 // No hosting-provider details (Railway service variables, Neon
 // connection strings, etc.) belong in this file or anywhere in this
@@ -29,7 +29,7 @@ class KodaConfig {
 
   // ── App identity ───────────────────────────────────────────────────────
   static const String appName     = 'Koda';
-  static const String appVersion  = '0.6.2';
+  static const String appVersion  = '0.7.0';
   static const String buildLabel  = 'Beta';
   static const String fullVersion = '$appName $buildLabel v$appVersion';
   static const String company     = 'GryphonHeart LLC';

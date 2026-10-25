@@ -15,11 +15,24 @@ class VersionCheckResult {
   final String downloadUrl;
   final String releaseNotes;
   final bool required;
+  /// A direct installer URL for this exact OS, when the server has one
+  /// configured (see Koda.VersionController) -- null on any platform
+  /// without one, in which case there's nothing for self_update.dart to
+  /// fetch and the dialog falls back to [downloadUrl]'s browser page.
+  final String? platformDownloadUrl;
+  /// Lowercase hex SHA-256 the downloaded installer must match before
+  /// self_update.dart will launch it. Null means the server hasn't had
+  /// a real digest filled in for this release yet (see
+  /// VersionController's moduledoc) -- also treated as "can't verify,
+  /// don't run it," not as "skip verification."
+  final String? platformSha256;
   const VersionCheckResult({
     required this.latestVersion,
     required this.downloadUrl,
     required this.releaseNotes,
     required this.required,
+    this.platformDownloadUrl,
+    this.platformSha256,
   });
 }
 
@@ -62,6 +75,8 @@ class VersionCheck {
       downloadUrl: data['download_url'] as String? ?? 'https://koda.fyi/#download',
       releaseNotes: data['release_notes'] as String? ?? '',
       required: data['required'] as bool? ?? false,
+      platformDownloadUrl: data['platform_download_url'] as String?,
+      platformSha256: data['platform_sha256'] as String?,
     );
   }
 

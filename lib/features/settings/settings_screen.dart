@@ -62,9 +62,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _loadingThroneUrl = false;
   bool _closeToTray = true;
   bool _showVispAvatar = true;
-  final Map<String, Map<String, dynamic>?> _streamingStatus = {'twitch': null, 'youtube': null};
-  final Map<String, bool> _loadingStreaming = {'twitch': true, 'youtube': true};
-  final Map<String, bool> _connectingStreaming = {'twitch': false, 'youtube': false};
+  final Map<String, Map<String, dynamic>?> _streamingStatus = {'twitch': null, 'youtube': null, 'kick': null};
+  final Map<String, bool> _loadingStreaming = {'twitch': true, 'youtube': true, 'kick': true};
+  final Map<String, bool> _connectingStreaming = {'twitch': false, 'youtube': false, 'kick': false};
 
   // Steam: a different shape from the Twitch/YouTube map above on
   // purpose -- it has two independent opt-in switches (share_presence,
@@ -74,6 +74,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _loadingSteam = true;
   bool _connectingSteam = false;
   bool _syncingSteamLibrary = false;
+
+  // Spotify: also its own bespoke shape, same reasoning as Steam above --
+  // no announce_enabled (there's no automatic announcement at all, see
+  // koda-server's Koda.Spotify moduledoc for why), just polled
+  // now-playing presence.
+  Map<String, dynamic>? _spotifyStatus;
+  bool _loadingSpotify = true;
+  bool _connectingSpotify = false;
 
   // Not static const -- section labels are localized, which needs a
   // BuildContext (see AppLocalizations.of(context) below).
@@ -117,15 +125,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     });
     _loadStreamingStatus('twitch');
     _loadStreamingStatus('youtube');
+    _loadStreamingStatus('kick');
     _loadSteamStatus();
+    _loadSpotifyStatus();
   }
 
-  String _platformLabel(String platform) => platform == 'twitch' ? 'Twitch' : 'YouTube';
+  String _platformLabel(String platform) => switch (platform) {
+        'twitch' => 'Twitch',
+        'kick' => 'Kick',
+        _ => 'YouTube',
+      };
 
   Future<void> _loadStreamingStatus(String platform) async {
-    final status = platform == 'twitch'
-        ? await KodaApi.instance.getTwitchStatus()
-        : await KodaApi.instance.getYoutubeStatus();
+    final status = switch (platform) {
+      'twitch' => await KodaApi.instance.getTwitchStatus(),
+      'kick' => await KodaApi.instance.getKickStatus(),
+      _ => await KodaApi.instance.getYoutubeStatus(),
+    };
     if (mounted) {
       setState(() {
         _streamingStatus[platform] = status;
@@ -136,18 +152,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _connectStreaming(String platform) async {
     setState(() => _connectingStreaming[platform] = true);
-    final url = platform == 'twitch'
-        ? await KodaApi.instance.connectTwitch()
-        : await KodaApi.instance.connectYoutube();
+    final result = switch (platform) {
+      'twitch' => await KodaApi.instance.connectTwitch(),
+      'kick' => await KodaApi.instance.connectKick(),
+      _ => await KodaApi.instance.connectYoutube(),
+    };
     if (!mounted) return;
     setState(() => _connectingStreaming[platform] = false);
     final t = AppLocalizations.of(context);
-    if (url == null) {
+    if (result.consentRequired) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(t.settingsStreamingConsentRequired(_platformLabel(platform)))));
+      return;
+    }
+    if (result.url == null) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(t.settingsStreamingConnectError(_platformLabel(platform)))));
       return;
     }
-    final uri = Uri.parse(url);
+    final uri = Uri.parse(result.url!);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!mounted) return;
@@ -157,9 +180,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _disconnectStreaming(String platform) async {
-    final ok = platform == 'twitch'
-        ? await KodaApi.instance.disconnectTwitch()
-        : await KodaApi.instance.disconnectYoutube();
+    final ok = switch (platform) {
+      'twitch' => await KodaApi.instance.disconnectTwitch(),
+      'kick' => await KodaApi.instance.disconnectKick(),
+      _ => await KodaApi.instance.disconnectYoutube(),
+    };
     if (ok && mounted) setState(() => _streamingStatus[platform] = null);
   }
 
@@ -167,9 +192,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final previous = _streamingStatus[platform];
     setState(() => _streamingStatus[platform] =
         {...?_streamingStatus[platform], 'announce_enabled': enabled});
-    final ok = platform == 'twitch'
-        ? await KodaApi.instance.setTwitchAnnounceEnabled(enabled)
-        : await KodaApi.instance.setYoutubeAnnounceEnabled(enabled);
+    final ok = switch (platform) {
+      'twitch' => await KodaApi.instance.setTwitchAnnounceEnabled(enabled),
+      'kick' => await KodaApi.instance.setKickAnnounceEnabled(enabled),
+      _ => await KodaApi.instance.setYoutubeAnnounceEnabled(enabled),
+    };
     if (!ok && mounted) setState(() => _streamingStatus[platform] = previous);
   }
 
@@ -180,16 +207,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _connectSteam() async {
     setState(() => _connectingSteam = true);
-    final url = await KodaApi.instance.connectSteam();
+    final result = await KodaApi.instance.connectSteam();
     if (!mounted) return;
     setState(() => _connectingSteam = false);
     final t = AppLocalizations.of(context);
-    if (url == null) {
+    if (result.consentRequired) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(t.settingsStreamingConsentRequired('Steam'))));
+      return;
+    }
+    if (result.url == null) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(t.settingsStreamingConnectError('Steam'))));
       return;
     }
-    final uri = Uri.parse(url);
+    final uri = Uri.parse(result.url!);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!mounted) return;
@@ -228,6 +260,41 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final t = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
         ok ? t.steamSyncSuccess : t.steamSyncError)));
+  }
+
+  Future<void> _loadSpotifyStatus() async {
+    final status = await KodaApi.instance.getSpotifyStatus();
+    if (mounted) setState(() { _spotifyStatus = status; _loadingSpotify = false; });
+  }
+
+  Future<void> _connectSpotify() async {
+    setState(() => _connectingSpotify = true);
+    final result = await KodaApi.instance.connectSpotify();
+    if (!mounted) return;
+    setState(() => _connectingSpotify = false);
+    final t = AppLocalizations.of(context);
+    if (result.consentRequired) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(t.settingsStreamingConsentRequired('Spotify'))));
+      return;
+    }
+    if (result.url == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(t.settingsStreamingConnectError('Spotify'))));
+      return;
+    }
+    final uri = Uri.parse(result.url!);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+          t.settingsStreamingFinishInBrowser)));
+    }
+  }
+
+  Future<void> _disconnectSpotify() async {
+    final ok = await KodaApi.instance.disconnectSpotify();
+    if (ok && mounted) setState(() => _spotifyStatus = null);
   }
 
   @override
@@ -332,6 +399,48 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (mounted) {
       Navigator.pushAndRemoveUntil(context,
           MaterialPageRoute(builder: (_) => const AuthScreen()), (route) => false);
+    }
+  }
+
+  /// Self-service "right to deletion" -- re-confirms the account's own
+  /// password server-side before scrubbing personal information (see
+  /// koda-server's Koda.Auth.delete_account/1). A parent/guardian
+  /// deletes a child's account instead from the Parental Dashboard,
+  /// which never needs the child's password (see child_detail_screen.dart).
+  Future<void> _confirmDeleteAccount() async {
+    final t = AppLocalizations.of(context);
+    final passwordCtrl = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: Text(t.settingsDeleteAccountTitle, style: TextStyle(color: KodaColors.text1)),
+        content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(t.settingsDeleteAccountWarning, style: TextStyle(color: KodaColors.text3, fontSize: 12, height: 1.4)),
+          const SizedBox(height: 14),
+          KodaTextField(controller: passwordCtrl, hintText: t.settingsDeleteAccountPasswordHint, obscureText: true),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(t.commonCancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(t.settingsDeleteAccountConfirm, style: TextStyle(color: KodaColors.accent)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    if (passwordCtrl.text.isEmpty) return;
+
+    final error = await KodaApi.instance.deleteAccount(passwordCtrl.text);
+    if (!mounted) return;
+    if (error == null) {
+      ref.read(authProvider.notifier).clear();
+      Navigator.pushAndRemoveUntil(context,
+          MaterialPageRoute(builder: (_) => const AuthScreen()), (route) => false);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+          error == 'invalid' ? t.settingsDeleteAccountWrongPassword : t.commonActionFailed)));
     }
   }
 
@@ -479,6 +588,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 setState(() => _showVispAvatar = v);
                 await VispAvatarPrefs.setEnabled(v);
               },
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            margin: const EdgeInsets.only(bottom: 6),
+            decoration: BoxDecoration(
+                color: KodaColors.card, borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: KodaColors.accent.withValues(alpha: 0.4))),
+            child: ListTile(
+              leading: Icon(Icons.delete_forever_outlined, color: KodaColors.accent, size: 18),
+              title: Text(t.settingsDeleteAccountTitle,
+                  style: TextStyle(color: KodaColors.accent, fontSize: 13)),
+              subtitle: Text(t.settingsDeleteAccountSubtitle,
+                  style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+              onTap: _confirmDeleteAccount,
             ),
           ),
         ]));
@@ -811,6 +935,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       _buildStreamingCard(),
       const SizedBox(height: 16),
       _buildSteamCard(),
+      const SizedBox(height: 16),
+      _buildSpotifyCard(),
     ]);
   }
 
@@ -835,6 +961,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         _buildStreamingRow('twitch'),
         Divider(color: KodaColors.border, height: 24),
         _buildStreamingRow('youtube'),
+        Divider(color: KodaColors.border, height: 24),
+        _buildStreamingRow('kick'),
       ]),
     );
   }
@@ -849,9 +977,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final connected = status?['connected'] == true;
     final connecting = _connectingStreaming[platform] == true;
     final label = _platformLabel(platform);
-    final liveSuffix = platform == 'twitch'
-        ? t.settingsStreamingLiveSuffixTwitch
-        : t.settingsStreamingLiveSuffixYoutube;
+    final liveSuffix = switch (platform) {
+      'twitch' => t.settingsStreamingLiveSuffixTwitch,
+      'kick' => t.settingsStreamingLiveSuffixKick,
+      _ => t.settingsStreamingLiveSuffixYoutube,
+    };
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
@@ -883,8 +1013,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           dense: true,
           contentPadding: EdgeInsets.zero,
           controlAffinity: ListTileControlAffinity.leading,
-          title: Text(platform == 'twitch' ? t.settingsAnnounceLiveTwitch : t.settingsAnnounceLiveYoutube,
-              style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+          title: Text(switch (platform) {
+            'twitch' => t.settingsAnnounceLiveTwitch,
+            'kick' => t.settingsAnnounceLiveKick,
+            _ => t.settingsAnnounceLiveYoutube,
+          }, style: TextStyle(color: KodaColors.text1, fontSize: 13)),
           value: status?['announce_enabled'] == true,
           activeColor: KodaColors.koda,
           onChanged: (v) => _setStreamingAnnounceEnabled(platform, v ?? true),
@@ -988,6 +1121,87 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ] else
             TextButton(
               onPressed: _loadSteamStatus,
+              child: Text(t.settingsRefreshStatus,
+                  style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+            ),
+        ],
+      ]),
+    );
+  }
+
+  Widget _buildSpotifyCard() {
+    final t = AppLocalizations.of(context);
+    final connected = _spotifyStatus?['connected'] == true;
+    final isListening = _spotifyStatus?['is_listening'] == true;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+          color: KodaColors.card, borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: KodaColors.border)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(Icons.music_note_outlined, size: 16, color: KodaColors.accent),
+          const SizedBox(width: 8),
+          Text(t.settingsSpotifyTitle,
+              style: TextStyle(color: KodaColors.text1, fontSize: 14, fontWeight: FontWeight.w600)),
+        ]),
+        const SizedBox(height: 6),
+        Text(t.settingsSpotifyDescription,
+            style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+        const SizedBox(height: 12),
+        if (_loadingSpotify)
+          Center(child: SizedBox(width: 18, height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda)))
+        else ...[
+          Row(children: [
+            Icon(connected ? Icons.check_circle : Icons.circle_outlined,
+                size: 16, color: connected ? KodaColors.mint : KodaColors.text3),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                  connected
+                      ? t.settingsSpotifyConnected(_spotifyStatus?['external_username'] ?? '')
+                      : t.settingsSpotifyNotConnected,
+                  style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+            ),
+            if (connected)
+              TextButton(onPressed: _disconnectSpotify, child: Text(t.commonDisconnect))
+            else
+              TextButton.icon(
+                icon: _connectingSpotify
+                    ? SizedBox(width: 12, height: 12,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
+                    : const Icon(Icons.link, size: 14),
+                label: Text(_connectingSpotify ? t.settingsStreamingConnecting : t.settingsStreamingConnect),
+                onPressed: _connectingSpotify ? null : _connectSpotify,
+              ),
+          ]),
+          if (connected && isListening) ...[
+            const SizedBox(height: 10),
+            Row(children: [
+              if ((_spotifyStatus?['album_art_url'] as String?) != null)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Image.network(_spotifyStatus!['album_art_url'] as String,
+                      width: 36, height: 36, fit: BoxFit.cover),
+                ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                    t.settingsSpotifyNowPlaying(
+                        _spotifyStatus?['track_name'] ?? '', _spotifyStatus?['artist_name'] ?? ''),
+                    style: TextStyle(color: KodaColors.text2, fontSize: 12),
+                    overflow: TextOverflow.ellipsis),
+              ),
+            ]),
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(t.settingsSpotifyShareHint,
+                  style: TextStyle(color: KodaColors.text3, fontSize: 10, fontStyle: FontStyle.italic)),
+            ),
+          ] else if (connected)
+            TextButton(
+              onPressed: _loadSpotifyStatus,
               child: Text(t.settingsRefreshStatus,
                   style: TextStyle(color: KodaColors.text3, fontSize: 11)),
             ),

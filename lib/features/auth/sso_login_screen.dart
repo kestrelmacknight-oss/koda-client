@@ -50,6 +50,11 @@ class _SsoLoginScreenState extends ConsumerState<SsoLoginScreen> {
     setState(() => _busy = false);
 
     if (result == null) {
+      setState(() => _error = t.ssoGenericError);
+      return;
+    }
+
+    if (result['error'] == 'no_config') {
       setState(() => _error = t.ssoNoConfigError);
       return;
     }
@@ -62,9 +67,11 @@ class _SsoLoginScreenState extends ConsumerState<SsoLoginScreen> {
     }
 
     final uri = Uri.parse(redirectUrl);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!await canLaunchUrl(uri)) {
+      setState(() => _error = t.ssoBrowserLaunchError);
+      return;
     }
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
 
     setState(() => _waiting = true);
     _pollTimer = Timer.periodic(const Duration(seconds: 2), (_) => _poll(attemptToken));
@@ -82,8 +89,15 @@ class _SsoLoginScreenState extends ConsumerState<SsoLoginScreen> {
     }
 
     if (status['status'] == 'completed') {
+      final jwt = status['jwt'] as String?;
+      if (jwt == null) {
+        _pollTimer?.cancel();
+        final t = AppLocalizations.of(context);
+        setState(() { _waiting = false; _error = t.ssoGenericError; });
+        return;
+      }
       _pollTimer?.cancel();
-      await _finishLogin(status['jwt'] as String);
+      await _finishLogin(jwt);
     }
   }
 

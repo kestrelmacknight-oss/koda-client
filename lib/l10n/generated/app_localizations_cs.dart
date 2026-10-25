@@ -161,6 +161,26 @@ class AppLocalizationsCs extends AppLocalizations {
       'Zobrazuje tvář a náladu Visp v jeho dialozích nastavení, událostí a rad';
 
   @override
+  String get settingsDeleteAccountTitle => 'Smazat účet';
+
+  @override
+  String get settingsDeleteAccountSubtitle =>
+      'Trvale odstranit vaše osobní údaje z Koda';
+
+  @override
+  String get settingsDeleteAccountWarning =>
+      'Tím se trvale odstraní informace vašeho profilu a nelze to vrátit zpět. Vaše dřívější zprávy mohou zůstat ostatním viditelné, zobrazené jako odeslané smazaným uživatelem. Zadejte heslo pro potvrzení.';
+
+  @override
+  String get settingsDeleteAccountPasswordHint => 'Heslo';
+
+  @override
+  String get settingsDeleteAccountConfirm => 'Smazat účet';
+
+  @override
+  String get settingsDeleteAccountWrongPassword => 'Nesprávné heslo.';
+
+  @override
   String get settingsHighContrastTitle => 'Vysoký kontrast';
 
   @override
@@ -208,7 +228,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get settingsStreamingDescription =>
-      'Propojte Twitch/YouTube, aby servery, kde máte oprávnění \"Oznamovat vysílání\", mohly automaticky zveřejnit příspěvek, když začnete vysílat naživo nebo nahrajete nové video.';
+      'Propojte Twitch/YouTube/Kick, aby servery, kde máte oprávnění \"Oznamovat vysílání\", mohly automaticky zveřejnit příspěvek, když začnete vysílat naživo nebo nahrajete nové video.';
 
   @override
   String settingsStreamingConnected(
@@ -228,6 +248,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsStreamingLiveSuffixYoutube => ' -- nové nahrání';
 
   @override
+  String get settingsStreamingLiveSuffixKick => ' -- právě vysílá';
+
+  @override
   String get settingsStreamingConnecting => 'Připojování...';
 
   @override
@@ -241,12 +264,20 @@ class AppLocalizationsCs extends AppLocalizations {
       'Oznamovat živá vysílání a nová nahrání';
 
   @override
+  String get settingsAnnounceLiveKick => 'Oznámit, když začnu vysílat naživo';
+
+  @override
   String get settingsRefreshStatus =>
       'Už jste připojeni v prohlížeči? Obnovit stav';
 
   @override
   String settingsStreamingConnectError(String platform) {
     return 'Nepodařilo se zahájit připojení $platform.';
+  }
+
+  @override
+  String settingsStreamingConsentRequired(String platform) {
+    return 'Požádejte rodiče nebo zákonného zástupce dítěte, aby nejprve povolil připojení $platform v Rodičovském panelu.';
   }
 
   @override
@@ -505,6 +536,12 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get homeBrowsePublicServersTooltip => 'Procházet veřejné servery';
+
+  @override
+  String get homeUpcomingEventsTooltip => 'Nadcházející události';
+
+  @override
+  String get homeActivityFeedTooltip => 'Aktivita přátel';
 
   @override
   String get serverDiscoveryTitle => 'Procházet servery';
@@ -1592,6 +1629,20 @@ class AppLocalizationsCs extends AppLocalizations {
       'Dosáhněte úrovně boostu 5 a odemkněte vlastní okraj ikony.';
 
   @override
+  String get serverAchievementsCardTitle => 'Úspěchy';
+
+  @override
+  String get serverAchievementsCardDescription =>
+      'Vytvářejte vlastní odznaky a udělujte je členům.';
+
+  @override
+  String get serverAchievementsLockedHint =>
+      'Dosáhněte úrovně boostu 3 a odemkněte vytváření úspěchů.';
+
+  @override
+  String get serverOpenAchievements => 'Spravovat úspěchy';
+
+  @override
   String get serverBoostFromBank =>
       'Zvyšte boost tohoto serveru z Banky serveru na Tržišti a zvedněte tak jeho úroveň.';
 
@@ -2277,7 +2328,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildExplanation =>
-      'Tím se vytvoří plně kontrolovaný účet: označené kanály jsou zablokovány a budete moci nastavit povolené hodiny a vidět (ale ne číst) jejich přátele a servery.';
+      'Tím se zahájí žádost o vytvoření plně kontrolovaného účtu pro vaše dítě: označené kanály jsou zablokovány a budete moci nastavit povolené hodiny a vidět (ale ne číst) jejich přátele a servery. Před vytvořením účtu ověříme, že jste rodič nebo oprávněný zákonný zástupce -- vyberte způsob ověření níže.';
 
   @override
   String get parentalDashboardValidationError =>
@@ -2285,10 +2336,10 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildFailed =>
-      'Dětský účet se nepodařilo vytvořit -- uživatelské jméno/e-mail může být již obsazeno.';
+      'Žádost se nepodařilo zahájit -- uživatelské jméno/e-mail může být již obsazeno.';
 
   @override
-  String get parentalDashboardCreatingLabel => 'Vytváření...';
+  String get parentalDashboardCreatingLabel => 'Zahajování...';
 
   @override
   String get parentalDashboardNoChildren => 'Zatím žádné propojené účty.';
@@ -2298,6 +2349,69 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get parentalDashboardUnknownUser => 'Neznámý';
+
+  @override
+  String get parentalConsentMethodLabel =>
+      'Jak máme ověřit, že jste rodič nebo zákonný zástupce?';
+
+  @override
+  String get parentalConsentMethodCardTitle => 'Kreditní nebo debetní karta';
+
+  @override
+  String get parentalConsentMethodCardSubtitle =>
+      'Malá platba 0,50 \$ ověří, že kartu vlastníte, a je okamžitě vrácena.';
+
+  @override
+  String get parentalConsentMethodFormTitle => 'Podepsaný souhlasný formulář';
+
+  @override
+  String get parentalConsentMethodFormSubtitle =>
+      'Nahrajte podepsaný formulář. Zaměstnanec jej zkontroluje před vytvořením účtu.';
+
+  @override
+  String get parentalConsentAttestation =>
+      'Potvrzuji, že jsem rodič nebo oprávněný zákonný zástupce tohoto dítěte.';
+
+  @override
+  String get parentalConsentUploadFormHint =>
+      'Dále nahrajte svůj podepsaný souhlasný formulář níže.';
+
+  @override
+  String get parentalConsentFinishInBrowser =>
+      'Dokončete ověření v prohlížeči a pak se vraťte -- aktualizuje se to automaticky.';
+
+  @override
+  String parentalConsentStatusRejected(String reason) {
+    return 'Zamítnuto: $reason';
+  }
+
+  @override
+  String get parentalConsentStatusExpired =>
+      'Žádost vypršela -- začněte prosím znovu';
+
+  @override
+  String get parentalConsentStatusAwaitingUpload =>
+      'Čeká na váš podepsaný formulář';
+
+  @override
+  String get parentalConsentUploadFormButton => 'Nahrát formulář';
+
+  @override
+  String get parentalConsentStatusAwaitingReview =>
+      'Čeká na kontrolu zaměstnancem';
+
+  @override
+  String get parentalConsentStatusAwaitingPayment => 'Čeká na ověření platby';
+
+  @override
+  String get parentalConsentPendingSectionTitle => 'ČEKAJÍCÍ ŽÁDOSTI';
+
+  @override
+  String get parentalConsentPrivacyNoticePrefix => 'Přečtěte si naše ';
+
+  @override
+  String get parentalConsentPrivacyNoticeSuffix =>
+      ' a zjistěte přesně, jaké informace o vašem dítěti shromažďujeme a jak je používáme.';
 
   @override
   String get childDetailFallbackTitle => 'Dětský účet';
@@ -2313,6 +2427,9 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get childDetailTabOverride => 'Výjimka';
+
+  @override
+  String get childDetailTabThirdParty => 'Připojení';
 
   @override
   String get childDetailNoFriends => 'Žádní přátelé.';
@@ -2384,6 +2501,29 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get childDetailOverrideExplanation =>
       'Udělte dočasný přístup mimo běžný rozvrh -- vhodné pro jednorázovou výjimku bez úpravy týdenního rozvrhu.';
+
+  @override
+  String get childDetailThirdPartyExplanation =>
+      'Připojení ke službě jako Twitch, Kick, YouTube, Steam nebo Spotify sdílí uživatelské jméno a aktivitu vašeho dítěte na Koda s touto externí platformou. To je oddělené od souhlasu, který vytvořil jeho účet, a je ve výchozím stavu vypnuté -- zapněte to jen tehdy, pokud chcete, aby si vaše dítě mohlo tyto účty propojit.';
+
+  @override
+  String get childDetailThirdPartyToggleTitle =>
+      'Povolit připojení třetích stran';
+
+  @override
+  String get childDetailThirdPartyToggleSubtitle =>
+      'Vypnutím se okamžitě odpojí jakýkoli již propojený účet';
+
+  @override
+  String get childDetailDeleteAccountTitle => 'Smazat účet';
+
+  @override
+  String childDetailDeleteAccountWarning(String username) {
+    return 'Tím se trvale odstraní účet a osobní údaje uživatele $username. Tuto akci nelze vrátit zpět.';
+  }
+
+  @override
+  String get childDetailDeleteAccountConfirm => 'Smazat účet';
 
   @override
   String get childDetailReasonHint => 'Důvod (nepovinné)';
@@ -3559,6 +3699,112 @@ class AppLocalizationsCs extends AppLocalizations {
   String get calendarUnsubscribeTooltip => 'Zrušit odběr';
 
   @override
+  String get calendarReminderOffTooltip => 'Připomenout';
+
+  @override
+  String get calendarReminderOnTooltip => 'Vypnout připomenutí';
+
+  @override
+  String get calendarAddToCalendarTooltip => 'Přidat do mého kalendáře';
+
+  @override
+  String get calendarIcsSaved => 'Soubor kalendáře uložen';
+
+  @override
+  String get upcomingEventsTitle => 'Nadcházející';
+
+  @override
+  String get upcomingEventsEmptyState =>
+      'Žádné nadcházející události na vašich serverech';
+
+  @override
+  String get upcomingEventsPublicBadge => 'Veřejné';
+
+  @override
+  String upcomingEventsFriendGoing(String name) {
+    return '$name se zúčastní';
+  }
+
+  @override
+  String upcomingEventsTwoFriendsGoing(String name1, String name2) {
+    return '$name1 a $name2 se zúčastní';
+  }
+
+  @override
+  String upcomingEventsManyFriendsGoing(String name, int count) {
+    return '$name a dalších $count se zúčastní';
+  }
+
+  @override
+  String get activityFeedTitle => 'Aktivita přátel';
+
+  @override
+  String get activityFeedEmptyState => 'Zatím žádná aktivita od vašich přátel';
+
+  @override
+  String activityFeedAchievement(
+      String username, String achievement, String server) {
+    return '$username získal(a) $achievement na $server';
+  }
+
+  @override
+  String activityFeedWentLive(String username, String platform) {
+    return '$username je živě na $platform';
+  }
+
+  @override
+  String activityFeedServerJoined(String username, String server) {
+    return '$username se připojil(a) na $server';
+  }
+
+  @override
+  String activityFeedArcadeHighScore(String username, String game, int score) {
+    return '$username dosáhl(a) nového rekordu ve hře $game: $score';
+  }
+
+  @override
+  String get activityFeedJustNow => 'Právě teď';
+
+  @override
+  String activityFeedMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'před $count minutami',
+      many: 'před $count minuty',
+      few: 'před $count minutami',
+      one: 'před 1 minutou',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'před $count hodinami',
+      many: 'před $count hodiny',
+      few: 'před $count hodinami',
+      one: 'před 1 hodinou',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'před $count dny',
+      many: 'před $count dne',
+      few: 'před $count dny',
+      one: 'před 1 dnem',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String calendarRepeatsLabel(String recurrence) {
     return 'Opakuje se $recurrence';
   }
@@ -4416,6 +4662,24 @@ class AppLocalizationsCs extends AppLocalizations {
   String get updateNudgeLaterButton => 'Později';
 
   @override
+  String get updateNudgeUpdateNowButton => 'Aktualizovat nyní';
+
+  @override
+  String updateNudgeDownloading(int percent) {
+    return 'Stahuji aktualizaci... $percent %';
+  }
+
+  @override
+  String get updateNudgeVerifying => 'Ověřuji stažený soubor...';
+
+  @override
+  String get updateNudgeLaunching => 'Spouštím instalátor...';
+
+  @override
+  String get updateNudgeFailed =>
+      'Aktualizaci se nepodařilo dokončit. Můžete ji stáhnout ručně.';
+
+  @override
   String get tierBadgeSparkSubscriber => 'Předplatitel Spark';
 
   @override
@@ -5220,6 +5484,45 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String get achievementScreenTitle => 'Úspěchy';
+
+  @override
+  String get achievementCreateTitle => 'Vytvořit úspěch';
+
+  @override
+  String get achievementNameHint => 'Název úspěchu';
+
+  @override
+  String get achievementDescriptionHint => 'Popis (volitelné)';
+
+  @override
+  String get achievementDeleteTitle => 'Smazat úspěch';
+
+  @override
+  String achievementDeleteConfirm(String name) {
+    return 'Smazat „$name“? Kdo ho už má, o něj nepřijde, ale odstraní se ze serveru. Tuto akci nelze vrátit zpět.';
+  }
+
+  @override
+  String get achievementAwardTitle => 'Udělit úspěch';
+
+  @override
+  String get achievementAwardButton => 'Udělit';
+
+  @override
+  String get achievementUserIdHint => 'ID uživatele';
+
+  @override
+  String get achievementLockedBanner =>
+      'Tento server je pod úrovní boostu 3, takže stávající úspěchy a jejich držitelé zůstávají přesně tak, jak jsou, ale žádný nelze udělit nikomu novému, dokud se server nevrátí na úroveň 3.';
+
+  @override
+  String get achievementEmptyState => 'Zatím žádné úspěchy';
+
+  @override
+  String get achievementNoRecipients => 'Zatím to nikdo nemá';
+
+  @override
   String chatGifLevelGated(int level) {
     return 'Pro odesílání GIFů zde potřebujete úroveň $level';
   }
@@ -5313,6 +5616,35 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get adminTabStatus => 'Stav';
+
+  @override
+  String get adminTabParentalConsent => 'Souhlas rodičů';
+
+  @override
+  String get adminParentalConsentDescription =>
+      'Zkontrolujte nahrané podepsané souhlasné formuláře před vytvořením dětského účtu. Ověření kartou se zpracuje automaticky a nikdy se zde nezobrazí.';
+
+  @override
+  String get adminParentalConsentEmptyState => 'Žádné čekající kontroly.';
+
+  @override
+  String get adminParentalConsentViewDocument => 'Zobrazit dokument';
+
+  @override
+  String get adminParentalConsentApprove => 'Schválit';
+
+  @override
+  String get adminParentalConsentReject => 'Zamítnout';
+
+  @override
+  String get adminParentalConsentRejectTitle => 'Zamítnout žádost o souhlas';
+
+  @override
+  String get adminParentalConsentRejectReasonHint =>
+      'Důvod (zobrazí se rodiči/zákonnému zástupci)';
+
+  @override
+  String get adminParentalConsentRejectConfirm => 'Zamítnout';
 
   @override
   String get serverTabSso => 'SSO';
@@ -5416,6 +5748,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get permManageWebhooks => 'Správa webhooků';
 
   @override
+  String get permManageAchievements => 'Spravovat úspěchy';
+
+  @override
   String get channelEditDialogManageWebhooks => 'Spravovat webhooky';
 
   @override
@@ -5459,4 +5794,77 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get chatWebhookBadge => 'WEBHOOK';
+
+  @override
+  String adminReportWebhookTarget(String reporterId, String webhookName) {
+    return 'Nahlásil: $reporterId\nWebhook: $webhookName';
+  }
+
+  @override
+  String get commonActionFailed => 'Něco se pokazilo. Zkuste to prosím znovu.';
+
+  @override
+  String get ssoBrowserLaunchError =>
+      'Nepodařilo se otevřít prohlížeč pro pokračování v přihlášení.';
+
+  @override
+  String get settingsSpotifyTitle => 'Spotify';
+
+  @override
+  String get settingsSpotifyDescription =>
+      'Připoj Spotify a sdílej, co posloucháš, v kanálu. Koda nemůže synchronizovat přehrávání v reálném čase -- tohle zveřejní odkaz, aby si ostatní mohli přehrát stejnou skladbu sami.';
+
+  @override
+  String settingsSpotifyConnected(String username) {
+    return 'Připojeno jako $username';
+  }
+
+  @override
+  String get settingsSpotifyNotConnected => 'Spotify nepřipojeno';
+
+  @override
+  String settingsSpotifyNowPlaying(String track, String artist) {
+    return 'Právě hraje: $track od $artist';
+  }
+
+  @override
+  String get settingsSpotifyShareHint =>
+      'Sdílej to pomocí ikony noty v poli zprávy v jakémkoli kanálu.';
+
+  @override
+  String get chatShareSpotifyTooltip => 'Sdílet, co posloucháš';
+
+  @override
+  String get chatSpotifyShareFailed =>
+      'Nelze sdílet -- ujisti se, že Spotify něco přehrává.';
+
+  @override
+  String get chatPreviewBadgeLive => 'ŽIVĚ';
+
+  @override
+  String get chatPreviewBadgeListening => 'POSLOUCHÁ';
+
+  @override
+  String get chatPreviewBadgeEnded => 'SKONČILO';
+
+  @override
+  String get serverAuditLogExportDescription =>
+      'Exportuj celý protokol auditu jako CSV nebo JSON Lines pro compliance nebo import do SIEM.';
+
+  @override
+  String get serverAuditLogExportLockedHint =>
+      'Export protokolu auditu je dostupný v úrovni Enterprise. Kontaktujte nás pro upgrade.';
+
+  @override
+  String get serverExportAuditLog => 'Exportovat';
+
+  @override
+  String get serverExportFormatPrompt =>
+      'Vyberte formát. JSON Lines je obvykle lepší pro nahrání do SIEM nebo log pipeline; CSV se otevře přímo v tabulkovém procesoru.';
+
+  @override
+  String get serverAuditLogExported => 'Protokol auditu exportován';
+
+  @override
+  String get chatPreviewBadgePremiere => 'PREMIÉRA';
 }

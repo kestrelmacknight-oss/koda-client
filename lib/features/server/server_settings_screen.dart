@@ -28,6 +28,7 @@ import 'threshold_moderation_tab.dart';
 import '../visp/visp_setup_dialog.dart';
 import 'server_theme_library_screen.dart';
 import 'leaderboard_screen.dart';
+import 'achievements_screen.dart';
 
 class ServerSettingsScreen extends ConsumerStatefulWidget {
   const ServerSettingsScreen({super.key});
@@ -44,6 +45,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   List<Map<String, dynamic>> _members = [];
   List<Map<String, dynamic>> _bans = [];
   List<Map<String, dynamic>> _auditActions = [];
+  bool _exportingAuditLog = false;
   List<Map<String, dynamic>> _reports = [];
   bool _loading = true;
   bool _showBans = false;
@@ -79,6 +81,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     'manage_channels', 'manage_roles', 'manage_messages',
     'kick_members', 'ban_members', 'mute_members', 'mention_everyone', 'manage_marketplace',
     'announce_live', 'move_members', 'manage_leaderboards', 'manage_webhooks',
+    'manage_achievements',
   ];
 
   // Not static const -- labels are localized, which needs a BuildContext.
@@ -99,6 +102,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     'move_members':     t.permMoveMembers,
     'manage_leaderboards': t.permManageLeaderboards,
     'manage_webhooks': t.permManageWebhooks,
+    'manage_achievements': t.permManageAchievements,
   };
 
   static const List<String> _colorSwatches = [
@@ -1219,6 +1223,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
     final level = _boostStatus?['level'] as int? ?? 0;
     final cosmeticsUnlocked = _boostStatus?['cosmetics_unlocked'] as bool? ?? false;
     final iconBorderUnlocked = _boostStatus?['icon_border_unlocked'] as bool? ?? false;
+    final achievementsUnlocked = _boostStatus?['achievements_unlocked'] as bool? ?? false;
     final server = ref.watch(selectedServerProvider);
     final cosmetics = (server?['cosmetics'] as Map?) ?? {};
 
@@ -1228,6 +1233,21 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         child: Text(t.serverCurrentBoostLevel(level),
             style: TextStyle(color: KodaColors.text2, fontSize: 12, fontWeight: FontWeight.w600)),
       ),
+      _customizeCard(
+        title: t.serverAchievementsCardTitle,
+        description: t.serverAchievementsCardDescription,
+        unlocked: achievementsUnlocked,
+        lockedHint: t.serverAchievementsLockedHint,
+        child: achievementsUnlocked
+            ? OutlinedButton.icon(
+                icon: Icon(Icons.emoji_events_outlined, size: 16, color: KodaColors.koda),
+                label: Text(t.serverOpenAchievements),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => AchievementsScreen(serverId: _serverId, canManage: true))),
+              )
+            : null,
+      ),
+      const SizedBox(height: 16),
       _customizeCard(
         title: t.serverThemeCardTitle,
         description: t.serverThemeCardDescription,
@@ -2214,6 +2234,7 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
 
   Widget _buildAuditLogTab() {
     final t = AppLocalizations.of(context);
+    final enterpriseTier = ref.watch(selectedServerProvider)?['enterprise_tier'] as bool? ?? false;
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -2236,6 +2257,24 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
                 _loadAll();
               }
             },
+          ),
+        ]),
+        const SizedBox(height: 10),
+        Row(children: [
+          Expanded(
+            child: Text(
+              enterpriseTier ? t.serverAuditLogExportDescription : t.serverAuditLogExportLockedHint,
+              style: TextStyle(color: KodaColors.text3, fontSize: 11, fontStyle: FontStyle.italic),
+            ),
+          ),
+          const SizedBox(width: 8),
+          OutlinedButton.icon(
+            icon: _exportingAuditLog
+                ? SizedBox(width: 12, height: 12,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
+                : const Icon(Icons.download_outlined, size: 14),
+            label: Text(t.serverExportAuditLog),
+            onPressed: enterpriseTier && !_exportingAuditLog ? _exportAuditLog : null,
           ),
         ]),
         const SizedBox(height: 16),
@@ -2281,6 +2320,46 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
           }),
       ],
     );
+  }
+
+  /// CSV or JSON Lines -- the latter because that's what most SIEM/log
+  /// ingestion (Splunk HEC, Filebeat, etc.) actually expects for a bulk
+  /// import, not a single big JSON array. Fetches the full export as
+  /// raw bytes then hands off to a native save-file dialog, same
+  /// pattern as EncryptedAttachmentView._saveToDisk.
+  Future<void> _exportAuditLog() async {
+    final t = AppLocalizations.of(context);
+    final format = await showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: Text(t.serverExportAuditLog, style: TextStyle(color: KodaColors.text1)),
+        content: Text(t.serverExportFormatPrompt, style: TextStyle(color: KodaColors.text3)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.commonCancel)),
+          TextButton(onPressed: () => Navigator.pop(context, 'csv'), child: const Text('CSV')),
+          TextButton(onPressed: () => Navigator.pop(context, 'json'), child: const Text('JSON Lines')),
+        ],
+      ),
+    );
+    if (format == null) return;
+
+    setState(() => _exportingAuditLog = true);
+    final bytes = await KodaApi.instance.exportAuditLog(_serverId, format: format);
+    if (!mounted) return;
+    setState(() => _exportingAuditLog = false);
+
+    if (bytes == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.commonActionFailed)));
+      return;
+    }
+
+    final ext = format == 'csv' ? 'csv' : 'jsonl';
+    final path = await FilePicker.platform.saveFile(fileName: 'audit-log-$_serverId.$ext');
+    if (path == null || !mounted) return;
+    await File(path).writeAsBytes(bytes);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.serverAuditLogExported)));
   }
 
   // Tier 2 -- see koda-server's Koda.Reports. Only channel reports show

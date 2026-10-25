@@ -46,13 +46,52 @@ class ChildDetailScreen extends StatefulWidget {
 
 class _ChildDetailScreenState extends State<ChildDetailScreen>
     with SingleTickerProviderStateMixin {
-  late final TabController _tabs = TabController(length: 4, vsync: this);
+  late final TabController _tabs = TabController(length: 5, vsync: this);
+  bool _deleting = false;
   String get _childId => widget.child['id'] as String;
 
   @override
   void dispose() {
     _tabs.dispose();
     super.dispose();
+  }
+
+  /// Parent-directed deletion -- COPPA's right to direct deletion of a
+  /// child's personal information, independent of the child's own
+  /// cooperation, so this never asks for the child's password (see
+  /// koda-server's Koda.Parental.delete_child_account/2). Distinct from
+  /// unlinking: this permanently scrubs the child's account.
+  Future<void> _confirmDelete() async {
+    final t = AppLocalizations.of(context);
+    final username = widget.child['username'] as String? ?? t.childDetailFallbackTitle;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: KodaColors.card,
+        title: Text(t.childDetailDeleteAccountTitle, style: TextStyle(color: KodaColors.text1)),
+        content: Text(t.childDetailDeleteAccountWarning(username),
+            style: TextStyle(color: KodaColors.text3, fontSize: 12, height: 1.4)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(t.commonCancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(t.childDetailDeleteAccountConfirm, style: TextStyle(color: KodaColors.accent)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _deleting = true);
+    final ok = await KodaApi.instance.deleteChildAccount(_childId);
+    if (!mounted) return;
+    if (ok) {
+      Navigator.pop(context, true);
+    } else {
+      setState(() => _deleting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(t.commonActionFailed)));
+    }
   }
 
   @override
@@ -64,6 +103,16 @@ class _ChildDetailScreenState extends State<ChildDetailScreen>
         backgroundColor: KodaColors.bg2,
         title: Text(widget.child['username'] as String? ?? t.childDetailFallbackTitle,
             style: TextStyle(color: KodaColors.text1, fontSize: 16, fontWeight: FontWeight.w700)),
+        actions: [
+          IconButton(
+            icon: _deleting
+                ? SizedBox(width: 16, height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.accent))
+                : Icon(Icons.delete_forever_outlined, color: KodaColors.accent),
+            tooltip: t.childDetailDeleteAccountTitle,
+            onPressed: _deleting ? null : _confirmDelete,
+          ),
+        ],
         bottom: TabBar(
           controller: _tabs,
           indicatorColor: KodaColors.koda,
@@ -74,6 +123,7 @@ class _ChildDetailScreenState extends State<ChildDetailScreen>
             Tab(text: t.childDetailTabServers),
             Tab(text: t.childDetailTabSchedule),
             Tab(text: t.childDetailTabOverride),
+            Tab(text: t.childDetailTabThirdParty),
           ],
         ),
       ),
@@ -82,6 +132,7 @@ class _ChildDetailScreenState extends State<ChildDetailScreen>
         _ChildServersTab(childId: _childId),
         _ChildScheduleTab(childId: _childId),
         _ChildOverrideTab(childId: _childId),
+        _ChildThirdPartyTab(childId: _childId),
       ]),
     );
   }
@@ -469,6 +520,78 @@ class _ChildOverrideTabState extends State<_ChildOverrideTab> {
           ),
           onPressed: _busy ? null : _revoke,
           child: Text(t.childDetailRevokeOverrideButton),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Third-party disclosure consent ──────────────────────────────────────
+//
+// Separate from the consent that created the account (see koda-server's
+// Koda.Parental moduledoc) -- off by default, and governs whether the
+// child can connect Twitch/Kick/YouTube/Steam/Spotify at all. Turning it
+// off also disconnects any already-linked account, enforced server-side.
+
+class _ChildThirdPartyTab extends StatefulWidget {
+  final String childId;
+  const _ChildThirdPartyTab({required this.childId});
+  @override
+  State<_ChildThirdPartyTab> createState() => _ChildThirdPartyTabState();
+}
+
+class _ChildThirdPartyTabState extends State<_ChildThirdPartyTab> {
+  bool _loading = true;
+  bool _allowed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final allowed = await KodaApi.instance.getThirdPartyDisclosureConsent(widget.childId);
+    if (!mounted) return;
+    setState(() { _allowed = allowed ?? false; _loading = false; });
+  }
+
+  Future<void> _setAllowed(bool v) async {
+    final previous = _allowed;
+    setState(() => _allowed = v);
+    final ok = await KodaApi.instance.setThirdPartyDisclosureConsent(widget.childId, v);
+    if (!ok && mounted) setState(() => _allowed = previous);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) return Center(child: CircularProgressIndicator(color: KodaColors.koda));
+    final t = AppLocalizations.of(context);
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          t.childDetailThirdPartyExplanation,
+          style: TextStyle(color: KodaColors.text3, fontSize: 12, height: 1.5),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: KodaColors.card,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: KodaColors.border),
+          ),
+          child: SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(t.childDetailThirdPartyToggleTitle,
+                style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+            subtitle: Text(t.childDetailThirdPartyToggleSubtitle,
+                style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+            activeThumbColor: KodaColors.koda,
+            value: _allowed,
+            onChanged: _setAllowed,
+          ),
         ),
       ],
     );

@@ -160,6 +160,27 @@ class AppLocalizationsEl extends AppLocalizations {
       'Εμφανίζει το πρόσωπο και τη διάθεση του Visp στους διαλόγους ρύθμισης/συμβάντων/συμβούλου του';
 
   @override
+  String get settingsDeleteAccountTitle => 'Διαγραφή λογαριασμού';
+
+  @override
+  String get settingsDeleteAccountSubtitle =>
+      'Αφαιρεί οριστικά τα προσωπικά σας στοιχεία από το Koda';
+
+  @override
+  String get settingsDeleteAccountWarning =>
+      'Αυτό διαγράφει οριστικά τις πληροφορίες του προφίλ σας και δεν μπορεί να αναιρεθεί. Τα προηγούμενα μηνύματά σας μπορεί να παραμείνουν ορατά σε άλλους, εμφανιζόμενα ως απεσταλμένα από διαγραμμένο χρήστη. Εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.';
+
+  @override
+  String get settingsDeleteAccountPasswordHint => 'Κωδικός πρόσβασης';
+
+  @override
+  String get settingsDeleteAccountConfirm => 'Διαγραφή λογαριασμού';
+
+  @override
+  String get settingsDeleteAccountWrongPassword =>
+      'Λανθασμένος κωδικός πρόσβασης.';
+
+  @override
   String get settingsHighContrastTitle => 'Υψηλή αντίθεση';
 
   @override
@@ -208,7 +229,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get settingsStreamingDescription =>
-      'Συνδέστε το Twitch/YouTube ώστε οι διακομιστές όπου έχετε το δικαίωμα \"Ανακοίνωση κατά τη μετάδοση\" να μπορούν να δημοσιεύουν αυτόματα όταν μεταδίδετε ζωντανά ή ανεβάζετε νέο βίντεο.';
+      'Συνδέστε το Twitch/YouTube/Kick ώστε οι διακομιστές όπου έχετε το δικαίωμα \"Ανακοίνωση κατά τη μετάδοση\" να μπορούν να δημοσιεύουν αυτόματα όταν μεταδίδετε ζωντανά ή ανεβάζετε νέο βίντεο.';
 
   @override
   String settingsStreamingConnected(
@@ -228,6 +249,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get settingsStreamingLiveSuffixYoutube => ' -- νέο ανέβασμα';
 
   @override
+  String get settingsStreamingLiveSuffixKick => ' -- ζωντανά τώρα';
+
+  @override
   String get settingsStreamingConnecting => 'Σύνδεση...';
 
   @override
@@ -241,12 +265,20 @@ class AppLocalizationsEl extends AppLocalizations {
       'Ανακοίνωση ζωντανών μεταδόσεων και νέων αναρτήσεων';
 
   @override
+  String get settingsAnnounceLiveKick => 'Ανακοίνωση όταν μεταδίδω ζωντανά';
+
+  @override
   String get settingsRefreshStatus =>
       'Ήδη συνδεδεμένοι στο πρόγραμμα περιήγησης; Ανανέωση κατάστασης';
 
   @override
   String settingsStreamingConnectError(String platform) {
     return 'Δεν ήταν δυνατή η έναρξη της σύνδεσης $platform.';
+  }
+
+  @override
+  String settingsStreamingConsentRequired(String platform) {
+    return 'Ζητήστε από τον γονέα ή κηδεμόνα του παιδιού να επιτρέψει πρώτα τη σύνδεση $platform στον Πίνακα Γονικού Ελέγχου.';
   }
 
   @override
@@ -508,6 +540,12 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get homeBrowsePublicServersTooltip =>
       'Περιήγηση σε δημόσιους διακομιστές';
+
+  @override
+  String get homeUpcomingEventsTooltip => 'Επερχόμενες εκδηλώσεις';
+
+  @override
+  String get homeActivityFeedTooltip => 'Ροή δραστηριότητας';
 
   @override
   String get serverDiscoveryTitle => 'Περιήγηση διακομιστών';
@@ -1613,6 +1651,20 @@ class AppLocalizationsEl extends AppLocalizations {
       'Φτάστε στο επίπεδο ενίσχυσης 5 για να ξεκλειδώσετε προσαρμοσμένο περίγραμμα εικονιδίου.';
 
   @override
+  String get serverAchievementsCardTitle => 'Επιτεύγματα';
+
+  @override
+  String get serverAchievementsCardDescription =>
+      'Δημιουργήστε προσαρμοσμένα παράσημα και απονείμετέ τα σε μέλη.';
+
+  @override
+  String get serverAchievementsLockedHint =>
+      'Φτάστε στο επίπεδο ενίσχυσης 3 για να δημιουργήσετε επιτεύγματα.';
+
+  @override
+  String get serverOpenAchievements => 'Διαχείριση επιτευγμάτων';
+
+  @override
   String get serverBoostFromBank =>
       'Ενισχύστε αυτόν τον διακομιστή από την Τράπεζα Διακομιστή στην Αγορά για να ανεβάσετε το επίπεδό του.';
 
@@ -2296,7 +2348,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildExplanation =>
-      'Αυτό δημιουργεί έναν πλήρως εποπτευόμενο λογαριασμό: τα επισημασμένα κανάλια αποκλείονται και θα μπορείτε να ορίζετε επιτρεπόμενες ώρες και να βλέπετε (αλλά όχι να διαβάζετε) τους φίλους και τους διακομιστές τους.';
+      'Αυτό ξεκινά ένα αίτημα για τη δημιουργία ενός πλήρως εποπτευόμενου λογαριασμού για το παιδί σας: τα επισημασμένα κανάλια αποκλείονται και θα μπορείτε να ορίζετε επιτρεπόμενες ώρες και να βλέπετε (αλλά όχι να διαβάζετε) τους φίλους και τους διακομιστές τους. Επαληθεύουμε ότι είστε γονέας ή εξουσιοδοτημένος κηδεμόνας πριν δημιουργηθεί ο λογαριασμός -- επιλέξτε μέθοδο επαλήθευσης παρακάτω.';
 
   @override
   String get parentalDashboardValidationError =>
@@ -2304,10 +2356,10 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildFailed =>
-      'Δεν ήταν δυνατή η δημιουργία παιδικού λογαριασμού -- το όνομα χρήστη/email μπορεί να χρησιμοποιείται ήδη.';
+      'Δεν ήταν δυνατή η έναρξη του αιτήματος -- το όνομα χρήστη/email μπορεί να χρησιμοποιείται ήδη.';
 
   @override
-  String get parentalDashboardCreatingLabel => 'Δημιουργία...';
+  String get parentalDashboardCreatingLabel => 'Έναρξη...';
 
   @override
   String get parentalDashboardNoChildren =>
@@ -2318,6 +2370,70 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get parentalDashboardUnknownUser => 'Άγνωστος';
+
+  @override
+  String get parentalConsentMethodLabel =>
+      'Πώς να επαληθεύσουμε ότι είστε γονέας ή κηδεμόνας;';
+
+  @override
+  String get parentalConsentMethodCardTitle => 'Πιστωτική ή χρεωστική κάρτα';
+
+  @override
+  String get parentalConsentMethodCardSubtitle =>
+      'Μια μικρή χρέωση 0,50\$ επαληθεύει ότι κατέχετε την κάρτα και επιστρέφεται αμέσως.';
+
+  @override
+  String get parentalConsentMethodFormTitle => 'Υπογεγραμμένη φόρμα συναίνεσης';
+
+  @override
+  String get parentalConsentMethodFormSubtitle =>
+      'Ανεβάστε μια υπογεγραμμένη φόρμα. Ένα μέλος του προσωπικού θα την ελέγξει πριν δημιουργηθεί ο λογαριασμός.';
+
+  @override
+  String get parentalConsentAttestation =>
+      'Επιβεβαιώνω ότι είμαι γονέας ή εξουσιοδοτημένος νόμιμος κηδεμόνας αυτού του παιδιού.';
+
+  @override
+  String get parentalConsentUploadFormHint =>
+      'Στη συνέχεια, ανεβάστε την υπογεγραμμένη φόρμα συναίνεσης παρακάτω.';
+
+  @override
+  String get parentalConsentFinishInBrowser =>
+      'Ολοκληρώστε την επαλήθευση στο πρόγραμμα περιήγησης και επιστρέψτε -- αυτό ενημερώνεται αυτόματα.';
+
+  @override
+  String parentalConsentStatusRejected(String reason) {
+    return 'Απορρίφθηκε: $reason';
+  }
+
+  @override
+  String get parentalConsentStatusExpired =>
+      'Το αίτημα έληξε -- ξεκινήστε ξανά';
+
+  @override
+  String get parentalConsentStatusAwaitingUpload =>
+      'Αναμονή της υπογεγραμμένης φόρμας σας';
+
+  @override
+  String get parentalConsentUploadFormButton => 'Μεταφόρτωση φόρμας';
+
+  @override
+  String get parentalConsentStatusAwaitingReview =>
+      'Αναμονή ελέγχου από το προσωπικό';
+
+  @override
+  String get parentalConsentStatusAwaitingPayment =>
+      'Αναμονή επαλήθευσης πληρωμής';
+
+  @override
+  String get parentalConsentPendingSectionTitle => 'ΑΙΤΗΜΑΤΑ ΣΕ ΕΚΚΡΕΜΟΤΗΤΑ';
+
+  @override
+  String get parentalConsentPrivacyNoticePrefix => 'Διαβάστε την ';
+
+  @override
+  String get parentalConsentPrivacyNoticeSuffix =>
+      ' για να δείτε ακριβώς ποιες πληροφορίες συλλέγουμε για το παιδί σας και πώς χρησιμοποιούνται.';
 
   @override
   String get childDetailFallbackTitle => 'Παιδικός λογαριασμός';
@@ -2333,6 +2449,9 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get childDetailTabOverride => 'Εξαίρεση';
+
+  @override
+  String get childDetailTabThirdParty => 'Συνδέσεις';
 
   @override
   String get childDetailNoFriends => 'Δεν υπάρχουν φίλοι.';
@@ -2404,6 +2523,29 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get childDetailOverrideExplanation =>
       'Παραχωρήστε προσωρινή πρόσβαση εκτός του κανονικού προγράμματος -- χρήσιμο για μια μεμονωμένη εξαίρεση χωρίς να αλλάξετε το εβδομαδιαίο πρόγραμμα.';
+
+  @override
+  String get childDetailThirdPartyExplanation =>
+      'Η σύνδεση μιας υπηρεσίας όπως το Twitch, το Kick, το YouTube, το Steam ή το Spotify κοινοποιεί το όνομα χρήστη και τη δραστηριότητα του παιδιού σας στο Koda σε αυτήν την εξωτερική πλατφόρμα. Αυτό είναι ξεχωριστό από τη συναίνεση που δημιούργησε τον λογαριασμό του και είναι απενεργοποιημένο από προεπιλογή -- ενεργοποιήστε το μόνο αν θέλετε το παιδί σας να μπορεί να συνδέει αυτούς τους λογαριασμούς.';
+
+  @override
+  String get childDetailThirdPartyToggleTitle =>
+      'Να επιτρέπονται συνδέσεις τρίτων';
+
+  @override
+  String get childDetailThirdPartyToggleSubtitle =>
+      'Η απενεργοποίηση αποσυνδέει αμέσως κάθε ήδη συνδεδεμένο λογαριασμό';
+
+  @override
+  String get childDetailDeleteAccountTitle => 'Διαγραφή λογαριασμού';
+
+  @override
+  String childDetailDeleteAccountWarning(String username) {
+    return 'Αυτό διαγράφει οριστικά τον λογαριασμό και τα προσωπικά στοιχεία του/της $username. Δεν μπορεί να αναιρεθεί.';
+  }
+
+  @override
+  String get childDetailDeleteAccountConfirm => 'Διαγραφή λογαριασμού';
 
   @override
   String get childDetailReasonHint => 'Λόγος (προαιρετικό)';
@@ -3575,6 +3717,107 @@ class AppLocalizationsEl extends AppLocalizations {
   String get calendarUnsubscribeTooltip => 'Κατάργηση εγγραφής';
 
   @override
+  String get calendarReminderOffTooltip => 'Υπενθύμισέ μου';
+
+  @override
+  String get calendarReminderOnTooltip => 'Απενεργοποίηση υπενθύμισης';
+
+  @override
+  String get calendarAddToCalendarTooltip => 'Προσθήκη στο ημερολόγιό μου';
+
+  @override
+  String get calendarIcsSaved => 'Το αρχείο ημερολογίου αποθηκεύτηκε';
+
+  @override
+  String get upcomingEventsTitle => 'Επερχόμενα';
+
+  @override
+  String get upcomingEventsEmptyState =>
+      'Καμία επερχόμενη εκδήλωση στους διακομιστές σας';
+
+  @override
+  String get upcomingEventsPublicBadge => 'Δημόσιο';
+
+  @override
+  String upcomingEventsFriendGoing(String name) {
+    return 'Ο/Η $name θα παρευρεθεί';
+  }
+
+  @override
+  String upcomingEventsTwoFriendsGoing(String name1, String name2) {
+    return 'Οι $name1 και $name2 θα παρευρεθούν';
+  }
+
+  @override
+  String upcomingEventsManyFriendsGoing(String name, int count) {
+    return 'Ο/Η $name και $count ακόμη θα παρευρεθούν';
+  }
+
+  @override
+  String get activityFeedTitle => 'Ροή δραστηριότητας';
+
+  @override
+  String get activityFeedEmptyState =>
+      'Καμία δραστηριότητα από τους φίλους σας ακόμα';
+
+  @override
+  String activityFeedAchievement(
+      String username, String achievement, String server) {
+    return 'Ο/Η $username κέρδισε το $achievement στο $server';
+  }
+
+  @override
+  String activityFeedWentLive(String username, String platform) {
+    return 'Ο/Η $username κάνει ζωντανή μετάδοση στο $platform';
+  }
+
+  @override
+  String activityFeedServerJoined(String username, String server) {
+    return 'Ο/Η $username εντάχθηκε στο $server';
+  }
+
+  @override
+  String activityFeedArcadeHighScore(String username, String game, int score) {
+    return 'Ο/Η $username πέτυχε νέο ρεκόρ στο $game: $score';
+  }
+
+  @override
+  String get activityFeedJustNow => 'Μόλις τώρα';
+
+  @override
+  String activityFeedMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'πριν από $count λεπτά',
+      one: 'πριν από 1 λεπτό',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'πριν από $count ώρες',
+      one: 'πριν από 1 ώρα',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'πριν από $count ημέρες',
+      one: 'πριν από 1 ημέρα',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String calendarRepeatsLabel(String recurrence) {
     return 'Επαναλαμβάνεται $recurrence';
   }
@@ -4426,6 +4669,24 @@ class AppLocalizationsEl extends AppLocalizations {
   String get updateNudgeLaterButton => 'Αργότερα';
 
   @override
+  String get updateNudgeUpdateNowButton => 'Ενημέρωση τώρα';
+
+  @override
+  String updateNudgeDownloading(int percent) {
+    return 'Λήψη ενημέρωσης... $percent%';
+  }
+
+  @override
+  String get updateNudgeVerifying => 'Επαλήθευση λήψης...';
+
+  @override
+  String get updateNudgeLaunching => 'Εκκίνηση προγράμματος εγκατάστασης...';
+
+  @override
+  String get updateNudgeFailed =>
+      'Δεν ήταν δυνατή η ολοκλήρωση της ενημέρωσης. Μπορείτε να την κατεβάσετε χειροκίνητα.';
+
+  @override
   String get tierBadgeSparkSubscriber => 'Συνδρομητής Spark';
 
   @override
@@ -5238,6 +5499,45 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String get achievementScreenTitle => 'Επιτεύγματα';
+
+  @override
+  String get achievementCreateTitle => 'Δημιουργία επιτεύγματος';
+
+  @override
+  String get achievementNameHint => 'Όνομα επιτεύγματος';
+
+  @override
+  String get achievementDescriptionHint => 'Περιγραφή (προαιρετικό)';
+
+  @override
+  String get achievementDeleteTitle => 'Διαγραφή επιτεύγματος';
+
+  @override
+  String achievementDeleteConfirm(String name) {
+    return 'Διαγραφή του \"$name\"; Όποιος το έχει ήδη το κρατά, αλλά αφαιρείται από τον διακομιστή. Αυτό δεν αναιρείται.';
+  }
+
+  @override
+  String get achievementAwardTitle => 'Απονομή επιτεύγματος';
+
+  @override
+  String get achievementAwardButton => 'Απονομή';
+
+  @override
+  String get achievementUserIdHint => 'Αναγνωριστικό χρήστη';
+
+  @override
+  String get achievementLockedBanner =>
+      'Αυτός ο διακομιστής είναι κάτω από το επίπεδο ενίσχυσης 3, οπότε τα υπάρχοντα επιτεύγματα και οι κάτοχοί τους παραμένουν ακριβώς όπως είναι, αλλά κανένα δεν μπορεί να απονεμηθεί σε νέο άτομο μέχρι να επανέλθει στο επίπεδο 3.';
+
+  @override
+  String get achievementEmptyState => 'Δεν υπάρχουν ακόμη επιτεύγματα';
+
+  @override
+  String get achievementNoRecipients => 'Κανείς δεν το έχει ακόμη';
+
+  @override
   String chatGifLevelGated(int level) {
     return 'Χρειάζεσαι επίπεδο $level για να στείλεις GIF εδώ';
   }
@@ -5332,6 +5632,36 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get adminTabStatus => 'Κατάσταση';
+
+  @override
+  String get adminTabParentalConsent => 'Γονική συναίνεση';
+
+  @override
+  String get adminParentalConsentDescription =>
+      'Ελέγξτε τις μεταφορτωμένες υπογεγραμμένες φόρμες συναίνεσης πριν δημιουργηθεί ένας λογαριασμός παιδιού. Η επαλήθευση με κάρτα γίνεται αυτόματα και δεν εμφανίζεται ποτέ εδώ.';
+
+  @override
+  String get adminParentalConsentEmptyState =>
+      'Δεν υπάρχουν εκκρεμείς έλεγχοι.';
+
+  @override
+  String get adminParentalConsentViewDocument => 'Προβολή εγγράφου';
+
+  @override
+  String get adminParentalConsentApprove => 'Έγκριση';
+
+  @override
+  String get adminParentalConsentReject => 'Απόρριψη';
+
+  @override
+  String get adminParentalConsentRejectTitle => 'Απόρριψη αιτήματος συναίνεσης';
+
+  @override
+  String get adminParentalConsentRejectReasonHint =>
+      'Αιτία (εμφανίζεται στον γονέα/κηδεμόνα)';
+
+  @override
+  String get adminParentalConsentRejectConfirm => 'Απόρριψη';
 
   @override
   String get serverTabSso => 'SSO';
@@ -5436,6 +5766,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get permManageWebhooks => 'Διαχείριση Webhooks';
 
   @override
+  String get permManageAchievements => 'Διαχείριση επιτευγμάτων';
+
+  @override
   String get channelEditDialogManageWebhooks => 'Διαχείριση Webhooks';
 
   @override
@@ -5479,4 +5812,77 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get chatWebhookBadge => 'WEBHOOK';
+
+  @override
+  String adminReportWebhookTarget(String reporterId, String webhookName) {
+    return 'Αναφέρων: $reporterId\nWebhook: $webhookName';
+  }
+
+  @override
+  String get commonActionFailed => 'Κάτι πήγε στραβά. Δοκιμάστε ξανά.';
+
+  @override
+  String get ssoBrowserLaunchError =>
+      'Δεν ήταν δυνατό το άνοιγμα προγράμματος περιήγησης για να συνεχίσετε τη σύνδεση.';
+
+  @override
+  String get settingsSpotifyTitle => 'Spotify';
+
+  @override
+  String get settingsSpotifyDescription =>
+      'Συνδέστε το Spotify για να μοιραστείτε τι ακούτε σε ένα κανάλι. Το Koda δεν μπορεί να συγχρονίσει την αναπαραγωγή σε πραγματικό χρόνο -- αναρτά έναν σύνδεσμο ώστε άλλοι να αναπαράγουν το ίδιο κομμάτι μόνοι τους.';
+
+  @override
+  String settingsSpotifyConnected(String username) {
+    return 'Συνδεδεμένος ως $username';
+  }
+
+  @override
+  String get settingsSpotifyNotConnected => 'Το Spotify δεν είναι συνδεδεμένο';
+
+  @override
+  String settingsSpotifyNowPlaying(String track, String artist) {
+    return 'Παίζει τώρα: $track από $artist';
+  }
+
+  @override
+  String get settingsSpotifyShareHint =>
+      'Μοιραστείτε το από το εικονίδιο της νότας στο πλαίσιο μηνυμάτων οποιουδήποτε καναλιού.';
+
+  @override
+  String get chatShareSpotifyTooltip => 'Κοινοποίηση τι ακούτε';
+
+  @override
+  String get chatSpotifyShareFailed =>
+      'Δεν ήταν δυνατή η κοινοποίηση -- βεβαιωθείτε ότι το Spotify αναπαράγει κάτι.';
+
+  @override
+  String get chatPreviewBadgeLive => 'ΖΩΝΤΑΝΑ';
+
+  @override
+  String get chatPreviewBadgeListening => 'ΑΚΟΥΕΙ';
+
+  @override
+  String get chatPreviewBadgeEnded => 'ΕΛΗΞΕ';
+
+  @override
+  String get serverAuditLogExportDescription =>
+      'Εξαγάγετε το πλήρες αρχείο καταγραφής ελέγχου ως CSV ή JSON Lines για συμμόρφωση ή εισαγωγή σε SIEM.';
+
+  @override
+  String get serverAuditLogExportLockedHint =>
+      'Η εξαγωγή αρχείου ελέγχου είναι διαθέσιμη στο επίπεδο Enterprise. Επικοινωνήστε μαζί μας για αναβάθμιση.';
+
+  @override
+  String get serverExportAuditLog => 'Εξαγωγή';
+
+  @override
+  String get serverExportFormatPrompt =>
+      'Επιλέξτε μορφή. Το JSON Lines είναι συνήθως καταλληλότερο για τροφοδοσία σε SIEM ή γραμμή καταγραφών· το CSV ανοίγει απευθείας σε υπολογιστικό φύλλο.';
+
+  @override
+  String get serverAuditLogExported => 'Το αρχείο ελέγχου εξήχθη';
+
+  @override
+  String get chatPreviewBadgePremiere => 'ΠΡΕΜΙΕΡΑ';
 }

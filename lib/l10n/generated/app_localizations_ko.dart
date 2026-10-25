@@ -156,6 +156,25 @@ class AppLocalizationsKo extends AppLocalizations {
       '설정/이벤트/어드바이저 대화상자에서 Visp의 얼굴과 기분을 표시합니다';
 
   @override
+  String get settingsDeleteAccountTitle => '계정 삭제';
+
+  @override
+  String get settingsDeleteAccountSubtitle => 'Koda에서 개인정보를 영구적으로 제거합니다';
+
+  @override
+  String get settingsDeleteAccountWarning =>
+      '이 작업은 프로필 정보를 영구적으로 삭제하며 되돌릴 수 없습니다. 이전 메시지는 삭제된 사용자가 보낸 것으로 표시되어 다른 사람에게 계속 보일 수 있습니다. 확인을 위해 비밀번호를 입력하세요.';
+
+  @override
+  String get settingsDeleteAccountPasswordHint => '비밀번호';
+
+  @override
+  String get settingsDeleteAccountConfirm => '계정 삭제';
+
+  @override
+  String get settingsDeleteAccountWrongPassword => '비밀번호가 올바르지 않습니다.';
+
+  @override
   String get settingsHighContrastTitle => '고대비';
 
   @override
@@ -202,7 +221,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get settingsStreamingDescription =>
-      'Twitch/YouTube를 연결하면 “방송 시작 알림” 권한이 있는 서버에서 방송을 시작하거나 새 영상을 올릴 때 자동으로 게시할 수 있습니다.';
+      'Twitch/YouTube/Kick를 연결하면 “방송 시작 알림” 권한이 있는 서버에서 방송을 시작하거나 새 영상을 올릴 때 자동으로 게시할 수 있습니다.';
 
   @override
   String settingsStreamingConnected(
@@ -222,6 +241,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsStreamingLiveSuffixYoutube => ' -- 새 영상 업로드';
 
   @override
+  String get settingsStreamingLiveSuffixKick => ' -- 방송 중';
+
+  @override
   String get settingsStreamingConnecting => '연결 중...';
 
   @override
@@ -234,11 +256,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsAnnounceLiveYoutube => '라이브 방송과 새 영상 업로드 알림';
 
   @override
+  String get settingsAnnounceLiveKick => '방송을 시작하면 알림';
+
+  @override
   String get settingsRefreshStatus => '브라우저에서 이미 연결하셨나요? 상태 새로고침';
 
   @override
   String settingsStreamingConnectError(String platform) {
     return '$platform 연결을 시작할 수 없습니다.';
+  }
+
+  @override
+  String settingsStreamingConsentRequired(String platform) {
+    return '자녀의 부모 또는 보호자에게 부모 대시보드에서 먼저 $platform 연결을 허용하도록 요청하세요.';
   }
 
   @override
@@ -485,6 +515,12 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get homeBrowsePublicServersTooltip => '공개 서버 둘러보기';
+
+  @override
+  String get homeUpcomingEventsTooltip => '다가오는 이벤트';
+
+  @override
+  String get homeActivityFeedTooltip => '활동 피드';
 
   @override
   String get serverDiscoveryTitle => '서버 둘러보기';
@@ -1544,6 +1580,18 @@ class AppLocalizationsKo extends AppLocalizations {
       '부스트 레벨 5에 도달하면 사용자 지정 아이콘 테두리가 해제됩니다.';
 
   @override
+  String get serverAchievementsCardTitle => '업적';
+
+  @override
+  String get serverAchievementsCardDescription => '맞춤 배지를 만들어 멤버에게 수여하세요.';
+
+  @override
+  String get serverAchievementsLockedHint => '업적을 만들려면 부스트 레벨 3에 도달해야 합니다.';
+
+  @override
+  String get serverOpenAchievements => '업적 관리';
+
+  @override
   String get serverBoostFromBank => '마켓플레이스의 서버 뱅크에서 이 서버를 부스트하여 레벨을 올리세요.';
 
   @override
@@ -2207,7 +2255,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildExplanation =>
-      '완전히 보호자 관리하에 있는 계정이 생성됩니다. 라벨이 지정된 채널은 차단되며, 허용 시간대를 설정하고 자녀의 친구와 서버를 확인(내용은 열람 불가)할 수 있습니다.';
+      '이 작업은 자녀를 위한 완전히 보호자 관리하에 있는 계정 생성 요청을 시작합니다. 라벨이 지정된 채널은 차단되며, 허용 시간대를 설정하고 자녀의 친구와 서버를 확인(내용은 열람 불가)할 수 있습니다. 계정이 생성되기 전에 귀하가 부모 또는 법적 보호자인지 확인합니다 -- 아래에서 확인 방법을 선택하세요.';
 
   @override
   String get parentalDashboardValidationError =>
@@ -2215,10 +2263,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildFailed =>
-      '자녀 계정을 만들 수 없습니다 -- 사용자 이름/이메일이 이미 사용 중일 수 있습니다.';
+      '요청을 시작할 수 없습니다 -- 사용자 이름/이메일이 이미 사용 중일 수 있습니다.';
 
   @override
-  String get parentalDashboardCreatingLabel => '만드는 중...';
+  String get parentalDashboardCreatingLabel => '시작 중...';
 
   @override
   String get parentalDashboardNoChildren => '연결된 계정이 아직 없습니다.';
@@ -2228,6 +2276,63 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get parentalDashboardUnknownUser => '알 수 없음';
+
+  @override
+  String get parentalConsentMethodLabel => '귀하가 부모 또는 보호자인지 어떻게 확인할까요?';
+
+  @override
+  String get parentalConsentMethodCardTitle => '신용카드 또는 체크카드';
+
+  @override
+  String get parentalConsentMethodCardSubtitle =>
+      '\$0.50의 소액 결제로 카드 소유를 확인한 후 즉시 환불됩니다.';
+
+  @override
+  String get parentalConsentMethodFormTitle => '서명된 동의서';
+
+  @override
+  String get parentalConsentMethodFormSubtitle =>
+      '서명된 동의서를 업로드하세요. 계정 생성 전에 담당자가 검토합니다.';
+
+  @override
+  String get parentalConsentAttestation => '저는 이 아동의 부모 또는 승인된 법적 보호자임을 확인합니다.';
+
+  @override
+  String get parentalConsentUploadFormHint => '다음으로 아래에 서명된 동의서를 업로드하세요.';
+
+  @override
+  String get parentalConsentFinishInBrowser =>
+      '브라우저에서 확인을 완료한 후 돌아오세요 -- 자동으로 업데이트됩니다.';
+
+  @override
+  String parentalConsentStatusRejected(String reason) {
+    return '거부됨: $reason';
+  }
+
+  @override
+  String get parentalConsentStatusExpired => '요청이 만료되었습니다 -- 다시 시작해 주세요';
+
+  @override
+  String get parentalConsentStatusAwaitingUpload => '서명된 양식 제출 대기 중';
+
+  @override
+  String get parentalConsentUploadFormButton => '양식 업로드';
+
+  @override
+  String get parentalConsentStatusAwaitingReview => '담당자 검토 대기 중';
+
+  @override
+  String get parentalConsentStatusAwaitingPayment => '결제 확인 대기 중';
+
+  @override
+  String get parentalConsentPendingSectionTitle => '대기 중인 요청';
+
+  @override
+  String get parentalConsentPrivacyNoticePrefix =>
+      '자녀에 대해 어떤 정보를 수집하고 어떻게 사용하는지 정확히 확인하려면 다음을 참고하세요: ';
+
+  @override
+  String get parentalConsentPrivacyNoticeSuffix => '.';
 
   @override
   String get childDetailFallbackTitle => '자녀 계정';
@@ -2243,6 +2348,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get childDetailTabOverride => '예외 허용';
+
+  @override
+  String get childDetailTabThirdParty => '연결';
 
   @override
   String get childDetailNoFriends => '친구가 없습니다.';
@@ -2312,6 +2420,28 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get childDetailOverrideExplanation =>
       '정상 일정 외에 일시적으로 접근을 허용합니다 -- 주간 일정을 바꾸지 않고 일회성 예외를 두고 싶을 때 유용합니다.';
+
+  @override
+  String get childDetailThirdPartyExplanation =>
+      'Twitch, Kick, YouTube, Steam, Spotify와 같은 서비스를 연결하면 자녀의 Koda 사용자 이름과 활동이 해당 외부 플랫폼과 공유됩니다. 이는 계정을 생성한 동의와는 별개이며 기본적으로 꺼져 있습니다 -- 자녀가 이러한 계정을 연결할 수 있도록 하려는 경우에만 켜세요.';
+
+  @override
+  String get childDetailThirdPartyToggleTitle => '타사 연결 허용';
+
+  @override
+  String get childDetailThirdPartyToggleSubtitle =>
+      '이를 끄면 이미 연결된 계정의 연결이 즉시 해제됩니다';
+
+  @override
+  String get childDetailDeleteAccountTitle => '계정 삭제';
+
+  @override
+  String childDetailDeleteAccountWarning(String username) {
+    return '이 작업은 $username의 계정과 개인정보를 영구적으로 삭제합니다. 이 작업은 되돌릴 수 없습니다.';
+  }
+
+  @override
+  String get childDetailDeleteAccountConfirm => '계정 삭제';
 
   @override
   String get childDetailReasonHint => '사유 (선택 사항)';
@@ -3417,6 +3547,102 @@ class AppLocalizationsKo extends AppLocalizations {
   String get calendarUnsubscribeTooltip => '구독 취소';
 
   @override
+  String get calendarReminderOffTooltip => '알림 받기';
+
+  @override
+  String get calendarReminderOnTooltip => '알림 끄기';
+
+  @override
+  String get calendarAddToCalendarTooltip => '내 캘린더에 추가';
+
+  @override
+  String get calendarIcsSaved => '캘린더 파일이 저장되었습니다';
+
+  @override
+  String get upcomingEventsTitle => '다가오는 일정';
+
+  @override
+  String get upcomingEventsEmptyState => '서버에 다가오는 이벤트가 없습니다';
+
+  @override
+  String get upcomingEventsPublicBadge => '공개';
+
+  @override
+  String upcomingEventsFriendGoing(String name) {
+    return '$name님이 참석 예정';
+  }
+
+  @override
+  String upcomingEventsTwoFriendsGoing(String name1, String name2) {
+    return '$name1님과 $name2님이 참석 예정';
+  }
+
+  @override
+  String upcomingEventsManyFriendsGoing(String name, int count) {
+    return '$name님 외 $count명이 참석 예정';
+  }
+
+  @override
+  String get activityFeedTitle => '활동 피드';
+
+  @override
+  String get activityFeedEmptyState => '아직 친구들의 활동이 없습니다';
+
+  @override
+  String activityFeedAchievement(
+      String username, String achievement, String server) {
+    return '$username님이 $server에서 $achievement 업적을 획득했습니다';
+  }
+
+  @override
+  String activityFeedWentLive(String username, String platform) {
+    return '$username님이 $platform에서 라이브 중';
+  }
+
+  @override
+  String activityFeedServerJoined(String username, String server) {
+    return '$username님이 $server에 참여했습니다';
+  }
+
+  @override
+  String activityFeedArcadeHighScore(String username, String game, int score) {
+    return '$username님이 $game에서 새 최고 점수를 기록: $score';
+  }
+
+  @override
+  String get activityFeedJustNow => '방금 전';
+
+  @override
+  String activityFeedMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count분 전',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count시간 전',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count일 전',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String calendarRepeatsLabel(String recurrence) {
     return '반복: $recurrence';
   }
@@ -4234,6 +4460,23 @@ class AppLocalizationsKo extends AppLocalizations {
   String get updateNudgeLaterButton => '나중에';
 
   @override
+  String get updateNudgeUpdateNowButton => '지금 업데이트';
+
+  @override
+  String updateNudgeDownloading(int percent) {
+    return '업데이트 다운로드 중... $percent%';
+  }
+
+  @override
+  String get updateNudgeVerifying => '다운로드 확인 중...';
+
+  @override
+  String get updateNudgeLaunching => '설치 프로그램 실행 중...';
+
+  @override
+  String get updateNudgeFailed => '업데이트를 완료할 수 없습니다. 대신 수동으로 다운로드할 수 있습니다.';
+
+  @override
   String get tierBadgeSparkSubscriber => 'Spark 구독자';
 
   @override
@@ -5008,6 +5251,45 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get achievementScreenTitle => '업적';
+
+  @override
+  String get achievementCreateTitle => '업적 만들기';
+
+  @override
+  String get achievementNameHint => '업적 이름';
+
+  @override
+  String get achievementDescriptionHint => '설명(선택 사항)';
+
+  @override
+  String get achievementDeleteTitle => '업적 삭제';
+
+  @override
+  String achievementDeleteConfirm(String name) {
+    return '\"$name\"을(를) 삭제할까요? 이미 보유한 사람은 계속 유지하지만 서버에서는 제거됩니다. 되돌릴 수 없습니다.';
+  }
+
+  @override
+  String get achievementAwardTitle => '업적 수여';
+
+  @override
+  String get achievementAwardButton => '수여';
+
+  @override
+  String get achievementUserIdHint => '사용자 ID';
+
+  @override
+  String get achievementLockedBanner =>
+      '이 서버는 부스트 레벨 3 미만이므로 기존 업적과 보유자는 그대로 유지되지만, 서버가 다시 레벨 3이 될 때까지 새로운 사람에게는 수여할 수 없습니다.';
+
+  @override
+  String get achievementEmptyState => '아직 업적이 없습니다';
+
+  @override
+  String get achievementNoRecipients => '아직 아무도 가지고 있지 않습니다';
+
+  @override
   String chatGifLevelGated(int level) {
     return '여기서 GIF를 보내려면 레벨 $level이 필요합니다';
   }
@@ -5098,6 +5380,34 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get adminTabStatus => '상태';
+
+  @override
+  String get adminTabParentalConsent => '부모 동의';
+
+  @override
+  String get adminParentalConsentDescription =>
+      '자녀 계정이 생성되기 전에 업로드된 서명된 동의서를 검토하세요. 카드 확인은 자동으로 처리되며 여기에는 표시되지 않습니다.';
+
+  @override
+  String get adminParentalConsentEmptyState => '대기 중인 검토가 없습니다.';
+
+  @override
+  String get adminParentalConsentViewDocument => '문서 보기';
+
+  @override
+  String get adminParentalConsentApprove => '승인';
+
+  @override
+  String get adminParentalConsentReject => '거부';
+
+  @override
+  String get adminParentalConsentRejectTitle => '동의 요청 거부';
+
+  @override
+  String get adminParentalConsentRejectReasonHint => '이유(부모/보호자에게 표시됨)';
+
+  @override
+  String get adminParentalConsentRejectConfirm => '거부';
 
   @override
   String get serverTabSso => 'SSO';
@@ -5197,6 +5507,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get permManageWebhooks => '웹훅 관리';
 
   @override
+  String get permManageAchievements => '업적 관리';
+
+  @override
   String get channelEditDialogManageWebhooks => '웹훅 관리';
 
   @override
@@ -5240,4 +5553,76 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get chatWebhookBadge => '웹훅';
+
+  @override
+  String adminReportWebhookTarget(String reporterId, String webhookName) {
+    return '신고자: $reporterId\n웹훅: $webhookName';
+  }
+
+  @override
+  String get commonActionFailed => '문제가 발생했습니다. 다시 시도해 주세요.';
+
+  @override
+  String get ssoBrowserLaunchError => '로그인을 계속하기 위한 브라우저를 열 수 없습니다.';
+
+  @override
+  String get settingsSpotifyTitle => 'Spotify';
+
+  @override
+  String get settingsSpotifyDescription =>
+      '채널에서 듣고 있는 음악을 공유하려면 Spotify를 연결하세요. Koda는 실시간으로 재생을 동기화할 수 없습니다 -- 대신 다른 사람이 같은 트랙을 직접 재생할 수 있도록 링크를 게시합니다.';
+
+  @override
+  String settingsSpotifyConnected(String username) {
+    return '$username(으)로 연결됨';
+  }
+
+  @override
+  String get settingsSpotifyNotConnected => 'Spotify가 연결되지 않음';
+
+  @override
+  String settingsSpotifyNowPlaying(String track, String artist) {
+    return '현재 재생 중: $artist의 $track';
+  }
+
+  @override
+  String get settingsSpotifyShareHint =>
+      '모든 채널의 메시지 상자에 있는 음표 아이콘을 통해 공유할 수 있습니다.';
+
+  @override
+  String get chatShareSpotifyTooltip => '듣고 있는 음악 공유';
+
+  @override
+  String get chatSpotifyShareFailed =>
+      '공유할 수 없습니다 -- Spotify에서 무언가 재생 중인지 확인하세요.';
+
+  @override
+  String get chatPreviewBadgeLive => '라이브';
+
+  @override
+  String get chatPreviewBadgeListening => '듣는 중';
+
+  @override
+  String get chatPreviewBadgeEnded => '종료됨';
+
+  @override
+  String get serverAuditLogExportDescription =>
+      '컴플라이언스 또는 SIEM 수집을 위해 전체 감사 로그를 CSV 또는 JSON Lines로 내보냅니다.';
+
+  @override
+  String get serverAuditLogExportLockedHint =>
+      '감사 로그 내보내기는 엔터프라이즈 등급에서 사용할 수 있습니다. 업그레이드하려면 문의하세요.';
+
+  @override
+  String get serverExportAuditLog => '내보내기';
+
+  @override
+  String get serverExportFormatPrompt =>
+      '형식을 선택하세요. SIEM이나 로그 파이프라인에 공급하기에는 보통 JSON Lines가 더 적합합니다. CSV는 스프레드시트에서 바로 열립니다.';
+
+  @override
+  String get serverAuditLogExported => '감사 로그가 내보내졌습니다';
+
+  @override
+  String get chatPreviewBadgePremiere => '프리미어';
 }

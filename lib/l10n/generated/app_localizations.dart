@@ -429,6 +429,42 @@ abstract class AppLocalizations {
   /// **'Shows Visp\'s face and mood in its setup/event/advisor dialogs'**
   String get settingsShowVispAvatarSubtitle;
 
+  /// No description provided for @settingsDeleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get settingsDeleteAccountTitle;
+
+  /// No description provided for @settingsDeleteAccountSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently remove your personal information from Koda'**
+  String get settingsDeleteAccountSubtitle;
+
+  /// No description provided for @settingsDeleteAccountWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes your profile information and can\'t be undone. Your past messages may remain visible to others, shown as sent by a deleted user. Enter your password to confirm.'**
+  String get settingsDeleteAccountWarning;
+
+  /// No description provided for @settingsDeleteAccountPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get settingsDeleteAccountPasswordHint;
+
+  /// No description provided for @settingsDeleteAccountConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get settingsDeleteAccountConfirm;
+
+  /// No description provided for @settingsDeleteAccountWrongPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password.'**
+  String get settingsDeleteAccountWrongPassword;
+
   /// No description provided for @settingsHighContrastTitle.
   ///
   /// In en, this message translates to:
@@ -516,7 +552,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsStreamingDescription.
   ///
   /// In en, this message translates to:
-  /// **'Connect Twitch/YouTube so servers where you have the \"Announce When Live\" permission can automatically post when you go live or post a new video.'**
+  /// **'Connect Twitch/YouTube/Kick so servers where you have the \"Announce When Live\" permission can automatically post when you go live or post a new video.'**
   String get settingsStreamingDescription;
 
   /// No description provided for @settingsStreamingConnected.
@@ -544,6 +580,12 @@ abstract class AppLocalizations {
   /// **' -- a new upload'**
   String get settingsStreamingLiveSuffixYoutube;
 
+  /// No description provided for @settingsStreamingLiveSuffixKick.
+  ///
+  /// In en, this message translates to:
+  /// **' -- live now'**
+  String get settingsStreamingLiveSuffixKick;
+
   /// No description provided for @settingsStreamingConnecting.
   ///
   /// In en, this message translates to:
@@ -568,6 +610,12 @@ abstract class AppLocalizations {
   /// **'Announce live streams and new uploads'**
   String get settingsAnnounceLiveYoutube;
 
+  /// No description provided for @settingsAnnounceLiveKick.
+  ///
+  /// In en, this message translates to:
+  /// **'Announce when I go live'**
+  String get settingsAnnounceLiveKick;
+
   /// No description provided for @settingsRefreshStatus.
   ///
   /// In en, this message translates to:
@@ -579,6 +627,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not start {platform} connection.'**
   String settingsStreamingConnectError(String platform);
+
+  /// No description provided for @settingsStreamingConsentRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask your parent or guardian to allow connecting {platform} in the Parental Dashboard first.'**
+  String settingsStreamingConsentRequired(String platform);
 
   /// No description provided for @settingsStreamingFinishInBrowser.
   ///
@@ -1041,6 +1095,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Browse public servers'**
   String get homeBrowsePublicServersTooltip;
+
+  /// No description provided for @homeUpcomingEventsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming events'**
+  String get homeUpcomingEventsTooltip;
+
+  /// No description provided for @homeActivityFeedTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity feed'**
+  String get homeActivityFeedTooltip;
 
   /// No description provided for @serverDiscoveryTitle.
   ///
@@ -2974,6 +3040,30 @@ abstract class AppLocalizations {
   /// **'Reach boost level 5 to unlock a custom icon border.'**
   String get serverIconBorderLockedHint;
 
+  /// No description provided for @serverAchievementsCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements'**
+  String get serverAchievementsCardTitle;
+
+  /// No description provided for @serverAchievementsCardDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Create custom badges and award them to members.'**
+  String get serverAchievementsCardDescription;
+
+  /// No description provided for @serverAchievementsLockedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Reach boost level 3 to create achievements.'**
+  String get serverAchievementsLockedHint;
+
+  /// No description provided for @serverOpenAchievements.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Achievements'**
+  String get serverOpenAchievements;
+
   /// No description provided for @serverBoostFromBank.
   ///
   /// In en, this message translates to:
@@ -4130,7 +4220,7 @@ abstract class AppLocalizations {
   /// No description provided for @parentalDashboardCreateChildExplanation.
   ///
   /// In en, this message translates to:
-  /// **'This creates a fully supervised account: labeled channels are blocked, and you\'ll be able to set allowed hours and see (but not read) their friends and servers.'**
+  /// **'This starts a request to create a fully supervised account for your child: labeled channels are blocked, and you\'ll be able to set allowed hours and see (but not read) their friends and servers. We verify you\'re their parent or authorized guardian before the account is created -- choose a verification method below.'**
   String get parentalDashboardCreateChildExplanation;
 
   /// No description provided for @parentalDashboardValidationError.
@@ -4142,13 +4232,13 @@ abstract class AppLocalizations {
   /// No description provided for @parentalDashboardCreateChildFailed.
   ///
   /// In en, this message translates to:
-  /// **'Could not create child account -- username/email may already be taken.'**
+  /// **'Could not start the request -- username/email may already be taken.'**
   String get parentalDashboardCreateChildFailed;
 
   /// No description provided for @parentalDashboardCreatingLabel.
   ///
   /// In en, this message translates to:
-  /// **'Creating...'**
+  /// **'Starting...'**
   String get parentalDashboardCreatingLabel;
 
   /// No description provided for @parentalDashboardNoChildren.
@@ -4168,6 +4258,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown'**
   String get parentalDashboardUnknownUser;
+
+  /// No description provided for @parentalConsentMethodLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'How should we verify you\'re their parent or guardian?'**
+  String get parentalConsentMethodLabel;
+
+  /// No description provided for @parentalConsentMethodCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit or debit card'**
+  String get parentalConsentMethodCardTitle;
+
+  /// No description provided for @parentalConsentMethodCardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A small \$0.50 charge verifies you hold the card, then it\'s refunded immediately.'**
+  String get parentalConsentMethodCardSubtitle;
+
+  /// No description provided for @parentalConsentMethodFormTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed consent form'**
+  String get parentalConsentMethodFormTitle;
+
+  /// No description provided for @parentalConsentMethodFormSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload a signed form. A staff member reviews it before the account is created.'**
+  String get parentalConsentMethodFormSubtitle;
+
+  /// No description provided for @parentalConsentAttestation.
+  ///
+  /// In en, this message translates to:
+  /// **'I confirm I am this child\'s parent or an authorized legal guardian.'**
+  String get parentalConsentAttestation;
+
+  /// No description provided for @parentalConsentUploadFormHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Next, upload your signed consent form below.'**
+  String get parentalConsentUploadFormHint;
+
+  /// No description provided for @parentalConsentFinishInBrowser.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish verifying in your browser, then come back -- this updates automatically.'**
+  String get parentalConsentFinishInBrowser;
+
+  /// No description provided for @parentalConsentStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Declined: {reason}'**
+  String parentalConsentStatusRejected(String reason);
+
+  /// No description provided for @parentalConsentStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Request expired -- please start again'**
+  String get parentalConsentStatusExpired;
+
+  /// No description provided for @parentalConsentStatusAwaitingUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting your signed form'**
+  String get parentalConsentStatusAwaitingUpload;
+
+  /// No description provided for @parentalConsentUploadFormButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload form'**
+  String get parentalConsentUploadFormButton;
+
+  /// No description provided for @parentalConsentStatusAwaitingReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting staff review'**
+  String get parentalConsentStatusAwaitingReview;
+
+  /// No description provided for @parentalConsentStatusAwaitingPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting payment verification'**
+  String get parentalConsentStatusAwaitingPayment;
+
+  /// No description provided for @parentalConsentPendingSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PENDING REQUESTS'**
+  String get parentalConsentPendingSectionTitle;
+
+  /// No description provided for @parentalConsentPrivacyNoticePrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Read our '**
+  String get parentalConsentPrivacyNoticePrefix;
+
+  /// No description provided for @parentalConsentPrivacyNoticeSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **' to see exactly what information we collect about your child and how it\'s used.'**
+  String get parentalConsentPrivacyNoticeSuffix;
 
   /// No description provided for @childDetailFallbackTitle.
   ///
@@ -4198,6 +4390,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Override'**
   String get childDetailTabOverride;
+
+  /// No description provided for @childDetailTabThirdParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Connections'**
+  String get childDetailTabThirdParty;
 
   /// No description provided for @childDetailNoFriends.
   ///
@@ -4330,6 +4528,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Grant temporary access outside the normal schedule -- useful for a one-off exception without changing the weekly schedule.'**
   String get childDetailOverrideExplanation;
+
+  /// No description provided for @childDetailThirdPartyExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting a service like Twitch, Kick, YouTube, Steam, or Spotify shares your child\'s Koda username and activity with that outside platform. This is separate from the consent that created their account, and is off by default -- turn it on only if you want your child to be able to link these.'**
+  String get childDetailThirdPartyExplanation;
+
+  /// No description provided for @childDetailThirdPartyToggleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow third-party connections'**
+  String get childDetailThirdPartyToggleTitle;
+
+  /// No description provided for @childDetailThirdPartyToggleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Turning this off immediately disconnects any already-linked accounts'**
+  String get childDetailThirdPartyToggleSubtitle;
+
+  /// No description provided for @childDetailDeleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get childDetailDeleteAccountTitle;
+
+  /// No description provided for @childDetailDeleteAccountWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes {username}\'s account and personal information. This can\'t be undone.'**
+  String childDetailDeleteAccountWarning(String username);
+
+  /// No description provided for @childDetailDeleteAccountConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get childDetailDeleteAccountConfirm;
 
   /// No description provided for @childDetailReasonHint.
   ///
@@ -6179,6 +6413,127 @@ abstract class AppLocalizations {
   /// **'Unsubscribe'**
   String get calendarUnsubscribeTooltip;
 
+  /// No description provided for @calendarReminderOffTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me'**
+  String get calendarReminderOffTooltip;
+
+  /// No description provided for @calendarReminderOnTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off reminder'**
+  String get calendarReminderOnTooltip;
+
+  /// No description provided for @calendarAddToCalendarTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to my calendar'**
+  String get calendarAddToCalendarTooltip;
+
+  /// No description provided for @calendarIcsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar file saved'**
+  String get calendarIcsSaved;
+
+  /// No description provided for @upcomingEventsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get upcomingEventsTitle;
+
+  /// No description provided for @upcomingEventsEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No upcoming events across your servers'**
+  String get upcomingEventsEmptyState;
+
+  /// No description provided for @upcomingEventsPublicBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Public'**
+  String get upcomingEventsPublicBadge;
+
+  /// No description provided for @upcomingEventsFriendGoing.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is going'**
+  String upcomingEventsFriendGoing(String name);
+
+  /// No description provided for @upcomingEventsTwoFriendsGoing.
+  ///
+  /// In en, this message translates to:
+  /// **'{name1} and {name2} are going'**
+  String upcomingEventsTwoFriendsGoing(String name1, String name2);
+
+  /// No description provided for @upcomingEventsManyFriendsGoing.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} and {count} others are going'**
+  String upcomingEventsManyFriendsGoing(String name, int count);
+
+  /// No description provided for @activityFeedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity Feed'**
+  String get activityFeedTitle;
+
+  /// No description provided for @activityFeedEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No activity from your friends yet'**
+  String get activityFeedEmptyState;
+
+  /// No description provided for @activityFeedAchievement.
+  ///
+  /// In en, this message translates to:
+  /// **'{username} earned {achievement} in {server}'**
+  String activityFeedAchievement(
+      String username, String achievement, String server);
+
+  /// No description provided for @activityFeedWentLive.
+  ///
+  /// In en, this message translates to:
+  /// **'{username} is live on {platform}'**
+  String activityFeedWentLive(String username, String platform);
+
+  /// No description provided for @activityFeedServerJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'{username} joined {server}'**
+  String activityFeedServerJoined(String username, String server);
+
+  /// No description provided for @activityFeedArcadeHighScore.
+  ///
+  /// In en, this message translates to:
+  /// **'{username} got a new high score in {game}: {score}'**
+  String activityFeedArcadeHighScore(String username, String game, int score);
+
+  /// No description provided for @activityFeedJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get activityFeedJustNow;
+
+  /// No description provided for @activityFeedMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one {1 minute ago} other {{count} minutes ago}}'**
+  String activityFeedMinutesAgo(int count);
+
+  /// No description provided for @activityFeedHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one {1 hour ago} other {{count} hours ago}}'**
+  String activityFeedHoursAgo(int count);
+
+  /// No description provided for @activityFeedDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one {1 day ago} other {{count} days ago}}'**
+  String activityFeedDaysAgo(int count);
+
   /// No description provided for @calendarRepeatsLabel.
   ///
   /// In en, this message translates to:
@@ -7590,6 +7945,36 @@ abstract class AppLocalizations {
   /// **'Later'**
   String get updateNudgeLaterButton;
 
+  /// No description provided for @updateNudgeUpdateNowButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Now'**
+  String get updateNudgeUpdateNowButton;
+
+  /// No description provided for @updateNudgeDownloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading update... {percent}%'**
+  String updateNudgeDownloading(int percent);
+
+  /// No description provided for @updateNudgeVerifying.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying download...'**
+  String get updateNudgeVerifying;
+
+  /// No description provided for @updateNudgeLaunching.
+  ///
+  /// In en, this message translates to:
+  /// **'Launching installer...'**
+  String get updateNudgeLaunching;
+
+  /// No description provided for @updateNudgeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t complete the update. You can download it manually instead.'**
+  String get updateNudgeFailed;
+
   /// No description provided for @tierBadgeSparkSubscriber.
   ///
   /// In en, this message translates to:
@@ -8940,6 +9325,78 @@ abstract class AppLocalizations {
   /// **'Lv. {level}'**
   String memberPanelLevelLabel(int level);
 
+  /// No description provided for @achievementScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements'**
+  String get achievementScreenTitle;
+
+  /// No description provided for @achievementCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Achievement'**
+  String get achievementCreateTitle;
+
+  /// No description provided for @achievementNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievement name'**
+  String get achievementNameHint;
+
+  /// No description provided for @achievementDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get achievementDescriptionHint;
+
+  /// No description provided for @achievementDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Achievement'**
+  String get achievementDeleteTitle;
+
+  /// No description provided for @achievementDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"? Anyone already holding it keeps it, but this removes it from the server. This can\'t be undone.'**
+  String achievementDeleteConfirm(String name);
+
+  /// No description provided for @achievementAwardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Award Achievement'**
+  String get achievementAwardTitle;
+
+  /// No description provided for @achievementAwardButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Award'**
+  String get achievementAwardButton;
+
+  /// No description provided for @achievementUserIdHint.
+  ///
+  /// In en, this message translates to:
+  /// **'User ID'**
+  String get achievementUserIdHint;
+
+  /// No description provided for @achievementLockedBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'This server is below boost level 3, so existing achievements and their holders stay exactly as they are, but none can be awarded to anyone new until boosts bring it back to level 3.'**
+  String get achievementLockedBanner;
+
+  /// No description provided for @achievementEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No achievements yet'**
+  String get achievementEmptyState;
+
+  /// No description provided for @achievementNoRecipients.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody has this yet'**
+  String get achievementNoRecipients;
+
   /// No description provided for @chatGifLevelGated.
   ///
   /// In en, this message translates to:
@@ -9095,6 +9552,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Status'**
   String get adminTabStatus;
+
+  /// No description provided for @adminTabParentalConsent.
+  ///
+  /// In en, this message translates to:
+  /// **'Parental Consent'**
+  String get adminTabParentalConsent;
+
+  /// No description provided for @adminParentalConsentDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Review uploaded signed consent forms before a child account is created. Credit-card verification resolves automatically and never appears here.'**
+  String get adminParentalConsentDescription;
+
+  /// No description provided for @adminParentalConsentEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No pending reviews.'**
+  String get adminParentalConsentEmptyState;
+
+  /// No description provided for @adminParentalConsentViewDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'View document'**
+  String get adminParentalConsentViewDocument;
+
+  /// No description provided for @adminParentalConsentApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get adminParentalConsentApprove;
+
+  /// No description provided for @adminParentalConsentReject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get adminParentalConsentReject;
+
+  /// No description provided for @adminParentalConsentRejectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject Consent Request'**
+  String get adminParentalConsentRejectTitle;
+
+  /// No description provided for @adminParentalConsentRejectReasonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason (shown to the parent/guardian)'**
+  String get adminParentalConsentRejectReasonHint;
+
+  /// No description provided for @adminParentalConsentRejectConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get adminParentalConsentRejectConfirm;
 
   /// No description provided for @serverTabSso.
   ///
@@ -9282,6 +9793,12 @@ abstract class AppLocalizations {
   /// **'Manage Webhooks'**
   String get permManageWebhooks;
 
+  /// No description provided for @permManageAchievements.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Achievements'**
+  String get permManageAchievements;
+
   /// No description provided for @channelEditDialogManageWebhooks.
   ///
   /// In en, this message translates to:
@@ -9365,6 +9882,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'WEBHOOK'**
   String get chatWebhookBadge;
+
+  /// No description provided for @adminReportWebhookTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Reporter: {reporterId}\nWebhook: {webhookName}'**
+  String adminReportWebhookTarget(String reporterId, String webhookName);
+
+  /// No description provided for @commonActionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get commonActionFailed;
+
+  /// No description provided for @ssoBrowserLaunchError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open a browser to continue signing in.'**
+  String get ssoBrowserLaunchError;
+
+  /// No description provided for @settingsSpotifyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spotify'**
+  String get settingsSpotifyTitle;
+
+  /// No description provided for @settingsSpotifyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect Spotify to share what you\'re listening to in a channel. Koda can\'t synchronize playback in real time -- this posts a link so others can play the same track themselves.'**
+  String get settingsSpotifyDescription;
+
+  /// No description provided for @settingsSpotifyConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected as {username}'**
+  String settingsSpotifyConnected(String username);
+
+  /// No description provided for @settingsSpotifyNotConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Spotify not connected'**
+  String get settingsSpotifyNotConnected;
+
+  /// No description provided for @settingsSpotifyNowPlaying.
+  ///
+  /// In en, this message translates to:
+  /// **'Now playing: {track} by {artist}'**
+  String settingsSpotifyNowPlaying(String track, String artist);
+
+  /// No description provided for @settingsSpotifyShareHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Share this from the music note icon in any channel\'s message box.'**
+  String get settingsSpotifyShareHint;
+
+  /// No description provided for @chatShareSpotifyTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Share what you\'re listening to'**
+  String get chatShareSpotifyTooltip;
+
+  /// No description provided for @chatSpotifyShareFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t share -- make sure Spotify is playing something.'**
+  String get chatSpotifyShareFailed;
+
+  /// No description provided for @chatPreviewBadgeLive.
+  ///
+  /// In en, this message translates to:
+  /// **'LIVE'**
+  String get chatPreviewBadgeLive;
+
+  /// No description provided for @chatPreviewBadgeListening.
+  ///
+  /// In en, this message translates to:
+  /// **'LISTENING'**
+  String get chatPreviewBadgeListening;
+
+  /// No description provided for @chatPreviewBadgeEnded.
+  ///
+  /// In en, this message translates to:
+  /// **'ENDED'**
+  String get chatPreviewBadgeEnded;
+
+  /// No description provided for @serverAuditLogExportDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Export the full audit log as CSV or JSON Lines for compliance or SIEM ingestion.'**
+  String get serverAuditLogExportDescription;
+
+  /// No description provided for @serverAuditLogExportLockedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit log export is available on the Enterprise tier. Contact us to upgrade this server.'**
+  String get serverAuditLogExportLockedHint;
+
+  /// No description provided for @serverExportAuditLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get serverExportAuditLog;
+
+  /// No description provided for @serverExportFormatPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a format. JSON Lines is usually the better fit for feeding into a SIEM or log pipeline; CSV opens directly in a spreadsheet.'**
+  String get serverExportFormatPrompt;
+
+  /// No description provided for @serverAuditLogExported.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit log exported'**
+  String get serverAuditLogExported;
+
+  /// No description provided for @chatPreviewBadgePremiere.
+  ///
+  /// In en, this message translates to:
+  /// **'PREMIERE'**
+  String get chatPreviewBadgePremiere;
 }
 
 class _AppLocalizationsDelegate

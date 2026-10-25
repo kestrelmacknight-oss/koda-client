@@ -30,6 +30,7 @@ import 'features/auth/auth_screen.dart';
 import 'features/auth/child_lockout_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/voice/pop_out_video_window.dart';
+import 'features/activity/activity_feed_popout_window.dart';
 import 'shared/update_nudge.dart';
 
 void main(List<String> args) async {
@@ -49,6 +50,13 @@ void main(List<String> args) async {
       runApp(ProviderScope(child: PopOutVideoWindow(
         windowId: windowController.windowId,
         arguments: rawArgs,
+      )));
+      return;
+    }
+
+    if (arguments['type'] == 'activity_feed_popout') {
+      runApp(ProviderScope(child: ActivityFeedPopoutWindow(
+        windowId: windowController.windowId,
       )));
       return;
     }

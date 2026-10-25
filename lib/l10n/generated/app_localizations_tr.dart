@@ -160,6 +160,26 @@ class AppLocalizationsTr extends AppLocalizations {
       'Visp\'in kurulum/etkinlik/danışman pencerelerinde yüzünü ve ruh halini gösterir';
 
   @override
+  String get settingsDeleteAccountTitle => 'Hesabı Sil';
+
+  @override
+  String get settingsDeleteAccountSubtitle =>
+      'Kişisel bilgilerinizi Koda\'dan kalıcı olarak kaldırır';
+
+  @override
+  String get settingsDeleteAccountWarning =>
+      'Bu, profil bilgilerinizi kalıcı olarak siler ve geri alınamaz. Önceki mesajlarınız, silinmiş bir kullanıcı tarafından gönderilmiş olarak gösterilerek diğerlerine görünür kalabilir. Onaylamak için şifrenizi girin.';
+
+  @override
+  String get settingsDeleteAccountPasswordHint => 'Şifre';
+
+  @override
+  String get settingsDeleteAccountConfirm => 'Hesabı Sil';
+
+  @override
+  String get settingsDeleteAccountWrongPassword => 'Yanlış şifre.';
+
+  @override
   String get settingsHighContrastTitle => 'Yüksek Kontrast';
 
   @override
@@ -208,7 +228,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsStreamingDescription =>
-      '\"Canlı Yayına Geçince Duyur\" iznine sahip olduğunuz sunucuların, canlı yayına geçtiğinizde veya yeni bir video paylaştığınızda otomatik olarak paylaşım yapabilmesi için Twitch/YouTube\'u bağlayın.';
+      '\"Canlı Yayına Geçince Duyur\" iznine sahip olduğunuz sunucuların, canlı yayına geçtiğinizde veya yeni bir video paylaştığınızda otomatik olarak paylaşım yapabilmesi için Twitch/YouTube/Kick\'i bağlayın.';
 
   @override
   String settingsStreamingConnected(
@@ -228,6 +248,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsStreamingLiveSuffixYoutube => ' -- yeni bir yükleme';
 
   @override
+  String get settingsStreamingLiveSuffixKick => ' -- şu anda canlı';
+
+  @override
   String get settingsStreamingConnecting => 'Bağlanıyor...';
 
   @override
@@ -241,12 +264,20 @@ class AppLocalizationsTr extends AppLocalizations {
       'Canlı yayınları ve yeni yüklemeleri duyur';
 
   @override
+  String get settingsAnnounceLiveKick => 'Canlı yayına geçtiğimde duyur';
+
+  @override
   String get settingsRefreshStatus =>
       'Tarayıcınızda zaten bağlandınız mı? Durumu yenile';
 
   @override
   String settingsStreamingConnectError(String platform) {
     return '$platform bağlantısı başlatılamadı.';
+  }
+
+  @override
+  String settingsStreamingConsentRequired(String platform) {
+    return 'Çocuğun ebeveyninden veya vasisinden önce Ebeveyn Panelinde $platform bağlantısına izin vermesini isteyin.';
   }
 
   @override
@@ -504,6 +535,12 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get homeBrowsePublicServersTooltip => 'Herkese açık sunuculara göz at';
+
+  @override
+  String get homeUpcomingEventsTooltip => 'Yaklaşan etkinlikler';
+
+  @override
+  String get homeActivityFeedTooltip => 'Etkinlik akışı';
 
   @override
   String get serverDiscoveryTitle => 'Sunuculara Göz At';
@@ -1585,6 +1622,20 @@ class AppLocalizationsTr extends AppLocalizations {
       'Özel bir simge çerçevesinin kilidini açmak için boost seviye 5\'e ulaşın.';
 
   @override
+  String get serverAchievementsCardTitle => 'Başarımlar';
+
+  @override
+  String get serverAchievementsCardDescription =>
+      'Özel rozetler oluşturun ve üyelere verin.';
+
+  @override
+  String get serverAchievementsLockedHint =>
+      'Başarım oluşturmak için boost seviye 3\'e ulaşın.';
+
+  @override
+  String get serverOpenAchievements => 'Başarımları Yönet';
+
+  @override
   String get serverBoostFromBank =>
       'Seviyesini yükseltmek için bu sunucuyu Pazar Yeri\'ndeki Sunucu Bankası\'ndan güçlendirin.';
 
@@ -2261,7 +2312,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildExplanation =>
-      'Bu, tamamen denetimli bir hesap oluşturur: etiketlenmiş kanallar engellenir ve izin verilen saatleri ayarlayabilir, arkadaşlarını ve sunucularını görebilirsiniz (ama okuyamazsınız).';
+      'Bu, çocuğunuz için tamamen denetimli bir hesap oluşturma talebini başlatır: etiketlenmiş kanallar engellenir ve izin verilen saatleri ayarlayabilir, arkadaşlarını ve sunucularını görebilirsiniz (ama okuyamazsınız). Hesap oluşturulmadan önce ebeveyn veya yetkili vasi olduğunuzu doğrularız -- aşağıdan bir doğrulama yöntemi seçin.';
 
   @override
   String get parentalDashboardValidationError =>
@@ -2269,10 +2320,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildFailed =>
-      'Çocuk hesabı oluşturulamadı -- kullanıcı adı/e-posta zaten kullanımda olabilir.';
+      'Talep başlatılamadı -- kullanıcı adı/e-posta zaten kullanımda olabilir.';
 
   @override
-  String get parentalDashboardCreatingLabel => 'Oluşturuluyor...';
+  String get parentalDashboardCreatingLabel => 'Başlatılıyor...';
 
   @override
   String get parentalDashboardNoChildren => 'Henüz bağlı hesap yok.';
@@ -2282,6 +2333,70 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get parentalDashboardUnknownUser => 'Bilinmiyor';
+
+  @override
+  String get parentalConsentMethodLabel =>
+      'Ebeveyn veya vasi olduğunuzu nasıl doğrulamalıyız?';
+
+  @override
+  String get parentalConsentMethodCardTitle => 'Kredi veya banka kartı';
+
+  @override
+  String get parentalConsentMethodCardSubtitle =>
+      '0,50 \$ tutarında küçük bir ücret, kartın size ait olduğunu doğrular ve ardından anında iade edilir.';
+
+  @override
+  String get parentalConsentMethodFormTitle => 'İmzalı onay formu';
+
+  @override
+  String get parentalConsentMethodFormSubtitle =>
+      'İmzalı bir form yükleyin. Hesap oluşturulmadan önce bir personel bunu inceleyecek.';
+
+  @override
+  String get parentalConsentAttestation =>
+      'Bu çocuğun ebeveyni veya yetkili yasal vasisi olduğumu onaylıyorum.';
+
+  @override
+  String get parentalConsentUploadFormHint =>
+      'Ardından, imzalı onay formunuzu aşağıya yükleyin.';
+
+  @override
+  String get parentalConsentFinishInBrowser =>
+      'Doğrulamayı tarayıcınızda tamamlayın, ardından geri gelin -- bu otomatik olarak güncellenir.';
+
+  @override
+  String parentalConsentStatusRejected(String reason) {
+    return 'Reddedildi: $reason';
+  }
+
+  @override
+  String get parentalConsentStatusExpired =>
+      'Talebin süresi doldu -- lütfen yeniden başlayın';
+
+  @override
+  String get parentalConsentStatusAwaitingUpload =>
+      'İmzalı formunuz bekleniyor';
+
+  @override
+  String get parentalConsentUploadFormButton => 'Form yükle';
+
+  @override
+  String get parentalConsentStatusAwaitingReview =>
+      'Personel incelemesi bekleniyor';
+
+  @override
+  String get parentalConsentStatusAwaitingPayment =>
+      'Ödeme doğrulaması bekleniyor';
+
+  @override
+  String get parentalConsentPendingSectionTitle => 'BEKLEYEN TALEPLER';
+
+  @override
+  String get parentalConsentPrivacyNoticePrefix =>
+      'Çocuğunuz hakkında tam olarak hangi bilgileri topladığımızı ve nasıl kullanıldığını görmek için ';
+
+  @override
+  String get parentalConsentPrivacyNoticeSuffix => ' sayfamızı okuyun.';
 
   @override
   String get childDetailFallbackTitle => 'Çocuk hesabı';
@@ -2297,6 +2412,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get childDetailTabOverride => 'Geçersiz Kılma';
+
+  @override
+  String get childDetailTabThirdParty => 'Bağlantılar';
 
   @override
   String get childDetailNoFriends => 'Arkadaş yok.';
@@ -2368,6 +2486,29 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get childDetailOverrideExplanation =>
       'Normal programın dışında geçici erişim ver -- haftalık programı değiştirmeden tek seferlik bir istisna için kullanışlıdır.';
+
+  @override
+  String get childDetailThirdPartyExplanation =>
+      'Twitch, Kick, YouTube, Steam veya Spotify gibi bir hizmeti bağlamak, çocuğunuzun Koda kullanıcı adını ve etkinliğini bu dış platformla paylaşır. Bu, hesabını oluşturan onaydan ayrıdır ve varsayılan olarak kapalıdır -- yalnızca çocuğunuzun bu hesapları bağlayabilmesini istiyorsanız açın.';
+
+  @override
+  String get childDetailThirdPartyToggleTitle =>
+      'Üçüncü taraf bağlantılarına izin ver';
+
+  @override
+  String get childDetailThirdPartyToggleSubtitle =>
+      'Bunu kapatmak, zaten bağlı olan her hesabın bağlantısını hemen keser';
+
+  @override
+  String get childDetailDeleteAccountTitle => 'Hesabı Sil';
+
+  @override
+  String childDetailDeleteAccountWarning(String username) {
+    return 'Bu, $username adlı kullanıcının hesabını ve kişisel bilgilerini kalıcı olarak siler. Bu işlem geri alınamaz.';
+  }
+
+  @override
+  String get childDetailDeleteAccountConfirm => 'Hesabı Sil';
 
   @override
   String get childDetailReasonHint => 'Neden (isteğe bağlı)';
@@ -3522,6 +3663,106 @@ class AppLocalizationsTr extends AppLocalizations {
   String get calendarUnsubscribeTooltip => 'Aboneliği Bırak';
 
   @override
+  String get calendarReminderOffTooltip => 'Hatırlat';
+
+  @override
+  String get calendarReminderOnTooltip => 'Hatırlatmayı kapat';
+
+  @override
+  String get calendarAddToCalendarTooltip => 'Takvimime ekle';
+
+  @override
+  String get calendarIcsSaved => 'Takvim dosyası kaydedildi';
+
+  @override
+  String get upcomingEventsTitle => 'Yaklaşan';
+
+  @override
+  String get upcomingEventsEmptyState =>
+      'Sunucularınızda yaklaşan etkinlik yok';
+
+  @override
+  String get upcomingEventsPublicBadge => 'Herkese açık';
+
+  @override
+  String upcomingEventsFriendGoing(String name) {
+    return '$name katılacak';
+  }
+
+  @override
+  String upcomingEventsTwoFriendsGoing(String name1, String name2) {
+    return '$name1 ve $name2 katılacak';
+  }
+
+  @override
+  String upcomingEventsManyFriendsGoing(String name, int count) {
+    return '$name ve $count kişi daha katılacak';
+  }
+
+  @override
+  String get activityFeedTitle => 'Etkinlik Akışı';
+
+  @override
+  String get activityFeedEmptyState => 'Arkadaşlarından henüz bir etkinlik yok';
+
+  @override
+  String activityFeedAchievement(
+      String username, String achievement, String server) {
+    return '$username, $server sunucusunda $achievement kazandı';
+  }
+
+  @override
+  String activityFeedWentLive(String username, String platform) {
+    return '$username, $platform üzerinde canlı yayında';
+  }
+
+  @override
+  String activityFeedServerJoined(String username, String server) {
+    return '$username, $server sunucusuna katıldı';
+  }
+
+  @override
+  String activityFeedArcadeHighScore(String username, String game, int score) {
+    return '$username, $game oyununda yeni yüksek skor yaptı: $score';
+  }
+
+  @override
+  String get activityFeedJustNow => 'Az önce';
+
+  @override
+  String activityFeedMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dakika önce',
+      one: '1 dakika önce',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saat önce',
+      one: '1 saat önce',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count gün önce',
+      one: '1 gün önce',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String calendarRepeatsLabel(String recurrence) {
     return '$recurrence tekrarlanır';
   }
@@ -4366,6 +4607,24 @@ class AppLocalizationsTr extends AppLocalizations {
   String get updateNudgeLaterButton => 'Sonra';
 
   @override
+  String get updateNudgeUpdateNowButton => 'Şimdi Güncelle';
+
+  @override
+  String updateNudgeDownloading(int percent) {
+    return 'Güncelleme indiriliyor... $percent%';
+  }
+
+  @override
+  String get updateNudgeVerifying => 'İndirme doğrulanıyor...';
+
+  @override
+  String get updateNudgeLaunching => 'Yükleyici başlatılıyor...';
+
+  @override
+  String get updateNudgeFailed =>
+      'Güncelleme tamamlanamadı. Bunun yerine elle indirebilirsiniz.';
+
+  @override
   String get tierBadgeSparkSubscriber => 'Spark abonesi';
 
   @override
@@ -5160,6 +5419,45 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get achievementScreenTitle => 'Başarımlar';
+
+  @override
+  String get achievementCreateTitle => 'Başarım Oluştur';
+
+  @override
+  String get achievementNameHint => 'Başarım adı';
+
+  @override
+  String get achievementDescriptionHint => 'Açıklama (isteğe bağlı)';
+
+  @override
+  String get achievementDeleteTitle => 'Başarımı Sil';
+
+  @override
+  String achievementDeleteConfirm(String name) {
+    return '\"$name\" silinsin mi? Zaten sahip olanlar onu elinde tutar, ancak sunucudan kaldırılır. Bu geri alınamaz.';
+  }
+
+  @override
+  String get achievementAwardTitle => 'Başarım Ver';
+
+  @override
+  String get achievementAwardButton => 'Ver';
+
+  @override
+  String get achievementUserIdHint => 'Kullanıcı Kimliği';
+
+  @override
+  String get achievementLockedBanner =>
+      'Bu sunucu boost seviye 3\'ün altında, bu yüzden mevcut başarımlar ve sahipleri olduğu gibi kalır, ancak sunucu seviye 3\'e geri dönene kadar hiçbiri yeni birine verilemez.';
+
+  @override
+  String get achievementEmptyState => 'Henüz başarım yok';
+
+  @override
+  String get achievementNoRecipients => 'Henüz kimsede yok';
+
+  @override
   String chatGifLevelGated(int level) {
     return 'Burada GIF göndermek için seviye $level gerekiyor';
   }
@@ -5253,6 +5551,35 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get adminTabStatus => 'Durum';
+
+  @override
+  String get adminTabParentalConsent => 'Ebeveyn Onayı';
+
+  @override
+  String get adminParentalConsentDescription =>
+      'Bir çocuk hesabı oluşturulmadan önce yüklenen imzalı onay formlarını inceleyin. Kart doğrulaması otomatik olarak çözümlenir ve burada hiç görünmez.';
+
+  @override
+  String get adminParentalConsentEmptyState => 'Bekleyen inceleme yok.';
+
+  @override
+  String get adminParentalConsentViewDocument => 'Belgeyi görüntüle';
+
+  @override
+  String get adminParentalConsentApprove => 'Onayla';
+
+  @override
+  String get adminParentalConsentReject => 'Reddet';
+
+  @override
+  String get adminParentalConsentRejectTitle => 'Onay Talebini Reddet';
+
+  @override
+  String get adminParentalConsentRejectReasonHint =>
+      'Neden (ebeveyne/vasiye gösterilir)';
+
+  @override
+  String get adminParentalConsentRejectConfirm => 'Reddet';
 
   @override
   String get serverTabSso => 'SSO';
@@ -5354,6 +5681,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get permManageWebhooks => 'Webhookları Yönet';
 
   @override
+  String get permManageAchievements => 'Başarımları Yönet';
+
+  @override
   String get channelEditDialogManageWebhooks => 'Webhookları Yönet';
 
   @override
@@ -5397,4 +5727,78 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get chatWebhookBadge => 'WEBHOOK';
+
+  @override
+  String adminReportWebhookTarget(String reporterId, String webhookName) {
+    return 'Bildiren: $reporterId\nWebhook: $webhookName';
+  }
+
+  @override
+  String get commonActionFailed =>
+      'Bir şeyler ters gitti. Lütfen tekrar deneyin.';
+
+  @override
+  String get ssoBrowserLaunchError =>
+      'Girişe devam etmek için bir tarayıcı açılamadı.';
+
+  @override
+  String get settingsSpotifyTitle => 'Spotify';
+
+  @override
+  String get settingsSpotifyDescription =>
+      'Bir kanalda ne dinlediğinizi paylaşmak için Spotify\'ı bağlayın. Koda, oynatmayı gerçek zamanlı olarak senkronize edemez -- bu, başkalarının aynı parçayı kendileri çalabilmesi için bir bağlantı paylaşır.';
+
+  @override
+  String settingsSpotifyConnected(String username) {
+    return '$username olarak bağlandı';
+  }
+
+  @override
+  String get settingsSpotifyNotConnected => 'Spotify bağlı değil';
+
+  @override
+  String settingsSpotifyNowPlaying(String track, String artist) {
+    return 'Şimdi çalıyor: $artist - $track';
+  }
+
+  @override
+  String get settingsSpotifyShareHint =>
+      'Bunu herhangi bir kanalın mesaj kutusundaki nota simgesinden paylaşın.';
+
+  @override
+  String get chatShareSpotifyTooltip => 'Ne dinlediğinizi paylaşın';
+
+  @override
+  String get chatSpotifyShareFailed =>
+      'Paylaşılamadı -- Spotify\'da bir şeyin çalındığından emin olun.';
+
+  @override
+  String get chatPreviewBadgeLive => 'CANLI';
+
+  @override
+  String get chatPreviewBadgeListening => 'DİNLİYOR';
+
+  @override
+  String get chatPreviewBadgeEnded => 'SONA ERDİ';
+
+  @override
+  String get serverAuditLogExportDescription =>
+      'Uyumluluk veya SIEM\'e aktarım için tüm denetim günlüğünü CSV veya JSON Lines olarak dışa aktarın.';
+
+  @override
+  String get serverAuditLogExportLockedHint =>
+      'Denetim günlüğü dışa aktarımı Kurumsal katmanda kullanılabilir. Yükseltmek için bizimle iletişime geçin.';
+
+  @override
+  String get serverExportAuditLog => 'Dışa Aktar';
+
+  @override
+  String get serverExportFormatPrompt =>
+      'Bir format seçin. JSON Lines genellikle bir SIEM veya günlük hattına beslemek için daha uygundur; CSV doğrudan bir hesap tablosunda açılır.';
+
+  @override
+  String get serverAuditLogExported => 'Denetim günlüğü dışa aktarıldı';
+
+  @override
+  String get chatPreviewBadgePremiere => 'PRÖMIYER';
 }

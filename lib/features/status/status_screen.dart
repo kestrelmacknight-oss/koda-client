@@ -63,12 +63,27 @@ class _StatusScreenState extends State<StatusScreen> {
     );
     if (post != true || titleCtrl.text.trim().isEmpty) return;
     final ok = await KodaApi.instance.adminPostIncident(titleCtrl.text.trim(), bodyCtrl.text.trim());
-    if (ok) await _load();
+    if (!mounted) return;
+    if (ok) {
+      await _load();
+    } else {
+      _showActionFailed();
+    }
   }
 
   Future<void> _resolve(String id) async {
     final ok = await KodaApi.instance.adminResolveIncident(id);
-    if (ok) await _load();
+    if (!mounted) return;
+    if (ok) {
+      await _load();
+    } else {
+      _showActionFailed();
+    }
+  }
+
+  void _showActionFailed() {
+    final t = AppLocalizations.of(context);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.commonActionFailed)));
   }
 
   @override

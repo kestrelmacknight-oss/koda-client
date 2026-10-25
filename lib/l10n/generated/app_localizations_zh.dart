@@ -154,6 +154,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsShowVispAvatarSubtitle => '在设置/事件/顾问对话框中显示 Visp 的表情和心情';
 
   @override
+  String get settingsDeleteAccountTitle => '删除账号';
+
+  @override
+  String get settingsDeleteAccountSubtitle => '永久从 Koda 中移除你的个人信息';
+
+  @override
+  String get settingsDeleteAccountWarning =>
+      '此操作将永久删除你的个人资料信息，且无法撤销。你之前发送的消息可能仍会对其他人可见，显示为由已删除用户发送。请输入密码以确认。';
+
+  @override
+  String get settingsDeleteAccountPasswordHint => '密码';
+
+  @override
+  String get settingsDeleteAccountConfirm => '删除账号';
+
+  @override
+  String get settingsDeleteAccountWrongPassword => '密码不正确。';
+
+  @override
   String get settingsHighContrastTitle => '高对比度';
 
   @override
@@ -198,7 +217,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsStreamingDescription =>
-      '连接 Twitch/YouTube 后，拥有“开播通知”权限的服务器可在你开播或发布新视频时自动发布消息。';
+      '连接 Twitch/YouTube/Kick 后，拥有“开播通知”权限的服务器可在你开播或发布新视频时自动发布消息。';
 
   @override
   String settingsStreamingConnected(
@@ -218,6 +237,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsStreamingLiveSuffixYoutube => ' -- 新上传视频';
 
   @override
+  String get settingsStreamingLiveSuffixKick => ' -- 正在直播';
+
+  @override
   String get settingsStreamingConnecting => '连接中...';
 
   @override
@@ -230,11 +252,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsAnnounceLiveYoutube => '通知直播开始和新视频上传';
 
   @override
+  String get settingsAnnounceLiveKick => '开播时通知';
+
+  @override
   String get settingsRefreshStatus => '已在浏览器中连接？刷新状态';
 
   @override
   String settingsStreamingConnectError(String platform) {
     return '无法开始连接 $platform。';
+  }
+
+  @override
+  String settingsStreamingConsentRequired(String platform) {
+    return '请孩子的家长或监护人先在家长控制面板中允许连接 $platform。';
   }
 
   @override
@@ -478,6 +508,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeBrowsePublicServersTooltip => '浏览公开服务器';
+
+  @override
+  String get homeUpcomingEventsTooltip => '即将举行的活动';
+
+  @override
+  String get homeActivityFeedTooltip => '动态消息';
 
   @override
   String get serverDiscoveryTitle => '浏览服务器';
@@ -1523,6 +1559,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverIconBorderLockedHint => '达到助力等级 5 即可解锁自定义图标边框。';
 
   @override
+  String get serverAchievementsCardTitle => '成就';
+
+  @override
+  String get serverAchievementsCardDescription => '创建自定义徽章并授予成员。';
+
+  @override
+  String get serverAchievementsLockedHint => '达到助力等级 3 即可创建成就。';
+
+  @override
+  String get serverOpenAchievements => '管理成就';
+
+  @override
   String get serverBoostFromBank => '在市场的服务器银行中助力此服务器，以提升其等级。';
 
   @override
@@ -2181,16 +2229,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildExplanation =>
-      '这将创建一个完全受监护的账号：带标签的频道会被屏蔽，你可以设置允许使用的时间段，并查看（但无法阅读内容）他们的好友和服务器。';
+      '此操作将开始为您的孩子创建完全受监护账号的请求：带标签的频道会被屏蔽，你可以设置允许使用的时间段，并查看（但无法阅读内容）他们的好友和服务器。在创建账号之前，我们会验证您是否为其父母或经授权的监护人 -- 请在下方选择验证方式。';
 
   @override
   String get parentalDashboardValidationError => '需要填写用户名、邮箱，以及至少 8 位的密码。';
 
   @override
-  String get parentalDashboardCreateChildFailed => '无法创建儿童账号 -- 用户名/邮箱可能已被占用。';
+  String get parentalDashboardCreateChildFailed => '无法开始请求 -- 用户名/邮箱可能已被占用。';
 
   @override
-  String get parentalDashboardCreatingLabel => '创建中...';
+  String get parentalDashboardCreatingLabel => '正在开始...';
 
   @override
   String get parentalDashboardNoChildren => '尚未关联任何账号。';
@@ -2200,6 +2248,61 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get parentalDashboardUnknownUser => '未知';
+
+  @override
+  String get parentalConsentMethodLabel => '我们应如何验证您是其父母或监护人？';
+
+  @override
+  String get parentalConsentMethodCardTitle => '信用卡或借记卡';
+
+  @override
+  String get parentalConsentMethodCardSubtitle =>
+      '0.50 美元的小额扣款用于验证您持有该卡，随后会立即退款。';
+
+  @override
+  String get parentalConsentMethodFormTitle => '已签署的同意书';
+
+  @override
+  String get parentalConsentMethodFormSubtitle => '上传已签署的表格。工作人员会在创建账号前审核。';
+
+  @override
+  String get parentalConsentAttestation => '我确认我是该儿童的父母或经授权的法定监护人。';
+
+  @override
+  String get parentalConsentUploadFormHint => '接下来，请在下方上传您已签署的同意书。';
+
+  @override
+  String get parentalConsentFinishInBrowser => '在浏览器中完成验证，然后返回 -- 此处会自动更新。';
+
+  @override
+  String parentalConsentStatusRejected(String reason) {
+    return '已拒绝：$reason';
+  }
+
+  @override
+  String get parentalConsentStatusExpired => '请求已过期 -- 请重新开始';
+
+  @override
+  String get parentalConsentStatusAwaitingUpload => '正在等待您签署的表格';
+
+  @override
+  String get parentalConsentUploadFormButton => '上传表格';
+
+  @override
+  String get parentalConsentStatusAwaitingReview => '正在等待工作人员审核';
+
+  @override
+  String get parentalConsentStatusAwaitingPayment => '正在等待付款验证';
+
+  @override
+  String get parentalConsentPendingSectionTitle => '待处理请求';
+
+  @override
+  String get parentalConsentPrivacyNoticePrefix => '阅读我们的';
+
+  @override
+  String get parentalConsentPrivacyNoticeSuffix =>
+      '以准确了解我们收集了孩子的哪些信息，以及这些信息的使用方式。';
 
   @override
   String get childDetailFallbackTitle => '儿童账号';
@@ -2215,6 +2318,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get childDetailTabOverride => '临时许可';
+
+  @override
+  String get childDetailTabThirdParty => '连接';
 
   @override
   String get childDetailNoFriends => '暂无好友。';
@@ -2284,6 +2390,27 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get childDetailOverrideExplanation =>
       '在正常时间表之外临时授予访问权限 -- 适合一次性例外情况，而无需更改每周的时间表。';
+
+  @override
+  String get childDetailThirdPartyExplanation =>
+      '连接 Twitch、Kick、YouTube、Steam 或 Spotify 等服务会将孩子的 Koda 用户名和活动分享给该外部平台。这与创建账号时的同意是分开的，默认处于关闭状态 -- 只有在你希望孩子能够关联这些账号时才开启。';
+
+  @override
+  String get childDetailThirdPartyToggleTitle => '允许第三方连接';
+
+  @override
+  String get childDetailThirdPartyToggleSubtitle => '关闭此项会立即断开任何已关联的账号';
+
+  @override
+  String get childDetailDeleteAccountTitle => '删除账号';
+
+  @override
+  String childDetailDeleteAccountWarning(String username) {
+    return '此操作将永久删除 $username 的账号及其个人信息，且无法撤销。';
+  }
+
+  @override
+  String get childDetailDeleteAccountConfirm => '删除账号';
 
   @override
   String get childDetailReasonHint => '原因（可选）';
@@ -3377,6 +3504,102 @@ class AppLocalizationsZh extends AppLocalizations {
   String get calendarUnsubscribeTooltip => '取消订阅';
 
   @override
+  String get calendarReminderOffTooltip => '提醒我';
+
+  @override
+  String get calendarReminderOnTooltip => '关闭提醒';
+
+  @override
+  String get calendarAddToCalendarTooltip => '添加到我的日历';
+
+  @override
+  String get calendarIcsSaved => '日历文件已保存';
+
+  @override
+  String get upcomingEventsTitle => '即将举行';
+
+  @override
+  String get upcomingEventsEmptyState => '你的服务器上没有即将举行的活动';
+
+  @override
+  String get upcomingEventsPublicBadge => '公开';
+
+  @override
+  String upcomingEventsFriendGoing(String name) {
+    return '$name 将参加';
+  }
+
+  @override
+  String upcomingEventsTwoFriendsGoing(String name1, String name2) {
+    return '$name1 和 $name2 将参加';
+  }
+
+  @override
+  String upcomingEventsManyFriendsGoing(String name, int count) {
+    return '$name 和另外 $count 人将参加';
+  }
+
+  @override
+  String get activityFeedTitle => '动态消息';
+
+  @override
+  String get activityFeedEmptyState => '你的好友还没有任何动态';
+
+  @override
+  String activityFeedAchievement(
+      String username, String achievement, String server) {
+    return '$username 在 $server 获得了成就“$achievement”';
+  }
+
+  @override
+  String activityFeedWentLive(String username, String platform) {
+    return '$username 正在 $platform 直播';
+  }
+
+  @override
+  String activityFeedServerJoined(String username, String server) {
+    return '$username 加入了 $server';
+  }
+
+  @override
+  String activityFeedArcadeHighScore(String username, String game, int score) {
+    return '$username 在 $game 中创造了新纪录: $score';
+  }
+
+  @override
+  String get activityFeedJustNow => '刚刚';
+
+  @override
+  String activityFeedMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 分钟前',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 小时前',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 天前',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String calendarRepeatsLabel(String recurrence) {
     return '重复：$recurrence';
   }
@@ -4185,6 +4408,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updateNudgeLaterButton => '以后再说';
 
   @override
+  String get updateNudgeUpdateNowButton => '立即更新';
+
+  @override
+  String updateNudgeDownloading(int percent) {
+    return '正在下载更新... $percent%';
+  }
+
+  @override
+  String get updateNudgeVerifying => '正在验证下载内容...';
+
+  @override
+  String get updateNudgeLaunching => '正在启动安装程序...';
+
+  @override
+  String get updateNudgeFailed => '无法完成更新。你可以改为手动下载。';
+
+  @override
   String get tierBadgeSparkSubscriber => 'Spark 订阅者';
 
   @override
@@ -4942,6 +5182,45 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get achievementScreenTitle => '成就';
+
+  @override
+  String get achievementCreateTitle => '创建成就';
+
+  @override
+  String get achievementNameHint => '成就名称';
+
+  @override
+  String get achievementDescriptionHint => '描述(可选)';
+
+  @override
+  String get achievementDeleteTitle => '删除成就';
+
+  @override
+  String achievementDeleteConfirm(String name) {
+    return '删除\"$name\"?已拥有的人会保留它,但它会从服务器中移除。此操作无法撤销。';
+  }
+
+  @override
+  String get achievementAwardTitle => '授予成就';
+
+  @override
+  String get achievementAwardButton => '授予';
+
+  @override
+  String get achievementUserIdHint => '用户ID';
+
+  @override
+  String get achievementLockedBanner =>
+      '该服务器低于助力等级 3,因此现有成就及其持有者将保持不变,但在服务器恢复到等级 3 之前,无法将其授予新的人。';
+
+  @override
+  String get achievementEmptyState => '暂无成就';
+
+  @override
+  String get achievementNoRecipients => '还没有人拥有这个';
+
+  @override
   String chatGifLevelGated(int level) {
     return '你需要 $level 级才能在此发送 GIF';
   }
@@ -5032,6 +5311,34 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get adminTabStatus => '状态';
+
+  @override
+  String get adminTabParentalConsent => '家长同意';
+
+  @override
+  String get adminParentalConsentDescription =>
+      '在创建儿童账号前审核已上传的签署同意书。信用卡验证会自动完成，不会在此处显示。';
+
+  @override
+  String get adminParentalConsentEmptyState => '没有待审核的项目。';
+
+  @override
+  String get adminParentalConsentViewDocument => '查看文件';
+
+  @override
+  String get adminParentalConsentApprove => '批准';
+
+  @override
+  String get adminParentalConsentReject => '拒绝';
+
+  @override
+  String get adminParentalConsentRejectTitle => '拒绝同意请求';
+
+  @override
+  String get adminParentalConsentRejectReasonHint => '原因（将显示给家长/监护人）';
+
+  @override
+  String get adminParentalConsentRejectConfirm => '拒绝';
 
   @override
   String get serverTabSso => '单点登录';
@@ -5127,6 +5434,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get permManageWebhooks => '管理 Webhook';
 
   @override
+  String get permManageAchievements => '管理成就';
+
+  @override
   String get channelEditDialogManageWebhooks => '管理 Webhook';
 
   @override
@@ -5169,6 +5479,75 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chatWebhookBadge => 'WEBHOOK';
+
+  @override
+  String adminReportWebhookTarget(String reporterId, String webhookName) {
+    return '举报人：$reporterId\nWebhook：$webhookName';
+  }
+
+  @override
+  String get commonActionFailed => '出了点问题，请重试。';
+
+  @override
+  String get ssoBrowserLaunchError => '无法打开浏览器以继续登录。';
+
+  @override
+  String get settingsSpotifyTitle => 'Spotify';
+
+  @override
+  String get settingsSpotifyDescription =>
+      '连接 Spotify，在频道中分享你正在听的内容。Koda 无法实时同步播放——这会发布一个链接，让其他人自己播放同一首歌。';
+
+  @override
+  String settingsSpotifyConnected(String username) {
+    return '已连接为 $username';
+  }
+
+  @override
+  String get settingsSpotifyNotConnected => 'Spotify 未连接';
+
+  @override
+  String settingsSpotifyNowPlaying(String track, String artist) {
+    return '正在播放：$artist 的 $track';
+  }
+
+  @override
+  String get settingsSpotifyShareHint => '通过任意频道消息框中的音符图标分享此内容。';
+
+  @override
+  String get chatShareSpotifyTooltip => '分享你正在听的内容';
+
+  @override
+  String get chatSpotifyShareFailed => '无法分享——请确认 Spotify 正在播放内容。';
+
+  @override
+  String get chatPreviewBadgeLive => '直播中';
+
+  @override
+  String get chatPreviewBadgeListening => '收听中';
+
+  @override
+  String get chatPreviewBadgeEnded => '已结束';
+
+  @override
+  String get serverAuditLogExportDescription =>
+      '将完整审计日志导出为 CSV 或 JSON Lines，用于合规或导入 SIEM。';
+
+  @override
+  String get serverAuditLogExportLockedHint => '审计日志导出功能在企业版层级提供。请联系我们升级。';
+
+  @override
+  String get serverExportAuditLog => '导出';
+
+  @override
+  String get serverExportFormatPrompt =>
+      '选择一种格式。JSON Lines 通常更适合导入 SIEM 或日志管道；CSV 可直接在电子表格中打开。';
+
+  @override
+  String get serverAuditLogExported => '审计日志已导出';
+
+  @override
+  String get chatPreviewBadgePremiere => '首映';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -5321,6 +5700,25 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get settingsShowVispAvatarSubtitle => '在設定／事件／顧問對話框中顯示 Visp 的表情與心情';
 
   @override
+  String get settingsDeleteAccountTitle => '刪除帳號';
+
+  @override
+  String get settingsDeleteAccountSubtitle => '永久從 Koda 中移除你的個人資訊';
+
+  @override
+  String get settingsDeleteAccountWarning =>
+      '此操作將永久刪除你的個人資料資訊，且無法復原。你之前發送的訊息可能仍會對其他人可見，顯示為由已刪除使用者發送。請輸入密碼以確認。';
+
+  @override
+  String get settingsDeleteAccountPasswordHint => '密碼';
+
+  @override
+  String get settingsDeleteAccountConfirm => '刪除帳號';
+
+  @override
+  String get settingsDeleteAccountWrongPassword => '密碼不正確。';
+
+  @override
   String get settingsHighContrastTitle => '高對比';
 
   @override
@@ -5366,7 +5764,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get settingsStreamingDescription =>
-      '連結 Twitch/YouTube 後，擁有「開播通知」權限的伺服器可在你開播或發布新影片時自動發文。';
+      '連結 Twitch/YouTube/Kick 後，擁有「開播通知」權限的伺服器可在你開播或發布新影片時自動發文。';
 
   @override
   String settingsStreamingConnected(
@@ -5386,6 +5784,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get settingsStreamingLiveSuffixYoutube => ' -- 新上傳影片';
 
   @override
+  String get settingsStreamingLiveSuffixKick => ' -- 直播中';
+
+  @override
   String get settingsStreamingConnecting => '連結中...';
 
   @override
@@ -5398,11 +5799,19 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get settingsAnnounceLiveYoutube => '通知直播開始與新影片上傳';
 
   @override
+  String get settingsAnnounceLiveKick => '開播時通知';
+
+  @override
   String get settingsRefreshStatus => '已在瀏覽器完成連結？重新整理狀態';
 
   @override
   String settingsStreamingConnectError(String platform) {
     return '無法開始連結 $platform。';
+  }
+
+  @override
+  String settingsStreamingConsentRequired(String platform) {
+    return '請孩子的家長或監護人先在家長控制面板中允許連線 $platform。';
   }
 
   @override
@@ -5646,6 +6055,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get homeBrowsePublicServersTooltip => '瀏覽公開伺服器';
+
+  @override
+  String get homeUpcomingEventsTooltip => '即將舉行的活動';
+
+  @override
+  String get homeActivityFeedTooltip => '動態消息';
 
   @override
   String get serverDiscoveryTitle => '瀏覽伺服器';
@@ -6691,6 +7106,18 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get serverIconBorderLockedHint => '達到加成等級 5 即可解鎖自訂圖示邊框。';
 
   @override
+  String get serverAchievementsCardTitle => '成就';
+
+  @override
+  String get serverAchievementsCardDescription => '建立自訂徽章並授予成員。';
+
+  @override
+  String get serverAchievementsLockedHint => '達到加成等級 3 即可建立成就。';
+
+  @override
+  String get serverOpenAchievements => '管理成就';
+
+  @override
   String get serverBoostFromBank => '在市集的伺服器銀行中為此伺服器加成，以提升其等級。';
 
   @override
@@ -7350,17 +7777,17 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get parentalDashboardCreateChildExplanation =>
-      '這將建立一個完全受監護的帳號：已標記的頻道會被封鎖，你可以設定允許使用的時段，並檢視（但無法閱讀內容）他們的好友與伺服器。';
+      '此操作將開始為您的孩子建立完全受監護帳號的請求：已標記的頻道會被封鎖，你可以設定允許使用的時段，並檢視（但無法閱讀內容）他們的好友與伺服器。在建立帳號之前，我們會驗證您是否為其父母或經授權的監護人 -- 請在下方選擇驗證方式。';
 
   @override
   String get parentalDashboardValidationError => '需要使用者名稱、電子郵件，以及至少 8 個字元的密碼。';
 
   @override
   String get parentalDashboardCreateChildFailed =>
-      '無法建立兒童帳號 -- 使用者名稱／電子郵件可能已被使用。';
+      '無法開始請求 -- 使用者名稱／電子郵件可能已被使用。';
 
   @override
-  String get parentalDashboardCreatingLabel => '建立中...';
+  String get parentalDashboardCreatingLabel => '正在開始...';
 
   @override
   String get parentalDashboardNoChildren => '尚未連結任何帳號。';
@@ -7370,6 +7797,61 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get parentalDashboardUnknownUser => '未知';
+
+  @override
+  String get parentalConsentMethodLabel => '我們應如何驗證您是其父母或監護人？';
+
+  @override
+  String get parentalConsentMethodCardTitle => '信用卡或金融卡';
+
+  @override
+  String get parentalConsentMethodCardSubtitle =>
+      '0.50 美元的小額扣款用於驗證您持有該卡，隨後會立即退款。';
+
+  @override
+  String get parentalConsentMethodFormTitle => '已簽署的同意書';
+
+  @override
+  String get parentalConsentMethodFormSubtitle => '上傳已簽署的表格。工作人員會在建立帳號前審核。';
+
+  @override
+  String get parentalConsentAttestation => '我確認我是該兒童的父母或經授權的法定監護人。';
+
+  @override
+  String get parentalConsentUploadFormHint => '接下來，請在下方上傳您已簽署的同意書。';
+
+  @override
+  String get parentalConsentFinishInBrowser => '在瀏覽器中完成驗證，然後返回 -- 此處會自動更新。';
+
+  @override
+  String parentalConsentStatusRejected(String reason) {
+    return '已拒絕：$reason';
+  }
+
+  @override
+  String get parentalConsentStatusExpired => '請求已過期 -- 請重新開始';
+
+  @override
+  String get parentalConsentStatusAwaitingUpload => '正在等待您簽署的表格';
+
+  @override
+  String get parentalConsentUploadFormButton => '上傳表格';
+
+  @override
+  String get parentalConsentStatusAwaitingReview => '正在等待工作人員審核';
+
+  @override
+  String get parentalConsentStatusAwaitingPayment => '正在等待付款驗證';
+
+  @override
+  String get parentalConsentPendingSectionTitle => '待處理請求';
+
+  @override
+  String get parentalConsentPrivacyNoticePrefix => '閱讀我們的';
+
+  @override
+  String get parentalConsentPrivacyNoticeSuffix =>
+      '以準確了解我們收集了孩子的哪些資訊，以及這些資訊的使用方式。';
 
   @override
   String get childDetailFallbackTitle => '兒童帳號';
@@ -7385,6 +7867,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get childDetailTabOverride => '臨時許可';
+
+  @override
+  String get childDetailTabThirdParty => '連線';
 
   @override
   String get childDetailNoFriends => '尚無好友。';
@@ -7454,6 +7939,27 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   @override
   String get childDetailOverrideExplanation =>
       '在正常時間表之外臨時授予存取權限 -- 適合單次例外情況，而不必變更每週的時間表。';
+
+  @override
+  String get childDetailThirdPartyExplanation =>
+      '連線 Twitch、Kick、YouTube、Steam 或 Spotify 等服務會將孩子的 Koda 使用者名稱和活動分享給該外部平台。這與建立帳號時的同意是分開的，預設為關閉 -- 只有在你希望孩子能夠關聯這些帳號時才開啟。';
+
+  @override
+  String get childDetailThirdPartyToggleTitle => '允許第三方連線';
+
+  @override
+  String get childDetailThirdPartyToggleSubtitle => '關閉此項會立即中斷任何已關聯的帳號';
+
+  @override
+  String get childDetailDeleteAccountTitle => '刪除帳號';
+
+  @override
+  String childDetailDeleteAccountWarning(String username) {
+    return '此操作將永久刪除 $username 的帳號及其個人資訊，且無法復原。';
+  }
+
+  @override
+  String get childDetailDeleteAccountConfirm => '刪除帳號';
 
   @override
   String get childDetailReasonHint => '原因（選填）';
@@ -8547,6 +9053,102 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get calendarUnsubscribeTooltip => '取消訂閱';
 
   @override
+  String get calendarReminderOffTooltip => '提醒我';
+
+  @override
+  String get calendarReminderOnTooltip => '關閉提醒';
+
+  @override
+  String get calendarAddToCalendarTooltip => '新增到我的日曆';
+
+  @override
+  String get calendarIcsSaved => '日曆檔案已儲存';
+
+  @override
+  String get upcomingEventsTitle => '即將舉行';
+
+  @override
+  String get upcomingEventsEmptyState => '你的伺服器上沒有即將舉行的活動';
+
+  @override
+  String get upcomingEventsPublicBadge => '公開';
+
+  @override
+  String upcomingEventsFriendGoing(String name) {
+    return '$name 將參加';
+  }
+
+  @override
+  String upcomingEventsTwoFriendsGoing(String name1, String name2) {
+    return '$name1 和 $name2 將參加';
+  }
+
+  @override
+  String upcomingEventsManyFriendsGoing(String name, int count) {
+    return '$name 和另外 $count 人將參加';
+  }
+
+  @override
+  String get activityFeedTitle => '動態消息';
+
+  @override
+  String get activityFeedEmptyState => '你的好友還沒有任何動態';
+
+  @override
+  String activityFeedAchievement(
+      String username, String achievement, String server) {
+    return '$username 在 $server 獲得了成就「$achievement」';
+  }
+
+  @override
+  String activityFeedWentLive(String username, String platform) {
+    return '$username 正在 $platform 直播';
+  }
+
+  @override
+  String activityFeedServerJoined(String username, String server) {
+    return '$username 加入了 $server';
+  }
+
+  @override
+  String activityFeedArcadeHighScore(String username, String game, int score) {
+    return '$username 在 $game 中創造了新紀錄: $score';
+  }
+
+  @override
+  String get activityFeedJustNow => '剛剛';
+
+  @override
+  String activityFeedMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 分鐘前',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 小時前',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 天前',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String calendarRepeatsLabel(String recurrence) {
     return '重複：$recurrence';
   }
@@ -9355,6 +9957,23 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get updateNudgeLaterButton => '稍後再說';
 
   @override
+  String get updateNudgeUpdateNowButton => '立即更新';
+
+  @override
+  String updateNudgeDownloading(int percent) {
+    return '正在下載更新... $percent%';
+  }
+
+  @override
+  String get updateNudgeVerifying => '正在驗證下載內容...';
+
+  @override
+  String get updateNudgeLaunching => '正在啟動安裝程式...';
+
+  @override
+  String get updateNudgeFailed => '無法完成更新。你可以改為手動下載。';
+
+  @override
   String get tierBadgeSparkSubscriber => 'Spark 訂閱者';
 
   @override
@@ -10111,6 +10730,45 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
+  String get achievementScreenTitle => '成就';
+
+  @override
+  String get achievementCreateTitle => '建立成就';
+
+  @override
+  String get achievementNameHint => '成就名稱';
+
+  @override
+  String get achievementDescriptionHint => '描述(選填)';
+
+  @override
+  String get achievementDeleteTitle => '刪除成就';
+
+  @override
+  String achievementDeleteConfirm(String name) {
+    return '刪除「$name」?已擁有的人會保留它,但它會從伺服器中移除。此操作無法復原。';
+  }
+
+  @override
+  String get achievementAwardTitle => '授予成就';
+
+  @override
+  String get achievementAwardButton => '授予';
+
+  @override
+  String get achievementUserIdHint => '使用者ID';
+
+  @override
+  String get achievementLockedBanner =>
+      '此伺服器低於加成等級 3,因此現有成就及其持有者將保持不變,但在伺服器恢復到等級 3 之前,無法將其授予新的人。';
+
+  @override
+  String get achievementEmptyState => '尚無成就';
+
+  @override
+  String get achievementNoRecipients => '還沒有人擁有這個';
+
+  @override
   String chatGifLevelGated(int level) {
     return '你需要 $level 級才能在此傳送 GIF';
   }
@@ -10201,6 +10859,34 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get adminTabStatus => '狀態';
+
+  @override
+  String get adminTabParentalConsent => '家長同意';
+
+  @override
+  String get adminParentalConsentDescription =>
+      '在建立兒童帳號前審核已上傳的簽署同意書。信用卡驗證會自動完成，不會在此處顯示。';
+
+  @override
+  String get adminParentalConsentEmptyState => '沒有待審核的項目。';
+
+  @override
+  String get adminParentalConsentViewDocument => '檢視文件';
+
+  @override
+  String get adminParentalConsentApprove => '批准';
+
+  @override
+  String get adminParentalConsentReject => '拒絕';
+
+  @override
+  String get adminParentalConsentRejectTitle => '拒絕同意請求';
+
+  @override
+  String get adminParentalConsentRejectReasonHint => '原因（將顯示給家長/監護人）';
+
+  @override
+  String get adminParentalConsentRejectConfirm => '拒絕';
 
   @override
   String get serverTabSso => '單一登入';
@@ -10296,6 +10982,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get permManageWebhooks => '管理 Webhook';
 
   @override
+  String get permManageAchievements => '管理成就';
+
+  @override
   String get channelEditDialogManageWebhooks => '管理 Webhook';
 
   @override
@@ -10338,4 +11027,73 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get chatWebhookBadge => 'WEBHOOK';
+
+  @override
+  String adminReportWebhookTarget(String reporterId, String webhookName) {
+    return '檢舉人：$reporterId\nWebhook：$webhookName';
+  }
+
+  @override
+  String get commonActionFailed => '出了點問題，請重試。';
+
+  @override
+  String get ssoBrowserLaunchError => '無法開啟瀏覽器以繼續登入。';
+
+  @override
+  String get settingsSpotifyTitle => 'Spotify';
+
+  @override
+  String get settingsSpotifyDescription =>
+      '連接 Spotify，在頻道中分享你正在聽的內容。Koda 無法即時同步播放——這會發布一個連結，讓其他人自己播放同一首歌。';
+
+  @override
+  String settingsSpotifyConnected(String username) {
+    return '已連接為 $username';
+  }
+
+  @override
+  String get settingsSpotifyNotConnected => 'Spotify 未連接';
+
+  @override
+  String settingsSpotifyNowPlaying(String track, String artist) {
+    return '正在播放：$artist 的 $track';
+  }
+
+  @override
+  String get settingsSpotifyShareHint => '透過任意頻道訊息框中的音符圖示分享此內容。';
+
+  @override
+  String get chatShareSpotifyTooltip => '分享你正在聽的內容';
+
+  @override
+  String get chatSpotifyShareFailed => '無法分享——請確認 Spotify 正在播放內容。';
+
+  @override
+  String get chatPreviewBadgeLive => '直播中';
+
+  @override
+  String get chatPreviewBadgeListening => '收聽中';
+
+  @override
+  String get chatPreviewBadgeEnded => '已結束';
+
+  @override
+  String get serverAuditLogExportDescription =>
+      '將完整稽核日誌匯出為 CSV 或 JSON Lines，用於合規或匯入 SIEM。';
+
+  @override
+  String get serverAuditLogExportLockedHint => '稽核日誌匯出功能於企業版層級提供。請聯絡我們升級。';
+
+  @override
+  String get serverExportAuditLog => '匯出';
+
+  @override
+  String get serverExportFormatPrompt =>
+      '選擇一種格式。JSON Lines 通常更適合匯入 SIEM 或日誌管線；CSV 可直接在試算表中開啟。';
+
+  @override
+  String get serverAuditLogExported => '稽核日誌已匯出';
+
+  @override
+  String get chatPreviewBadgePremiere => '首映';
 }

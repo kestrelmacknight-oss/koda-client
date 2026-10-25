@@ -98,6 +98,27 @@ class KodaApi {
     return data is Map ? data['error'] as String? : null;
   }
 
+  /// Shared by connectTwitch/connectKick/connectYoutube/connectSteam/
+  /// connectSpotify -- each is a per-user OAuth "connect" that discloses
+  /// the user's Koda identity to that outside service, so for a child
+  /// account the server may 403 with "parental_consent_required" until
+  /// their parent/guardian separately allows it (see
+  /// setThirdPartyDisclosureConsent below). Distinguishing that from an
+  /// ordinary failure lets the UI show the right message instead of a
+  /// generic "could not connect."
+  Future<({String? url, bool consentRequired})> _connectThirdParty(String path) async {
+    try {
+      final res = await _dio.post(path);
+      return (url: res.data['authorize_url'] as String?, consentRequired: false);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 403 && _errorCodeOf(e) == 'parental_consent_required') {
+        return (url: null, consentRequired: true);
+      }
+      _log(path, e);
+      return (url: null, consentRequired: false);
+    } catch (e) { _log(path, e); return (url: null, consentRequired: false); }
+  }
+
   void setToken(String token) {
     _token = token;
     KodaStorage.saveToken(token);
@@ -163,6 +184,21 @@ class KodaApi {
     try { await _dio.delete('/auth/logout'); } catch (_) {}
     _token = null;
     await KodaStorage.clearToken();
+  }
+
+  /// Self-service account deletion -- scrubs personal information
+  /// server-side (see koda-server's Koda.Auth.delete_account/1) and
+  /// revokes the current session. Returns null on success, or an
+  /// error message (e.g. wrong password) to show the user.
+  Future<String?> deleteAccount(String password) async {
+    try {
+      await _dio.post('/auth/account/delete', data: {'password': password});
+      return null;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) return 'invalid';
+      _log('deleteAccount', e);
+      return 'failed';
+    } catch (e) { _log('deleteAccount', e); return 'failed'; }
   }
 
   Future<KodaApiResult<Map<String, dynamic>>> me() async {
@@ -628,6 +664,37 @@ class KodaApi {
     } catch (e) { _log('resolveSpamFlag', e); return false; }
   }
 
+  // ── Parental consent review (admin, signed-form method) ─────────────────
+
+  Future<List<Map<String, dynamic>>> getParentalConsentReviews() async {
+    try {
+      final res = await _dio.get('/admin/parental_consent_reviews');
+      return List<Map<String, dynamic>>.from(res.data['requests'] ?? []);
+    } catch (e) { _log('getParentalConsentReviews', e); return []; }
+  }
+
+  /// Raw bytes of the uploaded signed form -- never a public URL (see
+  /// Koda.Upload.fetch_private_consent_form/1's own doc comment).
+  Future<List<int>?> downloadParentalConsentDocument(String requestId) async {
+    try {
+      final res = await _dio.get<List<int>>(
+        '/admin/parental_consent_reviews/$requestId/document',
+        options: Options(responseType: ResponseType.bytes),
+      );
+      return res.data;
+    } catch (e) { _log('downloadParentalConsentDocument', e); return null; }
+  }
+
+  /// `decision` is 'approve' (creates the child account) or 'reject'
+  /// (notifies the parent/guardian with `reason`).
+  Future<bool> reviewParentalConsentRequest(String requestId, String decision, {String? reason}) async {
+    try {
+      await _dio.post('/admin/parental_consent_reviews/$requestId/review',
+          data: {'decision': decision, if (reason != null) 'reason': reason});
+      return true;
+    } catch (e) { _log('reviewParentalConsentRequest', e); return false; }
+  }
+
   // ── Moderation ────────────────────────────────────────────────────────────
 
   Future<bool> deleteMessage(String channelId, String messageId,
@@ -697,6 +764,22 @@ class KodaApi {
       final res = await _dio.get('/servers/$serverId/audit-log');
       return List<Map<String, dynamic>>.from(res.data['actions'] ?? []);
     } catch (e) { _log('getAuditLog', e); return []; }
+  }
+
+  /// Full audit-log export (Enterprise tier only) -- raw bytes, not
+  /// JSON, since the response IS the downloadable file (CSV or JSON
+  /// Lines) the caller writes straight to disk via FilePicker.saveFile,
+  /// same pattern as EncryptedAttachmentView._saveToDisk. null on any
+  /// failure, including a 403 for a non-Enterprise server.
+  Future<List<int>?> exportAuditLog(String serverId, {required String format}) async {
+    try {
+      final res = await _dio.get<List<int>>(
+        '/servers/$serverId/audit-log/export',
+        queryParameters: {'format': format},
+        options: Options(responseType: ResponseType.bytes),
+      );
+      return res.data;
+    } catch (e) { _log('exportAuditLog', e); return null; }
   }
 
   Future<List<Map<String, dynamic>>> listBans(String serverId) async {
@@ -1649,9 +1732,19 @@ class KodaApi {
 
   // -- Version check ------------------------------------------------------------
   
+  /// `platform` lets the server also return a direct installer URL +
+  /// expected SHA-256 for this OS (see Koda.VersionController and
+  /// lib/core/self_update.dart) -- omitted on any platform that isn't
+  /// a recognized desktop OS, where there's nothing for it to match.
   Future<Map<String, dynamic>?> checkVersion() async {
     try {
-      final res = await _dio.get('/version');
+      final platform = Platform.isWindows ? 'windows'
+          : Platform.isMacOS ? 'macos'
+          : Platform.isLinux ? 'linux'
+          : null;
+      final res = await _dio.get('/version', queryParameters: {
+        if (platform != null) 'platform': platform,
+      });
       return res.data as Map<String, dynamic>;
     } catch (e) { _log('checkVersion', e); return null; }
   }
@@ -1831,6 +1924,51 @@ class KodaApi {
       await _dio.delete('/events/$eventId/subscribe');
       return true;
     } catch (e) { _log('unsubscribeFromEvent', e); return false; }
+  }
+
+  /// Toggles the in-app reminder for one event -- a push/in-app alert a
+  /// fixed lead time before it starts, separate from (and auto-enabling)
+  /// the plain subscribe/unsubscribe above.
+  Future<bool> setEventReminder(String eventId, bool enabled) async {
+    try {
+      await _dio.post('/events/$eventId/reminder', data: {'enabled': enabled});
+      return true;
+    } catch (e) { _log('setEventReminder', e); return false; }
+  }
+
+  /// A standalone single-event .ics download -- NOT the server-wide
+  /// calendar feed (see getCalendarFeedUrl) -- for a user who wants just
+  /// this one event (its full recurring series, if any) in their own
+  /// calendar app without subscribing to everything else on the server.
+  Future<List<int>?> downloadEventIcs(String eventId) async {
+    try {
+      final res = await _dio.get<List<int>>(
+        '/events/$eventId/ics',
+        options: Options(responseType: ResponseType.bytes),
+      );
+      return res.data;
+    } catch (e) { _log('downloadEventIcs', e); return null; }
+  }
+
+  /// Your own cross-server "Upcoming" view -- events on any server
+  /// you're a member of, plus events a friend is attending on a public
+  /// server you're not in (each one carries `is_member` and
+  /// `friend_usernames` so the UI can tell the two apart). Not scoped
+  /// to one channel or server, unlike a calendar channel's own list.
+  Future<List<Map<String, dynamic>>> getUpcomingEvents({int days = 14}) async {
+    try {
+      final res = await _dio.get('/users/me/upcoming_events', queryParameters: {'days': days});
+      return List<Map<String, dynamic>>.from(res.data['events'] ?? []);
+    } catch (e) { _log('getUpcomingEvents', e); return []; }
+  }
+
+  /// Your friends' recent activity (achievements, going live, joining a
+  /// public server, new arcade high scores) -- see Koda.ActivityFeed.
+  Future<List<Map<String, dynamic>>> getActivityFeed({int limit = 50}) async {
+    try {
+      final res = await _dio.get('/users/me/activity_feed', queryParameters: {'limit': limit});
+      return List<Map<String, dynamic>>.from(res.data['entries'] ?? []);
+    } catch (e) { _log('getActivityFeed', e); return []; }
   }
 
   /// Buys (or claims, if free) a ticket for a calendar event linked to
@@ -2306,12 +2444,8 @@ class KodaApi {
   /// account -- the OAuth handshake itself happens server-side (see
   /// koda-server's TwitchController.callback/2). Per-user, not per-server
   /// -- your connected account follows you across every server you're in.
-  Future<String?> connectTwitch() async {
-    try {
-      final res = await _dio.post('/users/me/twitch/connect');
-      return res.data['authorize_url'] as String?;
-    } catch (e) { _log('connectTwitch', e); return null; }
-  }
+  Future<({String? url, bool consentRequired})> connectTwitch() =>
+      _connectThirdParty('/users/me/twitch/connect');
 
   Future<Map<String, dynamic>?> getTwitchStatus() async {
     try {
@@ -2341,12 +2475,8 @@ class KodaApi {
   /// Returns the URL to open in a browser to start connecting your
   /// YouTube account -- the OAuth handshake itself happens server-side
   /// (see koda-server's YoutubeController.callback/2).
-  Future<String?> connectYoutube() async {
-    try {
-      final res = await _dio.post('/users/me/youtube/connect');
-      return res.data['authorize_url'] as String?;
-    } catch (e) { _log('connectYoutube', e); return null; }
-  }
+  Future<({String? url, bool consentRequired})> connectYoutube() =>
+      _connectThirdParty('/users/me/youtube/connect');
 
   Future<Map<String, dynamic>?> getYoutubeStatus() async {
     try {
@@ -2371,6 +2501,63 @@ class KodaApi {
     } catch (e) { _log('setYoutubeAnnounceEnabled', e); return false; }
   }
 
+  // -- Kick (per-user account connection, webhook-based live detection) -----
+
+  Future<({String? url, bool consentRequired})> connectKick() =>
+      _connectThirdParty('/users/me/kick/connect');
+
+  Future<Map<String, dynamic>?> getKickStatus() async {
+    try {
+      final res = await _dio.get('/users/me/kick/status');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getKickStatus', e); return null; }
+  }
+
+  Future<bool> disconnectKick() async {
+    try {
+      await _dio.delete('/users/me/kick');
+      return true;
+    } catch (e) { _log('disconnectKick', e); return false; }
+  }
+
+  Future<bool> setKickAnnounceEnabled(bool enabled) async {
+    try {
+      await _dio.patch('/users/me/kick', data: {'announce_enabled': enabled});
+      return true;
+    } catch (e) { _log('setKickAnnounceEnabled', e); return false; }
+  }
+
+  // -- Spotify (per-user: polled now-playing presence + explicit share) -----
+  //
+  // Deliberately no announce_enabled toggle like Twitch/YouTube -- there's
+  // no automatic announcement here at all (constant per-track-skip posts
+  // would be spam). shareSpotifyNowPlaying is the one explicit action a
+  // user takes to actually post something, into a channel they choose.
+
+  Future<({String? url, bool consentRequired})> connectSpotify() =>
+      _connectThirdParty('/users/me/spotify/connect');
+
+  Future<Map<String, dynamic>?> getSpotifyStatus() async {
+    try {
+      final res = await _dio.get('/users/me/spotify/status');
+      return res.data as Map<String, dynamic>;
+    } catch (e) { _log('getSpotifyStatus', e); return null; }
+  }
+
+  Future<bool> disconnectSpotify() async {
+    try {
+      await _dio.delete('/users/me/spotify');
+      return true;
+    } catch (e) { _log('disconnectSpotify', e); return false; }
+  }
+
+  Future<bool> shareSpotifyNowPlaying(String channelId) async {
+    try {
+      await _dio.post('/users/me/spotify/share', data: {'channel_id': channelId});
+      return true;
+    } catch (e) { _log('shareSpotifyNowPlaying', e); return false; }
+  }
+
   // -- Steam (per-user account connection: presence + library comparison) ----
   // share_presence ("currently playing") and share_library (comparison)
   // are two fully independent opt-ins -- set*Sharing below never touches
@@ -2379,12 +2566,8 @@ class KodaApi {
   /// Returns the URL to open in a browser to start connecting a Steam
   /// account -- the OpenID 2.0 handshake happens server-side (see
   /// koda-server's SteamController.callback/2).
-  Future<String?> connectSteam() async {
-    try {
-      final res = await _dio.post('/users/me/steam/connect');
-      return res.data['authorize_url'] as String?;
-    } catch (e) { _log('connectSteam', e); return null; }
-  }
+  Future<({String? url, bool consentRequired})> connectSteam() =>
+      _connectThirdParty('/users/me/steam/connect');
 
   Future<Map<String, dynamic>?> getSteamStatus() async {
     try {
@@ -2682,6 +2865,80 @@ class KodaApi {
     } catch (e) { _log('adjustLeaderboardEntry', e); return false; }
   }
 
+  // -- Achievements (Koda.Achievements) -- boost-gated custom server badges ---
+  //
+  // A server needs Boost Level 3 to create or award one -- `unlocked`
+  // in getAchievements' result reflects that *current* state; losing
+  // boosts later never deletes a definition or revokes an existing
+  // holder, it just blocks awarding to anyone new until boosts return.
+
+  Future<Map<String, dynamic>> getAchievements(String serverId) async {
+    try {
+      final res = await _dio.get('/servers/$serverId/achievements');
+      return {
+        'achievements': List<Map<String, dynamic>>.from(res.data['achievements'] ?? []),
+        'unlocked': res.data['unlocked'] == true,
+      };
+    } catch (e) { _log('getAchievements', e); return {'achievements': <Map<String, dynamic>>[], 'unlocked': false}; }
+  }
+
+  Future<Map<String, dynamic>?> createAchievement(String serverId,
+      {required String name, String? description, String? icon}) async {
+    try {
+      final res = await _dio.post('/servers/$serverId/achievements', data: {
+        'name': name,
+        if (description != null) 'description': description,
+        if (icon != null) 'icon': icon,
+      });
+      return res.data['achievement'] as Map<String, dynamic>?;
+    } catch (e) { _log('createAchievement', e); return null; }
+  }
+
+  Future<Map<String, dynamic>?> updateAchievement(String achievementId,
+      {String? name, String? description, String? icon}) async {
+    try {
+      final res = await _dio.patch('/achievements/$achievementId', data: {
+        if (name != null) 'name': name,
+        if (description != null) 'description': description,
+        if (icon != null) 'icon': icon,
+      });
+      return res.data['achievement'] as Map<String, dynamic>?;
+    } catch (e) { _log('updateAchievement', e); return null; }
+  }
+
+  Future<bool> deleteAchievement(String achievementId) async {
+    try {
+      await _dio.delete('/achievements/$achievementId');
+      return true;
+    } catch (e) { _log('deleteAchievement', e); return false; }
+  }
+
+  /// Returns false (rather than throwing) when the server's currently
+  /// below the required boost level -- caller shows the server's
+  /// error message, same convention as every other gated action here.
+  Future<bool> awardAchievement(String achievementId, String userId) async {
+    try {
+      await _dio.post('/achievements/$achievementId/award/$userId');
+      return true;
+    } catch (e) { _log('awardAchievement', e); return false; }
+  }
+
+  Future<bool> revokeAchievement(String achievementId, String userId) async {
+    try {
+      await _dio.delete('/achievements/$achievementId/award/$userId');
+      return true;
+    } catch (e) { _log('revokeAchievement', e); return false; }
+  }
+
+  /// The current user's own achievements across every server -- for
+  /// their own profile.
+  Future<List<Map<String, dynamic>>> getMyAchievements() async {
+    try {
+      final res = await _dio.get('/users/me/achievements');
+      return List<Map<String, dynamic>>.from(res.data['achievements'] ?? []);
+    } catch (e) { _log('getMyAchievements', e); return []; }
+  }
+
   // -- Koda Arcade (Minesweeper, Gem Match) -- self-reported scores ------------
   //
   // Feeds the same Koda.Leaderboards tables above under "arcade_*" kinds,
@@ -2704,13 +2961,18 @@ class KodaApi {
   // koda:// scheme is Android/iOS only, and SSO logins are at least as
   // likely from desktop. See DeepLinks' header comment for why.
 
-  /// Looks up SSO by the email's domain; {error: ...} (no exception) if
-  /// that domain has no SSO configured -- the login screen falls back
-  /// to password login in that case, not an error state.
+  /// Looks up SSO by the email's domain; {'error': 'no_config'} (no
+  /// exception thrown) if that domain has no SSO configured -- the
+  /// login screen falls back to password login in that case, not a
+  /// generic error state. Any other failure returns null.
   Future<Map<String, dynamic>?> startSso(String email) async {
     try {
       final res = await _dio.post('/sso/start', data: {'email': email});
       return res.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) return {'error': 'no_config'};
+      _log('startSso', e);
+      return null;
     } catch (e) { _log('startSso', e); return null; }
   }
 
@@ -2796,14 +3058,17 @@ class KodaApi {
 
   Future<bool> deleteChannelWebhook(String webhookId) async {
     try {
-      await _dio.delete('/webhooks/$webhookId');
+      // /channel_webhooks/... (not /webhooks/...) -- the latter is
+      // reserved for the public execute URL (/webhooks/:id/:token);
+      // see router.ex's comment on why these can't share a prefix.
+      await _dio.delete('/channel_webhooks/$webhookId');
       return true;
     } catch (e) { _log('deleteChannelWebhook', e); return false; }
   }
 
   Future<Map<String, dynamic>?> regenerateChannelWebhookToken(String webhookId) async {
     try {
-      final res = await _dio.post('/webhooks/$webhookId/regenerate');
+      final res = await _dio.post('/channel_webhooks/$webhookId/regenerate');
       return res.data as Map<String, dynamic>;
     } catch (e) { _log('regenerateChannelWebhookToken', e); return null; }
   }
@@ -2973,18 +3238,51 @@ class KodaApi {
   // parent's linked child account -- never message content. See
   // koda-server's Koda.Parental / ParentalController.
 
-  Future<Map<String, dynamic>?> createChildAccount({
-    required String username,
-    required String email,
-    required String password,
+  /// Starts verifiable parental/guardian consent (see koda-server's
+  /// Koda.Parental moduledoc) -- no child account exists yet. `method`
+  /// is 'credit_card' (returns a Stripe Checkout `checkout_url` to open
+  /// in a browser; a small, immediately-refunded charge verifies card
+  /// ownership) or 'signed_form' (returns null `checkout_url`; call
+  /// uploadConsentDocument next, then an admin reviews it).
+  Future<({Map<String, dynamic>? request, String? checkoutUrl})> createConsentRequest({
+    required String childUsername,
+    required String childEmail,
+    required String childPassword,
+    required String method,
   }) async {
     try {
-      final res = await _dio.post('/parental/children', data: {
-        'username': username, 'email': email, 'password': password,
-        'password_confirmation': password,
+      final res = await _dio.post('/parental/consent_requests', data: {
+        'child_username': childUsername, 'child_email': childEmail,
+        'child_password': childPassword, 'method': method,
       });
-      return res.data['child'] as Map<String, dynamic>?;
-    } catch (e) { _log('createChildAccount', e); return null; }
+      return (
+        request: res.data['request'] as Map<String, dynamic>?,
+        checkoutUrl: res.data['checkout_url'] as String?,
+      );
+    } catch (e) { _log('createConsentRequest', e); return (request: null, checkoutUrl: null); }
+  }
+
+  Future<List<Map<String, dynamic>>> listConsentRequests() async {
+    try {
+      final res = await _dio.get('/parental/consent_requests');
+      return List<Map<String, dynamic>>.from(res.data['requests'] ?? []);
+    } catch (e) { _log('listConsentRequests', e); return []; }
+  }
+
+  /// Uploads the parent/guardian's signed consent form (PDF/JPEG/PNG,
+  /// max 8MB) for a pending 'signed_form' request -- stored privately,
+  /// never given a public URL (see Koda.Upload.upload_private_consent_form/3
+  /// server-side); only an admin can ever retrieve it, for review.
+  Future<bool> uploadConsentDocument(String requestId, File file, String contentType) async {
+    try {
+      final bytes = await file.readAsBytes();
+      await _dio.post(
+        '/parental/consent_requests/$requestId/document',
+        data: bytes,
+        options: Options(contentType: contentType, headers: {'Content-Length': bytes.length}),
+      );
+      return true;
+    } catch (e) { _log('uploadConsentDocument', e); return false; }
   }
 
   Future<List<Map<String, dynamic>>> listChildren() async {
@@ -2992,6 +3290,16 @@ class KodaApi {
       final res = await _dio.get('/parental/children');
       return List<Map<String, dynamic>>.from(res.data['children'] ?? []);
     } catch (e) { _log('listChildren', e); return []; }
+  }
+
+  /// Parent-directed deletion of a child's account and personal
+  /// information -- never asks for the child's password (see
+  /// koda-server's Koda.Parental.delete_child_account/2).
+  Future<bool> deleteChildAccount(String childId) async {
+    try {
+      await _dio.delete('/parental/children/$childId');
+      return true;
+    } catch (e) { _log('deleteChildAccount', e); return false; }
   }
 
   Future<List<Map<String, dynamic>>> childFriends(String childId) async {
@@ -3050,6 +3358,26 @@ class KodaApi {
       await _dio.delete('/parental/children/$childId/schedule');
       return true;
     } catch (e) { _log('deleteChildSchedule', e); return false; }
+  }
+
+  /// Separate from the consent that creates a child's account -- see
+  /// koda-server's Koda.Parental moduledoc. Governs whether the child
+  /// can connect a third-party account (Twitch/Kick/YouTube/Steam/
+  /// Spotify) that would disclose their Koda identity to it.
+  Future<bool?> getThirdPartyDisclosureConsent(String childId) async {
+    try {
+      final res = await _dio.get('/parental/children/$childId/third_party_disclosure');
+      return res.data['allowed'] as bool?;
+    } catch (e) { _log('getThirdPartyDisclosureConsent', e); return null; }
+  }
+
+  /// Turning this off also immediately disconnects any already-linked
+  /// third-party account for the child (enforced server-side).
+  Future<bool> setThirdPartyDisclosureConsent(String childId, bool allowed) async {
+    try {
+      await _dio.put('/parental/children/$childId/third_party_disclosure', data: {'allowed': allowed});
+      return true;
+    } catch (e) { _log('setThirdPartyDisclosureConsent', e); return false; }
   }
 
   /// Grants a temporary override. Pass exactly one of [durationMinutes]

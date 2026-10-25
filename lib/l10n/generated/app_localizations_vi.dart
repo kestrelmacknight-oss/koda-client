@@ -161,6 +161,26 @@ class AppLocalizationsVi extends AppLocalizations {
       'Hiện khuôn mặt và tâm trạng của Visp trong các hộp thoại thiết lập/sự kiện/tư vấn';
 
   @override
+  String get settingsDeleteAccountTitle => 'Xóa tài khoản';
+
+  @override
+  String get settingsDeleteAccountSubtitle =>
+      'Xóa vĩnh viễn thông tin cá nhân của bạn khỏi Koda';
+
+  @override
+  String get settingsDeleteAccountWarning =>
+      'Việc này sẽ xóa vĩnh viễn thông tin hồ sơ của bạn và không thể hoàn tác. Các tin nhắn trước đây của bạn có thể vẫn hiển thị với người khác, hiển thị là được gửi từ một người dùng đã bị xóa. Nhập mật khẩu của bạn để xác nhận.';
+
+  @override
+  String get settingsDeleteAccountPasswordHint => 'Mật khẩu';
+
+  @override
+  String get settingsDeleteAccountConfirm => 'Xóa tài khoản';
+
+  @override
+  String get settingsDeleteAccountWrongPassword => 'Mật khẩu không đúng.';
+
+  @override
   String get settingsHighContrastTitle => 'Độ tương phản cao';
 
   @override
@@ -211,7 +231,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get settingsStreamingDescription =>
-      'Kết nối Twitch/YouTube để các máy chủ mà bạn có quyền \"Thông báo khi phát trực tiếp\" có thể tự động đăng bài khi bạn phát trực tiếp hoặc đăng video mới.';
+      'Kết nối Twitch/YouTube/Kick để các máy chủ mà bạn có quyền \"Thông báo khi phát trực tiếp\" có thể tự động đăng bài khi bạn phát trực tiếp hoặc đăng video mới.';
 
   @override
   String settingsStreamingConnected(
@@ -231,6 +251,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsStreamingLiveSuffixYoutube => ' -- video mới';
 
   @override
+  String get settingsStreamingLiveSuffixKick => ' -- đang phát trực tiếp';
+
+  @override
   String get settingsStreamingConnecting => 'Đang kết nối...';
 
   @override
@@ -244,12 +267,20 @@ class AppLocalizationsVi extends AppLocalizations {
       'Thông báo khi phát trực tiếp và có video mới';
 
   @override
+  String get settingsAnnounceLiveKick => 'Thông báo khi tôi phát trực tiếp';
+
+  @override
   String get settingsRefreshStatus =>
       'Đã kết nối trên trình duyệt? Làm mới trạng thái';
 
   @override
   String settingsStreamingConnectError(String platform) {
     return 'Không thể bắt đầu kết nối $platform.';
+  }
+
+  @override
+  String settingsStreamingConsentRequired(String platform) {
+    return 'Yêu cầu cha mẹ hoặc người giám hộ của trẻ cho phép kết nối $platform trong Bảng điều khiển dành cho phụ huynh trước.';
   }
 
   @override
@@ -503,6 +534,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get homeBrowsePublicServersTooltip => 'Duyệt máy chủ công khai';
+
+  @override
+  String get homeUpcomingEventsTooltip => 'Sự kiện sắp tới';
+
+  @override
+  String get homeActivityFeedTooltip => 'Bảng tin hoạt động';
 
   @override
   String get serverDiscoveryTitle => 'Duyệt Máy Chủ';
@@ -1588,6 +1625,20 @@ class AppLocalizationsVi extends AppLocalizations {
       'Đạt cấp độ boost 5 để mở khóa viền biểu tượng tùy chỉnh.';
 
   @override
+  String get serverAchievementsCardTitle => 'Thành tựu';
+
+  @override
+  String get serverAchievementsCardDescription =>
+      'Tạo huy hiệu tùy chỉnh và trao cho thành viên.';
+
+  @override
+  String get serverAchievementsLockedHint =>
+      'Đạt cấp độ boost 3 để tạo thành tựu.';
+
+  @override
+  String get serverOpenAchievements => 'Quản lý thành tựu';
+
+  @override
   String get serverBoostFromBank =>
       'Boost máy chủ này từ Ngân hàng Máy chủ trong Chợ để nâng cấp độ của nó.';
 
@@ -2263,7 +2314,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildExplanation =>
-      'Thao tác này tạo một tài khoản được giám sát toàn diện: các kênh bị gắn nhãn sẽ bị chặn, và bạn có thể đặt khung giờ được phép truy cập cũng như xem (nhưng không đọc được) bạn bè và máy chủ của tài khoản đó.';
+      'Thao tác này bắt đầu một yêu cầu tạo tài khoản được giám sát toàn diện cho con bạn: các kênh bị gắn nhãn sẽ bị chặn, và bạn có thể đặt khung giờ được phép truy cập cũng như xem (nhưng không đọc được) bạn bè và máy chủ của tài khoản đó. Chúng tôi xác minh bạn là cha mẹ hoặc người giám hộ được ủy quyền trước khi tạo tài khoản -- chọn phương thức xác minh bên dưới.';
 
   @override
   String get parentalDashboardValidationError =>
@@ -2271,10 +2322,10 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildFailed =>
-      'Không thể tạo tài khoản trẻ em -- tên người dùng/email có thể đã được sử dụng.';
+      'Không thể bắt đầu yêu cầu -- tên người dùng/email có thể đã được sử dụng.';
 
   @override
-  String get parentalDashboardCreatingLabel => 'Đang tạo...';
+  String get parentalDashboardCreatingLabel => 'Đang bắt đầu...';
 
   @override
   String get parentalDashboardNoChildren =>
@@ -2285,6 +2336,70 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get parentalDashboardUnknownUser => 'Không xác định';
+
+  @override
+  String get parentalConsentMethodLabel =>
+      'Chúng tôi nên xác minh bạn là cha mẹ hoặc người giám hộ như thế nào?';
+
+  @override
+  String get parentalConsentMethodCardTitle => 'Thẻ tín dụng hoặc thẻ ghi nợ';
+
+  @override
+  String get parentalConsentMethodCardSubtitle =>
+      'Một khoản phí nhỏ 0,50 đô la xác minh bạn sở hữu thẻ, sau đó được hoàn lại ngay lập tức.';
+
+  @override
+  String get parentalConsentMethodFormTitle => 'Mẫu đơn đồng ý đã ký';
+
+  @override
+  String get parentalConsentMethodFormSubtitle =>
+      'Tải lên mẫu đơn đã ký. Một nhân viên sẽ xem xét trước khi tạo tài khoản.';
+
+  @override
+  String get parentalConsentAttestation =>
+      'Tôi xác nhận tôi là cha mẹ hoặc người giám hộ pháp lý được ủy quyền của trẻ này.';
+
+  @override
+  String get parentalConsentUploadFormHint =>
+      'Tiếp theo, tải lên mẫu đơn đồng ý đã ký của bạn bên dưới.';
+
+  @override
+  String get parentalConsentFinishInBrowser =>
+      'Hoàn tất xác minh trong trình duyệt của bạn, sau đó trở lại -- điều này sẽ tự động cập nhật.';
+
+  @override
+  String parentalConsentStatusRejected(String reason) {
+    return 'Đã bị từ chối: $reason';
+  }
+
+  @override
+  String get parentalConsentStatusExpired =>
+      'Yêu cầu đã hết hạn -- vui lòng bắt đầu lại';
+
+  @override
+  String get parentalConsentStatusAwaitingUpload =>
+      'Đang chờ mẫu đơn đã ký của bạn';
+
+  @override
+  String get parentalConsentUploadFormButton => 'Tải lên mẫu đơn';
+
+  @override
+  String get parentalConsentStatusAwaitingReview =>
+      'Đang chờ nhân viên xem xét';
+
+  @override
+  String get parentalConsentStatusAwaitingPayment =>
+      'Đang chờ xác minh thanh toán';
+
+  @override
+  String get parentalConsentPendingSectionTitle => 'YÊU CẦU ĐANG CHỜ';
+
+  @override
+  String get parentalConsentPrivacyNoticePrefix => 'Đọc ';
+
+  @override
+  String get parentalConsentPrivacyNoticeSuffix =>
+      ' của chúng tôi để xem chính xác thông tin nào chúng tôi thu thập về con bạn và cách sử dụng thông tin đó.';
 
   @override
   String get childDetailFallbackTitle => 'Tài khoản trẻ em';
@@ -2300,6 +2415,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get childDetailTabOverride => 'Ngoại lệ';
+
+  @override
+  String get childDetailTabThirdParty => 'Kết nối';
 
   @override
   String get childDetailNoFriends => 'Không có bạn bè nào.';
@@ -2371,6 +2489,28 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get childDetailOverrideExplanation =>
       'Cấp quyền truy cập tạm thời ngoài lịch trình thông thường -- hữu ích cho một ngoại lệ một lần mà không cần thay đổi lịch trình hàng tuần.';
+
+  @override
+  String get childDetailThirdPartyExplanation =>
+      'Kết nối một dịch vụ như Twitch, Kick, YouTube, Steam hoặc Spotify sẽ chia sẻ tên người dùng Koda và hoạt động của con bạn với nền tảng bên ngoài đó. Điều này tách biệt với sự đồng ý đã tạo tài khoản của trẻ, và mặc định bị tắt -- chỉ bật nếu bạn muốn con mình có thể liên kết các tài khoản này.';
+
+  @override
+  String get childDetailThirdPartyToggleTitle => 'Cho phép kết nối bên thứ ba';
+
+  @override
+  String get childDetailThirdPartyToggleSubtitle =>
+      'Tắt tùy chọn này sẽ ngay lập tức ngắt kết nối mọi tài khoản đã liên kết';
+
+  @override
+  String get childDetailDeleteAccountTitle => 'Xóa tài khoản';
+
+  @override
+  String childDetailDeleteAccountWarning(String username) {
+    return 'Việc này sẽ xóa vĩnh viễn tài khoản và thông tin cá nhân của $username. Không thể hoàn tác hành động này.';
+  }
+
+  @override
+  String get childDetailDeleteAccountConfirm => 'Xóa tài khoản';
 
   @override
   String get childDetailReasonHint => 'Lý do (không bắt buộc)';
@@ -3517,6 +3657,104 @@ class AppLocalizationsVi extends AppLocalizations {
   String get calendarUnsubscribeTooltip => 'Bỏ theo dõi';
 
   @override
+  String get calendarReminderOffTooltip => 'Nhắc tôi';
+
+  @override
+  String get calendarReminderOnTooltip => 'Tắt nhắc nhở';
+
+  @override
+  String get calendarAddToCalendarTooltip => 'Thêm vào lịch của tôi';
+
+  @override
+  String get calendarIcsSaved => 'Đã lưu tệp lịch';
+
+  @override
+  String get upcomingEventsTitle => 'Sắp tới';
+
+  @override
+  String get upcomingEventsEmptyState =>
+      'Không có sự kiện sắp tới trên máy chủ của bạn';
+
+  @override
+  String get upcomingEventsPublicBadge => 'Công khai';
+
+  @override
+  String upcomingEventsFriendGoing(String name) {
+    return '$name sẽ tham gia';
+  }
+
+  @override
+  String upcomingEventsTwoFriendsGoing(String name1, String name2) {
+    return '$name1 và $name2 sẽ tham gia';
+  }
+
+  @override
+  String upcomingEventsManyFriendsGoing(String name, int count) {
+    return '$name và $count người khác sẽ tham gia';
+  }
+
+  @override
+  String get activityFeedTitle => 'Bảng Tin Hoạt Động';
+
+  @override
+  String get activityFeedEmptyState =>
+      'Chưa có hoạt động nào từ bạn bè của bạn';
+
+  @override
+  String activityFeedAchievement(
+      String username, String achievement, String server) {
+    return '$username đã đạt được $achievement tại $server';
+  }
+
+  @override
+  String activityFeedWentLive(String username, String platform) {
+    return '$username đang phát trực tiếp trên $platform';
+  }
+
+  @override
+  String activityFeedServerJoined(String username, String server) {
+    return '$username đã tham gia $server';
+  }
+
+  @override
+  String activityFeedArcadeHighScore(String username, String game, int score) {
+    return '$username đã đạt điểm cao mới trong $game: $score';
+  }
+
+  @override
+  String get activityFeedJustNow => 'Vừa xong';
+
+  @override
+  String activityFeedMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count phút trước',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count giờ trước',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ngày trước',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String calendarRepeatsLabel(String recurrence) {
     return 'Lặp lại $recurrence';
   }
@@ -4352,6 +4590,24 @@ class AppLocalizationsVi extends AppLocalizations {
   String get updateNudgeLaterButton => 'Để sau';
 
   @override
+  String get updateNudgeUpdateNowButton => 'Cập nhật ngay';
+
+  @override
+  String updateNudgeDownloading(int percent) {
+    return 'Đang tải bản cập nhật... $percent%';
+  }
+
+  @override
+  String get updateNudgeVerifying => 'Đang xác minh tệp tải xuống...';
+
+  @override
+  String get updateNudgeLaunching => 'Đang khởi chạy trình cài đặt...';
+
+  @override
+  String get updateNudgeFailed =>
+      'Không thể hoàn tất cập nhật. Bạn có thể tải xuống thủ công thay thế.';
+
+  @override
   String get tierBadgeSparkSubscriber => 'Người đăng ký Spark';
 
   @override
@@ -5147,6 +5403,45 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get achievementScreenTitle => 'Thành tựu';
+
+  @override
+  String get achievementCreateTitle => 'Tạo thành tựu';
+
+  @override
+  String get achievementNameHint => 'Tên thành tựu';
+
+  @override
+  String get achievementDescriptionHint => 'Mô tả (không bắt buộc)';
+
+  @override
+  String get achievementDeleteTitle => 'Xóa thành tựu';
+
+  @override
+  String achievementDeleteConfirm(String name) {
+    return 'Xóa \"$name\"? Ai đã có sẽ vẫn giữ, nhưng nó sẽ bị xóa khỏi máy chủ. Không thể hoàn tác.';
+  }
+
+  @override
+  String get achievementAwardTitle => 'Trao thành tựu';
+
+  @override
+  String get achievementAwardButton => 'Trao';
+
+  @override
+  String get achievementUserIdHint => 'ID người dùng';
+
+  @override
+  String get achievementLockedBanner =>
+      'Máy chủ này đang dưới cấp độ boost 3, nên các thành tựu hiện có và người sở hữu vẫn giữ nguyên, nhưng không thể trao cho người mới cho đến khi máy chủ trở lại cấp độ 3.';
+
+  @override
+  String get achievementEmptyState => 'Chưa có thành tựu nào';
+
+  @override
+  String get achievementNoRecipients => 'Chưa ai có cái này';
+
+  @override
   String chatGifLevelGated(int level) {
     return 'Bạn cần cấp độ $level để gửi GIF ở đây';
   }
@@ -5239,6 +5534,35 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get adminTabStatus => 'Trạng thái';
+
+  @override
+  String get adminTabParentalConsent => 'Sự đồng ý của cha mẹ';
+
+  @override
+  String get adminParentalConsentDescription =>
+      'Xem xét các mẫu đơn đồng ý đã ký được tải lên trước khi tạo tài khoản trẻ em. Xác minh bằng thẻ được xử lý tự động và không bao giờ hiển thị ở đây.';
+
+  @override
+  String get adminParentalConsentEmptyState => 'Không có xem xét đang chờ.';
+
+  @override
+  String get adminParentalConsentViewDocument => 'Xem tài liệu';
+
+  @override
+  String get adminParentalConsentApprove => 'Chấp thuận';
+
+  @override
+  String get adminParentalConsentReject => 'Từ chối';
+
+  @override
+  String get adminParentalConsentRejectTitle => 'Từ chối yêu cầu đồng ý';
+
+  @override
+  String get adminParentalConsentRejectReasonHint =>
+      'Lý do (hiển thị cho cha mẹ/người giám hộ)';
+
+  @override
+  String get adminParentalConsentRejectConfirm => 'Từ chối';
 
   @override
   String get serverTabSso => 'SSO';
@@ -5341,6 +5665,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get permManageWebhooks => 'Quản lý Webhook';
 
   @override
+  String get permManageAchievements => 'Quản lý thành tựu';
+
+  @override
   String get channelEditDialogManageWebhooks => 'Quản lý Webhook';
 
   @override
@@ -5384,4 +5711,77 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get chatWebhookBadge => 'WEBHOOK';
+
+  @override
+  String adminReportWebhookTarget(String reporterId, String webhookName) {
+    return 'Người báo cáo: $reporterId\nWebhook: $webhookName';
+  }
+
+  @override
+  String get commonActionFailed => 'Đã xảy ra sự cố. Vui lòng thử lại.';
+
+  @override
+  String get ssoBrowserLaunchError =>
+      'Không thể mở trình duyệt để tiếp tục đăng nhập.';
+
+  @override
+  String get settingsSpotifyTitle => 'Spotify';
+
+  @override
+  String get settingsSpotifyDescription =>
+      'Kết nối Spotify để chia sẻ những gì bạn đang nghe trong một kênh. Koda không thể đồng bộ hóa việc phát nhạc theo thời gian thực -- thay vào đó, một liên kết sẽ được đăng để người khác có thể tự phát bài hát tương tự.';
+
+  @override
+  String settingsSpotifyConnected(String username) {
+    return 'Đã kết nối với tên $username';
+  }
+
+  @override
+  String get settingsSpotifyNotConnected => 'Spotify chưa được kết nối';
+
+  @override
+  String settingsSpotifyNowPlaying(String track, String artist) {
+    return 'Đang phát: $track của $artist';
+  }
+
+  @override
+  String get settingsSpotifyShareHint =>
+      'Chia sẻ điều này từ biểu tượng nốt nhạc trong hộp tin nhắn của bất kỳ kênh nào.';
+
+  @override
+  String get chatShareSpotifyTooltip => 'Chia sẻ những gì bạn đang nghe';
+
+  @override
+  String get chatSpotifyShareFailed =>
+      'Không thể chia sẻ -- hãy đảm bảo Spotify đang phát thứ gì đó.';
+
+  @override
+  String get chatPreviewBadgeLive => 'TRỰC TIẾP';
+
+  @override
+  String get chatPreviewBadgeListening => 'ĐANG NGHE';
+
+  @override
+  String get chatPreviewBadgeEnded => 'ĐÃ KẾT THÚC';
+
+  @override
+  String get serverAuditLogExportDescription =>
+      'Xuất toàn bộ nhật ký kiểm tra dưới dạng CSV hoặc JSON Lines để tuân thủ hoặc nạp vào SIEM.';
+
+  @override
+  String get serverAuditLogExportLockedHint =>
+      'Xuất nhật ký kiểm tra có sẵn ở hạng Doanh nghiệp. Liên hệ với chúng tôi để nâng cấp.';
+
+  @override
+  String get serverExportAuditLog => 'Xuất';
+
+  @override
+  String get serverExportFormatPrompt =>
+      'Chọn một định dạng. JSON Lines thường phù hợp hơn để nạp vào SIEM hoặc pipeline nhật ký; CSV mở trực tiếp trong bảng tính.';
+
+  @override
+  String get serverAuditLogExported => 'Đã xuất nhật ký kiểm tra';
+
+  @override
+  String get chatPreviewBadgePremiere => 'RA MẮT';
 }

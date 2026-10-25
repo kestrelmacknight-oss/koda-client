@@ -159,6 +159,26 @@ class AppLocalizationsHi extends AppLocalizations {
       'Visp के सेटअप/इवेंट/सलाहकार डायलॉग में उसका चेहरा और मूड दिखाता है';
 
   @override
+  String get settingsDeleteAccountTitle => 'अकाउंट हटाएं';
+
+  @override
+  String get settingsDeleteAccountSubtitle =>
+      'अपनी व्यक्तिगत जानकारी को Koda से स्थायी रूप से हटा दें';
+
+  @override
+  String get settingsDeleteAccountWarning =>
+      'यह आपकी प्रोफ़ाइल जानकारी को स्थायी रूप से हटा देगा और इसे पूर्ववत नहीं किया जा सकता। आपके पुराने मैसेज दूसरों को दिखते रह सकते हैं, एक हटाए गए यूज़र द्वारा भेजे गए के रूप में दिखाए जाएंगे। पुष्टि के लिए अपना पासवर्ड दर्ज करें।';
+
+  @override
+  String get settingsDeleteAccountPasswordHint => 'पासवर्ड';
+
+  @override
+  String get settingsDeleteAccountConfirm => 'अकाउंट हटाएं';
+
+  @override
+  String get settingsDeleteAccountWrongPassword => 'गलत पासवर्ड।';
+
+  @override
   String get settingsHighContrastTitle => 'हाई कॉन्ट्रास्ट';
 
   @override
@@ -207,7 +227,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get settingsStreamingDescription =>
-      'Twitch/YouTube कनेक्ट करें ताकि जिन सर्वरों में आपके पास \"लाइव होने पर सूचित करें\" अनुमति है, वे आपके लाइव जाने या नया वीडियो पोस्ट करने पर अपने आप पोस्ट कर सकें।';
+      'Twitch/YouTube/Kick कनेक्ट करें ताकि जिन सर्वरों में आपके पास \"लाइव होने पर सूचित करें\" अनुमति है, वे आपके लाइव जाने या नया वीडियो पोस्ट करने पर अपने आप पोस्ट कर सकें।';
 
   @override
   String settingsStreamingConnected(
@@ -227,6 +247,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get settingsStreamingLiveSuffixYoutube => ' -- नया अपलोड';
 
   @override
+  String get settingsStreamingLiveSuffixKick => ' -- अभी लाइव';
+
+  @override
   String get settingsStreamingConnecting => 'कनेक्ट हो रहा है...';
 
   @override
@@ -240,12 +263,20 @@ class AppLocalizationsHi extends AppLocalizations {
       'लाइव स्ट्रीम और नए अपलोड की घोषणा करें';
 
   @override
+  String get settingsAnnounceLiveKick => 'जब मैं लाइव जाऊं तो सूचित करें';
+
+  @override
   String get settingsRefreshStatus =>
       'क्या आप पहले से ही अपने ब्राउज़र में कनेक्ट हैं? स्टेटस रिफ़्रेश करें';
 
   @override
   String settingsStreamingConnectError(String platform) {
     return '$platform कनेक्शन शुरू नहीं हो सका।';
+  }
+
+  @override
+  String settingsStreamingConsentRequired(String platform) {
+    return 'बच्चे के पेरेंट या गार्डियन से कहें कि वे पहले पैरेंटल डैशबोर्ड में $platform कनेक्ट करने की अनुमति दें।';
   }
 
   @override
@@ -500,6 +531,12 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get homeBrowsePublicServersTooltip => 'सार्वजनिक सर्वर ब्राउज़ करें';
+
+  @override
+  String get homeUpcomingEventsTooltip => 'आगामी इवेंट';
+
+  @override
+  String get homeActivityFeedTooltip => 'गतिविधि फ़ीड';
 
   @override
   String get serverDiscoveryTitle => 'सर्वर ब्राउज़ करें';
@@ -1586,6 +1623,20 @@ class AppLocalizationsHi extends AppLocalizations {
       'कस्टम आइकन बॉर्डर अनलॉक करने के लिए बूस्ट लेवल 5 तक पहुंचें।';
 
   @override
+  String get serverAchievementsCardTitle => 'उपलब्धियाँ';
+
+  @override
+  String get serverAchievementsCardDescription =>
+      'कस्टम बैज बनाएं और सदस्यों को प्रदान करें।';
+
+  @override
+  String get serverAchievementsLockedHint =>
+      'उपलब्धियाँ बनाने के लिए बूस्ट लेवल 3 तक पहुंचें।';
+
+  @override
+  String get serverOpenAchievements => 'उपलब्धियाँ प्रबंधित करें';
+
+  @override
   String get serverBoostFromBank =>
       'इस सर्वर का लेवल बढ़ाने के लिए इसे मार्केटप्लेस के सर्वर बैंक से बूस्ट करें।';
 
@@ -2262,7 +2313,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildExplanation =>
-      'यह एक पूरी तरह से पर्यवेक्षित अकाउंट बनाता है: लेबल किए गए चैनल ब्लॉक कर दिए जाते हैं, और आप अनुमत घंटे तय कर सकेंगे तथा उनके दोस्तों और सर्वरों को देख सकेंगे (लेकिन पढ़ नहीं सकेंगे)।';
+      'यह आपके बच्चे के लिए पूरी तरह से पर्यवेक्षित अकाउंट बनाने का अनुरोध शुरू करता है: लेबल किए गए चैनल ब्लॉक कर दिए जाते हैं, और आप अनुमत घंटे तय कर सकेंगे तथा उनके दोस्तों और सर्वरों को देख सकेंगे (लेकिन पढ़ नहीं सकेंगे)। अकाउंट बनाने से पहले हम सत्यापित करते हैं कि आप उनके पेरेंट या अधिकृत गार्डियन हैं -- नीचे एक सत्यापन तरीका चुनें।';
 
   @override
   String get parentalDashboardValidationError =>
@@ -2270,10 +2321,10 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildFailed =>
-      'चाइल्ड अकाउंट नहीं बन सका -- यूज़रनेम/ईमेल पहले से इस्तेमाल में हो सकता है।';
+      'अनुरोध शुरू नहीं हो सका -- यूज़रनेम/ईमेल पहले से इस्तेमाल में हो सकता है।';
 
   @override
-  String get parentalDashboardCreatingLabel => 'बनाया जा रहा है...';
+  String get parentalDashboardCreatingLabel => 'शुरू हो रहा है...';
 
   @override
   String get parentalDashboardNoChildren =>
@@ -2284,6 +2335,70 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get parentalDashboardUnknownUser => 'अज्ञात';
+
+  @override
+  String get parentalConsentMethodLabel =>
+      'हमें कैसे सत्यापित करना चाहिए कि आप उनके पेरेंट या गार्डियन हैं?';
+
+  @override
+  String get parentalConsentMethodCardTitle => 'क्रेडिट या डेबिट कार्ड';
+
+  @override
+  String get parentalConsentMethodCardSubtitle =>
+      '\$0.50 का एक छोटा शुल्क यह सत्यापित करता है कि कार्ड आपका है, फिर इसे तुरंत रिफंड कर दिया जाता है।';
+
+  @override
+  String get parentalConsentMethodFormTitle => 'हस्ताक्षरित सहमति फ़ॉर्म';
+
+  @override
+  String get parentalConsentMethodFormSubtitle =>
+      'एक हस्ताक्षरित फ़ॉर्म अपलोड करें। अकाउंट बनाने से पहले एक स्टाफ सदस्य इसकी समीक्षा करेगा।';
+
+  @override
+  String get parentalConsentAttestation =>
+      'मैं पुष्टि करता/करती हूं कि मैं इस बच्चे का पेरेंट या अधिकृत कानूनी गार्डियन हूं।';
+
+  @override
+  String get parentalConsentUploadFormHint =>
+      'इसके बाद, नीचे अपना हस्ताक्षरित सहमति फ़ॉर्म अपलोड करें।';
+
+  @override
+  String get parentalConsentFinishInBrowser =>
+      'अपने ब्राउज़र में सत्यापन पूरा करें, फिर वापस आएं -- यह स्वचालित रूप से अपडेट होगा।';
+
+  @override
+  String parentalConsentStatusRejected(String reason) {
+    return 'अस्वीकृत: $reason';
+  }
+
+  @override
+  String get parentalConsentStatusExpired =>
+      'अनुरोध समाप्त हो गया -- कृपया फिर से शुरू करें';
+
+  @override
+  String get parentalConsentStatusAwaitingUpload =>
+      'आपके हस्ताक्षरित फ़ॉर्म की प्रतीक्षा है';
+
+  @override
+  String get parentalConsentUploadFormButton => 'फ़ॉर्म अपलोड करें';
+
+  @override
+  String get parentalConsentStatusAwaitingReview =>
+      'स्टाफ समीक्षा की प्रतीक्षा है';
+
+  @override
+  String get parentalConsentStatusAwaitingPayment =>
+      'पेमेंट सत्यापन की प्रतीक्षा है';
+
+  @override
+  String get parentalConsentPendingSectionTitle => 'लंबित अनुरोध';
+
+  @override
+  String get parentalConsentPrivacyNoticePrefix => 'हमारी ';
+
+  @override
+  String get parentalConsentPrivacyNoticeSuffix =>
+      ' पढ़ें ताकि देख सकें कि हम आपके बच्चे के बारे में वास्तव में क्या जानकारी इकट्ठा करते हैं और इसका उपयोग कैसे होता है।';
 
   @override
   String get childDetailFallbackTitle => 'चाइल्ड अकाउंट';
@@ -2299,6 +2414,9 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get childDetailTabOverride => 'ओवरराइड';
+
+  @override
+  String get childDetailTabThirdParty => 'कनेक्शन';
 
   @override
   String get childDetailNoFriends => 'कोई दोस्त नहीं है।';
@@ -2370,6 +2488,29 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get childDetailOverrideExplanation =>
       'सामान्य शेड्यूल के बाहर अस्थायी एक्सेस दें -- साप्ताहिक शेड्यूल बदले बिना एक बार के अपवाद के लिए उपयोगी।';
+
+  @override
+  String get childDetailThirdPartyExplanation =>
+      'Twitch, Kick, YouTube, Steam, या Spotify जैसी सेवा को कनेक्ट करने से आपके बच्चे का Koda यूज़रनेम और गतिविधि उस बाहरी प्लेटफ़ॉर्म के साथ साझा होती है। यह उस सहमति से अलग है जिसने उनका अकाउंट बनाया था, और यह डिफ़ॉल्ट रूप से बंद है -- इसे तभी चालू करें जब आप चाहें कि आपका बच्चा इन अकाउंट्स को लिंक कर सके।';
+
+  @override
+  String get childDetailThirdPartyToggleTitle =>
+      'थर्ड-पार्टी कनेक्शन की अनुमति दें';
+
+  @override
+  String get childDetailThirdPartyToggleSubtitle =>
+      'इसे बंद करने से पहले से लिंक किया गया कोई भी अकाउंट तुरंत डिस्कनेक्ट हो जाता है';
+
+  @override
+  String get childDetailDeleteAccountTitle => 'अकाउंट हटाएं';
+
+  @override
+  String childDetailDeleteAccountWarning(String username) {
+    return 'यह $username के अकाउंट और व्यक्तिगत जानकारी को स्थायी रूप से हटा देगा। इसे पूर्ववत नहीं किया जा सकता।';
+  }
+
+  @override
+  String get childDetailDeleteAccountConfirm => 'अकाउंट हटाएं';
 
   @override
   String get childDetailReasonHint => 'कारण (वैकल्पिक)';
@@ -3520,6 +3661,106 @@ class AppLocalizationsHi extends AppLocalizations {
   String get calendarUnsubscribeTooltip => 'अनसब्सक्राइब करें';
 
   @override
+  String get calendarReminderOffTooltip => 'मुझे याद दिलाएं';
+
+  @override
+  String get calendarReminderOnTooltip => 'रिमाइंडर बंद करें';
+
+  @override
+  String get calendarAddToCalendarTooltip => 'मेरे कैलेंडर में जोड़ें';
+
+  @override
+  String get calendarIcsSaved => 'कैलेंडर फ़ाइल सहेजी गई';
+
+  @override
+  String get upcomingEventsTitle => 'आगामी';
+
+  @override
+  String get upcomingEventsEmptyState => 'आपके सर्वर पर कोई आगामी इवेंट नहीं';
+
+  @override
+  String get upcomingEventsPublicBadge => 'सार्वजनिक';
+
+  @override
+  String upcomingEventsFriendGoing(String name) {
+    return '$name जा रहे हैं';
+  }
+
+  @override
+  String upcomingEventsTwoFriendsGoing(String name1, String name2) {
+    return '$name1 और $name2 जा रहे हैं';
+  }
+
+  @override
+  String upcomingEventsManyFriendsGoing(String name, int count) {
+    return '$name और $count अन्य जा रहे हैं';
+  }
+
+  @override
+  String get activityFeedTitle => 'गतिविधि फ़ीड';
+
+  @override
+  String get activityFeedEmptyState =>
+      'अभी तक आपके मित्रों की कोई गतिविधि नहीं है';
+
+  @override
+  String activityFeedAchievement(
+      String username, String achievement, String server) {
+    return '$username ने $server में $achievement अर्जित किया';
+  }
+
+  @override
+  String activityFeedWentLive(String username, String platform) {
+    return '$username $platform पर लाइव है';
+  }
+
+  @override
+  String activityFeedServerJoined(String username, String server) {
+    return '$username $server में शामिल हुए';
+  }
+
+  @override
+  String activityFeedArcadeHighScore(String username, String game, int score) {
+    return '$username ने $game में नया हाई स्कोर बनाया: $score';
+  }
+
+  @override
+  String get activityFeedJustNow => 'अभी-अभी';
+
+  @override
+  String activityFeedMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count मिनट पहले',
+      one: '1 मिनट पहले',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count घंटे पहले',
+      one: '1 घंटे पहले',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count दिन पहले',
+      one: '1 दिन पहले',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String calendarRepeatsLabel(String recurrence) {
     return '$recurrence रिपीट होता है';
   }
@@ -4363,6 +4604,24 @@ class AppLocalizationsHi extends AppLocalizations {
   String get updateNudgeLaterButton => 'बाद में';
 
   @override
+  String get updateNudgeUpdateNowButton => 'अभी अपडेट करें';
+
+  @override
+  String updateNudgeDownloading(int percent) {
+    return 'अपडेट डाउनलोड हो रहा है... $percent%';
+  }
+
+  @override
+  String get updateNudgeVerifying => 'डाउनलोड सत्यापित हो रहा है...';
+
+  @override
+  String get updateNudgeLaunching => 'इंस्टॉलर लॉन्च हो रहा है...';
+
+  @override
+  String get updateNudgeFailed =>
+      'अपडेट पूरा नहीं हो सका। आप इसे मैन्युअल रूप से डाउनलोड कर सकते हैं।';
+
+  @override
   String get tierBadgeSparkSubscriber => 'Spark सब्सक्राइबर';
 
   @override
@@ -5157,6 +5416,45 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
+  String get achievementScreenTitle => 'उपलब्धियाँ';
+
+  @override
+  String get achievementCreateTitle => 'उपलब्धि बनाएं';
+
+  @override
+  String get achievementNameHint => 'उपलब्धि का नाम';
+
+  @override
+  String get achievementDescriptionHint => 'विवरण (वैकल्पिक)';
+
+  @override
+  String get achievementDeleteTitle => 'उपलब्धि हटाएं';
+
+  @override
+  String achievementDeleteConfirm(String name) {
+    return '\"$name\" हटाएं? जिसके पास यह पहले से है वह इसे रखेगा, लेकिन यह सर्वर से हटा दी जाएगी। इसे पूर्ववत नहीं किया जा सकता।';
+  }
+
+  @override
+  String get achievementAwardTitle => 'उपलब्धि प्रदान करें';
+
+  @override
+  String get achievementAwardButton => 'प्रदान करें';
+
+  @override
+  String get achievementUserIdHint => 'यूज़र आईडी';
+
+  @override
+  String get achievementLockedBanner =>
+      'यह सर्वर बूस्ट लेवल 3 से नीचे है, इसलिए मौजूदा उपलब्धियाँ और उनके धारक बिल्कुल वैसे ही रहेंगे, लेकिन जब तक सर्वर लेवल 3 पर वापस नहीं आता, किसी नए व्यक्ति को कोई नहीं दी जा सकती।';
+
+  @override
+  String get achievementEmptyState => 'अभी तक कोई उपलब्धि नहीं';
+
+  @override
+  String get achievementNoRecipients => 'अभी तक किसी के पास यह नहीं है';
+
+  @override
   String chatGifLevelGated(int level) {
     return 'यहाँ GIF भेजने के लिए आपको लेवल $level चाहिए';
   }
@@ -5248,6 +5546,35 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get adminTabStatus => 'स्थिति';
+
+  @override
+  String get adminTabParentalConsent => 'पैरेंटल सहमति';
+
+  @override
+  String get adminParentalConsentDescription =>
+      'बच्चे का अकाउंट बनाने से पहले अपलोड किए गए हस्ताक्षरित सहमति फ़ॉर्म की समीक्षा करें। कार्ड सत्यापन स्वचालित रूप से हल हो जाता है और यहां कभी नहीं दिखता।';
+
+  @override
+  String get adminParentalConsentEmptyState => 'कोई लंबित समीक्षा नहीं।';
+
+  @override
+  String get adminParentalConsentViewDocument => 'दस्तावेज़ देखें';
+
+  @override
+  String get adminParentalConsentApprove => 'स्वीकृत करें';
+
+  @override
+  String get adminParentalConsentReject => 'अस्वीकृत करें';
+
+  @override
+  String get adminParentalConsentRejectTitle => 'सहमति अनुरोध अस्वीकृत करें';
+
+  @override
+  String get adminParentalConsentRejectReasonHint =>
+      'कारण (पेरेंट/गार्डियन को दिखाया जाएगा)';
+
+  @override
+  String get adminParentalConsentRejectConfirm => 'अस्वीकृत करें';
 
   @override
   String get serverTabSso => 'SSO';
@@ -5349,6 +5676,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get permManageWebhooks => 'वेबहुक प्रबंधित करें';
 
   @override
+  String get permManageAchievements => 'उपलब्धियाँ प्रबंधित करें';
+
+  @override
   String get channelEditDialogManageWebhooks => 'वेबहुक प्रबंधित करें';
 
   @override
@@ -5392,4 +5722,77 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get chatWebhookBadge => 'वेबहुक';
+
+  @override
+  String adminReportWebhookTarget(String reporterId, String webhookName) {
+    return 'रिपोर्टर: $reporterId\nवेबहुक: $webhookName';
+  }
+
+  @override
+  String get commonActionFailed => 'कुछ गलत हो गया। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get ssoBrowserLaunchError =>
+      'साइन-इन जारी रखने के लिए ब्राउज़र नहीं खोला जा सका।';
+
+  @override
+  String get settingsSpotifyTitle => 'Spotify';
+
+  @override
+  String get settingsSpotifyDescription =>
+      'किसी चैनल में आप क्या सुन रहे हैं साझा करने के लिए Spotify कनेक्ट करें। Koda वास्तविक समय में प्लेबैक सिंक नहीं कर सकता -- यह एक लिंक पोस्ट करता है ताकि अन्य लोग वही ट्रैक खुद चला सकें।';
+
+  @override
+  String settingsSpotifyConnected(String username) {
+    return '$username के रूप में कनेक्ट किया गया';
+  }
+
+  @override
+  String get settingsSpotifyNotConnected => 'Spotify कनेक्ट नहीं है';
+
+  @override
+  String settingsSpotifyNowPlaying(String track, String artist) {
+    return 'अभी बज रहा है: $track बाय $artist';
+  }
+
+  @override
+  String get settingsSpotifyShareHint =>
+      'इसे किसी भी चैनल के मैसेज बॉक्स में संगीत नोट आइकन से साझा करें।';
+
+  @override
+  String get chatShareSpotifyTooltip => 'आप क्या सुन रहे हैं साझा करें';
+
+  @override
+  String get chatSpotifyShareFailed =>
+      'साझा नहीं किया जा सका -- सुनिश्चित करें कि Spotify कुछ बजा रहा है।';
+
+  @override
+  String get chatPreviewBadgeLive => 'लाइव';
+
+  @override
+  String get chatPreviewBadgeListening => 'सुन रहे हैं';
+
+  @override
+  String get chatPreviewBadgeEnded => 'समाप्त';
+
+  @override
+  String get serverAuditLogExportDescription =>
+      'अनुपालन या SIEM में डालने के लिए पूरे ऑडिट लॉग को CSV या JSON Lines के रूप में एक्सपोर्ट करें।';
+
+  @override
+  String get serverAuditLogExportLockedHint =>
+      'ऑडिट लॉग एक्सपोर्ट एंटरप्राइज़ स्तर पर उपलब्ध है। अपग्रेड के लिए हमसे संपर्क करें।';
+
+  @override
+  String get serverExportAuditLog => 'एक्सपोर्ट करें';
+
+  @override
+  String get serverExportFormatPrompt =>
+      'एक फॉर्मेट चुनें। SIEM या लॉग पाइपलाइन में डालने के लिए सामान्यतः JSON Lines बेहतर होता है; CSV सीधे स्प्रेडशीट में खुलता है।';
+
+  @override
+  String get serverAuditLogExported => 'ऑडिट लॉग एक्सपोर्ट हो गया';
+
+  @override
+  String get chatPreviewBadgePremiere => 'प्रीमियर';
 }

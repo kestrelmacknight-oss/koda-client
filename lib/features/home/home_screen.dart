@@ -1,7 +1,9 @@
 ﻿// lib/features/home/home_screen.dart
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io' show File;
+import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +43,8 @@ import '../developer/bot_install_screen.dart';
 import '../developer/oauth_consent_screen.dart';
 import '../discover/server_discovery_screen.dart';
 import '../discover/featured_server_rail_tile.dart';
+import '../discover/upcoming_events_screen.dart';
+import '../activity/activity_feed_screen.dart';
 import '../steam/steam_compare_screen.dart';
 import '../../core/socket.dart';
 import '../../core/link_preview.dart';
@@ -300,6 +304,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     }
   }
 
+  // Desktop pops the feed out into its own OS window (same
+  // desktop_multi_window mechanism voice_screen.dart's pop-out button
+  // uses -- see main.dart's 'activity_feed_popout' branch); there's no
+  // multi-window equivalent on mobile, so it just pushes the normal
+  // full-screen route there instead.
+  Future<void> _openActivityFeed() async {
+    if (!isDesktop) {
+      await Navigator.push(context, MaterialPageRoute(builder: (_) => const ActivityFeedScreen()));
+      return;
+    }
+    final args = jsonEncode({'type': 'activity_feed_popout'});
+    final ctrl = await WindowController.create(WindowConfiguration(arguments: args));
+    await ctrl.show();
+  }
+
   // A standard account's personal hide/warn/show preferences (see
   // content_filters_screen.dart) -- irrelevant for a child session,
   // whose labeled channels are already hard-blocked server-side and
@@ -423,22 +442,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         }
       } else if (msg.event == const PhoenixChannelEvent.custom('presence_update')) {
         // A fellow server member or friend changed their status/
-        // custom_status (Koda.Auth.broadcast_presence_update/1) or their
-        // Steam "currently playing" game (Koda.Steam's own
-        // broadcast_presence/2) -- same event/topic, two independent
-        // sources, so only patch the field(s) this particular payload
-        // actually carries (see presence_provider.dart's merge-not-
-        // replace patch()).
+        // custom_status (Koda.Auth.broadcast_presence_update/1), their
+        // Steam "currently playing" game, or their Spotify now-playing
+        // (Koda.Steam/Koda.Spotify's own broadcast_presence/2) -- same
+        // event/topic, three independent sources, so only patch the
+        // field(s) this particular payload actually carries (see
+        // presence_provider.dart's merge-not-replace patch()).
         final payload = msg.payload as Map<String, dynamic>?;
         final userId = payload?['user_id'] as String?;
         if (userId != null && payload != null) {
+          final nowPlaying = payload['now_playing'] as Map<String, dynamic>?;
           ref.read(presenceOverridesProvider.notifier).patch(userId,
               status: payload['status'] as String?,
               customStatus: payload['custom_status'] as String?,
               playingGame: payload['playing_game'] as String?,
+              spotifyTrack: nowPlaying?['track'] as String?,
+              spotifyArtist: nowPlaying?['artist'] as String?,
+              spotifyUrl: nowPlaying?['url'] as String?,
               hasStatus: payload.containsKey('status'),
               hasCustomStatus: payload.containsKey('custom_status'),
-              hasPlayingGame: payload.containsKey('playing_game'));
+              hasPlayingGame: payload.containsKey('playing_game'),
+              hasSpotify: payload.containsKey('now_playing'));
         }
       }
     });
@@ -1391,6 +1415,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               final presenceStatus = override?.status ?? baseStatus ?? 'offline';
               final customStatus = override?.customStatus ?? baseCustomStatus;
               final playingGame = override?.playingGame ?? author['playing_game'] as String?;
+              // Live-only -- see presence_provider.dart's doc comment on
+              // why there's no initial-fetch fallback for this one.
+              final spotifyTrack = override?.spotifyTrack;
+              final spotifyArtist = override?.spotifyArtist;
               return Column(children: [
                 Stack(clipBehavior: Clip.none, children: [
                   KodaAvatar(username: username, size: 64, avatarUrl: avatarUrl),
@@ -1415,6 +1443,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 if (playingGame != null && playingGame.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text('🎮 ${t.profilePlayingGame(playingGame)}',
+                      style: TextStyle(color: KodaColors.text3, fontSize: 12),
+                      textAlign: TextAlign.center),
+                ],
+                if (spotifyTrack != null && spotifyTrack.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text('🎵 ${t.settingsSpotifyNowPlaying(spotifyTrack, spotifyArtist ?? '')}',
                       style: TextStyle(color: KodaColors.text3, fontSize: 12),
                       textAlign: TextAlign.center),
                 ],
@@ -2469,7 +2503,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     if (_showingArcade) {
       final serverId = ref.watch(selectedServerProvider)?['id'] as String?;
       if (serverId == null) return const SizedBox.shrink();
-      return ArcadeHomeScreen(serverId: serverId);
+      return ArcadeHomeScreen(serverId: serverId, canManageLeaderboards: _can('manage_leaderboards'));
     }
 
     if (selectedChannel == null) {
@@ -3150,6 +3184,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     MaterialPageRoute(builder: (_) => const ServerDiscoveryScreen()));
                 if (joined == true && mounted) _loadServers();
               },
+            ),
+            IconButton(
+              icon: Icon(Icons.event_outlined, color: KodaColors.text2),
+              tooltip: t.homeUpcomingEventsTooltip,
+              onPressed: () async {
+                final result = await Navigator.push<Map<String, dynamic>?>(context,
+                    MaterialPageRoute(builder: (_) => const UpcomingEventsScreen()));
+                if (result == null || !mounted) return;
+                final serverId = result['server_id'] as String?;
+                final channelId = result['channel_id'] as String?;
+                if (serverId == null) return;
+                var server = _servers.cast<Map<String, dynamic>?>().firstWhere(
+                    (s) => s?['id'] == serverId, orElse: () => null);
+                if (server == null) return;
+                await _selectServer(server);
+                if (!mounted || channelId == null) return;
+                final channel = _channels.cast<Map<String, dynamic>?>().firstWhere(
+                    (c) => c?['id'] == channelId, orElse: () => null);
+                if (channel != null) _selectChannel(channel);
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.dynamic_feed_outlined, color: KodaColors.text2),
+              tooltip: t.homeActivityFeedTooltip,
+              onPressed: _openActivityFeed,
             ),
             IconButton(
               icon: Icon(Icons.storefront_outlined, color: KodaColors.text2),

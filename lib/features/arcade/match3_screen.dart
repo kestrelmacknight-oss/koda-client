@@ -43,6 +43,12 @@ class _Match3ScreenState extends State<Match3Screen> {
   bool _busy = false;
   bool _ended = false;
   final _rand = Random();
+  // Bumped by _newGame so a still-running _resolveCascades loop from
+  // the PREVIOUS board (e.g. the app-bar refresh button tapped mid-
+  // cascade, which has no _busy guard unlike cell taps) notices the
+  // board underneath it changed and stops touching _grid/_score
+  // instead of corrupting the fresh game.
+  int _gameEpoch = 0;
 
   @override
   void initState() {
@@ -51,6 +57,7 @@ class _Match3ScreenState extends State<Match3Screen> {
   }
 
   void _newGame() {
+    _gameEpoch++;
     // Built into a local first, then assigned to _grid whole -- _grid is
     // `late` and, on the very first call (from initState), not yet
     // initialized at all, so _pickNonMatching can't read the real _grid
@@ -114,8 +121,9 @@ class _Match3ScreenState extends State<Match3Screen> {
       return;
     }
     _movesLeft--;
+    final epoch = _gameEpoch;
     await _resolveCascades();
-    if (!mounted) return;
+    if (!mounted || epoch != _gameEpoch) return;
     if (_movesLeft <= 0) {
       await _endGame();
     } else {
@@ -166,25 +174,27 @@ class _Match3ScreenState extends State<Match3Screen> {
   }
 
   Future<void> _resolveCascades() async {
+    final epoch = _gameEpoch;
     var cascadeMultiplier = 1;
     while (true) {
+      if (epoch != _gameEpoch) return;
       final matches = _findMatches();
       if (matches.isEmpty) break;
 
-      // Score per contiguous run rather than per cell -- group matched
-      // cells back into their runs so a 5-in-a-row scores once as a
-      // 5-match, not as five separate 3-matches.
-      final runSizesByCell = <Point<int>, int>{};
+      // Score per contiguous run, not per cell -- collecting run
+      // *lengths* into a flat list (rather than a per-cell map) means a
+      // 5-in-a-row scores once as a 5-match, not five times over. An
+      // L-shaped match (shares a cell between a row-run and a
+      // column-run) correctly contributes both runs independently --
+      // same two-independent-passes shape _findMatches/_collapseAndRefill
+      // already use for clearing.
+      final runLengths = <int>[];
       for (var r = 0; r < _gridSize; r++) {
         var runStart = 0;
         for (var c = 1; c <= _gridSize; c++) {
           final broke = c == _gridSize || _grid[r][c] != _grid[r][runStart];
           if (broke) {
-            if (c - runStart >= 3) {
-              for (var k = runStart; k < c; k++) {
-                runSizesByCell[Point(r, k)] = max(runSizesByCell[Point(r, k)] ?? 0, c - runStart);
-              }
-            }
+            if (c - runStart >= 3) runLengths.add(c - runStart);
             runStart = c;
           }
         }
@@ -194,17 +204,13 @@ class _Match3ScreenState extends State<Match3Screen> {
         for (var r = 1; r <= _gridSize; r++) {
           final broke = r == _gridSize || _grid[r][c] != _grid[runStart][c];
           if (broke) {
-            if (r - runStart >= 3) {
-              for (var k = runStart; k < r; k++) {
-                runSizesByCell[Point(k, c)] = max(runSizesByCell[Point(k, c)] ?? 0, r - runStart);
-              }
-            }
+            if (r - runStart >= 3) runLengths.add(r - runStart);
             runStart = r;
           }
         }
       }
 
-      final gained = runSizesByCell.values.fold(0, (sum, size) => sum + _scoreForMatchSize(size));
+      final gained = runLengths.fold(0, (sum, size) => sum + _scoreForMatchSize(size));
       _score += gained * cascadeMultiplier;
       cascadeMultiplier++;
 

@@ -159,6 +159,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Shows Visp\'s face and mood in its setup/event/advisor dialogs';
 
   @override
+  String get settingsDeleteAccountTitle => 'Delete Account';
+
+  @override
+  String get settingsDeleteAccountSubtitle =>
+      'Permanently remove your personal information from Koda';
+
+  @override
+  String get settingsDeleteAccountWarning =>
+      'This permanently deletes your profile information and can\'t be undone. Your past messages may remain visible to others, shown as sent by a deleted user. Enter your password to confirm.';
+
+  @override
+  String get settingsDeleteAccountPasswordHint => 'Password';
+
+  @override
+  String get settingsDeleteAccountConfirm => 'Delete Account';
+
+  @override
+  String get settingsDeleteAccountWrongPassword => 'Incorrect password.';
+
+  @override
   String get settingsHighContrastTitle => 'High Contrast';
 
   @override
@@ -207,7 +227,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsStreamingDescription =>
-      'Connect Twitch/YouTube so servers where you have the \"Announce When Live\" permission can automatically post when you go live or post a new video.';
+      'Connect Twitch/YouTube/Kick so servers where you have the \"Announce When Live\" permission can automatically post when you go live or post a new video.';
 
   @override
   String settingsStreamingConnected(
@@ -227,6 +247,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsStreamingLiveSuffixYoutube => ' -- a new upload';
 
   @override
+  String get settingsStreamingLiveSuffixKick => ' -- live now';
+
+  @override
   String get settingsStreamingConnecting => 'Connecting...';
 
   @override
@@ -240,12 +263,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Announce live streams and new uploads';
 
   @override
+  String get settingsAnnounceLiveKick => 'Announce when I go live';
+
+  @override
   String get settingsRefreshStatus =>
       'Already connected in your browser? Refresh status';
 
   @override
   String settingsStreamingConnectError(String platform) {
     return 'Could not start $platform connection.';
+  }
+
+  @override
+  String settingsStreamingConsentRequired(String platform) {
+    return 'Ask your parent or guardian to allow connecting $platform in the Parental Dashboard first.';
   }
 
   @override
@@ -499,6 +530,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeBrowsePublicServersTooltip => 'Browse public servers';
+
+  @override
+  String get homeUpcomingEventsTooltip => 'Upcoming events';
+
+  @override
+  String get homeActivityFeedTooltip => 'Activity feed';
 
   @override
   String get serverDiscoveryTitle => 'Browse Servers';
@@ -1582,6 +1619,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Reach boost level 5 to unlock a custom icon border.';
 
   @override
+  String get serverAchievementsCardTitle => 'Achievements';
+
+  @override
+  String get serverAchievementsCardDescription =>
+      'Create custom badges and award them to members.';
+
+  @override
+  String get serverAchievementsLockedHint =>
+      'Reach boost level 3 to create achievements.';
+
+  @override
+  String get serverOpenAchievements => 'Manage Achievements';
+
+  @override
   String get serverBoostFromBank =>
       'Boost this server from the Server Bank in Marketplace to raise its level.';
 
@@ -2254,7 +2305,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildExplanation =>
-      'This creates a fully supervised account: labeled channels are blocked, and you\'ll be able to set allowed hours and see (but not read) their friends and servers.';
+      'This starts a request to create a fully supervised account for your child: labeled channels are blocked, and you\'ll be able to set allowed hours and see (but not read) their friends and servers. We verify you\'re their parent or authorized guardian before the account is created -- choose a verification method below.';
 
   @override
   String get parentalDashboardValidationError =>
@@ -2262,10 +2313,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get parentalDashboardCreateChildFailed =>
-      'Could not create child account -- username/email may already be taken.';
+      'Could not start the request -- username/email may already be taken.';
 
   @override
-  String get parentalDashboardCreatingLabel => 'Creating...';
+  String get parentalDashboardCreatingLabel => 'Starting...';
 
   @override
   String get parentalDashboardNoChildren => 'No linked accounts yet.';
@@ -2275,6 +2326,68 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get parentalDashboardUnknownUser => 'Unknown';
+
+  @override
+  String get parentalConsentMethodLabel =>
+      'How should we verify you\'re their parent or guardian?';
+
+  @override
+  String get parentalConsentMethodCardTitle => 'Credit or debit card';
+
+  @override
+  String get parentalConsentMethodCardSubtitle =>
+      'A small \$0.50 charge verifies you hold the card, then it\'s refunded immediately.';
+
+  @override
+  String get parentalConsentMethodFormTitle => 'Signed consent form';
+
+  @override
+  String get parentalConsentMethodFormSubtitle =>
+      'Upload a signed form. A staff member reviews it before the account is created.';
+
+  @override
+  String get parentalConsentAttestation =>
+      'I confirm I am this child\'s parent or an authorized legal guardian.';
+
+  @override
+  String get parentalConsentUploadFormHint =>
+      'Next, upload your signed consent form below.';
+
+  @override
+  String get parentalConsentFinishInBrowser =>
+      'Finish verifying in your browser, then come back -- this updates automatically.';
+
+  @override
+  String parentalConsentStatusRejected(String reason) {
+    return 'Declined: $reason';
+  }
+
+  @override
+  String get parentalConsentStatusExpired =>
+      'Request expired -- please start again';
+
+  @override
+  String get parentalConsentStatusAwaitingUpload => 'Awaiting your signed form';
+
+  @override
+  String get parentalConsentUploadFormButton => 'Upload form';
+
+  @override
+  String get parentalConsentStatusAwaitingReview => 'Awaiting staff review';
+
+  @override
+  String get parentalConsentStatusAwaitingPayment =>
+      'Awaiting payment verification';
+
+  @override
+  String get parentalConsentPendingSectionTitle => 'PENDING REQUESTS';
+
+  @override
+  String get parentalConsentPrivacyNoticePrefix => 'Read our ';
+
+  @override
+  String get parentalConsentPrivacyNoticeSuffix =>
+      ' to see exactly what information we collect about your child and how it\'s used.';
 
   @override
   String get childDetailFallbackTitle => 'Child account';
@@ -2290,6 +2403,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get childDetailTabOverride => 'Override';
+
+  @override
+  String get childDetailTabThirdParty => 'Connections';
 
   @override
   String get childDetailNoFriends => 'No friends.';
@@ -2360,6 +2476,29 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get childDetailOverrideExplanation =>
       'Grant temporary access outside the normal schedule -- useful for a one-off exception without changing the weekly schedule.';
+
+  @override
+  String get childDetailThirdPartyExplanation =>
+      'Connecting a service like Twitch, Kick, YouTube, Steam, or Spotify shares your child\'s Koda username and activity with that outside platform. This is separate from the consent that created their account, and is off by default -- turn it on only if you want your child to be able to link these.';
+
+  @override
+  String get childDetailThirdPartyToggleTitle =>
+      'Allow third-party connections';
+
+  @override
+  String get childDetailThirdPartyToggleSubtitle =>
+      'Turning this off immediately disconnects any already-linked accounts';
+
+  @override
+  String get childDetailDeleteAccountTitle => 'Delete Account';
+
+  @override
+  String childDetailDeleteAccountWarning(String username) {
+    return 'This permanently deletes $username\'s account and personal information. This can\'t be undone.';
+  }
+
+  @override
+  String get childDetailDeleteAccountConfirm => 'Delete Account';
 
   @override
   String get childDetailReasonHint => 'Reason (optional)';
@@ -3503,6 +3642,106 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calendarUnsubscribeTooltip => 'Unsubscribe';
 
   @override
+  String get calendarReminderOffTooltip => 'Remind me';
+
+  @override
+  String get calendarReminderOnTooltip => 'Turn off reminder';
+
+  @override
+  String get calendarAddToCalendarTooltip => 'Add to my calendar';
+
+  @override
+  String get calendarIcsSaved => 'Calendar file saved';
+
+  @override
+  String get upcomingEventsTitle => 'Upcoming';
+
+  @override
+  String get upcomingEventsEmptyState =>
+      'No upcoming events across your servers';
+
+  @override
+  String get upcomingEventsPublicBadge => 'Public';
+
+  @override
+  String upcomingEventsFriendGoing(String name) {
+    return '$name is going';
+  }
+
+  @override
+  String upcomingEventsTwoFriendsGoing(String name1, String name2) {
+    return '$name1 and $name2 are going';
+  }
+
+  @override
+  String upcomingEventsManyFriendsGoing(String name, int count) {
+    return '$name and $count others are going';
+  }
+
+  @override
+  String get activityFeedTitle => 'Activity Feed';
+
+  @override
+  String get activityFeedEmptyState => 'No activity from your friends yet';
+
+  @override
+  String activityFeedAchievement(
+      String username, String achievement, String server) {
+    return '$username earned $achievement in $server';
+  }
+
+  @override
+  String activityFeedWentLive(String username, String platform) {
+    return '$username is live on $platform';
+  }
+
+  @override
+  String activityFeedServerJoined(String username, String server) {
+    return '$username joined $server';
+  }
+
+  @override
+  String activityFeedArcadeHighScore(String username, String game, int score) {
+    return '$username got a new high score in $game: $score';
+  }
+
+  @override
+  String get activityFeedJustNow => 'Just now';
+
+  @override
+  String activityFeedMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minutes ago',
+      one: '1 minute ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hours ago',
+      one: '1 hour ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String activityFeedDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days ago',
+      one: '1 day ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String calendarRepeatsLabel(String recurrence) {
     return 'Repeats $recurrence';
   }
@@ -4340,6 +4579,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateNudgeLaterButton => 'Later';
 
   @override
+  String get updateNudgeUpdateNowButton => 'Update Now';
+
+  @override
+  String updateNudgeDownloading(int percent) {
+    return 'Downloading update... $percent%';
+  }
+
+  @override
+  String get updateNudgeVerifying => 'Verifying download...';
+
+  @override
+  String get updateNudgeLaunching => 'Launching installer...';
+
+  @override
+  String get updateNudgeFailed =>
+      'Couldn\'t complete the update. You can download it manually instead.';
+
+  @override
   String get tierBadgeSparkSubscriber => 'Spark subscriber';
 
   @override
@@ -5131,6 +5388,45 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get achievementScreenTitle => 'Achievements';
+
+  @override
+  String get achievementCreateTitle => 'Create Achievement';
+
+  @override
+  String get achievementNameHint => 'Achievement name';
+
+  @override
+  String get achievementDescriptionHint => 'Description (optional)';
+
+  @override
+  String get achievementDeleteTitle => 'Delete Achievement';
+
+  @override
+  String achievementDeleteConfirm(String name) {
+    return 'Delete \"$name\"? Anyone already holding it keeps it, but this removes it from the server. This can\'t be undone.';
+  }
+
+  @override
+  String get achievementAwardTitle => 'Award Achievement';
+
+  @override
+  String get achievementAwardButton => 'Award';
+
+  @override
+  String get achievementUserIdHint => 'User ID';
+
+  @override
+  String get achievementLockedBanner =>
+      'This server is below boost level 3, so existing achievements and their holders stay exactly as they are, but none can be awarded to anyone new until boosts bring it back to level 3.';
+
+  @override
+  String get achievementEmptyState => 'No achievements yet';
+
+  @override
+  String get achievementNoRecipients => 'Nobody has this yet';
+
+  @override
   String chatGifLevelGated(int level) {
     return 'You need level $level to send GIFs here';
   }
@@ -5223,6 +5519,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminTabStatus => 'Status';
+
+  @override
+  String get adminTabParentalConsent => 'Parental Consent';
+
+  @override
+  String get adminParentalConsentDescription =>
+      'Review uploaded signed consent forms before a child account is created. Credit-card verification resolves automatically and never appears here.';
+
+  @override
+  String get adminParentalConsentEmptyState => 'No pending reviews.';
+
+  @override
+  String get adminParentalConsentViewDocument => 'View document';
+
+  @override
+  String get adminParentalConsentApprove => 'Approve';
+
+  @override
+  String get adminParentalConsentReject => 'Reject';
+
+  @override
+  String get adminParentalConsentRejectTitle => 'Reject Consent Request';
+
+  @override
+  String get adminParentalConsentRejectReasonHint =>
+      'Reason (shown to the parent/guardian)';
+
+  @override
+  String get adminParentalConsentRejectConfirm => 'Reject';
 
   @override
   String get serverTabSso => 'SSO';
@@ -5324,6 +5649,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get permManageWebhooks => 'Manage Webhooks';
 
   @override
+  String get permManageAchievements => 'Manage Achievements';
+
+  @override
   String get channelEditDialogManageWebhooks => 'Manage Webhooks';
 
   @override
@@ -5367,4 +5695,77 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatWebhookBadge => 'WEBHOOK';
+
+  @override
+  String adminReportWebhookTarget(String reporterId, String webhookName) {
+    return 'Reporter: $reporterId\nWebhook: $webhookName';
+  }
+
+  @override
+  String get commonActionFailed => 'Something went wrong. Please try again.';
+
+  @override
+  String get ssoBrowserLaunchError =>
+      'Could not open a browser to continue signing in.';
+
+  @override
+  String get settingsSpotifyTitle => 'Spotify';
+
+  @override
+  String get settingsSpotifyDescription =>
+      'Connect Spotify to share what you\'re listening to in a channel. Koda can\'t synchronize playback in real time -- this posts a link so others can play the same track themselves.';
+
+  @override
+  String settingsSpotifyConnected(String username) {
+    return 'Connected as $username';
+  }
+
+  @override
+  String get settingsSpotifyNotConnected => 'Spotify not connected';
+
+  @override
+  String settingsSpotifyNowPlaying(String track, String artist) {
+    return 'Now playing: $track by $artist';
+  }
+
+  @override
+  String get settingsSpotifyShareHint =>
+      'Share this from the music note icon in any channel\'s message box.';
+
+  @override
+  String get chatShareSpotifyTooltip => 'Share what you\'re listening to';
+
+  @override
+  String get chatSpotifyShareFailed =>
+      'Couldn\'t share -- make sure Spotify is playing something.';
+
+  @override
+  String get chatPreviewBadgeLive => 'LIVE';
+
+  @override
+  String get chatPreviewBadgeListening => 'LISTENING';
+
+  @override
+  String get chatPreviewBadgeEnded => 'ENDED';
+
+  @override
+  String get serverAuditLogExportDescription =>
+      'Export the full audit log as CSV or JSON Lines for compliance or SIEM ingestion.';
+
+  @override
+  String get serverAuditLogExportLockedHint =>
+      'Audit log export is available on the Enterprise tier. Contact us to upgrade this server.';
+
+  @override
+  String get serverExportAuditLog => 'Export';
+
+  @override
+  String get serverExportFormatPrompt =>
+      'Choose a format. JSON Lines is usually the better fit for feeding into a SIEM or log pipeline; CSV opens directly in a spreadsheet.';
+
+  @override
+  String get serverAuditLogExported => 'Audit log exported';
+
+  @override
+  String get chatPreviewBadgePremiere => 'PREMIERE';
 }

@@ -62,7 +62,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     );
     if (create != true || ctrl.text.trim().isEmpty) return;
     final created = await KodaApi.instance.createCustomLeaderboard(widget.serverId, ctrl.text.trim());
-    if (created != null) await _load();
+    if (created != null) {
+      await _load();
+    } else if (mounted) {
+      _showActionFailed();
+    }
   }
 
   Future<void> _resetSeason(Map<String, dynamic> lb) async {
@@ -82,12 +86,20 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     );
     if (confirmed != true) return;
     final updated = await KodaApi.instance.resetLeaderboardSeason(lb['id'] as String);
-    if (updated != null) await _load();
+    if (updated != null) {
+      await _load();
+    } else if (mounted) {
+      _showActionFailed();
+    }
   }
 
   Future<void> _deleteCustom(Map<String, dynamic> lb) async {
     final ok = await KodaApi.instance.deleteLeaderboard(lb['id'] as String);
-    if (ok) await _load();
+    if (ok) {
+      await _load();
+    } else if (mounted) {
+      _showActionFailed();
+    }
   }
 
   Future<void> _adjustEntry(Map<String, dynamic> lb, Map<String, dynamic>? entry) async {
@@ -115,7 +127,16 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     final score = int.tryParse(scoreCtrl.text.trim());
     if (userId.isEmpty || score == null) return;
     final ok = await KodaApi.instance.adjustLeaderboardEntry(lb['id'] as String, userId, score: score);
-    if (ok) await _load();
+    if (ok) {
+      await _load();
+    } else if (mounted) {
+      _showActionFailed();
+    }
+  }
+
+  void _showActionFailed() {
+    final t = AppLocalizations.of(context);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.commonActionFailed)));
   }
 
   @override
@@ -200,7 +221,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
           )
         else
           for (var i = 0; i < entries.length; i++) _buildEntryRow(t, i + 1, entries[i], isXp, isManual, lb),
-        if (viewerRank != null)
+        if (viewerRank != null &&
+            viewerRank['rank'] is int && viewerRank['score'] is int)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 14),
             child: Text(

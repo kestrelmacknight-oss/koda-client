@@ -4,6 +4,8 @@
 // role-locked via channel_allowed_roles, subscribe to notifications.
 
 import 'dart:async';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -367,6 +369,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     final color = Color(int.parse(
         (event['color'] as String? ?? '#2DD4A0').replaceFirst('#', '0xFF')));
     final subscribed = event['subscribed'] == true;
+    final remindMe = event['remind_me'] == true;
     final priceCents = event['price_cents'] as int? ?? 0;
     final hasTicket = event['has_ticket'] == true;
     final canManage = _canManageEvent(event);
@@ -404,6 +407,29 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 }
                 _loadEvents();
               },
+            ),
+            const SizedBox(width: 6),
+            IconButton(
+              icon: Icon(
+                remindMe ? Icons.alarm_on : Icons.alarm_outlined,
+                color: remindMe ? KodaColors.koda : KodaColors.text3,
+                size: 16,
+              ),
+              tooltip: remindMe ? t.calendarReminderOnTooltip : t.calendarReminderOffTooltip,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              onPressed: () async {
+                await KodaApi.instance.setEventReminder(event['id'] as String, !remindMe);
+                _loadEvents();
+              },
+            ),
+            const SizedBox(width: 6),
+            IconButton(
+              icon: Icon(Icons.file_download_outlined, color: KodaColors.text3, size: 16),
+              tooltip: t.calendarAddToCalendarTooltip,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              onPressed: () => _addEventToCalendar(event),
             ),
             if (canManage) ...[
               const SizedBox(width: 6),
@@ -491,6 +517,25 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         ]),
       ),
     );
+  }
+
+  Future<void> _addEventToCalendar(Map<String, dynamic> event) async {
+    final t = AppLocalizations.of(context);
+    final bytes = await KodaApi.instance.downloadEventIcs(event['id'] as String);
+    if (!mounted) return;
+    if (bytes == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.commonActionFailed)));
+      return;
+    }
+    final title = (event['title'] as String? ?? 'event')
+        .replaceAll(RegExp(r'[^\w\- ]'), '')
+        .trim();
+    final path = await FilePicker.platform
+        .saveFile(fileName: '${title.isEmpty ? 'event' : title}.ics');
+    if (path == null || !mounted) return;
+    await File(path).writeAsBytes(bytes);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.calendarIcsSaved)));
   }
 
   Future<void> _confirmDeleteEvent(Map<String, dynamic> event) async {

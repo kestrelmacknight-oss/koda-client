@@ -66,11 +66,23 @@ jobs:
         shell: powershell
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DAppVersion="${{ needs.version.outputs.version }}" koda_installer.iss
+      # Sidecar .sha256 (sha256sum-compatible "<hex>  <filename>" format)
+      # travels alongside the installer through the artifact upload below,
+      # and gets consolidated into one SHA256SUMS.txt by the release job
+      # -- see that job for where this actually gets consumed.
+      - name: Compute SHA-256
+        shell: powershell
+        run: |
+          $installer = Get-ChildItem installer\KodaSetup-*.exe | Select-Object -First 1
+          $hash = (Get-FileHash $installer.FullName -Algorithm SHA256).Hash.ToLower()
+          "$hash  $($installer.Name)" | Out-File -FilePath "installer\$($installer.Name).sha256" -Encoding ascii
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
           name: KodaSetup-Windows-${{ needs.version.outputs.version }}
-          path: installer/KodaSetup-*.exe
+          path: |
+            installer/KodaSetup-*.exe
+            installer/KodaSetup-*.sha256
           retention-days: 30
 
   build-macos:
@@ -114,6 +126,14 @@ jobs:
             cd build/macos/Build/Products/Release
             zip -r "$GITHUB_WORKSPACE/installer/Koda-${{ needs.version.outputs.version }}-macos.zip" koda.app
           fi
+      # Sidecar .sha256 for whichever of the dmg/zip fallback actually
+      # got produced above -- see build-windows's identical step.
+      - name: Compute SHA-256
+        run: |
+          cd installer
+          for f in Koda-*; do
+            shasum -a 256 "$f" | awk '{print $1"  "$2}' > "$f.sha256"
+          done
       - name: Upload macOS build
         uses: actions/upload-artifact@v4
         with:
@@ -161,11 +181,18 @@ jobs:
           mkdir -p installer
           cd build/linux/x64/release/bundle
           tar -czf "$GITHUB_WORKSPACE/installer/Koda-${{ needs.version.outputs.version }}-linux-x64.tar.gz" .
+      # Sidecar .sha256 -- see build-windows's identical step.
+      - name: Compute SHA-256
+        run: |
+          cd installer
+          sha256sum Koda-*.tar.gz > "Koda-${{ needs.version.outputs.version }}-linux-x64.tar.gz.sha256"
       - name: Upload Linux build
         uses: actions/upload-artifact@v4
         with:
           name: Koda-Linux-${{ needs.version.outputs.version }}
-          path: installer/Koda-*.tar.gz
+          path: |
+            installer/Koda-*.tar.gz
+            installer/Koda-*.sha256
           retention-days: 30
 
   build-android:
@@ -364,6 +391,48 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: release-artifacts
+      # Consolidates every build job's sidecar .sha256 (see build-windows/
+      # build-macos/build-linux) into one sha256sum-compatible file,
+      # published as its own release asset below -- `sha256sum -c
+      # SHA256SUMS.txt` verifies every installer against it in one shot.
+      - name: Consolidate checksums
+        run: find release-artifacts -name '*.sha256' -exec cat {} \; > SHA256SUMS.txt
+      # Prints the exact map entries koda-server-check's VersionController
+      # needs (see that module's moduledoc) straight into this run's
+      # summary page -- cutting a release should mean copy-pasting this
+      # block in, not hand-running sha256sum against a downloaded file.
+      - name: Paste-ready VersionController snippet
+        run: |
+          VERSION="${{ needs.version.outputs.version }}"
+          BASE_URL="https://github.com/${{ github.repository }}/releases/download/v$VERSION"
+          WIN_SHA=$(grep -i '\.exe$' SHA256SUMS.txt | awk '{print $1}')
+          MAC_SHA=$(grep -iE '\.dmg$|\.zip$' SHA256SUMS.txt | awk '{print $1}')
+          LINUX_SHA=$(grep -i '\.tar\.gz$' SHA256SUMS.txt | awk '{print $1}')
+          MAC_FILE=$(grep -iE '\.dmg$|\.zip$' SHA256SUMS.txt | awk '{print $2}')
+          {
+            echo "## Paste into koda-server-check's \`VersionController\`"
+            echo ''
+            echo '```elixir'
+            echo "  @current_version \"$VERSION\""
+            echo ""
+            echo "  @platform_downloads %{"
+            echo "    \"windows\" => %{"
+            echo "      url: \"$BASE_URL/KodaSetup-$VERSION.exe\","
+            echo "      sha256: \"$WIN_SHA\""
+            echo "    },"
+            echo "    \"macos\" => %{"
+            echo "      url: \"$BASE_URL/$MAC_FILE\","
+            echo "      sha256: \"$MAC_SHA\""
+            echo "    },"
+            echo "    \"linux\" => %{"
+            echo "      url: \"$BASE_URL/Koda-$VERSION-linux-x64.tar.gz\","
+            echo "      sha256: \"$LINUX_SHA\""
+            echo "    }"
+            echo "  }"
+            echo '```'
+            echo ''
+            echo "Don't forget \`@release_notes\` too -- see that module's moduledoc."
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -379,6 +448,8 @@ jobs:
             - **Android**: Download the `.apk` to sideload directly, or grab the `.aab` for Play Console (see android/KEYSTORE.md for release signing setup)
             - **iOS**: Not attached here -- TestFlight/App Store builds go through App Store Connect once ios/SIGNING.md's signing secrets are set up
 
+            Verify a download against `SHA256SUMS.txt` (also attached below): `sha256sum -c SHA256SUMS.txt`.
+
             ### What's New
             See [CHANGELOG.md](https://github.com/kestrelmacknight-oss/koda-client/blob/main/CHANGELOG.md) for details.
           files: |
@@ -388,6 +459,7 @@ jobs:
             release-artifacts/**/*.tar.gz
             release-artifacts/**/*.apk
             release-artifacts/**/*.aab
+            SHA256SUMS.txt
           draft: false
           prerelease: true
           generate_release_notes: true

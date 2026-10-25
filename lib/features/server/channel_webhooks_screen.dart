@@ -62,7 +62,11 @@ class _ChannelWebhooksScreenState extends State<ChannelWebhooksScreen> {
     if (create != true || nameCtrl.text.trim().isEmpty) return;
 
     final result = await KodaApi.instance.createChannelWebhook(widget.channelId, nameCtrl.text.trim());
-    if (result == null || !mounted) return;
+    if (!mounted) return;
+    if (result == null) {
+      _showActionFailed();
+      return;
+    }
     await _load();
     if (!mounted) return;
     _showUrlOnceDialog(result['url'] as String);
@@ -86,13 +90,27 @@ class _ChannelWebhooksScreenState extends State<ChannelWebhooksScreen> {
     if (confirmed != true) return;
 
     final result = await KodaApi.instance.regenerateChannelWebhookToken(webhookId);
-    if (result == null || !mounted) return;
+    if (!mounted) return;
+    if (result == null) {
+      _showActionFailed();
+      return;
+    }
     _showUrlOnceDialog(result['url'] as String);
   }
 
   Future<void> _delete(String webhookId) async {
     final ok = await KodaApi.instance.deleteChannelWebhook(webhookId);
-    if (ok) await _load();
+    if (!mounted) return;
+    if (ok) {
+      await _load();
+    } else {
+      _showActionFailed();
+    }
+  }
+
+  void _showActionFailed() {
+    final t = AppLocalizations.of(context);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.commonActionFailed)));
   }
 
   Future<void> _showUrlOnceDialog(String url) async {

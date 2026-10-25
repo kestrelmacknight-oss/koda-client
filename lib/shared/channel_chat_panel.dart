@@ -95,6 +95,26 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
   void initState() {
     super.initState();
     _load();
+    _loadSpotifyConnected();
+  }
+
+  // Gates the share icon's visibility only -- whether there's actually
+  // something playing right now is checked server-side at share time
+  // (see _shareSpotify), not kept continuously fresh here.
+  bool _spotifyConnected = false;
+  Future<void> _loadSpotifyConnected() async {
+    final status = await KodaApi.instance.getSpotifyStatus();
+    if (mounted) setState(() => _spotifyConnected = status?['connected'] == true);
+  }
+
+  Future<void> _shareSpotify() async {
+    final t = AppLocalizations.of(context);
+    final ok = await KodaApi.instance.shareSpotifyNowPlaying(widget.channelId);
+    if (!mounted) return;
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(t.chatSpotifyShareFailed)));
+    }
   }
 
   @override
@@ -894,15 +914,18 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
   // beyond this badge.
   Widget? _statusBadge(String? status) {
     if (status == null) return null;
-    final isLive = status == 'live';
+    final t = AppLocalizations.of(context);
+    final (label, color) = switch (status) {
+      'live'      => (t.chatPreviewBadgeLive, KodaColors.accent),
+      'listening' => (t.chatPreviewBadgeListening, KodaColors.mint),
+      'premiere'  => (t.chatPreviewBadgePremiere, KodaColors.koda),
+      _           => (t.chatPreviewBadgeEnded, Colors.black.withValues(alpha: 0.6)),
+    };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: isLive ? KodaColors.accent : Colors.black.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(4),
-      ),
+      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(4)),
       child: Text(
-        isLive ? 'LIVE' : 'ENDED',
+        label,
         style: const TextStyle(
             color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5),
       ),
@@ -1356,6 +1379,13 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
             tooltip: t.homeSlashCommandsTooltip,
             onPressed: _showCommandPicker,
           ),
+          if (_spotifyConnected)
+            IconButton(
+              iconSize: 18,
+              icon: Icon(Icons.music_note_outlined, color: KodaColors.text2),
+              tooltip: t.chatShareSpotifyTooltip,
+              onPressed: _shareSpotify,
+            ),
           Expanded(
             child: KodaTextField(
               controller: _messageController,
