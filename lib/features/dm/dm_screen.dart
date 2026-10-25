@@ -319,6 +319,14 @@ class _DmScreenState extends ConsumerState<DmScreen>
               ? payload
               : await _decryptForDisplay(payload, conversationId);
           if (!mounted || _activeConversationId != conversationId) return;
+          // Re-check right before the mutation, not just before starting
+          // the decrypt above -- decryption is async, so two broadcasts
+          // for the same group_id (e.g. a stale duplicate device row
+          // fanning the same message out twice) can both pass the
+          // earlier check and both reach here before either one has
+          // actually appended. This second check is what actually closes
+          // that race; the earlier one is just a fast path.
+          if (groupId != null && _messages.any((m) => m['message_group_id'] == groupId)) return;
           setState(() => _insertNewMessage(display));
           WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToLatest());
           // Conversation is open -- the incoming message is immediately seen.
