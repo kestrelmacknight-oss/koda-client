@@ -1653,6 +1653,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverAddRole => '添加身份组';
 
   @override
+  String get serverSaveRoleOrder => '保存顺序';
+
+  @override
+  String get serverRoleOrderSaved => '身份组顺序已保存。';
+
+  @override
+  String get serverRoleOrderSaveFailed => '无法保存身份组顺序，请重试。';
+
+  @override
   String get serverDefaultRoleLabel => '默认身份组';
 
   @override
@@ -7199,6 +7208,15 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get serverAddRole => '新增身分組';
+
+  @override
+  String get serverSaveRoleOrder => '儲存順序';
+
+  @override
+  String get serverRoleOrderSaved => '身分組順序已儲存。';
+
+  @override
+  String get serverRoleOrderSaveFailed => '無法儲存身分組順序，請重試。';
 
   @override
   String get serverDefaultRoleLabel => '預設身分組';

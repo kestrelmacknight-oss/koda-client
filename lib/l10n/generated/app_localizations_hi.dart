@@ -1722,6 +1722,16 @@ class AppLocalizationsHi extends AppLocalizations {
   String get serverAddRole => 'रोल जोड़ें';
 
   @override
+  String get serverSaveRoleOrder => 'क्रम सेव करें';
+
+  @override
+  String get serverRoleOrderSaved => 'रोल क्रम सेव हो गया।';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'रोल क्रम सेव नहीं हो सका। कृपया फिर से प्रयास करें।';
+
+  @override
   String get serverDefaultRoleLabel => 'डिफ़ॉल्ट रोल';
 
   @override

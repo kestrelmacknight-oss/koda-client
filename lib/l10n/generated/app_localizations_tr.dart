@@ -1722,6 +1722,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get serverAddRole => 'Rol Ekle';
 
   @override
+  String get serverSaveRoleOrder => 'Sırayı Kaydet';
+
+  @override
+  String get serverRoleOrderSaved => 'Rol sırası kaydedildi.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'Rol sırası kaydedilemedi. Lütfen tekrar deneyin.';
+
+  @override
   String get serverDefaultRoleLabel => 'Varsayılan rol';
 
   @override

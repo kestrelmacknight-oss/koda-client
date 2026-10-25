@@ -1732,6 +1732,16 @@ class AppLocalizationsPl extends AppLocalizations {
   String get serverAddRole => 'Dodaj rolę';
 
   @override
+  String get serverSaveRoleOrder => 'Zapisz kolejność';
+
+  @override
+  String get serverRoleOrderSaved => 'Kolejność ról zapisana.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'Nie udało się zapisać kolejności ról. Spróbuj ponownie.';
+
+  @override
   String get serverDefaultRoleLabel => 'Rola domyślna';
 
   @override

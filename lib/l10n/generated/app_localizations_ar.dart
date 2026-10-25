@@ -1714,6 +1714,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get serverAddRole => 'إضافة دور';
 
   @override
+  String get serverSaveRoleOrder => 'حفظ الترتيب';
+
+  @override
+  String get serverRoleOrderSaved => 'تم حفظ ترتيب الأدوار.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'تعذّر حفظ ترتيب الأدوار. يرجى المحاولة مرة أخرى.';
+
+  @override
   String get serverDefaultRoleLabel => 'الدور الافتراضي';
 
   @override

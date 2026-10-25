@@ -1742,6 +1742,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get serverAddRole => 'Rolle hinzufügen';
 
   @override
+  String get serverSaveRoleOrder => 'Reihenfolge speichern';
+
+  @override
+  String get serverRoleOrderSaved => 'Rollenreihenfolge gespeichert.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'Rollenreihenfolge konnte nicht gespeichert werden. Bitte versuche es erneut.';
+
+  @override
   String get serverDefaultRoleLabel => 'Standardrolle';
 
   @override

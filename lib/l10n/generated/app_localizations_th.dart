@@ -1714,6 +1714,16 @@ class AppLocalizationsTh extends AppLocalizations {
   String get serverAddRole => 'เพิ่มบทบาท';
 
   @override
+  String get serverSaveRoleOrder => 'บันทึกลำดับ';
+
+  @override
+  String get serverRoleOrderSaved => 'บันทึกลำดับบทบาทแล้ว';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'ไม่สามารถบันทึกลำดับบทบาทได้ กรุณาลองอีกครั้ง';
+
+  @override
   String get serverDefaultRoleLabel => 'บทบาทเริ่มต้น';
 
   @override

@@ -1729,6 +1729,16 @@ class AppLocalizationsCs extends AppLocalizations {
   String get serverAddRole => 'Přidat roli';
 
   @override
+  String get serverSaveRoleOrder => 'Uložit pořadí';
+
+  @override
+  String get serverRoleOrderSaved => 'Pořadí rolí uloženo.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'Nepodařilo se uložit pořadí rolí. Zkuste to prosím znovu.';
+
+  @override
   String get serverDefaultRoleLabel => 'Výchozí role';
 
   @override

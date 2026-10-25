@@ -1673,6 +1673,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get serverAddRole => 'ロールを追加';
 
   @override
+  String get serverSaveRoleOrder => '順序を保存';
+
+  @override
+  String get serverRoleOrderSaved => 'ロールの順序を保存しました。';
+
+  @override
+  String get serverRoleOrderSaveFailed => 'ロールの順序を保存できませんでした。もう一度お試しください。';
+
+  @override
   String get serverDefaultRoleLabel => 'デフォルトロール';
 
   @override

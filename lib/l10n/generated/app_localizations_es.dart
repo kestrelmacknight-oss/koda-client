@@ -1731,6 +1731,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get serverAddRole => 'Agregar rol';
 
   @override
+  String get serverSaveRoleOrder => 'Guardar orden';
+
+  @override
+  String get serverRoleOrderSaved => 'Orden de roles guardado.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'No se pudo guardar el orden de los roles. Inténtalo de nuevo.';
+
+  @override
   String get serverDefaultRoleLabel => 'Rol predeterminado';
 
   @override

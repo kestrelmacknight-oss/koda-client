@@ -1724,6 +1724,16 @@ class AppLocalizationsSv extends AppLocalizations {
   String get serverAddRole => 'Lägg till roll';
 
   @override
+  String get serverSaveRoleOrder => 'Spara ordning';
+
+  @override
+  String get serverRoleOrderSaved => 'Rollordningen sparades.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'Det gick inte att spara rollordningen. Försök igen.';
+
+  @override
   String get serverDefaultRoleLabel => 'Standardroll';
 
   @override

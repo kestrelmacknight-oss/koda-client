@@ -1676,6 +1676,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get serverAddRole => '역할 추가';
 
   @override
+  String get serverSaveRoleOrder => '순서 저장';
+
+  @override
+  String get serverRoleOrderSaved => '역할 순서가 저장되었습니다.';
+
+  @override
+  String get serverRoleOrderSaveFailed => '역할 순서를 저장할 수 없습니다. 다시 시도해 주세요.';
+
+  @override
   String get serverDefaultRoleLabel => '기본 역할';
 
   @override

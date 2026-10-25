@@ -1724,6 +1724,16 @@ class AppLocalizationsId extends AppLocalizations {
   String get serverAddRole => 'Tambah Peran';
 
   @override
+  String get serverSaveRoleOrder => 'Simpan Urutan';
+
+  @override
+  String get serverRoleOrderSaved => 'Urutan peran disimpan.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'Tidak dapat menyimpan urutan peran. Silakan coba lagi.';
+
+  @override
   String get serverDefaultRoleLabel => 'Peran default';
 
   @override

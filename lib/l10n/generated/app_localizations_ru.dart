@@ -1730,6 +1730,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get serverAddRole => 'Добавить роль';
 
   @override
+  String get serverSaveRoleOrder => 'Сохранить порядок';
+
+  @override
+  String get serverRoleOrderSaved => 'Порядок ролей сохранён.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'Не удалось сохранить порядок ролей. Попробуйте ещё раз.';
+
+  @override
   String get serverDefaultRoleLabel => 'Роль по умолчанию';
 
   @override

@@ -42,6 +42,8 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   List<Map<String, dynamic>> _categories = [];
   List<Map<String, dynamic>> _channels = [];
   List<Map<String, dynamic>> _roles = [];
+  bool _rolesDirty = false;
+  bool _savingRoleOrder = false;
   List<Map<String, dynamic>> _members = [];
   List<Map<String, dynamic>> _bans = [];
   List<Map<String, dynamic>> _auditActions = [];
@@ -318,12 +320,15 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
       KodaApi.instance.getServerReports(serverId),
     ]);
     if (!mounted) return;
-    final roles = results[2]
-      ..sort((a, b) => ((a['position'] ?? 0) as num).compareTo((b['position'] ?? 0) as num));
+    // No client-side re-sort here -- koda-server's list_roles/1 already
+    // returns these ordered by position descending (highest priority
+    // first), exactly matching reorder_roles/2's assignment. An earlier
+    // ascending re-sort here silently reversed that order on every
+    // reload, undoing whatever order a drag had just saved.
     setState(() {
       _categories    = results[0];
       _channels      = results[1];
-      _roles         = roles;
+      _roles         = results[2];
       _members       = results[3];
       _bans          = results[4];
       _auditActions  = results[5];
@@ -1881,6 +1886,15 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
         child: Row(children: [
           Expanded(child: Text(t.serverRolePriorityHelp,
               style: TextStyle(color: KodaColors.text3, fontSize: 11))),
+          if (_rolesDirty)
+            TextButton.icon(
+              onPressed: _savingRoleOrder ? null : _saveRoleOrder,
+              icon: _savingRoleOrder
+                  ? SizedBox(width: 14, height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: KodaColors.koda))
+                  : Icon(Icons.save_outlined, size: 16, color: KodaColors.koda),
+              label: Text(t.serverSaveRoleOrder, style: TextStyle(color: KodaColors.koda)),
+            ),
           TextButton.icon(
             onPressed: () => _showRoleEditor(),
             icon: Icon(Icons.add, size: 16, color: KodaColors.koda),
@@ -1944,16 +1958,37 @@ class _ServerSettingsScreenState extends ConsumerState<ServerSettingsScreen>
   /// Role priority -- the top of this list is the role shown as a
   /// member's displayed role when they hold several (member_panel.dart's
   /// "roles.first", now backed server-side by Koda.Servers.list_members/1's
-  /// explicit position ordering). Updates optimistically since the
-  /// reorder itself can't meaningfully fail (both roles already belong
-  /// to this server).
-  Future<void> _reorderRoles(int oldIndex, int newIndex) async {
+  /// explicit position ordering). Dragging only reorders the local list
+  /// and marks it dirty -- _saveRoleOrder below is what actually
+  /// persists it, explicitly, via the Save button that appears while
+  /// dirty. Auto-saving on every drag used to look like reordering
+  /// silently reverted whenever any failure went unnoticed; requiring
+  /// an explicit save makes success or failure visible instead.
+  void _reorderRoles(int oldIndex, int newIndex) {
     if (newIndex > oldIndex) newIndex -= 1;
     final updated = List<Map<String, dynamic>>.from(_roles);
     final moved = updated.removeAt(oldIndex);
     updated.insert(newIndex, moved);
-    setState(() => _roles = updated);
-    await KodaApi.instance.reorderRoles(_serverId, updated.map((r) => r['id'] as String).toList());
+    setState(() { _roles = updated; _rolesDirty = true; });
+  }
+
+  Future<void> _saveRoleOrder() async {
+    setState(() => _savingRoleOrder = true);
+    final result = await KodaApi.instance.reorderRoles(
+        _serverId, _roles.map((r) => r['id'] as String).toList());
+    if (!mounted) return;
+    final t = AppLocalizations.of(context);
+    setState(() => _savingRoleOrder = false);
+    if (result != null) {
+      setState(() { _roles = result; _rolesDirty = false; });
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(t.serverRoleOrderSaved)));
+    } else {
+      // Left dirty (and the Save button visible) on failure -- the
+      // local order never silently gets treated as saved when it isn't.
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(t.serverRoleOrderSaveFailed)));
+    }
   }
 
   Widget _buildMembersTab() {

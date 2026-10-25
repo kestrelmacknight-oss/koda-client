@@ -1726,6 +1726,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get serverAddRole => 'Thêm vai trò';
 
   @override
+  String get serverSaveRoleOrder => 'Lưu thứ tự';
+
+  @override
+  String get serverRoleOrderSaved => 'Đã lưu thứ tự vai trò.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'Không thể lưu thứ tự vai trò. Vui lòng thử lại.';
+
+  @override
   String get serverDefaultRoleLabel => 'Vai trò mặc định';
 
   @override

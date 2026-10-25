@@ -1736,6 +1736,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get serverAddRole => 'Adicionar cargo';
 
   @override
+  String get serverSaveRoleOrder => 'Salvar ordem';
+
+  @override
+  String get serverRoleOrderSaved => 'Ordem dos cargos salva.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'Não foi possível salvar a ordem dos cargos. Tente novamente.';
+
+  @override
   String get serverDefaultRoleLabel => 'Cargo padrão';
 
   @override

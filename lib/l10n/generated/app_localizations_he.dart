@@ -1707,6 +1707,16 @@ class AppLocalizationsHe extends AppLocalizations {
   String get serverAddRole => 'הוספת תפקיד';
 
   @override
+  String get serverSaveRoleOrder => 'שמירת הסדר';
+
+  @override
+  String get serverRoleOrderSaved => 'סדר התפקידים נשמר.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'לא ניתן היה לשמור את סדר התפקידים. נסו שוב.';
+
+  @override
   String get serverDefaultRoleLabel => 'תפקיד ברירת מחדל';
 
   @override

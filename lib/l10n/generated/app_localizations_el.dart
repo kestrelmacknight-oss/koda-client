@@ -1752,6 +1752,16 @@ class AppLocalizationsEl extends AppLocalizations {
   String get serverAddRole => 'Προσθήκη ρόλου';
 
   @override
+  String get serverSaveRoleOrder => 'Αποθήκευση σειράς';
+
+  @override
+  String get serverRoleOrderSaved => 'Η σειρά ρόλων αποθηκεύτηκε.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'Δεν ήταν δυνατή η αποθήκευση της σειράς ρόλων. Δοκιμάστε ξανά.';
+
+  @override
   String get serverDefaultRoleLabel => 'Προεπιλεγμένος ρόλος';
 
   @override

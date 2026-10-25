@@ -1731,6 +1731,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get serverAddRole => 'Rol toevoegen';
 
   @override
+  String get serverSaveRoleOrder => 'Volgorde opslaan';
+
+  @override
+  String get serverRoleOrderSaved => 'Rolvolgorde opgeslagen.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'Kan rolvolgorde niet opslaan. Probeer het opnieuw.';
+
+  @override
   String get serverDefaultRoleLabel => 'Standaardrol';
 
   @override

@@ -1718,6 +1718,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverAddRole => 'Add Role';
 
   @override
+  String get serverSaveRoleOrder => 'Save Order';
+
+  @override
+  String get serverRoleOrderSaved => 'Role order saved.';
+
+  @override
+  String get serverRoleOrderSaveFailed =>
+      'Could not save role order. Please try again.';
+
+  @override
   String get serverDefaultRoleLabel => 'Default role';
 
   @override

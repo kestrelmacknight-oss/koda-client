@@ -3226,6 +3226,24 @@ abstract class AppLocalizations {
   /// **'Add Role'**
   String get serverAddRole;
 
+  /// No description provided for @serverSaveRoleOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Order'**
+  String get serverSaveRoleOrder;
+
+  /// No description provided for @serverRoleOrderSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Role order saved.'**
+  String get serverRoleOrderSaved;
+
+  /// No description provided for @serverRoleOrderSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save role order. Please try again.'**
+  String get serverRoleOrderSaveFailed;
+
   /// No description provided for @serverDefaultRoleLabel.
   ///
   /// In en, this message translates to:
