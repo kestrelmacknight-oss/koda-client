@@ -157,7 +157,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     }
 
     Navigator.push(context, MaterialPageRoute(
-        builder: (_) => VerifyEmailScreen(email: _regEmail.text.trim())));
+        builder: (_) => VerifyEmailScreen(
+            email: _regEmail.text.trim(),
+            userId: result.data!['user_id'] as String)));
   }
 
   @override

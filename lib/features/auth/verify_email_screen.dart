@@ -9,7 +9,8 @@ import 'auth_screen.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
   final String email;
-  const VerifyEmailScreen({super.key, required this.email});
+  final String userId;
+  const VerifyEmailScreen({super.key, required this.email, required this.userId});
 
   @override
   State<VerifyEmailScreen> createState() => _VerifyEmailScreenState();
@@ -31,7 +32,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     }
     setState(() { _busy = true; _error = null; });
 
-    final ok = await KodaApi.instance.verifyEmail(_code.text.trim());
+    final ok = await KodaApi.instance.verifyEmail(_code.text.trim(), widget.userId);
 
     if (!mounted) return;
     setState(() => _busy = false);
@@ -52,7 +53,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     // possibly-unmounted context afterward.
     final t = AppLocalizations.of(context);
     setState(() => _info = null);
-    final ok = await KodaApi.instance.resendVerification();
+    final ok = await KodaApi.instance.resendVerification(widget.userId);
     if (!mounted) return;
     setState(() => _info =
         ok ? t.verifyEmailResentInfo(widget.email) : t.verifyEmailResendFailed);

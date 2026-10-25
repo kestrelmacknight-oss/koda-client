@@ -151,9 +151,9 @@ class KodaApi {
     } catch (e) { _log('verifyEmail', e); return false; }
   }
 
-  Future<bool> resendVerification() async {
+  Future<bool> resendVerification(String userId) async {
     try {
-      await _dio.post('/auth/verify_email/resend');
+      await _dio.post('/auth/verify_email/resend', data: {'user_id': userId});
       return true;
     } catch (e) { _log('resendVerification', e); return false; }
   }
