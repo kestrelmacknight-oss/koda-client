@@ -21,7 +21,17 @@ import '../../l10n/generated/app_localizations.dart';
 class SafetyNumberScreen extends StatefulWidget {
   final String peerUserId;
   final String peerName;
-  const SafetyNumberScreen({super.key, required this.peerUserId, required this.peerName});
+  // True when this screen was opened to resolve a SafetyNumberChanged
+  // exception (as opposed to a routine "let's just double-check"
+  // visit) -- see _loadForDevice's doc on why that changes whether a
+  // stale pin or a fresh fetch gets displayed.
+  final bool keyChanged;
+  const SafetyNumberScreen({
+    super.key,
+    required this.peerUserId,
+    required this.peerName,
+    this.keyChanged = false,
+  });
 
   @override
   State<SafetyNumberScreen> createState() => _SafetyNumberScreenState();
@@ -38,6 +48,13 @@ class _SafetyNumberScreenState extends State<SafetyNumberScreen> {
   String? _safetyNumber;
   String? _error;
   Uint8List? _myIkDhPub;
+  // Whatever _loadForDevice just displayed, for the selected device --
+  // this is what "Mark as Verified" actually pins. Previously that
+  // button only reset a local UI flag and never touched the stored
+  // pin at all, so a real key change could never actually be resolved:
+  // the very next send/receive would throw SafetyNumberChanged again
+  // from the exact same stale pin.
+  PinnedIdentity? _pendingIdentity;
 
   @override
   void initState() {
@@ -70,14 +87,26 @@ class _SafetyNumberScreenState extends State<SafetyNumberScreen> {
 
   Future<void> _loadForDevice(String deviceId, Uint8List myIkDhPub) async {
     final t = AppLocalizations.of(context);
-    if (mounted) setState(() { _selectedDeviceId = deviceId; _safetyNumber = null; });
+    if (mounted) {
+      setState(() { _selectedDeviceId = deviceId; _safetyNumber = null; _pendingIdentity = null; });
+    }
     try {
-      // Prefer the pinned key (what's actually being trusted for this
-      // device's session) over a fresh fetch -- fetching would consume
-      // one of its one-time prekeys for no reason, and the whole point
-      // of this screen is to verify the identity already in use.
-      var peerDhPub = (await SecureStorage.loadPinnedIdentity(widget.peerUserId, deviceId))?.ikDhPub;
-      peerDhPub ??= (await SecureStorage.loadPinnedIdentity(widget.peerUserId))?.ikDhPub;
+      Uint8List? peerDhPub;
+      Uint8List? peerSignPub;
+      if (!widget.keyChanged) {
+        // Prefer the pinned key (what's actually being trusted for this
+        // device's session) over a fresh fetch -- fetching would consume
+        // one of its one-time prekeys for no reason, and a routine
+        // "let's just double-check" visit only needs to confirm the
+        // identity already in use. widget.keyChanged skips straight to
+        // a fresh fetch below instead: by definition the pin is the
+        // *wrong* (stale) key in that case, so showing it would just
+        // silently re-confirm the same mismatch.
+        final pinned = await SecureStorage.loadPinnedIdentity(widget.peerUserId, deviceId) ??
+            await SecureStorage.loadPinnedIdentity(widget.peerUserId);
+        peerDhPub = pinned?.ikDhPub;
+        peerSignPub = pinned?.ikSignPub;
+      }
       if (peerDhPub == null) {
         final bundle = await KodaApi.instance.fetchKeyBundle(widget.peerUserId, deviceId);
         if (bundle == null) {
@@ -85,13 +114,30 @@ class _SafetyNumberScreenState extends State<SafetyNumberScreen> {
           return;
         }
         peerDhPub = b64ToBytes(bundle['ik_dh_pub'] as String);
+        peerSignPub = b64ToBytes(bundle['ik_sign_pub'] as String);
       }
+      _pendingIdentity = PinnedIdentity(peerDhPub, peerSignPub);
 
       final number = await computeSafetyNumber(myIkDhPub: myIkDhPub, theirIkDhPub: peerDhPub);
       if (mounted) setState(() => _safetyNumber = number);
     } catch (e) {
       if (mounted) setState(() => _error = t.safetyNumberComputeError('$e'));
     }
+  }
+
+  /// Actually commits what's currently displayed as the trusted key for
+  /// this device -- previously this button only reset a local flag in
+  /// dm_screen.dart and never touched the stored pin, so a genuine key
+  /// change (someone reinstalling, say) could never actually be
+  /// resolved: the next send/receive threw SafetyNumberChanged again
+  /// from the exact same stale pin, forever.
+  Future<void> _markVerified() async {
+    final identity = _pendingIdentity;
+    final deviceId = _selectedDeviceId;
+    if (identity != null && deviceId != null) {
+      await SecureStorage.savePinnedIdentity(widget.peerUserId, identity, deviceId);
+    }
+    if (mounted) Navigator.pop(context, true);
   }
 
   @override
@@ -159,7 +205,7 @@ class _SafetyNumberScreenState extends State<SafetyNumberScreen> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _safetyNumber == null ? null : () => Navigator.pop(context, true),
+              onPressed: _safetyNumber == null ? null : _markVerified,
               style: ElevatedButton.styleFrom(backgroundColor: KodaColors.koda),
               child: Text(t.safetyNumberMarkVerifiedButton),
             ),

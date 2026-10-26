@@ -795,7 +795,8 @@ class _DmScreenState extends ConsumerState<DmScreen>
               tooltip: t.dmVerifySafetyNumberTooltip,
               onPressed: () async {
                 final confirmed = await Navigator.push<bool>(context, MaterialPageRoute(
-                  builder: (_) => SafetyNumberScreen(peerUserId: peerId, peerName: peerName),
+                  builder: (_) => SafetyNumberScreen(
+                      peerUserId: peerId, peerName: peerName, keyChanged: _safetyNumberChanged),
                 ));
                 if (confirmed == true && mounted) setState(() => _safetyNumberChanged = false);
               },
