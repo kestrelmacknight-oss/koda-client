@@ -112,14 +112,37 @@ class DmSessionManager {
   /// Regenerating is always safe for *this device* -- it only affects
   /// this device's own key_bundles row (see Koda.Devices server-side),
   /// never any other device's.
+  ///
+  /// Local material existing isn't enough on its own, though: the call
+  /// site (main.dart) runs this fire-and-forget and silently swallows
+  /// any error, so a transient failure right after
+  /// generateKeyMaterial/saveKeyMaterial succeeded locally -- the
+  /// upload below never landing -- used to go unnoticed forever; every
+  /// later launch would see local material present and never retry
+  /// publishing it. Confirming the server actually has *this device's*
+  /// bundle (not just "this user has some bundle," which a different,
+  /// already-working device would satisfy) closes that gap. Re-sending
+  /// the same already-generated material is what happens here, never
+  /// regenerating it -- nobody could have fetched/pinned a key that
+  /// was never published, so there's nothing to invalidate.
   Future<void> ensureMyKeysExist() async {
     final existing = await SecureStorage.loadKeyMaterial();
-    if (existing != null) return;
+    final deviceId = await SecureStorage.getOrCreateDeviceId();
+
+    if (existing != null) {
+      if (await KodaApi.instance.hasKeyBundle(deviceId: deviceId)) return;
+      final spkSig = await signPrekey(existing.identity, existing.signedPrekey);
+      await KodaApi.instance.uploadKeyBundle({
+        ...bundleToUploadJson(existing, spkSig),
+        'device_id': deviceId,
+        'device_name': _deviceName(),
+      });
+      return;
+    }
 
     final material = await generateKeyMaterial();
     final spkSig = await signPrekey(material.identity, material.signedPrekey);
     await SecureStorage.saveKeyMaterial(material);
-    final deviceId = await SecureStorage.getOrCreateDeviceId();
     await KodaApi.instance.uploadKeyBundle({
       ...bundleToUploadJson(material, spkSig),
       'device_id': deviceId,

@@ -798,9 +798,15 @@ class KodaApi {
 
   // ── E2EE key bundles ──────────────────────────────────────────────────────
 
-  Future<bool> hasKeyBundle() async {
+  /// [deviceId] scopes the check to one specific device -- omitting it
+  /// asks "does this user have any bundle at all," which is a
+  /// different (and for ensureMyKeysExist's purposes, wrong) question
+  /// on a multi-device account. See koda-server's
+  /// Crypto.has_key_bundle_for_device?/2 doc for why.
+  Future<bool> hasKeyBundle({String? deviceId}) async {
     try {
-      final res = await _dio.get('/keys/bundle/status');
+      final res = await _dio.get('/keys/bundle/status',
+          queryParameters: deviceId != null ? {'device_id': deviceId} : null);
       return res.data['has_bundle'] as bool? ?? false;
     } catch (e) { _log('hasKeyBundle', e); return false; }
   }
