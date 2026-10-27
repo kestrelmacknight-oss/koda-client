@@ -117,7 +117,23 @@ class SecureStorage {
   /// device's next bundle upload updates that same row instead of
   /// orphaning it under a brand-new device id. Only a genuinely fresh
   /// install (no local key material yet) gets a random one.
-  static Future<String> getOrCreateDeviceId() async {
+  // Memoized so concurrent callers (e.g. ensureMyKeysExist() and
+  // encryptForSend()'s self-sync exclusion both call this independently
+  // at launch) share one in-flight read-check-write instead of racing
+  // it: the read-then-write below isn't atomic, so two overlapping
+  // calls could each see "no existing id," each generate a *different*
+  // random one, and both write -- whichever write lands last silently
+  // wins, leaving the other caller holding an id that was never
+  // actually persisted. That mismatch is enough to make the self-sync
+  // "exclude my own device" check in encryptForSend fail to recognize
+  // itself, fanning a copy of a just-sent message right back to the
+  // sender -- a plausible cause of a sender seeing their own message
+  // twice with nothing unusual on the receiving end at all.
+  static Future<String>? _deviceIdFuture;
+
+  static Future<String> getOrCreateDeviceId() => _deviceIdFuture ??= _loadOrCreateDeviceId();
+
+  static Future<String> _loadOrCreateDeviceId() async {
     final existing = await _storage.read(key: _deviceIdKey);
     if (existing != null) return existing;
 
