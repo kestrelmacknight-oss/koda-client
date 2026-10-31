@@ -89,10 +89,19 @@ class _MemberPanelState extends ConsumerState<MemberPanel> {
         id: entry.key,
         name: role['name'] as String? ?? t.serverTabMembers,
         color: role['color'] as String? ?? '#6b7280',
+        // __no_role has no position of its own -- sort it below every
+        // real role, same place a roleless member sits in the role list.
+        position: role['position'] as int? ?? -1,
         members: entry.value,
         isOffline: false,
       ));
     }
+    // Highest-position role first, matching the role list itself (see
+    // koda-server's list_roles/1 and member_presence/2) -- a plain Map's
+    // iteration order reflects whichever member happened first in the
+    // presence response, not role priority, which is what made groups
+    // look shuffled relative to the role list.
+    groups.sort((a, b) => b.position.compareTo(a.position));
 
     if (offline.isNotEmpty) {
       groups.add(_MemberGroup(
@@ -456,6 +465,7 @@ class _MemberGroup {
   final String id;
   final String name;
   final String color;
+  final int position;
   final List<Map<String, dynamic>> members;
   final bool isOffline;
 
@@ -463,6 +473,7 @@ class _MemberGroup {
     required this.id,
     required this.name,
     required this.color,
+    this.position = 0,
     required this.members,
     required this.isOffline,
   });
