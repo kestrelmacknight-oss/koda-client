@@ -748,6 +748,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get profileCompareSteamLibraries => 'So Sánh Thư Viện Steam';
 
   @override
+  String get profileUpcomingEventsLabel => 'UPCOMING EVENTS';
+
+  @override
+  String get profileSeeAllEvents => 'See all';
+
+  @override
   String get steamCompareScreenTitle => 'Thư Viện Steam Chung';
 
   @override
@@ -852,6 +858,19 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get settingsShowPronounsSubtitle =>
       'Hiển thị cạnh tên bạn trong trò chuyện, danh sách thành viên và thoại';
+
+  @override
+  String get settingsCalendarLabel => 'CALENDAR';
+
+  @override
+  String get settingsShareCalendarTitle => 'Share my calendar';
+
+  @override
+  String get settingsShareCalendarSubtitle =>
+      'Let friends and servers you share see events you\'ve confirmed';
+
+  @override
+  String get settingsViewMyCalendar => 'View my calendar';
 
   @override
   String get settingsStatusLabel => 'TRẠNG THÁI';
@@ -3684,6 +3703,17 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get upcomingEventsEmptyState =>
       'Không có sự kiện sắp tới trên máy chủ của bạn';
+
+  @override
+  String get userCalendarMyTitle => 'My calendar';
+
+  @override
+  String userCalendarOtherTitle(String username) {
+    return '$username\'s calendar';
+  }
+
+  @override
+  String get userCalendarEmptyState => 'No confirmed events yet';
 
   @override
   String get upcomingEventsPublicBadge => 'Công khai';

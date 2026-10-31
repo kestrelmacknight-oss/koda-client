@@ -1413,12 +1413,24 @@ class KodaApi {
     }
   }
 
+  /// The edit form's own current values (bio/pronouns/show_pronouns/
+  /// share_calendar/status/custom_status) -- call before opening the
+  /// editor so Save doesn't silently overwrite them with blank/false
+  /// defaults.
+  Future<Map<String, dynamic>?> getMyProfile() async {
+    try {
+      final res = await _dio.get('/users/me');
+      return res.data['user'] as Map<String, dynamic>;
+    } catch (e) { _log('getMyProfile', e); return null; }
+  }
+
   Future<Map<String, dynamic>?> updateProfile({
     String? displayName,
     String? avatarUrl,
     String? bio,
     String? pronouns,
     bool? showPronouns,
+    bool? shareCalendar,
     String? status,
     String? customStatus,
   }) async {
@@ -1429,6 +1441,7 @@ class KodaApi {
         if (bio           != null) 'bio':           bio,
         if (pronouns      != null) 'pronouns':      pronouns,
         if (showPronouns  != null) 'show_pronouns': showPronouns,
+        if (shareCalendar != null) 'share_calendar': shareCalendar,
         if (status        != null) 'status':        status,
         if (customStatus  != null) 'custom_status': customStatus,
       });
@@ -1989,6 +2002,20 @@ class KodaApi {
       final res = await _dio.get('/users/me/upcoming_events', queryParameters: {'days': days});
       return List<Map<String, dynamic>>.from(res.data['events'] ?? []);
     } catch (e) { _log('getUpcomingEvents', e); return []; }
+  }
+
+  /// userId's own confirmed events -- subscribed for a free event, an
+  /// actually-completed ticket for a priced one. Pass your own id for
+  /// your own calendar (always visible); for anyone else this is empty
+  /// unless they've opted in (share_calendar) and you're mutually visible
+  /// to them (friends or a shared server) -- a 403/404 is treated the
+  /// same as "nothing to show" rather than surfaced as an error, so the
+  /// caller can't distinguish "not shared" from "nothing confirmed yet".
+  Future<List<Map<String, dynamic>>> getUserCalendar(String userId) async {
+    try {
+      final res = await _dio.get('/users/$userId/calendar');
+      return List<Map<String, dynamic>>.from(res.data['events'] ?? []);
+    } catch (e) { _log('getUserCalendar', e); return []; }
   }
 
   /// Your friends' recent activity (achievements, going live, joining a

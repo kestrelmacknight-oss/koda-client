@@ -752,6 +752,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get profileCompareSteamLibraries => 'Porovnat knihovny Steam';
 
   @override
+  String get profileUpcomingEventsLabel => 'UPCOMING EVENTS';
+
+  @override
+  String get profileSeeAllEvents => 'See all';
+
+  @override
   String get steamCompareScreenTitle => 'Sdílená knihovna Steam';
 
   @override
@@ -857,6 +863,19 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get settingsShowPronounsSubtitle =>
       'Zobrazují se vedle vašeho jména v chatu, seznamech členů a hlasu';
+
+  @override
+  String get settingsCalendarLabel => 'CALENDAR';
+
+  @override
+  String get settingsShareCalendarTitle => 'Share my calendar';
+
+  @override
+  String get settingsShareCalendarSubtitle =>
+      'Let friends and servers you share see events you\'ve confirmed';
+
+  @override
+  String get settingsViewMyCalendar => 'View my calendar';
 
   @override
   String get settingsStatusLabel => 'STAV';
@@ -3726,6 +3745,17 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get upcomingEventsEmptyState =>
       'Žádné nadcházející události na vašich serverech';
+
+  @override
+  String get userCalendarMyTitle => 'My calendar';
+
+  @override
+  String userCalendarOtherTitle(String username) {
+    return '$username\'s calendar';
+  }
+
+  @override
+  String get userCalendarEmptyState => 'No confirmed events yet';
 
   @override
   String get upcomingEventsPublicBadge => 'Veřejné';

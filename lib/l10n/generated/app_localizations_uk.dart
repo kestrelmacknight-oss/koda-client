@@ -748,6 +748,12 @@ class AppLocalizationsUk extends AppLocalizations {
   String get profileCompareSteamLibraries => 'Порівняти бібліотеки Steam';
 
   @override
+  String get profileUpcomingEventsLabel => 'UPCOMING EVENTS';
+
+  @override
+  String get profileSeeAllEvents => 'See all';
+
+  @override
   String get steamCompareScreenTitle => 'Спільна бібліотека Steam';
 
   @override
@@ -853,6 +859,19 @@ class AppLocalizationsUk extends AppLocalizations {
   @override
   String get settingsShowPronounsSubtitle =>
       'Показуються поруч із вашим імʼям у чаті, списках учасників і голосі';
+
+  @override
+  String get settingsCalendarLabel => 'CALENDAR';
+
+  @override
+  String get settingsShareCalendarTitle => 'Share my calendar';
+
+  @override
+  String get settingsShareCalendarSubtitle =>
+      'Let friends and servers you share see events you\'ve confirmed';
+
+  @override
+  String get settingsViewMyCalendar => 'View my calendar';
 
   @override
   String get settingsStatusLabel => 'СТАТУС';
@@ -3737,6 +3756,17 @@ class AppLocalizationsUk extends AppLocalizations {
   @override
   String get upcomingEventsEmptyState =>
       'На ваших серверах немає майбутніх подій';
+
+  @override
+  String get userCalendarMyTitle => 'My calendar';
+
+  @override
+  String userCalendarOtherTitle(String username) {
+    return '$username\'s calendar';
+  }
+
+  @override
+  String get userCalendarEmptyState => 'No confirmed events yet';
 
   @override
   String get upcomingEventsPublicBadge => 'Публічний';

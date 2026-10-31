@@ -1456,6 +1456,18 @@ abstract class AppLocalizations {
   /// **'Compare Steam Libraries'**
   String get profileCompareSteamLibraries;
 
+  /// No description provided for @profileUpcomingEventsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'UPCOMING EVENTS'**
+  String get profileUpcomingEventsLabel;
+
+  /// No description provided for @profileSeeAllEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get profileSeeAllEvents;
+
   /// No description provided for @steamCompareScreenTitle.
   ///
   /// In en, this message translates to:
@@ -1647,6 +1659,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Shown next to your name in chat, member lists, and voice'**
   String get settingsShowPronounsSubtitle;
+
+  /// No description provided for @settingsCalendarLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CALENDAR'**
+  String get settingsCalendarLabel;
+
+  /// No description provided for @settingsShareCalendarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share my calendar'**
+  String get settingsShareCalendarTitle;
+
+  /// No description provided for @settingsShareCalendarSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let friends and servers you share see events you've confirmed'**
+  String get settingsShareCalendarSubtitle;
+
+  /// No description provided for @settingsViewMyCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'View my calendar'**
+  String get settingsViewMyCalendar;
 
   /// No description provided for @settingsStatusLabel.
   ///
@@ -6466,6 +6502,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No upcoming events across your servers'**
   String get upcomingEventsEmptyState;
+
+  /// No description provided for @userCalendarMyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My calendar'**
+  String get userCalendarMyTitle;
+
+  /// No description provided for @userCalendarOtherTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{username}'s calendar'**
+  String userCalendarOtherTitle(String username);
+
+  /// No description provided for @userCalendarEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No confirmed events yet'**
+  String get userCalendarEmptyState;
 
   /// No description provided for @upcomingEventsPublicBadge.
   ///

@@ -752,6 +752,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileCompareSteamLibraries => 'Comparer les bibliothèques Steam';
 
   @override
+  String get profileUpcomingEventsLabel => 'UPCOMING EVENTS';
+
+  @override
+  String get profileSeeAllEvents => 'See all';
+
+  @override
   String get steamCompareScreenTitle => 'Bibliothèque Steam partagée';
 
   @override
@@ -858,6 +864,19 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settingsShowPronounsSubtitle =>
       'Affichés à côté de votre nom dans le chat, les listes de membres et la voix';
+
+  @override
+  String get settingsCalendarLabel => 'CALENDAR';
+
+  @override
+  String get settingsShareCalendarTitle => 'Share my calendar';
+
+  @override
+  String get settingsShareCalendarSubtitle =>
+      'Let friends and servers you share see events you\'ve confirmed';
+
+  @override
+  String get settingsViewMyCalendar => 'View my calendar';
 
   @override
   String get settingsStatusLabel => 'STATUT';
@@ -3731,6 +3750,17 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get upcomingEventsEmptyState =>
       'Aucun événement à venir sur vos serveurs';
+
+  @override
+  String get userCalendarMyTitle => 'My calendar';
+
+  @override
+  String userCalendarOtherTitle(String username) {
+    return '$username\'s calendar';
+  }
+
+  @override
+  String get userCalendarEmptyState => 'No confirmed events yet';
 
   @override
   String get upcomingEventsPublicBadge => 'Public';

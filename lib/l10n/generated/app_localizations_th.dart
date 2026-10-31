@@ -744,6 +744,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get profileCompareSteamLibraries => 'เปรียบเทียบคลังเกม Steam';
 
   @override
+  String get profileUpcomingEventsLabel => 'UPCOMING EVENTS';
+
+  @override
+  String get profileSeeAllEvents => 'See all';
+
+  @override
   String get steamCompareScreenTitle => 'คลังเกม Steam ที่มีร่วมกัน';
 
   @override
@@ -850,6 +856,19 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get settingsShowPronounsSubtitle =>
       'แสดงข้างชื่อของคุณในแชท รายชื่อสมาชิก และช่องเสียง';
+
+  @override
+  String get settingsCalendarLabel => 'CALENDAR';
+
+  @override
+  String get settingsShareCalendarTitle => 'Share my calendar';
+
+  @override
+  String get settingsShareCalendarSubtitle =>
+      'Let friends and servers you share see events you\'ve confirmed';
+
+  @override
+  String get settingsViewMyCalendar => 'View my calendar';
 
   @override
   String get settingsStatusLabel => 'สถานะ';
@@ -3669,6 +3688,17 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get upcomingEventsEmptyState =>
       'ไม่มีกิจกรรมที่จะถึงในเซิร์ฟเวอร์ของคุณ';
+
+  @override
+  String get userCalendarMyTitle => 'My calendar';
+
+  @override
+  String userCalendarOtherTitle(String username) {
+    return '$username\'s calendar';
+  }
+
+  @override
+  String get userCalendarEmptyState => 'No confirmed events yet';
 
   @override
   String get upcomingEventsPublicBadge => 'สาธารณะ';

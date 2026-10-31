@@ -724,6 +724,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get profileCompareSteamLibraries => 'Steam 라이브러리 비교';
 
   @override
+  String get profileUpcomingEventsLabel => 'UPCOMING EVENTS';
+
+  @override
+  String get profileSeeAllEvents => 'See all';
+
+  @override
   String get steamCompareScreenTitle => '공유 Steam 라이브러리';
 
   @override
@@ -825,6 +831,19 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get settingsShowPronounsSubtitle => '채팅, 멤버 목록, 음성에서 이름 옆에 표시됩니다';
+
+  @override
+  String get settingsCalendarLabel => 'CALENDAR';
+
+  @override
+  String get settingsShareCalendarTitle => 'Share my calendar';
+
+  @override
+  String get settingsShareCalendarSubtitle =>
+      'Let friends and servers you share see events you\'ve confirmed';
+
+  @override
+  String get settingsViewMyCalendar => 'View my calendar';
 
   @override
   String get settingsStatusLabel => '상태';
@@ -3572,6 +3591,17 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get upcomingEventsEmptyState => '서버에 다가오는 이벤트가 없습니다';
+
+  @override
+  String get userCalendarMyTitle => 'My calendar';
+
+  @override
+  String userCalendarOtherTitle(String username) {
+    return '$username\'s calendar';
+  }
+
+  @override
+  String get userCalendarEmptyState => 'No confirmed events yet';
 
   @override
   String get upcomingEventsPublicBadge => '공개';

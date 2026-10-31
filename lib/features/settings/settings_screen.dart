@@ -26,6 +26,7 @@ import '../../core/tray_service.dart';
 import '../../core/uploader.dart';
 import '../../shared/glowing_username.dart';
 import '../../shared/presence_status.dart';
+import '../../shared/user_calendar_screen.dart';
 import '../../shared/widgets.dart';
 import 'content_filters_screen.dart';
 import 'devices_screen.dart';
@@ -57,6 +58,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   late TextEditingController _pronounsCtrl;
   late TextEditingController _customStatusCtrl;
   bool _showPronouns = false;
+  bool _shareCalendar = false;
   String _status = 'online';
   String? _throneWebhookUrl;
   bool _loadingThroneUrl = false;
@@ -307,9 +309,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     super.dispose();
   }
 
-  void _startEditing() {
+  Future<void> _startEditing() async {
     final user = ref.read(authProvider).user;
     _displayNameCtrl.text = user?.username ?? '';
+
+    // Preload the rest from the server before showing the editor -- without
+    // this, bio/pronouns/show_pronouns/share_calendar/custom_status/status
+    // silently reset to blank/default on every edit unless re-typed.
+    final profile = await KodaApi.instance.getMyProfile();
+    if (!mounted) return;
+    if (profile != null) {
+      _displayNameCtrl.text   = profile['display_name'] as String? ?? user?.username ?? '';
+      _avatarUrlCtrl.text     = profile['avatar_url'] as String? ?? '';
+      _bioCtrl.text           = profile['bio'] as String? ?? '';
+      _pronounsCtrl.text      = profile['pronouns'] as String? ?? '';
+      _customStatusCtrl.text  = profile['custom_status'] as String? ?? '';
+      _status                 = profile['status'] as String? ?? 'online';
+      _showPronouns           = profile['show_pronouns'] as bool? ?? false;
+      _shareCalendar          = profile['share_calendar'] as bool? ?? false;
+    }
     setState(() => _editingProfile = true);
   }
 
@@ -378,6 +396,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       bio:          data['bio'],
       pronouns:     data['pronouns'],
       showPronouns: _showPronouns,
+      shareCalendar: _shareCalendar,
       status:       _status,
       customStatus: data['custom_status'],
     );
@@ -1371,6 +1390,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         value: _showPronouns,
         activeThumbColor: KodaColors.koda,
         onChanged: (v) => setState(() => _showPronouns = v),
+      ),
+      const SizedBox(height: 20),
+
+      // Calendar
+      Text(t.settingsCalendarLabel,
+          style: TextStyle(color: KodaColors.text3, fontSize: 11,
+              fontWeight: FontWeight.w700, letterSpacing: 1)),
+      const SizedBox(height: 8),
+      SwitchListTile(
+        contentPadding: EdgeInsets.zero,
+        title: Text(t.settingsShareCalendarTitle,
+            style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+        subtitle: Text(t.settingsShareCalendarSubtitle,
+            style: TextStyle(color: KodaColors.text3, fontSize: 11)),
+        value: _shareCalendar,
+        activeThumbColor: KodaColors.koda,
+        onChanged: (v) => setState(() => _shareCalendar = v),
+      ),
+      ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: Icon(Icons.event_available_outlined, color: KodaColors.text3, size: 20),
+        title: Text(t.settingsViewMyCalendar,
+            style: TextStyle(color: KodaColors.text1, fontSize: 13)),
+        trailing: Icon(Icons.chevron_right, color: KodaColors.text3, size: 18),
+        onTap: () {
+          final me = ref.read(authProvider).user;
+          if (me == null) return;
+          Navigator.push(context, MaterialPageRoute(
+              builder: (_) => UserCalendarScreen(userId: me.id, username: me.username, isSelf: true)));
+        },
       ),
       const SizedBox(height: 20),
 

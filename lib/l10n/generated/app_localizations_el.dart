@@ -760,6 +760,12 @@ class AppLocalizationsEl extends AppLocalizations {
   String get profileCompareSteamLibraries => 'Σύγκριση βιβλιοθηκών Steam';
 
   @override
+  String get profileUpcomingEventsLabel => 'UPCOMING EVENTS';
+
+  @override
+  String get profileSeeAllEvents => 'See all';
+
+  @override
   String get steamCompareScreenTitle => 'Κοινή βιβλιοθήκη Steam';
 
   @override
@@ -867,6 +873,19 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get settingsShowPronounsSubtitle =>
       'Εμφανίζονται δίπλα στο όνομά σας στη συνομιλία, στις λίστες μελών και στη φωνή';
+
+  @override
+  String get settingsCalendarLabel => 'CALENDAR';
+
+  @override
+  String get settingsShareCalendarTitle => 'Share my calendar';
+
+  @override
+  String get settingsShareCalendarSubtitle =>
+      'Let friends and servers you share see events you\'ve confirmed';
+
+  @override
+  String get settingsViewMyCalendar => 'View my calendar';
 
   @override
   String get settingsStatusLabel => 'ΚΑΤΑΣΤΑΣΗ';
@@ -3744,6 +3763,17 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get upcomingEventsEmptyState =>
       'Καμία επερχόμενη εκδήλωση στους διακομιστές σας';
+
+  @override
+  String get userCalendarMyTitle => 'My calendar';
+
+  @override
+  String userCalendarOtherTitle(String username) {
+    return '$username\'s calendar';
+  }
+
+  @override
+  String get userCalendarEmptyState => 'No confirmed events yet';
 
   @override
   String get upcomingEventsPublicBadge => 'Δημόσιο';

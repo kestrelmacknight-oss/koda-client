@@ -745,6 +745,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String get profileCompareSteamLibraries => 'Steam लाइब्रेरी की तुलना करें';
 
   @override
+  String get profileUpcomingEventsLabel => 'UPCOMING EVENTS';
+
+  @override
+  String get profileSeeAllEvents => 'See all';
+
+  @override
   String get steamCompareScreenTitle => 'साझा Steam लाइब्रेरी';
 
   @override
@@ -850,6 +856,19 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get settingsShowPronounsSubtitle =>
       'चैट, सदस्य सूची और वॉइस में आपके नाम के बगल में दिखाया जाता है';
+
+  @override
+  String get settingsCalendarLabel => 'CALENDAR';
+
+  @override
+  String get settingsShareCalendarTitle => 'Share my calendar';
+
+  @override
+  String get settingsShareCalendarSubtitle =>
+      'Let friends and servers you share see events you\'ve confirmed';
+
+  @override
+  String get settingsViewMyCalendar => 'View my calendar';
 
   @override
   String get settingsStatusLabel => 'स्टेटस';
@@ -3687,6 +3706,17 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get upcomingEventsEmptyState => 'आपके सर्वर पर कोई आगामी इवेंट नहीं';
+
+  @override
+  String get userCalendarMyTitle => 'My calendar';
+
+  @override
+  String userCalendarOtherTitle(String username) {
+    return '$username\'s calendar';
+  }
+
+  @override
+  String get userCalendarEmptyState => 'No confirmed events yet';
 
   @override
   String get upcomingEventsPublicBadge => 'सार्वजनिक';

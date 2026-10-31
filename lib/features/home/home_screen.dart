@@ -58,6 +58,7 @@ import '../../core/time_utils.dart';
 import '../../shared/encrypted_attachment_view.dart';
 import '../../shared/presence_status.dart';
 import '../../shared/slowmode.dart';
+import '../../shared/user_calendar_screen.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 import '../gallery/gallery_screen.dart';
 import '../stage/stage_screen.dart';
@@ -1414,6 +1415,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     final canDm = friendStatus?['can_dm'] == true;
     final steamLibraryShared = friendStatus?['steam_library_shared'] == true;
 
+    // Empty whenever the calendar isn't shared, the viewer isn't mutually
+    // visible to this user (friends/shared server), or there's genuinely
+    // nothing confirmed -- getUserCalendar can't distinguish those, and
+    // the dialog shouldn't either: the section just doesn't appear.
+    final calendarEvents = await KodaApi.instance.getUserCalendar(userId);
+    if (!context.mounted) return;
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -1477,6 +1485,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             if (isFriend)
               Text(t.homeAreFriends,
                   style: TextStyle(color: KodaColors.koda, fontSize: 12)),
+            if (calendarEvents.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(t.profileUpcomingEventsLabel,
+                    style: TextStyle(color: KodaColors.text3, fontSize: 11,
+                        fontWeight: FontWeight.w700, letterSpacing: 1)),
+              ),
+              const SizedBox(height: 6),
+              ...calendarEvents.take(3).map((event) {
+                final start = parseServerTimestamp(event['start_at'] as String);
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                        '${event['title'] as String? ?? ''} · ${DateFormat('MMM d, h:mm a').format(start)}',
+                        style: TextStyle(color: KodaColors.text2, fontSize: 12),
+                        overflow: TextOverflow.ellipsis),
+                  ),
+                );
+              }),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(context, MaterialPageRoute(
+                        builder: (_) => UserCalendarScreen(userId: userId, username: username, isSelf: false)));
+                  },
+                  child: Text(t.profileSeeAllEvents,
+                      style: TextStyle(color: KodaColors.koda, fontSize: 12, fontWeight: FontWeight.w600)),
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               if (!isFriend)

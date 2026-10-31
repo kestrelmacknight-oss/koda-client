@@ -712,6 +712,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get profileCompareSteamLibraries => '比较 Steam 游戏库';
 
   @override
+  String get profileUpcomingEventsLabel => 'UPCOMING EVENTS';
+
+  @override
+  String get profileSeeAllEvents => 'See all';
+
+  @override
   String get steamCompareScreenTitle => '共同的 Steam 游戏库';
 
   @override
@@ -811,6 +817,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsShowPronounsSubtitle => '会显示在聊天、成员列表和语音中你的名字旁边';
+
+  @override
+  String get settingsCalendarLabel => 'CALENDAR';
+
+  @override
+  String get settingsShareCalendarTitle => 'Share my calendar';
+
+  @override
+  String get settingsShareCalendarSubtitle =>
+      'Let friends and servers you share see events you\'ve confirmed';
+
+  @override
+  String get settingsViewMyCalendar => 'View my calendar';
 
   @override
   String get settingsStatusLabel => '状态';
@@ -3529,6 +3548,17 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get upcomingEventsEmptyState => '你的服务器上没有即将举行的活动';
+
+  @override
+  String get userCalendarMyTitle => 'My calendar';
+
+  @override
+  String userCalendarOtherTitle(String username) {
+    return '$username\'s calendar';
+  }
+
+  @override
+  String get userCalendarEmptyState => 'No confirmed events yet';
 
   @override
   String get upcomingEventsPublicBadge => '公开';
