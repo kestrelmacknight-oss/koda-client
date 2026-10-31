@@ -87,7 +87,16 @@ Future<Map<String, dynamic>> decryptMessage(Map<String, dynamic> m,
     // ciphertext failed to authenticate -- both surface the same way
     // here; the channel view retries on next sync rather than ever
     // falling back to showing something unverified.
-    return {...m, 'content': '', '_decryptPending': true};
+    //
+    // TEMPORARY diagnostic: distinguish the two causes right in the
+    // badge text (see channel_chat_panel.dart/home_screen.dart's
+    // _decryptDebug usage) -- remove once the live "waiting for
+    // encryption key" investigation is resolved.
+    final hasLocalKey = await SecureStorage.loadChannelEpochKey(channelId, epoch) != null;
+    return {...m, 'content': '', '_decryptPending': true,
+        '_decryptDebug': hasLocalKey
+            ? 'key present locally -- ciphertext failed to authenticate'
+            : 'no local key for epoch $epoch'};
   }
 
   if (messageId != null) await SecureStorage.cacheDecryptedContent(messageId, plaintext);

@@ -1281,7 +1281,9 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
                           if (m['reply_to'] != null)
                             _buildReplyPreview(m['reply_to'] as Map<String, dynamic>),
                           if (m['_decryptPending'] == true)
-                            Text(t.homeWaitingForKey,
+                            Text(m['_decryptDebug'] != null
+                                    ? '${t.homeWaitingForKey} (${m['_decryptDebug']})'
+                                    : t.homeWaitingForKey,
                                 style: TextStyle(color: KodaColors.text3,
                                     fontSize: 12, fontStyle: FontStyle.italic))
                           else if (m['_decryptFailed'] == true)
