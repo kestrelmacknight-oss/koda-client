@@ -54,7 +54,7 @@ class _ForcePasswordChangeScreenState
 
     if (result != null) {
       final token = result['token'] as String?;
-      if (token != null) KodaApi.instance.setToken(token);
+      if (token != null) await KodaApi.instance.setToken(token);
       ref.read(authProvider.notifier).setUser(result['user']);
       Navigator.pushAndRemoveUntil(
         context,

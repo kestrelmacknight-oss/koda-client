@@ -91,7 +91,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
     final token = result['token'] as String?;
     if (token != null) {
-      KodaApi.instance.setToken(token);
+      await KodaApi.instance.setToken(token);
       KodaSocket.instance.connect(token);
       // Generate and upload key bundle if not already on server
       _initKeyBundle();

@@ -59,7 +59,7 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
     final token = await SecureStorage.loadToken();
     final myUserId = await SecureStorage.loadUserId();
     if (token == null || myUserId == null) return; // signed out -- nothing to sync
-    KodaApi.instance.setToken(token);
+    await KodaApi.instance.setToken(token);
 
     final type = message.data['type'] as String?;
     switch (type) {

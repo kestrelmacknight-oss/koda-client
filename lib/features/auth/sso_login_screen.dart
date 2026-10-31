@@ -102,7 +102,7 @@ class _SsoLoginScreenState extends ConsumerState<SsoLoginScreen> {
   }
 
   Future<void> _finishLogin(String token) async {
-    KodaApi.instance.setToken(token);
+    await KodaApi.instance.setToken(token);
     KodaSocket.instance.connect(token);
     try {
       await DmSessionManager.instance.ensureMyKeysExist();

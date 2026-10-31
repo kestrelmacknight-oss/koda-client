@@ -119,9 +119,9 @@ class KodaApi {
     } catch (e) { _log(path, e); return (url: null, consentRequired: false); }
   }
 
-  void setToken(String token) {
+  Future<void> setToken(String token) async {
     _token = token;
-    KodaStorage.saveToken(token);
+    await KodaStorage.saveToken(token);
   }
 
   Future<void> loadStoredToken() async {
