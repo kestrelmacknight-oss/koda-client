@@ -42,60 +42,74 @@ Map<String, dynamic> _withPlaintext(Map<String, dynamic> m, String raw) {
   };
 }
 
+// Decrypts one message-shaped map's `content` in place. Pulled out of
+// decryptMessages so the exact same logic also applies to a `reply_to`
+// snapshot embedded on a message -- Koda.Chat.get_reply_preview/1
+// server-side sends that snapshot in the identical
+// encrypted/epoch/nonce/content shape as a full message row (it IS one,
+// just a different message's), so without this a reply preview was
+// either raw ciphertext or (before the server-side fix) the literal
+// string "[encrypted message]" for every single reply, since nothing
+// upstream of here ever decrypted it.
+Future<Map<String, dynamic>> decryptMessage(Map<String, dynamic> m,
+    {required String channelId, required String myUserId}) async {
+  final isEncrypted = m['encrypted'] == true || m['encrypted'] == 'true';
+  if (!isEncrypted) return _withPlaintext(m, m['content'] as String? ?? '');
+
+  final epoch = m['epoch'] as int?;
+  if (epoch == null) {
+    // Legacy pre-existing row from before real channel encryption.
+    final raw = m['content'] as String? ?? '';
+    try {
+      final padded = raw.padRight((raw.length + 3) ~/ 4 * 4, '=');
+      return _withPlaintext(m, utf8.decode(base64Decode(padded)));
+    } catch (_) {
+      return m; // not legacy-decodable -- show as-is rather than crash
+    }
+  }
+
+  final messageId = m['id'] as String?;
+  final cached = messageId != null
+      ? await SecureStorage.getCachedDecryptedContent(messageId)
+      : null;
+  if (cached != null) return _withPlaintext(m, cached);
+
+  final content = m['content'] as String?;
+  final nonce = m['nonce'] as String?;
+  if (content == null || nonce == null) {
+    return {...m, 'content': '', '_decryptFailed': true};
+  }
+
+  final plaintext = await ChannelKeyManager.instance
+      .decryptForChannel(channelId, epoch, content, nonce, myUserId: myUserId);
+  if (plaintext == null) {
+    // Either the key hasn't reached this device yet, or the
+    // ciphertext failed to authenticate -- both surface the same way
+    // here; the channel view retries on next sync rather than ever
+    // falling back to showing something unverified.
+    return {...m, 'content': '', '_decryptPending': true};
+  }
+
+  if (messageId != null) await SecureStorage.cacheDecryptedContent(messageId, plaintext);
+  return _withPlaintext(m, plaintext);
+}
+
 Future<List<Map<String, dynamic>>> decryptMessages(
     List<Map<String, dynamic>> msgs,
     {required String channelId, required String myUserId}) async {
   final out = <Map<String, dynamic>>[];
 
   for (final m in msgs) {
-    final isEncrypted = m['encrypted'] == true || m['encrypted'] == 'true';
-    if (!isEncrypted) {
-      out.add(_withPlaintext(m, m['content'] as String? ?? ''));
-      continue;
+    var decrypted = await decryptMessage(m, channelId: channelId, myUserId: myUserId);
+
+    final replyTo = m['reply_to'] as Map<String, dynamic>?;
+    if (replyTo != null) {
+      final decryptedReply =
+          await decryptMessage(replyTo, channelId: channelId, myUserId: myUserId);
+      decrypted = {...decrypted, 'reply_to': decryptedReply};
     }
 
-    final epoch = m['epoch'] as int?;
-    if (epoch == null) {
-      // Legacy pre-existing row from before real channel encryption.
-      final raw = m['content'] as String? ?? '';
-      try {
-        final padded = raw.padRight((raw.length + 3) ~/ 4 * 4, '=');
-        out.add(_withPlaintext(m, utf8.decode(base64Decode(padded))));
-      } catch (_) {
-        out.add(m); // not legacy-decodable -- show as-is rather than crash
-      }
-      continue;
-    }
-
-    final messageId = m['id'] as String?;
-    final cached = messageId != null
-        ? await SecureStorage.getCachedDecryptedContent(messageId)
-        : null;
-    if (cached != null) {
-      out.add(_withPlaintext(m, cached));
-      continue;
-    }
-
-    final content = m['content'] as String?;
-    final nonce = m['nonce'] as String?;
-    if (content == null || nonce == null) {
-      out.add({...m, 'content': '', '_decryptFailed': true});
-      continue;
-    }
-
-    final plaintext = await ChannelKeyManager.instance
-        .decryptForChannel(channelId, epoch, content, nonce, myUserId: myUserId);
-    if (plaintext == null) {
-      // Either the key hasn't reached this device yet, or the
-      // ciphertext failed to authenticate -- both surface the same way
-      // here; the channel view retries on next sync rather than ever
-      // falling back to showing something unverified.
-      out.add({...m, 'content': '', '_decryptPending': true});
-      continue;
-    }
-
-    if (messageId != null) await SecureStorage.cacheDecryptedContent(messageId, plaintext);
-    out.add(_withPlaintext(m, plaintext));
+    out.add(decrypted);
   }
 
   return out;
