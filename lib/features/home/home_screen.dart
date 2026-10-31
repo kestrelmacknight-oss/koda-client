@@ -835,15 +835,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         _channelUnread = {..._channelUnread, channelId: 0};
         _channelsWithMentions.remove(channelId);
       });
-      // Land on the most recent messages, not wherever offset 0 happens
-      // to put us -- deferred to a postFrameCallback so the list has
-      // actually laid out this (possibly much longer) _messages before
-      // maxScrollExtent is read, same pattern dm_screen.dart's
-      // _openConversation already uses correctly. Skipped in top-anchored
-      // mode: offset 0 (the default) is already correct there.
+      // Land on the most recent messages, not wherever offset 0 (or the
+      // previous channel's own offset, which this shared _scroll
+      // controller otherwise just keeps showing) happens to put us --
+      // deferred to a postFrameCallback so the list has actually laid
+      // out this (possibly much longer) _messages before maxScrollExtent
+      // is read, same pattern dm_screen.dart's _openConversation already
+      // uses. Skipped in top-anchored mode: offset 0 (the default) is
+      // already correct there.
       if (!newestAtTop) {
+        void jumpToBottom() {
+          if (!mounted || _activeChannelId != channelId || !_scroll.hasClients) return;
+          _scroll.jumpTo(_scroll.position.maxScrollExtent);
+        }
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (_scroll.hasClients) _scroll.jumpTo(_scroll.position.maxScrollExtent);
+          jumpToBottom();
+          // A single postFrameCallback can still land on a frame where
+          // the list hasn't attached yet (observed as the view silently
+          // keeping whatever scroll offset the *previous* channel had,
+          // rather than visibly failing) -- this short retry catches
+          // that instead of leaving it stuck there for the rest of the
+          // session. _activeChannelId is re-checked so a slow retry from
+          // a channel the user has since navigated away from never
+          // yanks the one they're actually looking at back to its own
+          // bottom.
+          Future.delayed(const Duration(milliseconds: 100), jumpToBottom);
         });
       }
       KodaApi.instance.markChannelRead(channelId);

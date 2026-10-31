@@ -280,10 +280,18 @@ class _DmScreenState extends ConsumerState<DmScreen>
     });
     // Skipped top-anchored: offset 0 (the default) is already correct there.
     if (!newestAtTop) {
+      void jumpToBottom() {
+        if (!mounted || _activeConversationId != conversationId || !_scroll.hasClients) return;
+        _scroll.jumpTo(_scroll.position.maxScrollExtent);
+      }
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scroll.hasClients) {
-          _scroll.jumpTo(_scroll.position.maxScrollExtent);
-        }
+        jumpToBottom();
+        // See home_screen.dart's identical retry: a single
+        // postFrameCallback can land on a frame where the list hasn't
+        // attached yet, which otherwise silently leaves this view
+        // sitting at whatever scroll offset the *previous* conversation
+        // had rather than this one's actual bottom.
+        Future.delayed(const Duration(milliseconds: 100), jumpToBottom);
       });
     }
 
