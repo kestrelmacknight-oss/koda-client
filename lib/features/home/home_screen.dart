@@ -1050,7 +1050,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     if (msg != null && mounted) {
       await SecureStorage.cacheDecryptedContent(msg['id'] as String, payload);
       final lang = detectMessageLanguage(text);
+      // The server echoes back a `reply_to` snapshot in the same raw
+      // ciphertext shape as any other message -- decrypt it now rather
+      // than leaving it for the next full _load(), or the reply preview
+      // shows as encrypted/pending until the channel is left and reopened.
+      final replyTo = msg['reply_to'] as Map<String, dynamic>?;
+      final decryptedReplyTo = replyTo != null
+          ? await decryptMessage(replyTo, channelId: channelId, myUserId: myUserId)
+          : null;
       setState(() => _insertNewMessage({...msg, 'content': text,
+          if (decryptedReplyTo != null) 'reply_to': decryptedReplyTo,
           if (fileAttachment != null) '_attachment': fileAttachment,
           if (lang != null) '_detectedLang': lang}));
       Future.delayed(const Duration(milliseconds: 50), _scrollToLatest);
