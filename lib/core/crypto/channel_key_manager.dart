@@ -56,7 +56,8 @@ class ChannelKeyManager {
   /// undecryptable entry (stale session, safety number changed) doesn't
   /// block the rest.
   Future<void> syncDeliveries(String channelId, {required String myUserId}) async {
-    final deliveries = await KodaApi.instance.getMyChannelDeliveries(channelId);
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
+    final deliveries = await KodaApi.instance.getMyChannelDeliveries(channelId, myDeviceId);
     for (final d in deliveries) {
       final epoch = d['epoch'] as int?;
       final senderId = d['sender_id'] as String?;
@@ -150,19 +151,30 @@ class ChannelKeyManager {
     final pending = await KodaApi.instance.getPendingEpochRecipients(channelId, epoch);
     if (pending.isEmpty) return;
 
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
     final payload = jsonEncode({'key': bytesToB64(key)});
     final deliveries = <Map<String, dynamic>>[];
 
-    for (final recipientId in pending) {
-      if (recipientId == myUserId) continue; // I already have it, nothing to deliver to myself
+    // One entry per (user, device) still missing a delivery -- includes
+    // this account's *other* devices (self-sync, same as a real DM's
+    // fan-out), since the server now tracks delivery per device rather
+    // than per user. Only this exact device is skipped: it's the one
+    // that just generated or already holds [key], nothing to deliver to
+    // itself.
+    for (final recipient in pending) {
+      final recipientId = recipient['user_id'] as String;
+      final deviceId = recipient['device_id'] as String;
+      if (recipientId == myUserId && deviceId == myDeviceId) continue;
       try {
         final envelope = await DmSessionManager.instance.encryptForSendSingleSession(
           conversationId: _channelKeySessionId(myUserId, recipientId),
           peerUserId: recipientId,
+          peerDeviceId: deviceId,
           plaintext: payload,
         );
         deliveries.add({
           'recipient_id': recipientId,
+          'recipient_device_id': deviceId,
           'content': envelope.content,
           'ratchet_key': envelope.ratchetKey,
           'msg_number': envelope.msgNumber,
@@ -171,14 +183,14 @@ class ChannelKeyManager {
           if (envelope.x3dhHeader != null) 'x3dh_header': envelope.x3dhHeader,
         });
       } catch (_) {
-        // e.g. recipient hasn't published a key bundle yet -- they'll
+        // e.g. that device hasn't published a key bundle yet -- it'll
         // be picked up again next time someone calls ensureReady.
         continue;
       }
     }
 
     if (deliveries.isNotEmpty) {
-      await KodaApi.instance.deliverChannelEpochKeys(channelId, epoch, deliveries);
+      await KodaApi.instance.deliverChannelEpochKeys(channelId, epoch, myDeviceId, deliveries);
     }
   }
 

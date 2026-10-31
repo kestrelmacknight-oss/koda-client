@@ -207,20 +207,28 @@ class DmSessionManager {
     });
   }
 
-  /// A single, non-fanned-out session with [peerUserId] under
-  /// [conversationId] -- keyed by the original (pre-multi-device)
-  /// storage key, same one a legacy row's decryptReceived falls back
-  /// to. This is **not** for real DM conversations (those need
-  /// encryptForSend's full multi-device fan-out so every device on both
-  /// ends gets a copy) -- it exists for channel_key_manager.dart, which
-  /// reuses the pairwise Double Ratchet purely as a transport to move a
-  /// channel's epoch key to one other *user* (koda-server's
-  /// Koda.ChannelCrypto has no per-device concept at all -- one
-  /// delivery row per recipient user, full stop), not a real
-  /// conversation multiple devices need independent copies of.
+  /// A single, non-fanned-out session with one specific device
+  /// ([peerDeviceId]) of [peerUserId] under [conversationId] -- keyed by
+  /// (conversationId, peerDeviceId), the same per-device storage-key
+  /// convention encryptForSend's real multi-device fan-out already
+  /// uses. This is **not** for real DM conversations (those need
+  /// encryptForSend's full fan-out to every device on both ends) -- it's
+  /// for channel_key_manager.dart and threshold_moderation_manager.dart,
+  /// which reuse the pairwise Double Ratchet purely as a transport to
+  /// move key material to one specific device of one other user.
+  ///
+  /// [peerDeviceId] used to be picked for the caller, internally,
+  /// always the first device KodaApi.getDeviceIdsFor happened to
+  /// return -- harmless for a single-device account, but for a
+  /// multi-device one it meant every device *except* whichever one
+  /// happened to be first could never receive a delivery at all.
+  /// Callers now pick explicitly and are expected to loop over every
+  /// device that still needs one (see channel_key_manager.dart's
+  /// _distributePendingIfAny), not call this once per recipient.
   Future<EncryptedEnvelope> encryptForSendSingleSession({
     required String conversationId,
     required String peerUserId,
+    required String peerDeviceId,
     required String plaintext,
   }) async {
     final myMaterial = await SecureStorage.loadKeyMaterial();
@@ -228,17 +236,16 @@ class DmSessionManager {
       throw StateError('No local key material -- call ensureMyKeysExist() first.');
     }
 
-    var state = await SecureStorage.loadRatchetState(conversationId);
+    var state = await SecureStorage.loadRatchetState(conversationId, peerDeviceId);
     Map<String, dynamic>? x3dhHeader;
 
     if (state == null) {
-      final bundleJson = await KodaApi.instance.fetchKeyBundle(
-          peerUserId, (await KodaApi.instance.getDeviceIdsFor(peerUserId)).firstOrNull ?? '');
+      final bundleJson = await KodaApi.instance.fetchKeyBundle(peerUserId, peerDeviceId);
       if (bundleJson == null) {
-        throw StateError('$peerUserId has not published a key bundle yet.');
+        throw StateError('$peerUserId has not published a key bundle for device $peerDeviceId.');
       }
       final remoteBundle = RemoteBundle.fromJson(bundleJson);
-      await _checkAndPinIdentity(peerUserId, remoteBundle.ikDhPub, remoteBundle.ikSignPub, null);
+      await _checkAndPinIdentity(peerUserId, remoteBundle.ikDhPub, remoteBundle.ikSignPub, peerDeviceId);
 
       final x3dh = await initiateSession(myIdentity: myMaterial.identity, theirBundle: remoteBundle);
       state = await RatchetState.initAsInitiator(
@@ -257,7 +264,7 @@ class DmSessionManager {
     }
 
     final result = await state.encrypt(utf8.encode(plaintext));
-    await SecureStorage.saveRatchetState(conversationId, state);
+    await SecureStorage.saveRatchetState(conversationId, state, peerDeviceId);
 
     return EncryptedEnvelope(
       content: bytesToB64(result.payload),
@@ -265,8 +272,8 @@ class DmSessionManager {
       msgNumber: result.header.msgNumber,
       prevChain: result.header.prevChain,
       nonce: bytesToB64(result.nonce),
-      senderDeviceId: '',
-      recipientDeviceId: '',
+      senderDeviceId: await SecureStorage.getOrCreateDeviceId(),
+      recipientDeviceId: peerDeviceId,
       x3dhHeader: x3dhHeader,
     );
   }

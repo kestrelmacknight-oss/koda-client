@@ -887,29 +887,39 @@ class KodaApi {
     } catch (e) { _log('startChannelEpoch', e); return null; }
   }
 
-  Future<List<String>> getPendingEpochRecipients(String channelId, int epoch) async {
+  /// One entry per (user_id, device_id) still missing a delivery for
+  /// this epoch -- see koda-server's ChannelCrypto.pending_recipients/2.
+  /// Used to be bare user ids; a multi-device member's other devices
+  /// never showed up once their first device got a delivery, which is
+  /// exactly what left those other devices stuck decrypting nothing.
+  Future<List<Map<String, dynamic>>> getPendingEpochRecipients(String channelId, int epoch) async {
     try {
       final res = await _dio.get('/channels/$channelId/epoch/$epoch/pending');
-      return List<String>.from(res.data['user_ids'] ?? []);
+      return List<Map<String, dynamic>>.from(res.data['recipients'] ?? []);
     } catch (e) { _log('getPendingEpochRecipients', e); return []; }
   }
 
-  /// Uploads this sender's encrypted copies of one epoch's key, one per
-  /// recipient. Each entry is `{recipient_id, content, ratchet_key,
-  /// msg_number, prev_chain, nonce, x3dh_header?}` -- the same envelope
-  /// shape DmSessionManager.encryptForSend produces.
-  Future<bool> deliverChannelEpochKeys(
-      String channelId, int epoch, List<Map<String, dynamic>> deliveries) async {
+  /// Uploads [senderDeviceId]'s encrypted copies of one epoch's key, one
+  /// per (recipient, recipient device). Each entry is `{recipient_id,
+  /// recipient_device_id, content, ratchet_key, msg_number, prev_chain,
+  /// nonce, x3dh_header?}` -- the same envelope shape
+  /// DmSessionManager.encryptForSend produces.
+  Future<bool> deliverChannelEpochKeys(String channelId, int epoch, String senderDeviceId,
+      List<Map<String, dynamic>> deliveries) async {
     try {
       await _dio.post('/channels/$channelId/epoch/deliveries',
-          data: {'epoch': epoch, 'deliveries': deliveries});
+          data: {'epoch': epoch, 'sender_device_id': senderDeviceId, 'deliveries': deliveries});
       return true;
     } catch (e) { _log('deliverChannelEpochKeys', e); return false; }
   }
 
-  Future<List<Map<String, dynamic>>> getMyChannelDeliveries(String channelId) async {
+  /// This device's own deliveries (plus any legacy, pre-multi-device
+  /// row addressed to the account as a whole) -- [deviceId] scopes out
+  /// deliveries meant for a *different* device of the same account.
+  Future<List<Map<String, dynamic>>> getMyChannelDeliveries(String channelId, String deviceId) async {
     try {
-      final res = await _dio.get('/channels/$channelId/epoch/my_deliveries');
+      final res = await _dio.get('/channels/$channelId/epoch/my_deliveries',
+          queryParameters: {'device_id': deviceId});
       return List<Map<String, dynamic>>.from(res.data['deliveries'] ?? []);
     } catch (e) { _log('getMyChannelDeliveries', e); return []; }
   }
