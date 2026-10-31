@@ -7,7 +7,26 @@
 // Linux Secret Service depending on platform -- meaningfully stronger
 // than the shared_preferences flat file the JWT (also moved here) used
 // to live in.
+//
+// Windows concurrency note: flutter_secure_storage's Windows backend
+// (the FFI implementation, package:flutter_secure_storage_windows's
+// DpapiJsonFileMapStorage) keeps every key in ONE shared DPAPI-encrypted
+// JSON file and does a full load-the-whole-file -> modify one key ->
+// re-encrypt -> overwrite-the-whole-file on every single read, write,
+// AND delete -- with no locking of its own. Two of those overlapping
+// doesn't error, it just silently loses whichever change lost the
+// race (the loser's save() overwrites the file with its own stale
+// snapshot, clobbering whatever the winner just wrote) -- and a read
+// that catches a write mid-flight can look like a corrupt file, which
+// that package's load() responds to by deleting the file outright.
+// This app fires plenty of storage calls from overlapping async chains
+// (an unawaited ensureReady() distributing keys in the background
+// while _load() is concurrently caching decrypted messages, for
+// instance), so every call that touches [_storage] below is funneled
+// through [_synchronized] to serialize them -- cheap on every other
+// platform, and the only thing that makes Windows safe.
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -24,6 +43,21 @@ const _keyMaterialKey = 'kcp_key_material_v1';
 const _tokenKey = 'koda_jwt_v1';
 const _userIdKey = 'koda_user_id_v1';
 const _deviceIdKey = 'kcp_device_id';
+
+/// One global queue every storage operation runs through, in order --
+/// see this file's header. Not reentrant: a function running inside
+/// [_synchronized] must call [_storage] directly (or another function
+/// that does), never call back into [_synchronized] itself, or it
+/// deadlocks waiting on a slot that can't open until it returns.
+Future<void> _storageQueue = Future.value();
+
+Future<T> _synchronized<T>(Future<T> Function() action) {
+  final run = _storageQueue.then((_) => action());
+  // Chain off a version that swallows the error, so one failed op
+  // doesn't jam every later one behind a Future that never completes.
+  _storageQueue = run.then((_) {}, onError: (_) {});
+  return run;
+}
 
 /// [peerDeviceId] null selects the original (pre-multi-device) storage
 /// key -- used only for legacy conversations that predate per-device
@@ -43,16 +77,38 @@ String _pinnedIdentityKey(String userId, [String? deviceId]) =>
 String _channelEpochKey(String channelId, int epoch) => 'kcp_chan_epoch_${channelId}_$epoch';
 String _channelEpochsIndexKey(String channelId) => 'kcp_chan_epochs_$channelId';
 
+/// Raw (unlocked) key-material load/save -- used both by the public,
+/// locked saveKeyMaterial/loadKeyMaterial below and by other functions
+/// here that need to read or write it as one step of their own
+/// [_synchronized] block (removeOneTimePrekey, _loadOrCreateDeviceId).
+Future<void> _saveKeyMaterialRaw(LocalKeyMaterial material) =>
+    _storage.write(key: _keyMaterialKey, value: jsonEncode(SecureStorage._materialToJson(material)));
+
+Future<LocalKeyMaterial?> _loadKeyMaterialRaw() async {
+  final raw = await _storage.read(key: _keyMaterialKey);
+  if (raw == null) return null;
+  return SecureStorage._materialFromJson(jsonDecode(raw) as Map<String, dynamic>);
+}
+
+Future<List<int>> _knownChannelEpochsRaw(String channelId) async {
+  final raw = await _storage.read(key: _channelEpochsIndexKey(channelId));
+  if (raw == null) return [];
+  return (jsonDecode(raw) as List).cast<int>();
+}
+
 class SecureStorage {
   // ── Auth token ─────────────────────────────────────────────────────────
   // Same public shape as the old shared_preferences-backed KodaStorage so
   // api.dart didn't need to change.
 
-  static Future<void> saveToken(String token) => _storage.write(key: _tokenKey, value: token);
+  static Future<void> saveToken(String token) =>
+      _synchronized(() => _storage.write(key: _tokenKey, value: token));
 
-  static Future<String?> loadToken() => _storage.read(key: _tokenKey);
+  static Future<String?> loadToken() =>
+      _synchronized(() => _storage.read(key: _tokenKey));
 
-  static Future<void> clearToken() => _storage.delete(key: _tokenKey);
+  static Future<void> clearToken() =>
+      _synchronized(() => _storage.delete(key: _tokenKey));
 
   // ── My own user id ───────────────────────────────────────────────────────
   // Kept alongside the token (set/cleared together by AuthNotifier, see
@@ -61,44 +117,47 @@ class SecureStorage {
   // Riverpod authProvider state at all -- has a way to know whose
   // messages it's decrypting.
 
-  static Future<void> saveUserId(String userId) => _storage.write(key: _userIdKey, value: userId);
+  static Future<void> saveUserId(String userId) =>
+      _synchronized(() => _storage.write(key: _userIdKey, value: userId));
 
-  static Future<String?> loadUserId() => _storage.read(key: _userIdKey);
+  static Future<String?> loadUserId() =>
+      _synchronized(() => _storage.read(key: _userIdKey));
 
-  static Future<void> clearUserId() => _storage.delete(key: _userIdKey);
+  static Future<void> clearUserId() =>
+      _synchronized(() => _storage.delete(key: _userIdKey));
 
   // ── My own key material (identity, signed prekey, one-time prekeys) ────
 
-  static Future<void> saveKeyMaterial(LocalKeyMaterial material) async {
-    await _storage.write(key: _keyMaterialKey, value: jsonEncode(_materialToJson(material)));
-  }
+  static Future<void> saveKeyMaterial(LocalKeyMaterial material) =>
+      _synchronized(() => _saveKeyMaterialRaw(material));
 
-  static Future<LocalKeyMaterial?> loadKeyMaterial() async {
-    final raw = await _storage.read(key: _keyMaterialKey);
-    if (raw == null) return null;
-    return _materialFromJson(jsonDecode(raw) as Map<String, dynamic>);
-  }
+  static Future<LocalKeyMaterial?> loadKeyMaterial() =>
+      _synchronized(() => _loadKeyMaterialRaw());
 
   /// Removes one consumed one-time prekey by its public key, mirroring
   /// the server having just popped the matching entry -- keeps the local
   /// store from accumulating private keys for prekeys nobody can hand
   /// out anymore, and more importantly stops it from ever being reused.
-  static Future<void> removeOneTimePrekey(Uint8List publicKeyBytes) async {
-    final material = await loadKeyMaterial();
-    if (material == null) return;
-    final remaining = material.oneTimePrekeys
-        .where((k) => bytesToB64(k.publicKeyBytes) != bytesToB64(publicKeyBytes))
-        .toList();
-    if (remaining.length == material.oneTimePrekeys.length) return;
-    await saveKeyMaterial(LocalKeyMaterial(
-      material.identity,
-      material.signedPrekey,
-      remaining,
-      signedPrekeyCreatedAt: material.signedPrekeyCreatedAt,
-      previousSignedPrekey: material.previousSignedPrekey,
-      previousSignedPrekeyExpiresAt: material.previousSignedPrekeyExpiresAt,
-    ));
-  }
+  /// Read-modify-write runs as one locked step so a concurrent key-
+  /// material write from elsewhere can't land between the read and the
+  /// write here and get silently discarded.
+  static Future<void> removeOneTimePrekey(Uint8List publicKeyBytes) =>
+      _synchronized(() async {
+        final material = await _loadKeyMaterialRaw();
+        if (material == null) return;
+        final remaining = material.oneTimePrekeys
+            .where((k) => bytesToB64(k.publicKeyBytes) != bytesToB64(publicKeyBytes))
+            .toList();
+        if (remaining.length == material.oneTimePrekeys.length) return;
+        await _saveKeyMaterialRaw(LocalKeyMaterial(
+          material.identity,
+          material.signedPrekey,
+          remaining,
+          signedPrekeyCreatedAt: material.signedPrekeyCreatedAt,
+          previousSignedPrekey: material.previousSignedPrekey,
+          previousSignedPrekeyExpiresAt: material.previousSignedPrekeyExpiresAt,
+        ));
+      });
 
   // ── Device identity (multi-device E2EE, see Koda.Devices server-side) ──
 
@@ -120,32 +179,27 @@ class SecureStorage {
   // Memoized so concurrent callers (e.g. ensureMyKeysExist() and
   // encryptForSend()'s self-sync exclusion both call this independently
   // at launch) share one in-flight read-check-write instead of racing
-  // it: the read-then-write below isn't atomic, so two overlapping
-  // calls could each see "no existing id," each generate a *different*
-  // random one, and both write -- whichever write lands last silently
-  // wins, leaving the other caller holding an id that was never
-  // actually persisted. That mismatch is enough to make the self-sync
-  // "exclude my own device" check in encryptForSend fail to recognize
-  // itself, fanning a copy of a just-sent message right back to the
-  // sender -- a plausible cause of a sender seeing their own message
-  // twice with nothing unusual on the receiving end at all.
+  // it -- and the read-then-write itself now runs as one step of the
+  // shared storage queue (see _synchronized), so even a caller outside
+  // this memoized Future can't land a write between the read and the
+  // write here.
   static Future<String>? _deviceIdFuture;
 
   static Future<String> getOrCreateDeviceId() => _deviceIdFuture ??= _loadOrCreateDeviceId();
 
-  static Future<String> _loadOrCreateDeviceId() async {
-    final existing = await _storage.read(key: _deviceIdKey);
-    if (existing != null) return existing;
+  static Future<String> _loadOrCreateDeviceId() => _synchronized(() async {
+        final existing = await _storage.read(key: _deviceIdKey);
+        if (existing != null) return existing;
 
-    final hasExistingMaterial = await loadKeyMaterial() != null;
-    // Hex, not base64 -- this id is embedded directly in a URL path
-    // segment (DELETE /devices/:device_id) server-side, so it needs to
-    // be unambiguously URL-safe with zero encoding questions, not just
-    // "safe enough" after stripping a couple of characters.
-    final id = hasExistingMaterial ? 'legacy' : _toHex(randomBytes(16));
-    await _storage.write(key: _deviceIdKey, value: id);
-    return id;
-  }
+        final hasExistingMaterial = await _loadKeyMaterialRaw() != null;
+        // Hex, not base64 -- this id is embedded directly in a URL path
+        // segment (DELETE /devices/:device_id) server-side, so it needs to
+        // be unambiguously URL-safe with zero encoding questions, not just
+        // "safe enough" after stripping a couple of characters.
+        final id = hasExistingMaterial ? 'legacy' : _toHex(randomBytes(16));
+        await _storage.write(key: _deviceIdKey, value: id);
+        return id;
+      });
 
   // ── Per-conversation, per-peer-device Double Ratchet state ──────────────
   // peerDeviceId identifies which of the *other* participant's devices
@@ -156,54 +210,56 @@ class SecureStorage {
   // used only to decrypt legacy history (see dm_session_manager.dart).
 
   static Future<void> saveRatchetState(String conversationId, RatchetState state, [String? peerDeviceId]) =>
-      _storage.write(key: _ratchetKey(conversationId, peerDeviceId), value: jsonEncode(state.toJson()));
+      _synchronized(() => _storage.write(
+          key: _ratchetKey(conversationId, peerDeviceId), value: jsonEncode(state.toJson())));
 
-  static Future<RatchetState?> loadRatchetState(String conversationId, [String? peerDeviceId]) async {
-    final raw = await _storage.read(key: _ratchetKey(conversationId, peerDeviceId));
-    if (raw == null) return null;
-    return RatchetState.fromJson(jsonDecode(raw) as Map<String, dynamic>);
-  }
+  static Future<RatchetState?> loadRatchetState(String conversationId, [String? peerDeviceId]) =>
+      _synchronized(() async {
+        final raw = await _storage.read(key: _ratchetKey(conversationId, peerDeviceId));
+        if (raw == null) return null;
+        return RatchetState.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+      });
 
   static Future<void> deleteRatchetState(String conversationId, [String? peerDeviceId]) =>
-      _storage.delete(key: _ratchetKey(conversationId, peerDeviceId));
+      _synchronized(() => _storage.delete(key: _ratchetKey(conversationId, peerDeviceId)));
 
   // ── Channel epoch keys ───────────────────────────────────────────────────
   // See lib/core/crypto/channel_epoch.dart and channel_key_manager.dart.
   // One symmetric key per (channel, epoch), plus a small index of which
   // epochs are actually known locally so the manager doesn't have to
   // probe epoch numbers one at a time to find what it already has.
+  // Both writes below run as one locked step -- otherwise a concurrent
+  // index write for a *different* channel/epoch landing between them
+  // could lose this one's index update under the same whole-file-
+  // overwrite race this file's header describes.
 
-  static Future<void> saveChannelEpochKey(String channelId, int epoch, Uint8List key) async {
-    await _storage.write(key: _channelEpochKey(channelId, epoch), value: bytesToB64(key));
-    final known = await _knownChannelEpochs(channelId);
-    if (!known.contains(epoch)) {
-      known.add(epoch);
-      known.sort();
-      await _storage.write(
-          key: _channelEpochsIndexKey(channelId), value: jsonEncode(known));
-    }
-  }
+  static Future<void> saveChannelEpochKey(String channelId, int epoch, Uint8List key) =>
+      _synchronized(() async {
+        await _storage.write(key: _channelEpochKey(channelId, epoch), value: bytesToB64(key));
+        final known = await _knownChannelEpochsRaw(channelId);
+        if (!known.contains(epoch)) {
+          known.add(epoch);
+          known.sort();
+          await _storage.write(key: _channelEpochsIndexKey(channelId), value: jsonEncode(known));
+        }
+      });
 
-  static Future<Uint8List?> loadChannelEpochKey(String channelId, int epoch) async {
-    final raw = await _storage.read(key: _channelEpochKey(channelId, epoch));
-    if (raw == null) return null;
-    return b64ToBytes(raw);
-  }
+  static Future<Uint8List?> loadChannelEpochKey(String channelId, int epoch) =>
+      _synchronized(() async {
+        final raw = await _storage.read(key: _channelEpochKey(channelId, epoch));
+        if (raw == null) return null;
+        return b64ToBytes(raw);
+      });
 
   /// The highest epoch this device actually holds the key for, or null
   /// if it doesn't have any yet (a brand-new install, or hasn't synced
   /// deliveries for this channel).
-  static Future<int?> latestKnownChannelEpoch(String channelId) async {
-    final known = await _knownChannelEpochs(channelId);
-    if (known.isEmpty) return null;
-    return known.last;
-  }
-
-  static Future<List<int>> _knownChannelEpochs(String channelId) async {
-    final raw = await _storage.read(key: _channelEpochsIndexKey(channelId));
-    if (raw == null) return [];
-    return (jsonDecode(raw) as List).cast<int>();
-  }
+  static Future<int?> latestKnownChannelEpoch(String channelId) =>
+      _synchronized(() async {
+        final known = await _knownChannelEpochsRaw(channelId);
+        if (known.isEmpty) return null;
+        return known.last;
+      });
 
   // ── Decrypted-content cache ─────────────────────────────────────────────
   // Double Ratchet is forward-secret by design: once a message key is
@@ -222,27 +278,29 @@ class SecureStorage {
   // large.
 
   static Future<void> cacheDecryptedContent(String messageId, String plaintext) =>
-      _storage.write(key: 'kcp_msg_$messageId', value: plaintext);
+      _synchronized(() => _storage.write(key: 'kcp_msg_$messageId', value: plaintext));
 
   static Future<String?> getCachedDecryptedContent(String messageId) =>
-      _storage.read(key: 'kcp_msg_$messageId');
+      _synchronized(() => _storage.read(key: 'kcp_msg_$messageId'));
 
   /// Invalidates a cached plaintext -- e.g. a message was just edited,
   /// so the old cached content is stale and must not keep masking the
   /// freshly-decrypted replacement on the next decryptMessages call.
   static Future<void> deleteCachedDecryptedContent(String messageId) =>
-      _storage.delete(key: 'kcp_msg_$messageId');
+      _synchronized(() => _storage.delete(key: 'kcp_msg_$messageId'));
 
   // ── TOFU-pinned peer identities ─────────────────────────────────────────
 
   static Future<void> savePinnedIdentity(String userId, PinnedIdentity identity, [String? deviceId]) =>
-      _storage.write(key: _pinnedIdentityKey(userId, deviceId), value: jsonEncode(identity.toJson()));
+      _synchronized(() => _storage.write(
+          key: _pinnedIdentityKey(userId, deviceId), value: jsonEncode(identity.toJson())));
 
-  static Future<PinnedIdentity?> loadPinnedIdentity(String userId, [String? deviceId]) async {
-    final raw = await _storage.read(key: _pinnedIdentityKey(userId, deviceId));
-    if (raw == null) return null;
-    return PinnedIdentity.fromJson(jsonDecode(raw) as Map<String, dynamic>);
-  }
+  static Future<PinnedIdentity?> loadPinnedIdentity(String userId, [String? deviceId]) =>
+      _synchronized(() async {
+        final raw = await _storage.read(key: _pinnedIdentityKey(userId, deviceId));
+        if (raw == null) return null;
+        return PinnedIdentity.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+      });
 
   // ── Serialization helpers ───────────────────────────────────────────────
 
