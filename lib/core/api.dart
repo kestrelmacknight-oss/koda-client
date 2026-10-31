@@ -954,27 +954,36 @@ class KodaApi {
     } catch (e) { _log('setThresholdModerationConfig', e); return null; }
   }
 
-  Future<List<String>> getPendingThresholdShareRecipients(String channelId, int epoch) async {
+  /// One entry per (moderator user_id, device_id) still missing a share
+  /// for this epoch -- see koda-server's
+  /// ThresholdModeration.pending_share_recipients/2. Used to be bare
+  /// moderator ids, same multi-device gap channel_key_manager.dart's
+  /// own pending-recipients call had.
+  Future<List<Map<String, dynamic>>> getPendingThresholdShareRecipients(String channelId, int epoch) async {
     try {
       final res = await _dio.get('/channels/$channelId/epoch/$epoch/threshold_shares/pending');
-      return List<String>.from(res.data['moderator_ids'] ?? []);
+      return List<Map<String, dynamic>>.from(res.data['recipients'] ?? []);
     } catch (e) { _log('getPendingThresholdShareRecipients', e); return []; }
   }
 
-  /// Each entry is `{moderator_id, share_index, content, ratchet_key,
-  /// msg_number, prev_chain, nonce, x3dh_header?}`.
-  Future<bool> deliverThresholdShares(
-      String channelId, int epoch, List<Map<String, dynamic>> shares) async {
+  /// Each entry is `{moderator_id, moderator_device_id, share_index,
+  /// content, ratchet_key, msg_number, prev_chain, nonce, x3dh_header?}`.
+  Future<bool> deliverThresholdShares(String channelId, int epoch, String senderDeviceId,
+      List<Map<String, dynamic>> shares) async {
     try {
       await _dio.post('/channels/$channelId/epoch/threshold_shares',
-          data: {'epoch': epoch, 'shares': shares});
+          data: {'epoch': epoch, 'sender_device_id': senderDeviceId, 'shares': shares});
       return true;
     } catch (e) { _log('deliverThresholdShares', e); return false; }
   }
 
-  Future<List<Map<String, dynamic>>> getMyThresholdShares(String channelId) async {
+  /// This device's own shares (plus any legacy, pre-multi-device row
+  /// addressed to the account as a whole) -- [deviceId] scopes out
+  /// shares meant for a *different* device of the same moderator.
+  Future<List<Map<String, dynamic>>> getMyThresholdShares(String channelId, String deviceId) async {
     try {
-      final res = await _dio.get('/channels/$channelId/epoch/my_threshold_shares');
+      final res = await _dio.get('/channels/$channelId/epoch/my_threshold_shares',
+          queryParameters: {'device_id': deviceId});
       return List<Map<String, dynamic>>.from(res.data['shares'] ?? []);
     } catch (e) { _log('getMyThresholdShares', e); return []; }
   }
@@ -1017,8 +1026,10 @@ class KodaApi {
   }
 
   /// An approving moderator relays their decrypted-then-re-encrypted
-  /// share to the requester -- same envelope shape as everything else
-  /// in this section.
+  /// share to one specific device of the requester -- same envelope
+  /// shape as everything else in this section, plus `to_device_id`
+  /// (and the envelope's own `from_device_id`). Call once per device
+  /// the requester has.
   Future<bool> relayThresholdShare(String requestId, Map<String, dynamic> envelope) async {
     try {
       await _dio.post('/threshold_decrypt_requests/$requestId/share_relays', data: envelope);
@@ -1026,10 +1037,12 @@ class KodaApi {
     } catch (e) { _log('relayThresholdShare', e); return false; }
   }
 
-  /// The requester polls this for shares relayed to them so far.
-  Future<List<Map<String, dynamic>>> getThresholdShareRelays(String requestId) async {
+  /// This device's own relayed shares (plus any legacy, pre-multi-
+  /// device row) for one request so far.
+  Future<List<Map<String, dynamic>>> getThresholdShareRelays(String requestId, String deviceId) async {
     try {
-      final res = await _dio.get('/threshold_decrypt_requests/$requestId/share_relays');
+      final res = await _dio.get('/threshold_decrypt_requests/$requestId/share_relays',
+          queryParameters: {'device_id': deviceId});
       return List<Map<String, dynamic>>.from(res.data['relays'] ?? []);
     } catch (e) { _log('getThresholdShareRelays', e); return []; }
   }

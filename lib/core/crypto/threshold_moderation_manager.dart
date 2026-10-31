@@ -27,6 +27,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import '../api.dart';
+import '../secure_storage.dart';
 import 'dm_session_manager.dart';
 import 'kcp_primitives.dart' show secureZero;
 import 'shamir.dart';
@@ -68,6 +69,7 @@ class ThresholdModerationManager {
     final pending = await KodaApi.instance.getPendingThresholdShareRecipients(channelId, epoch);
     if (pending.isEmpty) return;
 
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
     final shares = Shamir.split(epochKey, threshold: threshold, totalShares: moderatorIds.length);
     // moderatorIds is a stable, ordered list from the server config --
     // share i goes to moderatorIds[i], consistently, so every
@@ -78,18 +80,28 @@ class ThresholdModerationManager {
       for (var i = 0; i < moderatorIds.length && i < shares.length; i++) moderatorIds[i]: shares[i],
     };
 
+    // One entry per (moderator, device) still missing a share --
+    // includes this account's *other* devices if it's itself a
+    // designated moderator (self-sync, same as
+    // channel_key_manager.dart's own distribute loop). Only this exact
+    // device is skipped.
     final deliveries = <Map<String, dynamic>>[];
-    for (final moderatorId in pending) {
+    for (final recipient in pending) {
+      final moderatorId = recipient['user_id'] as String;
+      final deviceId = recipient['device_id'] as String;
       final share = byModeratorId[moderatorId];
-      if (share == null || moderatorId == myUserId) continue;
+      if (share == null) continue;
+      if (moderatorId == myUserId && deviceId == myDeviceId) continue;
       try {
         final envelope = await DmSessionManager.instance.encryptForSendSingleSession(
           conversationId: _thresholdSessionId(myUserId, moderatorId),
           peerUserId: moderatorId,
+          peerDeviceId: deviceId,
           plaintext: jsonEncode(share.toJson()),
         );
         deliveries.add({
           'moderator_id': moderatorId,
+          'moderator_device_id': deviceId,
           'share_index': share.index,
           'content': envelope.content,
           'ratchet_key': envelope.ratchetKey,
@@ -99,14 +111,14 @@ class ThresholdModerationManager {
           if (envelope.x3dhHeader != null) 'x3dh_header': envelope.x3dhHeader,
         });
       } catch (_) {
-        // e.g. that moderator hasn't published a key bundle yet -- picked
+        // e.g. that device hasn't published a key bundle yet -- picked
         // up again next time someone calls this for the same epoch.
         continue;
       }
     }
 
     if (deliveries.isNotEmpty) {
-      await KodaApi.instance.deliverThresholdShares(channelId, epoch, deliveries);
+      await KodaApi.instance.deliverThresholdShares(channelId, epoch, myDeviceId, deliveries);
     }
   }
 
@@ -114,7 +126,8 @@ class ThresholdModerationManager {
   /// none has been delivered (yet, or Tier 3 wasn't enabled when that
   /// epoch was generated).
   Future<ShamirShare?> myShareFor(String channelId, int epoch, String myUserId) async {
-    final deliveries = await KodaApi.instance.getMyThresholdShares(channelId);
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
+    final deliveries = await KodaApi.instance.getMyThresholdShares(channelId, myDeviceId);
     final match = deliveries.cast<Map<String, dynamic>?>().firstWhere(
         (d) => d?['epoch'] == epoch, orElse: () => null);
     if (match == null) return null;
@@ -150,19 +163,36 @@ class ThresholdModerationManager {
     final share = await myShareFor(channelId, epoch, myUserId);
     if (share == null) return;
 
-    final envelope = await DmSessionManager.instance.encryptForSendSingleSession(
-      conversationId: _thresholdSessionId(myUserId, requestedBy),
-      peerUserId: requestedBy,
-      plaintext: jsonEncode(share.toJson()),
-    );
-    await KodaApi.instance.relayThresholdShare(request['id'] as String, {
-      'content': envelope.content,
-      'ratchet_key': envelope.ratchetKey,
-      'msg_number': envelope.msgNumber,
-      'prev_chain': envelope.prevChain,
-      'nonce': envelope.nonce,
-      if (envelope.x3dhHeader != null) 'x3dh_header': envelope.x3dhHeader,
-    });
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
+    final requesterDeviceIds = await KodaApi.instance.getDeviceIdsFor(requestedBy);
+    // Relay to every device the requester has -- koda-server's
+    // record_share_relay/1 is idempotent per (request, this moderator,
+    // target device), so re-running this for a device that already has
+    // its relay is a safe no-op server-side.
+    for (final requesterDeviceId in requesterDeviceIds) {
+      try {
+        final envelope = await DmSessionManager.instance.encryptForSendSingleSession(
+          conversationId: _thresholdSessionId(myUserId, requestedBy),
+          peerUserId: requestedBy,
+          peerDeviceId: requesterDeviceId,
+          plaintext: jsonEncode(share.toJson()),
+        );
+        await KodaApi.instance.relayThresholdShare(request['id'] as String, {
+          'from_device_id': myDeviceId,
+          'to_device_id': requesterDeviceId,
+          'content': envelope.content,
+          'ratchet_key': envelope.ratchetKey,
+          'msg_number': envelope.msgNumber,
+          'prev_chain': envelope.prevChain,
+          'nonce': envelope.nonce,
+          if (envelope.x3dhHeader != null) 'x3dh_header': envelope.x3dhHeader,
+        });
+      } catch (_) {
+        // e.g. that device hasn't published a key bundle yet -- picked
+        // up again next time this is called for the same request.
+        continue;
+      }
+    }
   }
 
   /// For the requester: attempts to reconstruct the epoch key from its
@@ -182,7 +212,8 @@ class ThresholdModerationManager {
     final mine = await myShareFor(channelId, epoch, myUserId);
     if (mine == null) return null;
 
-    final relays = await KodaApi.instance.getThresholdShareRelays(request['id'] as String);
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
+    final relays = await KodaApi.instance.getThresholdShareRelays(request['id'] as String, myDeviceId);
     final relayed = <ShamirShare>[];
     for (final r in relays) {
       try {
