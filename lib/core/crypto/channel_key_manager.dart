@@ -133,9 +133,28 @@ class ChannelKeyManager {
   /// to be called by whichever client actually processes the departure,
   /// which already has the up-to-date member list.
   Future<void> rotateAfterDeparture(String channelId,
+      {required String myUserId, required String serverId}) =>
+      _startFreshEpoch(channelId, myUserId: myUserId, serverId: serverId);
+
+  /// Explicit, user-triggered recovery for a channel stuck on an epoch
+  /// whose key is unrecoverable locally and was never delivered to
+  /// anyone else (e.g. lost to a client-side storage bug before it ever
+  /// reached a second device/member) -- same mechanics as
+  /// rotateAfterDeparture, just invoked directly instead of tied to a
+  /// membership change. Returns true if a fresh epoch was actually
+  /// started; false means another client already started one (its
+  /// delivery should arrive via the normal sync path instead) or the
+  /// request failed outright. Messages sent under the abandoned epoch
+  /// stay permanently unreadable -- this only unblocks the channel
+  /// going forward.
+  Future<bool> recoverOrphanedEpoch(String channelId,
+      {required String myUserId, required String serverId}) =>
+      _startFreshEpoch(channelId, myUserId: myUserId, serverId: serverId);
+
+  Future<bool> _startFreshEpoch(String channelId,
       {required String myUserId, required String serverId}) async {
     final started = await KodaApi.instance.startChannelEpoch(channelId);
-    if (started == null || !started.created) return; // someone else is already handling it
+    if (started == null || !started.created) return false; // someone else is already handling it
     final key = await generateChannelEpochKey();
     await SecureStorage.saveChannelEpochKey(channelId, started.epoch, key);
     await _distributePendingIfAny(channelId, started.epoch, key, myUserId: myUserId);
@@ -144,6 +163,7 @@ class ChannelKeyManager {
       epochKey: key, myUserId: myUserId,
     );
     secureZero(key);
+    return true;
   }
 
   Future<void> _distributePendingIfAny(

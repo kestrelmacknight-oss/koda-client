@@ -296,6 +296,51 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
     _scroll.animateTo(target, duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
   }
 
+  // Shown when encryptForChannel can't produce ciphertext -- almost
+  // always just a transient wait on someone else's delivery, but if
+  // that never resolves (the current epoch's key was lost locally and
+  // never reached anyone else -- see secure_storage.dart's header on
+  // the Windows storage race this can be a symptom of) there's no
+  // amount of waiting that fixes it. The "Reset" action is an explicit,
+  // user-confirmed escape hatch: it starts a fresh epoch rather than
+  // waiting forever on a delivery that will never arrive. Messages sent
+  // under the abandoned epoch stay permanently unreadable either way.
+  void _showEncryptionStuckSnackBar(String channelId, String myUserId) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: const Text(
+          "Still setting up encryption for this channel -- try sending again in a moment."),
+      action: SnackBarAction(
+        label: 'Reset',
+        onPressed: () => _confirmResetChannelEncryption(channelId, myUserId),
+      ),
+    ));
+  }
+
+  Future<void> _confirmResetChannelEncryption(String channelId, String myUserId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Reset channel encryption?'),
+        content: const Text(
+            'Only do this if nobody else in this channel can send or receive messages either '
+            '-- it starts a brand-new encryption key from scratch. Any messages stuck under the '
+            'current key will stay permanently unreadable; this does not affect anything else.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Reset')),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final started = await ChannelKeyManager.instance.recoverOrphanedEpoch(
+        channelId, myUserId: myUserId, serverId: widget.serverId);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(started
+        ? 'Encryption reset -- try sending again.'
+        : "Someone else just started a new epoch -- give it a moment, then try again.")));
+  }
+
   Future<void> _sendMessage() async {
     final channelId = widget.channelId;
     final text = _messageController.text.trim();
@@ -319,8 +364,7 @@ class _ChannelChatPanelState extends ConsumerState<ChannelChatPanel> {
         .encryptForChannel(channelId, payload, myUserId: myUserId);
     if (encrypted == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
-            "Still setting up encryption for this channel -- try sending again in a moment.")));
+        _showEncryptionStuckSnackBar(channelId, myUserId);
       }
       return;
     }
