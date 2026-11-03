@@ -186,10 +186,12 @@ class _DmScreenState extends ConsumerState<DmScreen>
     } on SafetyNumberChanged {
       if (mounted) setState(() => _safetyNumberChanged = true);
       return {...message, 'content': '', '_undecryptable': 'safety_number_changed'};
-    } on DoubleRatchetDecryptFailure {
-      return {...message, 'content': '', '_undecryptable': 'failed'};
-    } catch (_) {
-      return {...message, 'content': '', '_undecryptable': 'failed'};
+    } on DoubleRatchetDecryptFailure catch (e) {
+      // TEMPORARY diagnostic (see _undecryptableDebug's render site below)
+      // -- remove once the "DMs not arriving" investigation is resolved.
+      return {...message, 'content': '', '_undecryptable': 'failed', '_undecryptableDebug': e.toString()};
+    } catch (e) {
+      return {...message, 'content': '', '_undecryptable': 'failed', '_undecryptableDebug': e.toString()};
     }
   }
 
@@ -885,7 +887,9 @@ class _DmScreenState extends ConsumerState<DmScreen>
                                         Text(
                                           m['_undecryptable'] == 'safety_number_changed'
                                               ? 'Unable to decrypt -- safety number changed'
-                                              : 'Unable to decrypt this message',
+                                              : m['_undecryptableDebug'] != null
+                                                  ? 'Unable to decrypt (${m['_undecryptableDebug']})'
+                                                  : 'Unable to decrypt this message',
                                           style: TextStyle(
                                               color: KodaColors.accent,
                                               fontSize: 12,
