@@ -171,12 +171,33 @@ class DmSessionManager {
   /// *new* incoming sessions look at the current SPK, which is exactly
   /// what the previousSignedPrekey grace window in decryptReceived exists
   /// to bridge.
-  Future<void> rotateSignedPrekeyIfDue() async {
+  /// Re-signs and re-uploads a fresh signed prekey right now regardless
+  /// of age -- recovery for a published bundle whose spk_sig doesn't
+  /// verify against its own ik_sign_pub (X3dhHandshakeInvalid on
+  /// whoever tries to start a new session with this device). That can
+  /// only happen if an older, partial spk_pub/spk_sig upload lands on
+  /// the server *after* a newer one -- e.g. this device's local key
+  /// material got wiped by the storage race rotateSignedPrekeyIfDue
+  /// itself used to be vulnerable to (see secure_storage.dart), so a
+  /// fresh full bundle was generated and uploaded, and then a late,
+  /// already-in-flight rotation call from before the wipe landed on top
+  /// of it with a signature from the identity key that no longer
+  /// matches. The identity key itself is untouched here (unlike that
+  /// full-regenerate path), so this doesn't disturb anyone who's
+  /// already pinned this device's safety number -- it only replaces the
+  /// signed prekey with one freshly signed by the identity key already
+  /// on file, which self-corrects the mismatch as long as that identity
+  /// key is the one the server actually has on record (true unless the
+  /// wipe above also raced the *identity* key itself, not just its
+  /// signed prekey).
+  Future<void> fixSignedPrekeyMismatch() => rotateSignedPrekeyIfDue(force: true);
+
+  Future<void> rotateSignedPrekeyIfDue({bool force = false}) async {
     final material = await SecureStorage.loadKeyMaterial();
     if (material == null) return; // ensureMyKeysExist() hasn't run yet
 
     final age = DateTime.now().toUtc().difference(material.signedPrekeyCreatedAt);
-    if (age < spkRotationInterval) return;
+    if (!force && age < spkRotationInterval) return;
 
     final newSpk = await generateX25519KeyPair();
     final spkSig = await signPrekey(material.identity, newSpk);

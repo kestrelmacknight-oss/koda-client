@@ -17,6 +17,7 @@ import '../developer/developer_portal_screen.dart';
 import '../steam/steam_library_manage_screen.dart';
 import '../wiki/wiki_screen.dart';
 import '../../core/api.dart';
+import '../../core/crypto/dm_session_manager.dart';
 import '../../core/push_notifications.dart';
 import '../../core/socket.dart';
 import '../../core/theme.dart';
@@ -556,6 +557,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               t.settingsLinkedDevicesSubtitle,
               () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const DevicesScreen()))),
+          _tile(Icons.vpn_key_outlined, 'Fix my encryption keys',
+              "If people get an error trying to start a new encrypted chat with you, "
+              "this re-publishes a corrected one.",
+              _fixEncryptionKeys),
           // Child accounts have labeled channels hard-blocked server-side
           // and don't get a personal filter preference to configure --
           // see content_filters_screen.dart's doc comment.
@@ -1504,6 +1509,43 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           child,
         ]),
       );
+
+  // Recovery for a published key bundle whose signed-prekey signature
+  // no longer verifies against its own identity key -- see
+  // DmSessionManager.fixSignedPrekeyMismatch's doc for how that can
+  // happen. Surfaces as X3dhHandshakeInvalid for whoever tries to start
+  // a *new* DM session with this device; already-established sessions
+  // with people you already talk to are unaffected.
+  Future<void> _fixEncryptionKeys() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Fix my encryption keys?'),
+        content: const Text(
+            'Only do this if someone has told you they got an error trying to start a new '
+            'encrypted chat with you. This re-publishes your signed prekey; it does not change '
+            'your identity key, so it won\'t affect existing conversations or safety numbers.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Fix it')),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    try {
+      await DmSessionManager.instance.fixSignedPrekeyMismatch();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Done -- ask them to try starting the chat again.')));
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not reach the server -- try again in a moment.')));
+      }
+    }
+  }
 
   Widget _tile(IconData icon, String title, String subtitle, VoidCallback onTap) =>
       Container(
