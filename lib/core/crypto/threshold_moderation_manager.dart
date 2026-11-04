@@ -69,7 +69,7 @@ class ThresholdModerationManager {
     final pending = await KodaApi.instance.getPendingThresholdShareRecipients(channelId, epoch);
     if (pending.isEmpty) return;
 
-    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId(myUserId);
     final shares = Shamir.split(epochKey, threshold: threshold, totalShares: moderatorIds.length);
     // moderatorIds is a stable, ordered list from the server config --
     // share i goes to moderatorIds[i], consistently, so every
@@ -98,6 +98,7 @@ class ThresholdModerationManager {
           peerUserId: moderatorId,
           peerDeviceId: deviceId,
           plaintext: jsonEncode(share.toJson()),
+          myUserId: myUserId,
         );
         deliveries.add({
           'moderator_id': moderatorId,
@@ -126,7 +127,7 @@ class ThresholdModerationManager {
   /// none has been delivered (yet, or Tier 3 wasn't enabled when that
   /// epoch was generated).
   Future<ShamirShare?> myShareFor(String channelId, int epoch, String myUserId) async {
-    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId(myUserId);
     final deliveries = await KodaApi.instance.getMyThresholdShares(channelId, myDeviceId);
     final match = deliveries.cast<Map<String, dynamic>?>().firstWhere(
         (d) => d?['epoch'] == epoch, orElse: () => null);
@@ -135,6 +136,7 @@ class ThresholdModerationManager {
     final plaintext = await DmSessionManager.instance.decryptReceived(
       conversationId: _thresholdSessionId(myUserId, match['sender_id'] as String),
       message: match,
+      myUserId: myUserId,
     );
     return ShamirShare.fromJson(jsonDecode(plaintext) as Map<String, dynamic>);
   }
@@ -163,7 +165,7 @@ class ThresholdModerationManager {
     final share = await myShareFor(channelId, epoch, myUserId);
     if (share == null) return;
 
-    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId(myUserId);
     final requesterDeviceIds = await KodaApi.instance.getDeviceIdsFor(requestedBy);
     // Relay to every device the requester has -- koda-server's
     // record_share_relay/1 is idempotent per (request, this moderator,
@@ -176,6 +178,7 @@ class ThresholdModerationManager {
           peerUserId: requestedBy,
           peerDeviceId: requesterDeviceId,
           plaintext: jsonEncode(share.toJson()),
+          myUserId: myUserId,
         );
         await KodaApi.instance.relayThresholdShare(request['id'] as String, {
           'from_device_id': myDeviceId,
@@ -212,7 +215,7 @@ class ThresholdModerationManager {
     final mine = await myShareFor(channelId, epoch, myUserId);
     if (mine == null) return null;
 
-    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId(myUserId);
     final relays = await KodaApi.instance.getThresholdShareRelays(request['id'] as String, myDeviceId);
     final relayed = <ShamirShare>[];
     for (final r in relays) {
@@ -220,6 +223,7 @@ class ThresholdModerationManager {
         final plaintext = await DmSessionManager.instance.decryptReceived(
           conversationId: _thresholdSessionId(myUserId, r['sender_id'] as String),
           message: r,
+          myUserId: myUserId,
         );
         relayed.add(ShamirShare.fromJson(jsonDecode(plaintext) as Map<String, dynamic>));
       } catch (_) {

@@ -125,9 +125,9 @@ class DmSessionManager {
   /// the same already-generated material is what happens here, never
   /// regenerating it -- nobody could have fetched/pinned a key that
   /// was never published, so there's nothing to invalidate.
-  Future<void> ensureMyKeysExist() async {
-    final existing = await SecureStorage.loadKeyMaterial();
-    final deviceId = await SecureStorage.getOrCreateDeviceId();
+  Future<void> ensureMyKeysExist({required String myUserId}) async {
+    final existing = await SecureStorage.loadKeyMaterial(myUserId);
+    final deviceId = await SecureStorage.getOrCreateDeviceId(myUserId);
 
     if (existing != null) {
       if (await KodaApi.instance.hasKeyBundle(deviceId: deviceId)) return;
@@ -142,7 +142,7 @@ class DmSessionManager {
 
     final material = await generateKeyMaterial();
     final spkSig = await signPrekey(material.identity, material.signedPrekey);
-    await SecureStorage.saveKeyMaterial(material);
+    await SecureStorage.saveKeyMaterial(myUserId, material);
     await KodaApi.instance.uploadKeyBundle({
       ...bundleToUploadJson(material, spkSig),
       'device_id': deviceId,
@@ -167,7 +167,7 @@ class DmSessionManager {
   /// Already-established Double Ratchet sessions are unaffected: once
   /// initAsResponder/initAsInitiator captures a signed-prekey keypair
   /// into a conversation's persisted ratchet state, that state never
-  /// consults SecureStorage.loadKeyMaterial().signedPrekey again -- only
+  /// consults SecureStorage.loadKeyMaterial(myUserId).signedPrekey again -- only
   /// *new* incoming sessions look at the current SPK, which is exactly
   /// what the previousSignedPrekey grace window in decryptReceived exists
   /// to bridge.
@@ -190,10 +190,11 @@ class DmSessionManager {
   /// key is the one the server actually has on record (true unless the
   /// wipe above also raced the *identity* key itself, not just its
   /// signed prekey).
-  Future<void> fixSignedPrekeyMismatch() => rotateSignedPrekeyIfDue(force: true);
+  Future<void> fixSignedPrekeyMismatch({required String myUserId}) =>
+      rotateSignedPrekeyIfDue(myUserId: myUserId, force: true);
 
-  Future<void> rotateSignedPrekeyIfDue({bool force = false}) async {
-    final material = await SecureStorage.loadKeyMaterial();
+  Future<void> rotateSignedPrekeyIfDue({required String myUserId, bool force = false}) async {
+    final material = await SecureStorage.loadKeyMaterial(myUserId);
     if (material == null) return; // ensureMyKeysExist() hasn't run yet
 
     final age = DateTime.now().toUtc().difference(material.signedPrekeyCreatedAt);
@@ -220,9 +221,9 @@ class DmSessionManager {
       previousSignedPrekey: material.signedPrekey,
       previousSignedPrekeyExpiresAt: now.add(spkGraceRetention),
     );
-    await SecureStorage.saveKeyMaterial(rotated);
+    await SecureStorage.saveKeyMaterial(myUserId, rotated);
     await KodaApi.instance.uploadKeyBundle({
-      'device_id': await SecureStorage.getOrCreateDeviceId(),
+      'device_id': await SecureStorage.getOrCreateDeviceId(myUserId),
       'spk_pub': bytesToB64(newSpk.publicKeyBytes),
       'spk_sig': bytesToB64(spkSig),
     });
@@ -251,8 +252,9 @@ class DmSessionManager {
     required String peerUserId,
     required String peerDeviceId,
     required String plaintext,
+    required String myUserId,
   }) async {
-    final myMaterial = await SecureStorage.loadKeyMaterial();
+    final myMaterial = await SecureStorage.loadKeyMaterial(myUserId);
     if (myMaterial == null) {
       throw StateError('No local key material -- call ensureMyKeysExist() first.');
     }
@@ -293,7 +295,7 @@ class DmSessionManager {
       msgNumber: result.header.msgNumber,
       prevChain: result.header.prevChain,
       nonce: bytesToB64(result.nonce),
-      senderDeviceId: await SecureStorage.getOrCreateDeviceId(),
+      senderDeviceId: await SecureStorage.getOrCreateDeviceId(myUserId),
       recipientDeviceId: peerDeviceId,
       x3dhHeader: x3dhHeader,
     );
@@ -311,11 +313,11 @@ class DmSessionManager {
     required String myUserId,
     required String plaintext,
   }) async {
-    final myMaterial = await SecureStorage.loadKeyMaterial();
+    final myMaterial = await SecureStorage.loadKeyMaterial(myUserId);
     if (myMaterial == null) {
       throw StateError('No local key material -- call ensureMyKeysExist() first.');
     }
-    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId(myUserId);
 
     final peerDeviceIds = await KodaApi.instance.getDeviceIdsFor(peerUserId);
     if (peerDeviceIds.isEmpty) {
@@ -397,6 +399,7 @@ class DmSessionManager {
   Future<String> decryptReceived({
     required String conversationId,
     required Map<String, dynamic> message,
+    required String myUserId,
   }) async {
     final senderUserId = message['sender_id'] as String;
     final senderDeviceId = message['sender_device_id'] as String?;
@@ -416,7 +419,7 @@ class DmSessionManager {
         throw StateError(
             'No session for this conversation and the message carries no X3DH header -- cannot decrypt.');
       }
-      final myMaterial = await SecureStorage.loadKeyMaterial();
+      final myMaterial = await SecureStorage.loadKeyMaterial(myUserId);
       if (myMaterial == null) {
         throw StateError('No local key material -- call ensureMyKeysExist() first.');
       }
@@ -490,7 +493,7 @@ class DmSessionManager {
         state = candidate;
         await SecureStorage.saveRatchetState(conversationId, state, legacy ? null : senderDeviceId);
         if (myOpk != null) {
-          await SecureStorage.removeOneTimePrekey(myOpk.publicKeyBytes);
+          await SecureStorage.removeOneTimePrekey(myUserId, myOpk.publicKeyBytes);
           secureZero(myOpk.privateKeyBytes); // one-time prekeys are single-use by design
         }
         return utf8.decode(plaintext);
@@ -507,7 +510,7 @@ class DmSessionManager {
         state = fallback;
         await SecureStorage.saveRatchetState(conversationId, state, legacy ? null : senderDeviceId);
         if (myOpk != null) {
-          await SecureStorage.removeOneTimePrekey(myOpk.publicKeyBytes);
+          await SecureStorage.removeOneTimePrekey(myUserId, myOpk.publicKeyBytes);
           secureZero(myOpk.privateKeyBytes);
         }
         return utf8.decode(plaintext);
@@ -526,15 +529,6 @@ class DmSessionManager {
     );
     await SecureStorage.saveRatchetState(conversationId, state, legacy ? null : senderDeviceId);
     return utf8.decode(plaintext);
-  }
-
-  Future<String> mySafetyNumberWith(String peerUserId, Uint8List peerIkDhPub) async {
-    final myMaterial = await SecureStorage.loadKeyMaterial();
-    if (myMaterial == null) throw StateError('No local key material.');
-    return computeSafetyNumber(
-      myIkDhPub: myMaterial.identity.dh.publicKeyBytes,
-      theirIkDhPub: peerIkDhPub,
-    );
   }
 
   /// Checks (and pins, on first contact) a peer device's identity keys.

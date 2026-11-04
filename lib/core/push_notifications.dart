@@ -102,7 +102,9 @@ class PushNotifications {
   }
 
   Future<void> _registerToken(String token) async {
-    final deviceId = await SecureStorage.getOrCreateDeviceId();
+    final myUserId = await SecureStorage.loadUserId();
+    if (myUserId == null) return; // shouldn't happen -- init() only runs post-login
+    final deviceId = await SecureStorage.getOrCreateDeviceId(myUserId);
     await KodaApi.instance.registerPushToken(token, isIOS ? 'ios' : 'android', deviceId: deviceId);
   }
 

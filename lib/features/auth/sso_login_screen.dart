@@ -104,17 +104,20 @@ class _SsoLoginScreenState extends ConsumerState<SsoLoginScreen> {
   Future<void> _finishLogin(String token) async {
     await KodaApi.instance.setToken(token);
     KodaSocket.instance.connect(token);
-    try {
-      await DmSessionManager.instance.ensureMyKeysExist();
-      await DmSessionManager.instance.rotateSignedPrekeyIfDue();
-    } catch (_) {
-      // Non-fatal, same as the password-login path -- E2EE setup can
-      // catch up on a later launch.
-    }
 
     final me = await KodaApi.instance.me();
     if (!mounted) return;
     final user = me.data?['user'];
+    final myUserId = user?['id'] as String?;
+    if (myUserId != null) {
+      try {
+        await DmSessionManager.instance.ensureMyKeysExist(myUserId: myUserId);
+        await DmSessionManager.instance.rotateSignedPrekeyIfDue(myUserId: myUserId);
+      } catch (_) {
+        // Non-fatal, same as the password-login path -- E2EE setup can
+        // catch up on a later launch.
+      }
+    }
     if (user != null) ref.read(authProvider.notifier).setUser(user);
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
   }

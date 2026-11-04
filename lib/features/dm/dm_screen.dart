@@ -166,7 +166,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
   /// entry (see _dedupeByGroup). Legacy rows (no group id) fall back to
   /// their own row id, exactly as before multi-device existed.
   Future<Map<String, dynamic>> _decryptForDisplay(
-      Map<String, dynamic> message, String conversationId) async {
+      Map<String, dynamic> message, String conversationId, String myUserId) async {
     if (message['encrypted'] != true) {
       final lang = detectMessageLanguage(message['content'] as String? ?? '');
       return lang == null ? message : {...message, '_detectedLang': lang};
@@ -180,6 +180,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
       final plain = await DmSessionManager.instance.decryptReceived(
         conversationId: conversationId,
         message: message,
+        myUserId: myUserId,
       );
       await SecureStorage.cacheDecryptedContent(cacheKey, plain);
       return _applyPayload(message, plain);
@@ -265,12 +266,14 @@ class _DmScreenState extends ConsumerState<DmScreen>
     });
     ref.read(activeConversationProvider.notifier).state = conversationId;
 
-    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
+    final myUserId = ref.read(authProvider).user?.id;
+    if (myUserId == null) return;
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId(myUserId);
     final msgs = await KodaApi.instance.getDmMessages(conversationId, myDeviceId);
     if (!mounted) return;
     final decrypted = peerUserId == null
         ? msgs
-        : await Future.wait(msgs.map((m) => _decryptForDisplay(m, conversationId)));
+        : await Future.wait(msgs.map((m) => _decryptForDisplay(m, conversationId, myUserId)));
     if (!mounted) return;
     // See message_order_prefs.dart: newest-first API order is already
     // correct for a top-anchored list; a bottom-anchored one (default)
@@ -327,7 +330,7 @@ class _DmScreenState extends ConsumerState<DmScreen>
         () async {
           final display = peerUserId == null
               ? payload
-              : await _decryptForDisplay(payload, conversationId);
+              : await _decryptForDisplay(payload, conversationId, myUserId);
           if (!mounted || _activeConversationId != conversationId) return;
           // Re-check right before the mutation, not just before starting
           // the decrypt above -- decryption is async, so two broadcasts

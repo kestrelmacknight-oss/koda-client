@@ -65,7 +65,8 @@ class _SafetyNumberScreenState extends State<SafetyNumberScreen> {
   Future<void> _load() async {
     final t = AppLocalizations.of(context);
     try {
-      final myMaterial = await SecureStorage.loadKeyMaterial();
+      final myUserId = await SecureStorage.loadUserId();
+      final myMaterial = myUserId == null ? null : await SecureStorage.loadKeyMaterial(myUserId);
       if (myMaterial == null) {
         setState(() => _error = t.safetyNumberKeysNotSetUp);
         return;

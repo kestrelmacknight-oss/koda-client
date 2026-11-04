@@ -56,7 +56,7 @@ class ChannelKeyManager {
   /// undecryptable entry (stale session, safety number changed) doesn't
   /// block the rest.
   Future<void> syncDeliveries(String channelId, {required String myUserId}) async {
-    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId(myUserId);
     final deliveries = await KodaApi.instance.getMyChannelDeliveries(channelId, myDeviceId);
     for (final d in deliveries) {
       final epoch = d['epoch'] as int?;
@@ -70,6 +70,7 @@ class ChannelKeyManager {
         final plaintext = await DmSessionManager.instance.decryptReceived(
           conversationId: _channelKeySessionId(myUserId, senderId),
           message: d,
+          myUserId: myUserId,
         );
         final payload = jsonDecode(plaintext) as Map<String, dynamic>;
         final key = b64ToBytes(payload['key'] as String);
@@ -171,7 +172,7 @@ class ChannelKeyManager {
     final pending = await KodaApi.instance.getPendingEpochRecipients(channelId, epoch);
     if (pending.isEmpty) return;
 
-    final myDeviceId = await SecureStorage.getOrCreateDeviceId();
+    final myDeviceId = await SecureStorage.getOrCreateDeviceId(myUserId);
     final payload = jsonEncode({'key': bytesToB64(key)});
     final deliveries = <Map<String, dynamic>>[];
 
@@ -191,6 +192,7 @@ class ChannelKeyManager {
           peerUserId: recipientId,
           peerDeviceId: deviceId,
           plaintext: payload,
+          myUserId: myUserId,
         );
         deliveries.add({
           'recipient_id': recipientId,

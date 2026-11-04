@@ -1533,8 +1533,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
     if (confirmed != true || !mounted) return;
 
+    final myUserId = ref.read(authProvider).user?.id;
+    if (myUserId == null) return;
     try {
-      await DmSessionManager.instance.fixSignedPrekeyMismatch();
+      await DmSessionManager.instance.fixSignedPrekeyMismatch(myUserId: myUserId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('Done -- ask them to try starting the chat again.')));

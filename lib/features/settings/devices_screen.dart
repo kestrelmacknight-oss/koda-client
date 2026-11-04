@@ -31,14 +31,15 @@ class _DevicesScreenState extends State<DevicesScreen> {
 
   Future<void> _load() async {
     setState(() => _loading = true);
+    final myUserId = await SecureStorage.loadUserId();
     final results = await Future.wait([
       KodaApi.instance.getMyDevices(),
-      SecureStorage.getOrCreateDeviceId(),
+      if (myUserId != null) SecureStorage.getOrCreateDeviceId(myUserId),
     ]);
     if (!mounted) return;
     setState(() {
       _devices = results[0] as List<Map<String, dynamic>>;
-      _myDeviceId = results[1] as String;
+      _myDeviceId = results.length > 1 ? results[1] as String : null;
       _loading = false;
     });
   }

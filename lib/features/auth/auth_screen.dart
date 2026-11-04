@@ -48,12 +48,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     }
   }
 
-  Future<void> _initKeyBundle() async {
+  Future<void> _initKeyBundle(String myUserId) async {
     try {
       // Gated on local private-key presence (inside ensureMyKeysExist),
       // not on whatever the server reports -- see its doc comment.
-      await DmSessionManager.instance.ensureMyKeysExist();
-      await DmSessionManager.instance.rotateSignedPrekeyIfDue();
+      await DmSessionManager.instance.ensureMyKeysExist(myUserId: myUserId);
+      await DmSessionManager.instance.rotateSignedPrekeyIfDue(myUserId: myUserId);
     } catch (e) {
       // Non-fatal -- E2EE setup failed, app still works, DMs just won't
       // encrypt until this succeeds on a later launch.
@@ -90,11 +90,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     }
 
     final token = result['token'] as String?;
+    final myUserId = (result['user'] as Map<String, dynamic>?)?['id'] as String?;
     if (token != null) {
       await KodaApi.instance.setToken(token);
       KodaSocket.instance.connect(token);
       // Generate and upload key bundle if not already on server
-      _initKeyBundle();
+      if (myUserId != null) _initKeyBundle(myUserId);
     }
 
     if (result['must_change_password'] == true) {

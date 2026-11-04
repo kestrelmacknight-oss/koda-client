@@ -72,7 +72,7 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
       case 'dm_message':
         final conversationId = message.data['conversation_id'] as String?;
         if (conversationId == null) return;
-        await _syncDmConversation(conversationId);
+        await _syncDmConversation(conversationId, myUserId);
       default:
         return; // not a sync-eligible type -- nothing to do
     }
@@ -97,8 +97,8 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
 /// display payload (attachment metadata, language detection, etc.) --
 /// this handler has nothing to render, only a cache to warm so the UI
 /// path finds it already there.
-Future<void> _syncDmConversation(String conversationId) async {
-  final myDeviceId = await SecureStorage.getOrCreateDeviceId();
+Future<void> _syncDmConversation(String conversationId, String myUserId) async {
+  final myDeviceId = await SecureStorage.getOrCreateDeviceId(myUserId);
   final messages = await KodaApi.instance.getDmMessages(conversationId, myDeviceId);
   for (final m in messages) {
     if (m['encrypted'] != true) continue;
@@ -107,7 +107,7 @@ Future<void> _syncDmConversation(String conversationId) async {
     if (await SecureStorage.getCachedDecryptedContent(cacheKey) != null) continue;
     try {
       final plain = await DmSessionManager.instance
-          .decryptReceived(conversationId: conversationId, message: m);
+          .decryptReceived(conversationId: conversationId, message: m, myUserId: myUserId);
       await SecureStorage.cacheDecryptedContent(cacheKey, plain);
     } catch (_) {
       continue; // one undecryptable message shouldn't block the rest

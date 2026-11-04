@@ -24,7 +24,26 @@
 // while _load() is concurrently caching decrypted messages, for
 // instance), so every call that touches [_storage] below is funneled
 // through [_synchronized] to serialize them -- cheap on every other
-// platform, and the only thing that makes Windows safe.
+// platform, and the only thing that makes Windows safe. Every other
+// platform's backend (Keychain, Keystore-backed EncryptedSharedPreferences,
+// libsecret) already treats each key as its own atomic native call
+// rather than one shared blob, so this specific failure mode is
+// Windows-only -- but the serialization costs nothing elsewhere and
+// closes the door on it regardless of backend.
+//
+// Per-account scoping: key material and the device id are namespaced
+// by [userId] below (loadKeyMaterial, saveKeyMaterial,
+// removeOneTimePrekey, getOrCreateDeviceId) because this app allows
+// signing into a *different* Koda account on the same install (a
+// shared machine, or just switching accounts for testing) without
+// reinstalling. Before this, both lived under one global key with no
+// notion of "whose" -- the second account to ever launch on that
+// install would see the first account's already-generated identity
+// key material, silently adopt it as its own, and publish a server
+// bundle built from a stranger's private key. Every account on a
+// shared install now gets its own slot; _loadKeyMaterialRaw/
+// _loadOrCreateDeviceId below handle the one-time migration for an
+// install that predates this.
 
 import 'dart:async';
 import 'dart:convert';
@@ -39,10 +58,21 @@ const _storage = FlutterSecureStorage(
   aOptions: AndroidOptions(encryptedSharedPreferences: true),
 );
 
-const _keyMaterialKey = 'kcp_key_material_v1';
+// Pre-multi-account-aware keys -- every install before this scoping
+// existed stored its one-and-only key material/device id here, global
+// to the whole install rather than scoped to whichever account was
+// using it. Only ever read now, as a one-time migration source for
+// whichever account first asks after upgrading (see
+// _loadKeyMaterialRaw/_loadOrCreateDeviceId below) -- never written to
+// again.
+const _legacyKeyMaterialKey = 'kcp_key_material_v1';
+const _legacyDeviceIdKey = 'kcp_device_id';
+
+String _keyMaterialKey(String userId) => 'kcp_key_material_v2_$userId';
+String _deviceIdKeyFor(String userId) => 'kcp_device_id_v2_$userId';
+
 const _tokenKey = 'koda_jwt_v1';
 const _userIdKey = 'koda_user_id_v1';
-const _deviceIdKey = 'kcp_device_id';
 
 /// One global queue every storage operation runs through, in order --
 /// see this file's header. Not reentrant: a function running inside
@@ -81,13 +111,28 @@ String _channelEpochsIndexKey(String channelId) => 'kcp_chan_epochs_$channelId';
 /// locked saveKeyMaterial/loadKeyMaterial below and by other functions
 /// here that need to read or write it as one step of their own
 /// [_synchronized] block (removeOneTimePrekey, _loadOrCreateDeviceId).
-Future<void> _saveKeyMaterialRaw(LocalKeyMaterial material) =>
-    _storage.write(key: _keyMaterialKey, value: jsonEncode(SecureStorage._materialToJson(material)));
+Future<void> _saveKeyMaterialRaw(String userId, LocalKeyMaterial material) =>
+    _storage.write(
+        key: _keyMaterialKey(userId), value: jsonEncode(SecureStorage._materialToJson(material)));
 
-Future<LocalKeyMaterial?> _loadKeyMaterialRaw() async {
-  final raw = await _storage.read(key: _keyMaterialKey);
-  if (raw == null) return null;
-  return SecureStorage._materialFromJson(jsonDecode(raw) as Map<String, dynamic>);
+/// [userId] scopes this to one signed-in account -- see this file's
+/// header on why that matters. Falls back to (and migrates) whatever a
+/// pre-scoping install had under the old global key, exactly once: the
+/// first account to read after upgrading adopts it as its own and the
+/// legacy key is deleted, so a second account on the same install
+/// correctly gets "no material yet" and generates its own, rather than
+/// also adopting someone else's.
+Future<LocalKeyMaterial?> _loadKeyMaterialRaw(String userId) async {
+  final raw = await _storage.read(key: _keyMaterialKey(userId));
+  if (raw != null) {
+    return SecureStorage._materialFromJson(jsonDecode(raw) as Map<String, dynamic>);
+  }
+
+  final legacyRaw = await _storage.read(key: _legacyKeyMaterialKey);
+  if (legacyRaw == null) return null;
+  await _storage.write(key: _keyMaterialKey(userId), value: legacyRaw);
+  await _storage.delete(key: _legacyKeyMaterialKey);
+  return SecureStorage._materialFromJson(jsonDecode(legacyRaw) as Map<String, dynamic>);
 }
 
 Future<List<int>> _knownChannelEpochsRaw(String channelId) async {
@@ -127,12 +172,17 @@ class SecureStorage {
       _synchronized(() => _storage.delete(key: _userIdKey));
 
   // ── My own key material (identity, signed prekey, one-time prekeys) ────
+  // [userId] scopes every one of these to one signed-in account -- two
+  // different Koda accounts used on the same install must never share
+  // (or silently clobber) each other's private key material. See this
+  // file's header and _loadKeyMaterialRaw's doc on the one-time
+  // migration for installs that predate this scoping.
 
-  static Future<void> saveKeyMaterial(LocalKeyMaterial material) =>
-      _synchronized(() => _saveKeyMaterialRaw(material));
+  static Future<void> saveKeyMaterial(String userId, LocalKeyMaterial material) =>
+      _synchronized(() => _saveKeyMaterialRaw(userId, material));
 
-  static Future<LocalKeyMaterial?> loadKeyMaterial() =>
-      _synchronized(() => _loadKeyMaterialRaw());
+  static Future<LocalKeyMaterial?> loadKeyMaterial(String userId) =>
+      _synchronized(() => _loadKeyMaterialRaw(userId));
 
   /// Removes one consumed one-time prekey by its public key, mirroring
   /// the server having just popped the matching entry -- keeps the local
@@ -141,15 +191,15 @@ class SecureStorage {
   /// Read-modify-write runs as one locked step so a concurrent key-
   /// material write from elsewhere can't land between the read and the
   /// write here and get silently discarded.
-  static Future<void> removeOneTimePrekey(Uint8List publicKeyBytes) =>
+  static Future<void> removeOneTimePrekey(String userId, Uint8List publicKeyBytes) =>
       _synchronized(() async {
-        final material = await _loadKeyMaterialRaw();
+        final material = await _loadKeyMaterialRaw(userId);
         if (material == null) return;
         final remaining = material.oneTimePrekeys
             .where((k) => bytesToB64(k.publicKeyBytes) != bytesToB64(publicKeyBytes))
             .toList();
         if (remaining.length == material.oneTimePrekeys.length) return;
-        await _saveKeyMaterialRaw(LocalKeyMaterial(
+        await _saveKeyMaterialRaw(userId, LocalKeyMaterial(
           material.identity,
           material.signedPrekey,
           remaining,
@@ -161,43 +211,69 @@ class SecureStorage {
 
   // ── Device identity (multi-device E2EE, see Koda.Devices server-side) ──
 
-  /// A random id generated once per install and never regenerated --
-  /// each device has its own independent X3DH identity keypair (no
-  /// device-linking ceremony exists to transfer one securely between
-  /// devices, so each has to generate its own; see PUSH_NOTIFICATIONS.md-
-  /// style docs on why that's an accepted trade-off, not an oversight).
+  /// A random id generated once per (install, account) and never
+  /// regenerated -- each device has its own independent X3DH identity
+  /// keypair (no device-linking ceremony exists to transfer one
+  /// securely between devices, so each has to generate its own; see
+  /// PUSH_NOTIFICATIONS.md-style docs on why that's an accepted
+  /// trade-off, not an oversight). Scoped per [userId] for the same
+  /// reason key material is -- two different accounts signing into the
+  /// same install are still, correctly, two independent devices as far
+  /// as E2EE is concerned, even though they happen to share one
+  /// physical machine (the server's own key_bundles/devices rows are
+  /// already scoped by (user, device_id), so two accounts coincidentally
+  /// holding the same device_id string causes no collision there).
   ///
-  /// An *existing* single-device install (one that already has local
-  /// key material the first time this runs on the multi-device-aware
-  /// client) deliberately adopts the fixed id "legacy" instead of a
-  /// fresh random one -- matching the server-side migration's backfill
-  /// default for pre-existing key_bundles rows (see
-  /// 20260919000002_add_device_id_to_key_bundles.exs) -- so this
+  /// An *existing* single-account install (one that already has local
+  /// key material, under the old unscoped key, the first time this runs
+  /// on the per-account-aware client) deliberately adopts the fixed id
+  /// "legacy" instead of a fresh random one -- matching the server-side
+  /// migration's backfill default for pre-existing key_bundles rows
+  /// (see 20260919000002_add_device_id_to_key_bundles.exs) -- so this
   /// device's next bundle upload updates that same row instead of
-  /// orphaning it under a brand-new device id. Only a genuinely fresh
-  /// install (no local key material yet) gets a random one.
-  // Memoized so concurrent callers (e.g. ensureMyKeysExist() and
+  /// orphaning it under a brand-new device id. Only the one account
+  /// that migrates that legacy material (see _loadKeyMaterialRaw) ever
+  /// sees hasExistingMaterial true here; a second account added to the
+  /// same install later genuinely has none and gets a fresh random id,
+  /// same as a second account on a brand-new install always did.
+  // Memoized per user so concurrent callers (e.g. ensureMyKeysExist() and
   // encryptForSend()'s self-sync exclusion both call this independently
   // at launch) share one in-flight read-check-write instead of racing
   // it -- and the read-then-write itself now runs as one step of the
   // shared storage queue (see _synchronized), so even a caller outside
   // this memoized Future can't land a write between the read and the
   // write here.
-  static Future<String>? _deviceIdFuture;
+  static final Map<String, Future<String>> _deviceIdFutures = {};
 
-  static Future<String> getOrCreateDeviceId() => _deviceIdFuture ??= _loadOrCreateDeviceId();
+  static Future<String> getOrCreateDeviceId(String userId) =>
+      _deviceIdFutures[userId] ??= _loadOrCreateDeviceId(userId);
 
-  static Future<String> _loadOrCreateDeviceId() => _synchronized(() async {
-        final existing = await _storage.read(key: _deviceIdKey);
+  static Future<String> _loadOrCreateDeviceId(String userId) => _synchronized(() async {
+        final existing = await _storage.read(key: _deviceIdKeyFor(userId));
         if (existing != null) return existing;
 
-        final hasExistingMaterial = await _loadKeyMaterialRaw() != null;
+        // Migration: adopt whatever a pre-scoping install already had
+        // under the old global device id key, for the one account that
+        // also migrates the matching legacy key material (see
+        // _loadKeyMaterialRaw) -- the device id has to follow whichever
+        // key material it was always paired with, not get recomputed
+        // from scratch, or an install that already had a real
+        // (non-"legacy") random id would silently get relabeled and
+        // orphan its existing server-side registration.
+        final legacyDeviceId = await _storage.read(key: _legacyDeviceIdKey);
+        if (legacyDeviceId != null) {
+          await _storage.write(key: _deviceIdKeyFor(userId), value: legacyDeviceId);
+          await _storage.delete(key: _legacyDeviceIdKey);
+          return legacyDeviceId;
+        }
+
+        final hasExistingMaterial = await _loadKeyMaterialRaw(userId) != null;
         // Hex, not base64 -- this id is embedded directly in a URL path
         // segment (DELETE /devices/:device_id) server-side, so it needs to
         // be unambiguously URL-safe with zero encoding questions, not just
         // "safe enough" after stripping a couple of characters.
         final id = hasExistingMaterial ? 'legacy' : _toHex(randomBytes(16));
-        await _storage.write(key: _deviceIdKey, value: id);
+        await _storage.write(key: _deviceIdKeyFor(userId), value: id);
         return id;
       });
 

@@ -251,6 +251,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     if (KodaApi.instance.hasToken) {
       final result = await KodaApi.instance.me();
       if (result.ok && mounted) {
+        final myUserId = result.data!['user']['id'] as String;
         ref.read(authProvider.notifier).setUser(result.data!['user']);
         // Returning to an already-logged-in session (app relaunch with a
         // stored token, no auth_screen involved) -- this is the one
@@ -261,8 +262,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         // succeeds.
         unawaited(() async {
           try {
-            await DmSessionManager.instance.ensureMyKeysExist();
-            await DmSessionManager.instance.rotateSignedPrekeyIfDue();
+            await DmSessionManager.instance.ensureMyKeysExist(myUserId: myUserId);
+            await DmSessionManager.instance.rotateSignedPrekeyIfDue(myUserId: myUserId);
           } catch (_) {}
         }());
         return;
